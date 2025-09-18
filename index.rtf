@@ -1,0 +1,141 @@
+{\rtf1\mac\ansicpg10000\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+<meta charset="UTF-8">\
+<meta name="viewport" content="width=device-width, initial-scale=1.0">\
+<title>MirHollio FTSO Provider</title>\
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">\
+<style>\
+  * \{ margin:0; padding:0; box-sizing:border-box; \}\
+  body \{ font-family:'Inter',sans-serif; background:#0d0d0d; color:#fff; line-height:1.6; \}\
+\
+  a \{ color:#ff6600; text-decoration:none; \}\
+  a:hover \{ color:#ff8533; \}\
+\
+  header \{\
+    min-height:100vh;\
+    display:flex;\
+    flex-direction:column;\
+    justify-content:center;\
+    align-items:center;\
+    text-align:center;\
+    background: linear-gradient(135deg,#1a1a1a,#0d0d0d);\
+    padding:20px;\
+  \}\
+  header h1 \{ font-size:3em; font-weight:700; margin-bottom:15px; \}\
+  header p \{ font-size:1.3em; margin-bottom:30px; max-width:700px; \}\
+  .cta-btn \{\
+    display:inline-block; padding:18px 40px; background:#ff6600; font-weight:600; border-radius:10px;\
+    transition:0.3s ease; animation: pulse 2s infinite;\
+  \}\
+  .cta-btn:hover \{ background:#ff8533; transform: scale(1.05); \}\
+\
+  @keyframes pulse \{\
+    0%,100%\{ transform: scale(1); \}\
+    50% \{ transform: scale(1.05); \}\
+  \}\
+\
+  section \{ padding:80px 20px; max-width:1000px; margin:0 auto; \}\
+  section h2 \{ text-align:center; font-size:2.2em; margin-bottom:40px; color:#ff6600; \}\
+  section p \{ text-align:center; font-size:1.1em; margin-bottom:40px; \}\
+\
+  /* Cards for stats */\
+  .stats \{ display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-top:30px; \}\
+  .card \{ background:#1a1a1a; padding:30px; border-radius:12px; min-width:200px; flex:1 1 200px; text-align:center; transition:0.3s ease; \}\
+  .card:hover \{ background:#222; transform: translateY(-5px); \}\
+  .card h3 \{ font-size:1.5em; margin-bottom:15px; color:#ff6600; \}\
+  .card p \{ font-size:1.2em; \}\
+\
+  /* Feature list */\
+  ul \{ list-style:none; max-width:700px; margin:0 auto; padding:0; \}\
+  ul li \{ position:relative; padding-left:35px; margin:15px 0; font-size:1.1em; \}\
+  ul li:before \{ content:"\uc0\u10004 "; position:absolute; left:0; color:#ff6600; \}\
+\
+  footer \{ text-align:center; padding:40px 20px; background-color:#111; font-size:0.9em; color:#aaa; \}\
+  footer a \{ color:#ff6600; \}\
+\
+  /* Fade-in animation */\
+  .fade-in \{ opacity:0; transform: translateY(30px); transition: all 0.8s ease-out; \}\
+  .fade-in.visible \{ opacity:1; transform: translateY(0); \}\
+</style>\
+</head>\
+<body>\
+\
+<header>\
+  <h1 class="fade-in">MirHollio FTSO Provider</h1>\
+  <p class="fade-in">Reliable, fast, and transparent FTSO signal provider on the Flare Network.</p>\
+  <a href="https://flare.xyz/delegate" class="cta-btn fade-in">Delegate Now</a>\
+</header>\
+\
+<section id="about">\
+  <h2 class="fade-in">Why Delegate to MirHollio?</h2>\
+  <p class="fade-in">Enterprise-grade infrastructure with low-latency and high-accuracy signals ensures you maximize rewards.</p>\
+  <ul class="fade-in">\
+    <li>Redundant servers for maximum uptime</li>\
+    <li>Optimized data feeds for better rewards</li>\
+    <li>Transparent performance \'96 verifiable by community</li>\
+  </ul>\
+</section>\
+\
+<section id="stats">\
+  <h2 class="fade-in">Node Performance & Stats</h2>\
+  <div class="stats">\
+    <div class="card fade-in">\
+      <h3>99.9%</h3>\
+      <p>Uptime</p>\
+    </div>\
+    <div class="card fade-in">\
+      <h3>1.25x</h3>\
+      <p>Delegator Rewards</p>\
+    </div>\
+    <div class="card fade-in">\
+      <h3>500+</h3>\
+      <p>Active Delegators</p>\
+    </div>\
+    <div class="card fade-in">\
+      <h3>100%</h3>\
+      <p>Signal Accuracy</p>\
+    </div>\
+  </div>\
+</section>\
+\
+<section id="contact">\
+  <h2 class="fade-in">Get in Touch</h2>\
+  <p class="fade-in">Questions or partnership inquiries? Reach out to us!</p>\
+  <ul class="fade-in">\
+    <li>Email: <a href="mailto:hello@mirhollio.com">hello@mirhollio.com</a></li>\
+    <li>Twitter/X: <a href="#" target="_blank">Link</a></li>\
+    <li>Discord: <a href="#" target="_blank">Link</a></li>\
+  </ul>\
+</section>\
+\
+<footer>\
+  <p>\'a9 2025 MirHollio FTSO Provider</p>\
+  <p>Built for the Flare Network community</p>\
+</footer>\
+\
+<script>\
+  // Scroll fade-in\
+  const faders = document.querySelectorAll('.fade-in');\
+  const appearOptions = \{ threshold: 0.1 \};\
+  const appearOnScroll = new IntersectionObserver(function(entries, observer)\{\
+    entries.forEach(entry => \{\
+      if(entry.isIntersecting)\{\
+        entry.target.classList.add('visible');\
+        observer.unobserve(entry.target);\
+      \}\
+    \});\
+  \}, appearOptions);\
+  faders.forEach(fader => appearOnScroll.observe(fader));\
+</script>\
+\
+</body>\
+</html>\
+}
