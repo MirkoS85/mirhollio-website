@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSP: Poskusi sprostiti, ampak GitHub mogoce ignorira; ce blokira, deploy na drug host -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://flare-explorer.flare.network https://flare-api.flare.network https://api.allorigins.win https://api.coingecko.com;">
     <title>MirSFlr - Flare Network Live Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
@@ -15,9 +17,7 @@
         th { background-color: #f8f9fa; }
         .loading { text-align: center; color: #666; }
         .error { color: #d93025; text-align: center; }
-        canvas { max-width: 100%; height: 300px; }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Za stake chart -->
 </head>
 <body>
     <div class="container">
@@ -53,7 +53,6 @@
         <div class="section">
             <h2>Stake & Delegations</h2>
             <div id="stake-info" class="loading">Nalagam...</div>
-            <canvas id="stake-chart"></canvas>
         </div>
         
         <!-- Network Activity -->
@@ -65,17 +64,16 @@
 
     <script>
         const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
-        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P'; // P-chain RPC
-        const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url='; // CORS proxy
+        const FLARE_RPC = 'https://flare-api.flare.network/ext/P'; // Popravljeno na /ext/P za P-chain (staking)
+        const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url=';
         const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur';
+        const ATTO = BigInt("1000000000000000000"); // 1e18 za FLR
         
-        let stakeChart; // Za chart
-        
-        // Fetch REST (Blockscout)
+        // Fetch REST
         async function fetchRest(endpoint) {
             try {
                 const response = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
-                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
                 return await response.json();
             } catch (error) {
                 console.error('Blockscout Error:', error);
@@ -83,7 +81,7 @@
             }
         }
         
-        // Fetch RPC (POST za P-chain)
+        // Fetch RPC
         async function fetchRpc(method, params = {}) {
             try {
                 const response = await fetch(FLARE_RPC, {
@@ -96,7 +94,7 @@
                         params: [params]
                     })
                 });
-                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
                 const data = await response.json();
                 if (data.error) throw new Error(data.error.message);
                 return data.result;
@@ -106,18 +104,19 @@
             }
         }
         
-        // Osveži vse
+        // Osveži
         async function updateDashboard() {
             // FLR Price
+            const priceDiv = document.getElementById('flr-price');
             try {
                 const priceResponse = await fetch(COINGECKO_PROXY + encodeURIComponent(COINGECKO_URL));
-                if (!priceResponse.ok) throw new Error('Proxy/CoinGecko error');
+                if (!priceResponse.ok) throw new Error(await priceResponse.text());
                 const priceData = await priceResponse.json();
-                document.getElementById('flr-price').textContent = `${priceData.flare.eur.toFixed(4)} €`;
-                document.getElementById('flr-price').classList.remove('error', 'loading');
+                priceDiv.textContent = `${(priceData.flare?.eur || 0).toFixed(4)} €`;
+                priceDiv.classList.remove('loading');
             } catch (error) {
-                document.getElementById('flr-price').textContent = `Napaka: ${error.message}`;
-                document.getElementById('flr-price').classList.add('error');
+                priceDiv.textContent = `Napaka: ${error.message}`;
+                priceDiv.classList.add('error');
             }
             
             // Transactions
@@ -130,19 +129,19 @@
                 txCounter.classList.add('error');
             } else {
                 txCounter.textContent = `${statsData.transactions_today || 'N/A'} (24h)`;
-                txCounter.classList.remove('error', 'loading');
+                txCounter.classList.remove('loading');
                 txTable.innerHTML = (txData.items || []).map(tx => `
                     <tr>
-                        <td>${tx.hash.slice(0,10)}...</td>
-                        <td>${tx.from.hash.slice(0,10)}...</td>
+                        <td>${(tx.hash || '').slice(0,10)}...</td>
+                        <td>${(tx.from?.hash || '').slice(0,10)}...</td>
                         <td>${tx.to ? tx.to.hash.slice(0,10)+'...' : 'Contract'}</td>
-                        <td>${tx.value ? (BigInt(tx.value) / BigInt(1e18n)).toString() + ' FLR' : '0'}</td>
+                        <td>${tx.value ? (Number(BigInt(tx.value) / ATTO)).toFixed(2) + ' FLR' : '0'}</td>
                     </tr>
                 `).join('');
             }
             
-            // Active Validators (RPC: platform.getCurrentValidators)
-            const validatorsData = await fetchRpc('platform.getCurrentValidators', { subnetID: null });
+            // Active Validators
+            const validatorsData = await fetchRpc('platform.getCurrentValidators', { subnetID: '0x01' }); // subnetID za Primary network
             const valTable = document.querySelector('#validators-table tbody');
             const valCounter = document.getElementById('validators-counter');
             if (validatorsData.error) {
@@ -151,52 +150,34 @@
             } else {
                 const validators = validatorsData.validators || [];
                 valCounter.textContent = `Aktivnih: ${validators.length}`;
-                valCounter.classList.remove('error', 'loading');
+                valCounter.classList.remove('loading');
                 valTable.innerHTML = validators.slice(0,20).map(val => `
                     <tr>
-                        <td>${val.nodeID.slice(0,10)}...</td>
-                        <td>${(BigInt(val.stakeAmount) / BigInt(1e18n)).toString()} FLR</td>
-                        <td>${(BigInt(val.delegatedAmount) / BigInt(1e18n)).toString()} FLR</td>
+                        <td>${(val.nodeID || '').slice(0,10)}...</td>
+                        <td>${val.stakeAmount ? (Number(BigInt(val.stakeAmount) / ATTO)).toFixed(0) + ' FLR' : 'N/A'}</td>
+                        <td>${val.delegatedAmount ? (Number(BigInt(val.delegatedAmount) / ATTO)).toFixed(0) + ' FLR' : '0'}</td>
                         <td>Aktiven</td>
                     </tr>
                 `).join('');
             }
             
-            // Stake / Delegations (RPC: platform.getTotalStake + validators za porazdelitev)
-            const totalStakeData = await fetchRpc('platform.getTotalStake');
+            // Stake / Delegations
+            const totalStakeData = await fetchRpc('platform.getTotalStake', { subnetID: '0x01' });
             const stakeDiv = document.getElementById('stake-info');
             if (totalStakeData.error) {
                 stakeDiv.textContent = `Napaka: ${totalStakeData.error}`;
                 stakeDiv.classList.add('error');
             } else {
-                const totalStake = BigInt(totalStakeData.stakeAmount) / BigInt(1e18n);
-                const totalDelegated = (validatorsData.validators || []).reduce((sum, val) => sum + BigInt(val.delegatedAmount), 0n) / BigInt(1e18n);
+                const totalStake = totalStakeData.stakeAmount ? Number(BigInt(totalStakeData.stakeAmount) / ATTO) : 0;
+                const totalDelegated = (validatorsData.validators || []).reduce((sum, val) => sum + (val.delegatedAmount ? Number(BigInt(val.delegatedAmount) / ATTO) : 0), 0);
                 stakeDiv.innerHTML = `
-                    <p>Total Stake: ${totalStake.toString()} FLR</p>
-                    <p>Total Delegations: ${totalDelegated.toString()} FLR</p>
+                    <p>Total Stake: ${totalStake.toFixed(0)} FLR</p>
+                    <p>Total Delegations: ${totalDelegated.toFixed(0)} FLR</p>
                 `;
-                stakeDiv.classList.remove('loading', 'error');
-                
-                // Chart porazdelitve (top 5 validators po total stake)
-                const sortedValidators = (validatorsData.validators || []).sort((a, b) => 
-                    (BigInt(b.stakeAmount) + BigInt(b.delegatedAmount)) - (BigInt(a.stakeAmount) + BigInt(a.delegatedAmount))
-                ).slice(0, 5);
-                const chartCtx = document.getElementById('stake-chart').getContext('2d');
-                if (stakeChart) stakeChart.destroy();
-                stakeChart = new Chart(chartCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: sortedValidators.map(v => v.nodeID.slice(0,6)+'...'),
-                        datasets: [{
-                            data: sortedValidators.map(v => (BigInt(v.stakeAmount) + BigInt(v.delegatedAmount)) / BigInt(1e18n)),
-                            backgroundColor: ['#1a73e8', '#0f9d58', '#db4437', '#f4b400', '#ab47bc']
-                        }]
-                    },
-                    options: { responsive: true, plugins: { legend: { position: 'top' } } }
-                });
+                stakeDiv.classList.remove('loading');
             }
             
-            // Network Activity (zadnjih 10 dni: approx z blocks)
+            // Network Activity
             const blocksData = await fetchRest('/blocks?limit=100');
             const activityDiv = document.getElementById('activity-info');
             if (blocksData.error) {
@@ -205,9 +186,8 @@
             } else {
                 const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
                 const recentBlocks = (blocksData.items || []).filter(block => new Date(block.timestamp).getTime() > tenDaysAgo);
-                // Dnevni count (group by day)
                 const dailyCounts = recentBlocks.reduce((acc, block) => {
-                    const day = new Date(block.timestamp).toLocaleDateString();
+                    const day = new Date(block.timestamp).toLocaleDateString('sl-SI');
                     acc[day] = (acc[day] || 0) + 1;
                     return acc;
                 }, {});
@@ -216,7 +196,6 @@
             }
         }
         
-        // Inicialno in osveževanje
         updateDashboard();
         setInterval(updateDashboard, 30000);
     </script>
