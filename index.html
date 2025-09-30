@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
-  --bg-dark:#0a1a2f; --bg-dark2:#0a1a2f; --text-light:#fff;
+  --bg-dark:#0a1a2f; #000:#0a1a2f; --text-light:#fff;
   --flare-pink:#ff007f; --accent-blue:#1e90ff; --card-bg:#000;
 }
 body {
@@ -19,11 +19,11 @@ body {
   transition:0.4s;
 }
 /* Navbar */
-.navbar { display:flex; justify-content:center; gap:20px; background:var(--bg-dark2); padding:0.5rem 0; position:fixed; top:0; width:100%; z-index:5;}
+.navbar { display:flex; justify-content:center; gap:20px; background:var(#000); padding:0.5rem 0; position:fixed; top:0; width:100%; z-index:5;}
 .navbar a, .dropdown-btn { color:var(--flare-pink); text-decoration:none; font-weight:bold; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; display:flex; align-items:center;}
 .navbar a:hover, .dropdown-btn:hover { background:var(--accent-blue); color:#fff; }
 .dropdown { position:relative; display:inline-block; }
-.dropdown-content { display:none; position:absolute; background:var(--bg-dark2); min-width:220px; max-width:300px; padding:10px 0; box-shadow:0 12px 24px rgba(0,0,0,0.4); z-index:10; border-radius:12px;}
+.dropdown-content { display:none; position:absolute; background:var(#000); min-width:220px; max-width:300px; padding:10px 0; box-shadow:0 12px 24px rgba(0,0,0,0.4); z-index:10; border-radius:12px;}
 .dropdown-content a { color:var(--flare-pink); padding:12px 20px; text-decoration:none; display:block; }
 .dropdown-content a:hover { background:var(--accent-blue); color:#fff; }
 .dropdown:hover .dropdown-content { display:block; }
