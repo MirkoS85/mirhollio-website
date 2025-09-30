@@ -85,7 +85,7 @@
 <div class="section">
     <div class="metric-left">
         <h2>Network Activity (zadnjih 10 dni)</h2>
-        <div class="activity-text">Bloki na Flare C-Chain (EVM del mreže) – kaže transakcijsko aktivnost (block time ~2s; več blokov = višja throughput). Vir: Flare Explorer API.</div>
+        <div class="activity-text">Število blokov na dan in transakcije (zadnjih 10 dni) – višje število blokov pomeni večjo aktivnost mreže.</div>
         <div id="activity-info" class="loading">Nalagam...</div>
     </div>
     <div class="metric-right">
@@ -101,89 +101,70 @@ const ATTO = 1e18;
 
 let validatorsChart, stakeChart, activityChart;
 
-// --- Price Cache ---
-function getCachedPrice() {
-    const cached = localStorage.getItem('flrPrice');
-    if(cached){
-        const { value, timestamp } = JSON.parse(cached);
-        if(Date.now() - timestamp < 300000) return value;
-    }
-    return null;
-}
-function setCachedPrice(value) {
-    localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
+// --- Price with proxy ---
+async function fetchPrice(){
+    try{
+        const proxy = 'https://api.allorigins.win/raw?url=';
+        const url = encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
+        const data = await (await fetch(proxy+url)).json();
+        return (data.flare?.eur || 0).toFixed(4);
+    } catch(e){ console.error(e); return null; }
 }
 
 // --- Fetch REST ---
-async function fetchRest(endpoint) {
-    try {
+async function fetchRest(endpoint){
+    try{
         const resp = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
         if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
         return await resp.json();
-    } catch(e){
-        console.error('REST error:', e);
-        return { error: e.message };
-    }
+    } catch(e){ console.error('REST error',e); return {error:e.message}; }
 }
 
 // --- Fetch RPC ---
 async function fetchRpc(method){
-    try {
-        const resp = await fetch(FLARE_RPC, {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params:[] })
+    try{
+        const resp = await fetch(FLARE_RPC,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({jsonrpc:'2.0',id:1,method,params:[]})
         });
         if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         if(data.error) throw new Error(data.error.message);
         return data.result;
-    } catch(e){
-        console.error('RPC error:', e);
-        return { error: e.message };
-    }
+    } catch(e){ console.error('RPC error',e); return {error:e.message}; }
 }
 
 // --- Update Dashboard ---
 async function updateDashboard(){
     // --- FLR Price ---
     const priceDiv = document.getElementById('flr-price');
-    let price = getCachedPrice();
-    if(price){
-        priceDiv.innerHTML = `<span>${price} €</span>`;
-        priceDiv.classList.remove('loading');
-    }
-    try{
-        const data = await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur')).json();
-        price = (data.flare?.eur || 0).toFixed(4);
-        priceDiv.innerHTML = `<span>${price} €</span>`;
-        setCachedPrice(price);
-        priceDiv.classList.remove('loading');
-    } catch(e){
-        priceDiv.innerHTML = `<span class="no-data">Ni podatkov</span>`;
-    }
+    const price = await fetchPrice();
+    if(price) priceDiv.innerHTML = `<span>${price} €</span>`;
+    else priceDiv.innerHTML = `<span class="no-data">Ni podatkov</span>`;
+    priceDiv.classList.remove('loading');
 
     // --- Transactions ---
-    const statsData = await fetchRest('/stats');
+    const stats = await fetchRest('/stats');
     const txData = await fetchRest('/transactions?limit=100');
     const txTable = document.querySelector('#tx-table tbody');
     const txCounter = document.getElementById('tx-counter');
     const txDetails = document.getElementById('tx-details');
-    if(statsData.error || txData.error || !txData.items){
+
+    if(stats.error || txData.error || !txData.items){
         txCounter.innerHTML = `<span class="error">Ni podatkov</span>`;
         txDetails.classList.add('hidden');
     } else {
-        const tx24h = statsData.transactions_today || statsData.result?.transactions_today || 0;
+        const tx24h = stats.transactions_today || stats.result?.transactions_today || 0;
         txCounter.innerHTML = `<span>${tx24h.toLocaleString()}</span> (24h)`;
         txCounter.classList.remove('loading');
-        txTable.innerHTML = (txData.items.slice(0,10) || []).map(tx => `
+        txTable.innerHTML = txData.items.slice(0,100).map(tx=>`
             <tr>
                 <td>${(tx.hash||'').slice(0,10)}...</td>
-                <td>${(typeof tx.from==='string' ? tx.from.slice(0,10) : tx.from?.hash?.slice(0,10)) || ''}...</td>
-                <td>${(typeof tx.to==='string' ? tx.to.slice(0,10) : tx.to?.hash?.slice(0,10)) || 'Contract'}...</td>
-                <td>${tx.value ? (Number(tx.value)/ATTO).toFixed(4)+' FLR':'0'}</td>
-            </tr>
-        `).join('');
+                <td>${(typeof tx.from==='string'?tx.from.slice(0,10):tx.from?.hash?.slice(0,10))||''}...</td>
+                <td>${(typeof tx.to==='string'?tx.to.slice(0,10):tx.to?.hash?.slice(0,10))||'Contract'}...</td>
+                <td>${tx.value? (Number(tx.value)/ATTO).toFixed(4)+' FLR':'0'}</td>
+            </tr>`).join('');
         txDetails.classList.remove('hidden');
     }
 
@@ -204,50 +185,44 @@ async function updateDashboard(){
         valTable.innerHTML = validators.slice(0,5).map(v=>`
             <tr>
                 <td>${v.nodeID.slice(0,10)}...</td>
-                <td>${v.stakeAmount ? (Number(v.stakeAmount)/ATTO).toFixed(4):'N/A'}</td>
-                <td>${v.delegatedAmount ? (Number(v.delegatedAmount)/ATTO).toFixed(4):'0'}</td>
+                <td>${v.stakeAmount? (Number(v.stakeAmount)/ATTO).toFixed(4):'0'}</td>
+                <td>${v.delegatedAmount? (Number(v.delegatedAmount)/ATTO).toFixed(4):'0'}</td>
                 <td>Aktiven</td>
-            </tr>
-        `).join('');
+            </tr>`).join('');
         const sorted = validators.sort((a,b)=>Number(b.stakeAmount||0)-Number(a.stakeAmount||0)).slice(0,5);
         if(validatorsChart) validatorsChart.destroy();
         validatorsChart = new Chart(valChartCtx,{
             type:'bar',
-            data:{
-                labels: sorted.map(v=>v.nodeID.slice(0,6)+'...'),
-                datasets:[{label:'Stake (FLR)', data:sorted.map(v=>Number(v.stakeAmount||0)/ATTO), backgroundColor:'#1a73e8'}]
-            },
-            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+            data:{labels:sorted.map(v=>v.nodeID.slice(0,6)+'...'),datasets:[{label:'Stake (FLR)',data:sorted.map(v=>Number(v.stakeAmount||0)/ATTO),backgroundColor:'#1a73e8'}]},
+            options:{responsive:true,scales:{y:{beginAtZero:true}}}
         });
     }
 
-    // --- Stake / Delegations ---
+    // --- Stake & Delegations ---
     const totalStakeData = await fetchRpc('platform.getTotalStake');
     const stakeDiv = document.getElementById('stake-info');
     const stakeChartCtx = document.getElementById('stake-chart').getContext('2d');
-    let totalDelegated = 0;
-    if(!validatorsData.error && validatorsData.validators){
-        totalDelegated = validatorsData.validators.reduce((sum,v)=>sum+(v.delegatedAmount?Number(v.delegatedAmount)/ATTO:0),0);
-    }
+    let totalDelegated = validatorsData.validators? validatorsData.validators.reduce((sum,v)=>sum+(v.delegatedAmount?Number(v.delegatedAmount)/ATTO:0),0):0;
     if(totalStakeData.error){
         stakeDiv.innerHTML = `<p class="no-data">Ni podatkov (stake: 0 FLR, delegations: 0 FLR)</p>`;
         if(stakeChart) stakeChart.destroy();
     } else {
-        const totalStake = totalStakeData.stakeAmount ? Number(totalStakeData.stakeAmount)/ATTO:0;
+        const totalStake = totalStakeData.stakeAmount? Number(totalStakeData.stakeAmount)/ATTO:0;
         stakeDiv.innerHTML = `<p>Total Stake: ${totalStake.toFixed(4)} FLR</p><p>Total Delegations: ${totalDelegated.toFixed(4)} FLR</p>`;
         stakeDiv.classList.remove('loading');
         if(stakeChart) stakeChart.destroy();
         stakeChart = new Chart(stakeChartCtx,{
             type:'pie',
-            data:{labels:['Total Stake','Total Delegations'], datasets:[{data:[totalStake,totalDelegated], backgroundColor:['#1a73e8','#0f9d58']}]},
+            data:{labels:['Total Stake','Total Delegations'],datasets:[{data:[totalStake,totalDelegated],backgroundColor:['#1a73e8','#0f9d58']}]},
             options:{responsive:true}
         });
     }
 
     // --- Network Activity ---
-    const blocksData = await fetchRest('/blocks?limit=1000');
+    const blocksData = await fetchRest('/blocks?limit=5000');
     const activityDiv = document.getElementById('activity-info');
     const activityChartCtx = document.getElementById('activity-chart').getContext('2d');
+
     if(blocksData.error || !blocksData.items){
         activityDiv.innerHTML = `<p class="no-data">Ni podatkov</p>`;
         if(activityChart) activityChart.destroy();
@@ -256,22 +231,27 @@ async function updateDashboard(){
         const recentBlocks = blocksData.items.filter(b=>new Date(b.timestamp)>tenDaysAgo);
         const dailyCounts = recentBlocks.reduce((acc,b)=>{
             const day = new Date(b.timestamp).toLocaleDateString('sl-SI');
-            acc[day] = (acc[day]||0)+1;
+            acc[day] = acc[day]?{blocks:acc[day].blocks+1,tx:(acc[day].tx||0)+(b.transactions?.length||0)}:{blocks:1,tx:b.transactions?.length||0};
             return acc;
         },{});
-        activityDiv.innerHTML = Object.entries(dailyCounts).sort(([a],[b])=>new Date(b)-new Date(a)).map(([d,c])=>`<p>${d}: ${c.toLocaleString()} blokov</p>`).join('')||'<p class="no-data">Ni aktivnosti</p>';
+        activityDiv.innerHTML = Object.entries(dailyCounts).sort(([a],[b])=>new Date(b)-new Date(a))
+            .map(([d,v])=>`<p>${d}: ${v.blocks.toLocaleString()} blokov, ${v.tx.toLocaleString()} transakcij</p>`).join('')||'<p class="no-data">Ni aktivnosti</p>';
         activityDiv.classList.remove('loading');
-        const days = Object.keys(dailyCounts).sort().reverse().slice(0,10);
+
+        const days = Object.keys(dailyCounts).sort().slice(-10);
         if(activityChart) activityChart.destroy();
         activityChart = new Chart(activityChartCtx,{
             type:'line',
-            data:{labels:days,datasets:[{label:'Bloki na dan', data:days.map(d=>dailyCounts[d]), borderColor:'#1a73e8', fill:false}]},
-            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+            data:{
+                labels:days,
+                datasets:[{label:'Bloki na dan',data:days.map(d=>dailyCounts[d].blocks),borderColor:'#1a73e8',fill:false}]
+            },
+            options:{responsive:true,scales:{y:{beginAtZero:true}}}
         });
     }
 }
 
-// --- Initial Load + Refresh every 30s ---
+// --- Initial load + refresh ---
 updateDashboard();
 setInterval(updateDashboard,30000);
 </script>
