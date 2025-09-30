@@ -1,301 +1,279 @@
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirSFlr - Flare Network Live Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { text-align: center; color: #1a73e8; }
-        .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; }
-        .metric-left { width: 48%; }
-        .metric-right { width: 48%; text-align: center; }
-        .counter { font-size: 2em; font-weight: bold; color: #1a73e8; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-size: 0.85em; }
-        th { background-color: #f8f9fa; }
-        .loading { text-align: center; color: #666; }
-        .error { color: #d93025; text-align: center; }
-        .no-data { text-align: center; color: #999; font-style: italic; }
-        details { margin-top: 10px; width: 100%; }
-        summary { cursor: pointer; font-weight: bold; color: #1a73e8; }
-        .activity-text { font-size: 0.9em; color: #666; margin-bottom: 10px; width: 100%; }
-        canvas { max-width: 100%; height: 250px; display: block; }
-        .hidden { display: none; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MirSFlr - Flare Network Live Dashboard</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; color: #1a73e8; }
+    .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; }
+    .metric-left { width: 48%; }
+    .metric-right { width: 48%; text-align: center; }
+    .counter { font-size: 2em; font-weight: bold; color: #1a73e8; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-size: 0.85em; }
+    th { background-color: #f8f9fa; }
+    .loading { text-align: center; color: #666; }
+    .error { color: #d93025; text-align: center; }
+    .no-data { text-align: center; color: #999; font-style: italic; }
+    details { margin-top: 10px; width: 100%; }
+    summary { cursor: pointer; font-weight: bold; color: #1a73e8; }
+    .activity-text { font-size: 0.9em; color: #666; margin-bottom: 10px; width: 100%; }
+    canvas { max-width: 100%; height: 250px; display: block; }
+    .hidden { display: none; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>🔥 MirSFlr - Flare Network Live Podatki</h1>
-        
-        <!-- FLR Price -->
-        <div class="section">
-            <div class="metric-left">
-                <h2>FLR Token Price (EUR)</h2>
-                <div id="flr-price" class="counter loading">Nalagam...</div>
-            </div>
-            <div class="metric-right"></div>
-        </div>
-        
-        <!-- Transactions -->
-        <div class="section">
-            <div class="metric-left">
-                <h2>Transakcije (24h)</h2>
-                <div id="tx-counter" class="counter loading">Nalagam...</div>
-                <details id="tx-details">
-                    <summary>Razširi zadnjih 100 transakcij</summary>
-                    <table id="tx-table">
-                        <thead><tr><th>Hash</th><th>Od</th><th>Do</th><th>Vrednost (FLR)</th></tr></thead>
-                        <tbody></tbody>
-                    </table>
-                </details>
-            </div>
-            <div class="metric-right"></div>
-        </div>
-        
-        <!-- Active Validators -->
-        <div class="section">
-            <div class="metric-left">
-                <h2>Aktivni Validatorji</h2>
-                <div id="validators-counter" class="counter loading">Nalagam...</div>
-                <table id="validators-table">
-                    <thead><tr><th>Node ID</th><th>Stake (FLR)</th><th>Delegated (FLR)</th><th>Status</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <div class="metric-right">
-                <canvas id="validators-chart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Stake / Delegations -->
-        <div class="section">
-            <div class="metric-left">
-                <h2>Stake & Delegations</h2>
-                <div id="stake-info" class="loading">Nalagam...</div>
-            </div>
-            <div class="metric-right">
-                <canvas id="stake-chart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Network Activity -->
-        <div class="section">
-            <div class="metric-left">
-                <h2>Network Activity (zadnjih 10 dni)</h2>
-                <div class="activity-text">Bloki na Flare C-Chain (EVM del mreže) – kaže transakcijsko aktivnost (block time ~2s; več blokov = višja throughput). Vir: Flare Explorer API.</div>
-                <div id="activity-info" class="loading">Nalagam...</div>
-            </div>
-            <div class="metric-right">
-                <canvas id="activity-chart"></canvas>
-            </div>
-        </div>
-    </div>
+<div class="container">
+<h1>🔥 MirSFlr - Flare Network Live Podatki</h1>
 
-    <script>
-        const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
-        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P';
-        const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url=';
-        const COINGECKO_URL = encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
-        const ATTO = BigInt("1000000000000000000");
-        
-        let validatorsChart, stakeChart, activityChart;
-        
-        // Cache za price
-        function getCachedPrice() {
-            const cached = localStorage.getItem('flrPrice');
-            if (cached) {
-                const { value, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp < 300000) return value;
-            }
-            return null;
-        }
-        function setCachedPrice(value) {
-            localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
-        }
-        
-        // Fetch REST (v2)
-        async function fetchRest(endpoint) {
-            try {
-                const response = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                console.error('Blockscout Error:', error);
-                return { error: error.message };
-            }
-        }
-        
-        // Fetch RPC
-        async function fetchRpc(method) {
-            try {
-                const response = await fetch(FLARE_RPC, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method: method,
-                        params: []
-                    })
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-                return data.result;
-            } catch (error) {
-                console.error('RPC Error:', error);
-                return { error: error.message };
-            }
-        }
-        
-        // Osveži
-        async function updateDashboard() {
-            // FLR Price
-            const priceDiv = document.getElementById('flr-price');
-            let price = getCachedPrice();
-            if (price) {
-                priceDiv.innerHTML = `<span>${price} €</span>`;
-                priceDiv.classList.remove('loading');
-            }
-            try {
-                const priceResponse = await fetch(COINGECKO_PROXY + COINGECKO_URL);
-                if (!priceResponse.ok) throw new Error('Proxy error');
-                const priceData = await priceResponse.json();
-                price = (priceData.flare?.eur || 0).toFixed(4);
-                priceDiv.innerHTML = `<span>${price} €</span>`;
-                setCachedPrice(price);
-                priceDiv.classList.remove('loading');
-            } catch (error) {
-                priceDiv.innerHTML = `<span class="no-data">Ni podatkov</span>`;
-            }
-            
-            // Transactions
-            const statsData = await fetchRest('/stats');
-            const txData = await fetchRest('/transactions?limit=100');
-            const txTable = document.querySelector('#tx-table tbody');
-            const txCounter = document.getElementById('tx-counter');
-            const txDetails = document.getElementById('tx-details');
-            if (statsData.error || txData.error || !txData.items) {
-                txCounter.innerHTML = `<span class="error">Napaka ali ni podatkov</span>`;
-                txDetails.classList.add('hidden');
-            } else {
-                const tx24h = statsData.transactions_today || statsData.result?.transactions_today || 'N/A';
-                txCounter.innerHTML = `<span>${tx24h.toLocaleString()}</span> (24h)`;
-                txCounter.classList.remove('loading');
-                txTable.innerHTML = (txData.items.slice(0,10) || []).map(tx => `
-                    <tr>
-                        <td>${(tx.hash || '').slice(0,10)}...</td>
-                        <td>${(tx.from?.hash || '').slice(0,10)}...</td>
-                        <td>${tx.to?.hash ? tx.to.hash.slice(0,10)+'...' : 'Contract'}</td>
-                        <td>${tx.value ? (Number(BigInt(tx.value) / ATTO)).toFixed(4) + ' FLR' : '0'}</td>
-                    </tr>
-                `).join('');
-                txDetails.classList.remove('hidden');
-            }
-            
-            // Active Validators
-            const validatorsData = await fetchRpc('platform.getCurrentValidators');
-            const valTable = document.querySelector('#validators-table tbody');
-            const valCounter = document.getElementById('validators-counter');
-            const valChartCtx = document.getElementById('validators-chart');
-            const valChart = document.getElementById('validators-chart');
-            if (validatorsData.error || !validatorsData.validators) {
-                valCounter.innerHTML = `<span class="error">Napaka ali ni podatkov</span>`;
-                valTable.innerHTML = '<tr><td colspan="4" class="no-data">Ni validatorjev</td></tr>';
-                valChart.classList.add('hidden');
-            } else {
-                const validators = validatorsData.validators;
-                valCounter.innerHTML = `<span>${validators.length}</span> aktivnih`;
-                valCounter.classList.remove('loading');
-                valTable.innerHTML = validators.slice(0,5).map(val => `
-                    <tr>
-                        <td>${(val.nodeID || '').slice(0,10)}...</td>
-                        <td>${val.stakeAmount ? (Number(BigInt(val.stakeAmount) / ATTO)).toFixed(4) + ' FLR' : 'N/A'}</td>
-                        <td>${val.delegatedAmount ? (Number(BigInt(val.delegatedAmount) / ATTO)).toFixed(4) + ' FLR' : '0'}</td>
-                        <td>Aktiven</td>
-                    </tr>
-                `).join('');
-                const sortedVal = validators.sort((a,b) => Number(BigInt(b.stakeAmount || 0)) - Number(BigInt(a.stakeAmount || 0))).slice(0,5);
-                if (validatorsChart) validatorsChart.destroy();
-                validatorsChart = new Chart(valChartCtx.getContext('2d'), {
-                    type: 'bar',
-                    data: {
-                        labels: sortedVal.map(v => v.nodeID.slice(0,6)+'...'),
-                        datasets: [{ label: 'Stake (FLR)', data: sortedVal.map(v => Number(BigInt(v.stakeAmount || 0) / ATTO)), backgroundColor: '#1a73e8' }]
-                    },
-                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-                });
-                valChart.classList.remove('hidden');
-            }
-            
-            // Stake / Delegations
-            const totalStakeData = await fetchRpc('platform.getTotalStake');
-            const stakeDiv = document.getElementById('stake-info');
-            const stakeChartCtx = document.getElementById('stake-chart');
-            const stakeChartEl = document.getElementById('stake-chart');
-            let totalDelegated = 0;
-            if (!validatorsData.error && validatorsData.validators) {
-                totalDelegated = validatorsData.validators.reduce((sum, val) => sum + (val.delegatedAmount ? Number(BigInt(val.delegatedAmount) / ATTO) : 0), 0);
-            }
-            if (totalStakeData.error) {
-                stakeDiv.innerHTML = `<p class="no-data">Ni podatkov (stake: 0 FLR, delegations: 0 FLR)</p>`;
-                stakeChartEl.classList.add('hidden');
-            } else {
-                const totalStake = totalStakeData.stakeAmount ? Number(BigInt(totalStakeData.stakeAmount) / ATTO) : 0;
-                stakeDiv.innerHTML = `
-                    <p>Total Stake: ${totalStake.toFixed(4)} FLR</p>
-                    <p>Total Delegations: ${totalDelegated.toFixed(4)} FLR</p>
-                `;
-                stakeDiv.classList.remove('loading');
-                if (stakeChart) stakeChart.destroy();
-                stakeChart = new Chart(stakeChartCtx.getContext('2d'), {
-                    type: 'pie',
-                    data: {
-                        labels: ['Total Stake', 'Total Delegations'],
-                        datasets: [{ data: [totalStake, totalDelegated], backgroundColor: ['#1a73e8', '#0f9d58'] }]
-                    },
-                    options: { responsive: true }
-                });
-                stakeChartEl.classList.remove('hidden');
-            }
-            
-            // Network Activity (ISO timestamp)
-            const blocksData = await fetchRest('/blocks?limit=1000');
-            const activityDiv = document.getElementById('activity-info');
-            const activityChartCtx = document.getElementById('activity-chart');
-            const activityChartEl = document.getElementById('activity-chart');
-            if (blocksData.error || !blocksData.items) {
-                activityDiv.innerHTML = `<p class="no-data">Ni podatkov</p>`;
-                activityChartEl.classList.add('hidden');
-            } else {
-                const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
-                const recentBlocks = blocksData.items.filter(block => new Date(block.timestamp) > tenDaysAgo);
-                const dailyCounts = recentBlocks.reduce((acc, block) => {
-                    const day = new Date(block.timestamp).toLocaleDateString('sl-SI');
-                    acc[day] = (acc[day] || 0) + 1;
-                    return acc;
-                }, {});
-                activityDiv.innerHTML = Object.entries(dailyCounts).sort(([a],[b]) => new Date(b) - new Date(a)).map(([day, count]) => `<p>${day}: ${count.toLocaleString()} blokov</p>`).join('') || '<p class="no-data">Ni aktivnosti</p>';
-                activityDiv.classList.remove('loading');
-                const days = Object.keys(dailyCounts).sort().reverse().slice(0,10);
-                if (activityChart) activityChart.destroy();
-                activityChart = new Chart(activityChartCtx.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: days,
-                        datasets: [{ label: 'Bloki na dan', data: days.map(d => dailyCounts[d]), borderColor: '#1a73e8', fill: false }]
-                    },
-                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
-                });
-                activityChartEl.classList.remove('hidden');
-            }
-        }
-        
-        updateDashboard();
-        setInterval(updateDashboard, 30000);
-    </script>
+<!-- FLR Price -->
+<div class="section">
+    <div class="metric-left">
+        <h2>FLR Token Price (EUR)</h2>
+        <div id="flr-price" class="counter loading">Nalagam...</div>
+    </div>
+    <div class="metric-right"></div>
+</div>
+
+<!-- Transactions -->
+<div class="section">
+    <div class="metric-left">
+        <h2>Transakcije (24h)</h2>
+        <div id="tx-counter" class="counter loading">Nalagam...</div>
+        <details id="tx-details">
+            <summary>Razširi zadnjih 100 transakcij</summary>
+            <table id="tx-table">
+                <thead><tr><th>Hash</th><th>Od</th><th>Do</th><th>Vrednost (FLR)</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </details>
+    </div>
+    <div class="metric-right"></div>
+</div>
+
+<!-- Active Validators -->
+<div class="section">
+    <div class="metric-left">
+        <h2>Aktivni Validatorji</h2>
+        <div id="validators-counter" class="counter loading">Nalagam...</div>
+        <table id="validators-table">
+            <thead><tr><th>Node ID</th><th>Stake (FLR)</th><th>Delegated (FLR)</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="metric-right">
+        <canvas id="validators-chart"></canvas>
+    </div>
+</div>
+
+<!-- Stake / Delegations -->
+<div class="section">
+    <div class="metric-left">
+        <h2>Stake & Delegations</h2>
+        <div id="stake-info" class="loading">Nalagam...</div>
+    </div>
+    <div class="metric-right">
+        <canvas id="stake-chart"></canvas>
+    </div>
+</div>
+
+<!-- Network Activity -->
+<div class="section">
+    <div class="metric-left">
+        <h2>Network Activity (zadnjih 10 dni)</h2>
+        <div class="activity-text">Bloki na Flare C-Chain (EVM del mreže) – kaže transakcijsko aktivnost (block time ~2s; več blokov = višja throughput). Vir: Flare Explorer API.</div>
+        <div id="activity-info" class="loading">Nalagam...</div>
+    </div>
+    <div class="metric-right">
+        <canvas id="activity-chart"></canvas>
+    </div>
+</div>
+</div>
+
+<script>
+const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
+const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P';
+const ATTO = 1e18;
+
+let validatorsChart, stakeChart, activityChart;
+
+// --- Price Cache ---
+function getCachedPrice() {
+    const cached = localStorage.getItem('flrPrice');
+    if(cached){
+        const { value, timestamp } = JSON.parse(cached);
+        if(Date.now() - timestamp < 300000) return value;
+    }
+    return null;
+}
+function setCachedPrice(value) {
+    localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
+}
+
+// --- Fetch REST ---
+async function fetchRest(endpoint) {
+    try {
+        const resp = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
+        if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return await resp.json();
+    } catch(e){
+        console.error('REST error:', e);
+        return { error: e.message };
+    }
+}
+
+// --- Fetch RPC ---
+async function fetchRpc(method){
+    try {
+        const resp = await fetch(FLARE_RPC, {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params:[] })
+        });
+        if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        if(data.error) throw new Error(data.error.message);
+        return data.result;
+    } catch(e){
+        console.error('RPC error:', e);
+        return { error: e.message };
+    }
+}
+
+// --- Update Dashboard ---
+async function updateDashboard(){
+    // --- FLR Price ---
+    const priceDiv = document.getElementById('flr-price');
+    let price = getCachedPrice();
+    if(price){
+        priceDiv.innerHTML = `<span>${price} €</span>`;
+        priceDiv.classList.remove('loading');
+    }
+    try{
+        const data = await (await fetch('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur')).json();
+        price = (data.flare?.eur || 0).toFixed(4);
+        priceDiv.innerHTML = `<span>${price} €</span>`;
+        setCachedPrice(price);
+        priceDiv.classList.remove('loading');
+    } catch(e){
+        priceDiv.innerHTML = `<span class="no-data">Ni podatkov</span>`;
+    }
+
+    // --- Transactions ---
+    const statsData = await fetchRest('/stats');
+    const txData = await fetchRest('/transactions?limit=100');
+    const txTable = document.querySelector('#tx-table tbody');
+    const txCounter = document.getElementById('tx-counter');
+    const txDetails = document.getElementById('tx-details');
+    if(statsData.error || txData.error || !txData.items){
+        txCounter.innerHTML = `<span class="error">Ni podatkov</span>`;
+        txDetails.classList.add('hidden');
+    } else {
+        const tx24h = statsData.transactions_today || statsData.result?.transactions_today || 0;
+        txCounter.innerHTML = `<span>${tx24h.toLocaleString()}</span> (24h)`;
+        txCounter.classList.remove('loading');
+        txTable.innerHTML = (txData.items.slice(0,10) || []).map(tx => `
+            <tr>
+                <td>${(tx.hash||'').slice(0,10)}...</td>
+                <td>${(typeof tx.from==='string' ? tx.from.slice(0,10) : tx.from?.hash?.slice(0,10)) || ''}...</td>
+                <td>${(typeof tx.to==='string' ? tx.to.slice(0,10) : tx.to?.hash?.slice(0,10)) || 'Contract'}...</td>
+                <td>${tx.value ? (Number(tx.value)/ATTO).toFixed(4)+' FLR':'0'}</td>
+            </tr>
+        `).join('');
+        txDetails.classList.remove('hidden');
+    }
+
+    // --- Validators ---
+    const validatorsData = await fetchRpc('platform.getCurrentValidators');
+    const valTable = document.querySelector('#validators-table tbody');
+    const valCounter = document.getElementById('validators-counter');
+    const valChartCtx = document.getElementById('validators-chart').getContext('2d');
+
+    if(validatorsData.error || !validatorsData.validators){
+        valCounter.innerHTML = `<span class="error">Ni podatkov</span>`;
+        valTable.innerHTML = '<tr><td colspan="4" class="no-data">Ni validatorjev</td></tr>';
+        if(validatorsChart) validatorsChart.destroy();
+    } else {
+        const validators = validatorsData.validators;
+        valCounter.innerHTML = `<span>${validators.length}</span> aktivnih`;
+        valCounter.classList.remove('loading');
+        valTable.innerHTML = validators.slice(0,5).map(v=>`
+            <tr>
+                <td>${v.nodeID.slice(0,10)}...</td>
+                <td>${v.stakeAmount ? (Number(v.stakeAmount)/ATTO).toFixed(4):'N/A'}</td>
+                <td>${v.delegatedAmount ? (Number(v.delegatedAmount)/ATTO).toFixed(4):'0'}</td>
+                <td>Aktiven</td>
+            </tr>
+        `).join('');
+        const sorted = validators.sort((a,b)=>Number(b.stakeAmount||0)-Number(a.stakeAmount||0)).slice(0,5);
+        if(validatorsChart) validatorsChart.destroy();
+        validatorsChart = new Chart(valChartCtx,{
+            type:'bar',
+            data:{
+                labels: sorted.map(v=>v.nodeID.slice(0,6)+'...'),
+                datasets:[{label:'Stake (FLR)', data:sorted.map(v=>Number(v.stakeAmount||0)/ATTO), backgroundColor:'#1a73e8'}]
+            },
+            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+        });
+    }
+
+    // --- Stake / Delegations ---
+    const totalStakeData = await fetchRpc('platform.getTotalStake');
+    const stakeDiv = document.getElementById('stake-info');
+    const stakeChartCtx = document.getElementById('stake-chart').getContext('2d');
+    let totalDelegated = 0;
+    if(!validatorsData.error && validatorsData.validators){
+        totalDelegated = validatorsData.validators.reduce((sum,v)=>sum+(v.delegatedAmount?Number(v.delegatedAmount)/ATTO:0),0);
+    }
+    if(totalStakeData.error){
+        stakeDiv.innerHTML = `<p class="no-data">Ni podatkov (stake: 0 FLR, delegations: 0 FLR)</p>`;
+        if(stakeChart) stakeChart.destroy();
+    } else {
+        const totalStake = totalStakeData.stakeAmount ? Number(totalStakeData.stakeAmount)/ATTO:0;
+        stakeDiv.innerHTML = `<p>Total Stake: ${totalStake.toFixed(4)} FLR</p><p>Total Delegations: ${totalDelegated.toFixed(4)} FLR</p>`;
+        stakeDiv.classList.remove('loading');
+        if(stakeChart) stakeChart.destroy();
+        stakeChart = new Chart(stakeChartCtx,{
+            type:'pie',
+            data:{labels:['Total Stake','Total Delegations'], datasets:[{data:[totalStake,totalDelegated], backgroundColor:['#1a73e8','#0f9d58']}]},
+            options:{responsive:true}
+        });
+    }
+
+    // --- Network Activity ---
+    const blocksData = await fetchRest('/blocks?limit=1000');
+    const activityDiv = document.getElementById('activity-info');
+    const activityChartCtx = document.getElementById('activity-chart').getContext('2d');
+    if(blocksData.error || !blocksData.items){
+        activityDiv.innerHTML = `<p class="no-data">Ni podatkov</p>`;
+        if(activityChart) activityChart.destroy();
+    } else {
+        const tenDaysAgo = new Date(Date.now() - 10*24*60*60*1000);
+        const recentBlocks = blocksData.items.filter(b=>new Date(b.timestamp)>tenDaysAgo);
+        const dailyCounts = recentBlocks.reduce((acc,b)=>{
+            const day = new Date(b.timestamp).toLocaleDateString('sl-SI');
+            acc[day] = (acc[day]||0)+1;
+            return acc;
+        },{});
+        activityDiv.innerHTML = Object.entries(dailyCounts).sort(([a],[b])=>new Date(b)-new Date(a)).map(([d,c])=>`<p>${d}: ${c.toLocaleString()} blokov</p>`).join('')||'<p class="no-data">Ni aktivnosti</p>';
+        activityDiv.classList.remove('loading');
+        const days = Object.keys(dailyCounts).sort().reverse().slice(0,10);
+        if(activityChart) activityChart.destroy();
+        activityChart = new Chart(activityChartCtx,{
+            type:'line',
+            data:{labels:days,datasets:[{label:'Bloki na dan', data:days.map(d=>dailyCounts[d]), borderColor:'#1a73e8', fill:false}]},
+            options:{responsive:true, scales:{y:{beginAtZero:true}}}
+        });
+    }
+}
+
+// --- Initial Load + Refresh every 30s ---
+updateDashboard();
+setInterval(updateDashboard,30000);
+</script>
 </body>
 </html>
