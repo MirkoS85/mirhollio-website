@@ -34,7 +34,7 @@
                 <h2>FLR Token Price (EUR)</h2>
                 <div id="flr-price" class="counter loading">Nalagam...</div>
             </div>
-            <div class="metric-right"></div> <!-- Prazen za balance -->
+            <div class="metric-right"></div>
         </div>
         
         <!-- Transactions -->
@@ -93,8 +93,8 @@
     </div>
 
     <script>
-        const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api';
-        const FLARE_RPC = 'https://flare.public-rpc.com/ext/bc/P'; // Javni RPC za boljšo dostopnost
+        const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2'; // Popravljeno na v2
+        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P'; // Uradni P-chain URL
         const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url=';
         const COINGECKO_URL = encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
         const ATTO = BigInt("1000000000000000000");
@@ -114,11 +114,11 @@
             localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
         }
         
-        // Fetch REST (legacy za 24h TX)
+        // Fetch REST (v2)
         async function fetchRest(endpoint) {
             try {
                 const response = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
                 return await response.json();
             } catch (error) {
                 console.error('Blockscout Error:', error);
@@ -139,7 +139,7 @@
                         params: []
                     })
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
                 const data = await response.json();
                 if (data.error) throw new Error(data.error.message);
                 return data.result;
@@ -151,7 +151,7 @@
         
         // Osveži
         async function updateDashboard() {
-            // FLR Price (CoinGecko z proxy + cache)
+            // FLR Price
             const priceDiv = document.getElementById('flr-price');
             let price = getCachedPrice();
             if (price) {
@@ -162,7 +162,7 @@
                 const priceResponse = await fetch(COINGECKO_PROXY + COINGECKO_URL);
                 if (!priceResponse.ok) throw new Error('Proxy error');
                 const priceData = await priceResponse.json();
-                price = (priceData.flare?.eur || 0).toFixed(6); // Več decimalk
+                price = (priceData.flare?.eur || 0).toFixed(6);
                 priceDiv.textContent = `${price} €`;
                 setCachedPrice(price);
                 priceDiv.classList.remove('loading');
@@ -173,9 +173,9 @@
                 }
             }
             
-            // Transactions (legacy API za prave 24h)
-            const statsData = await fetchRest('?module=stats&action=daily');
-            const txData = await fetchRest('/transactions?limit=100'); // 100 TX
+            // Transactions (v2 stats in transactions)
+            const statsData = await fetchRest('/stats');
+            const txData = await fetchRest('/transactions?limit=100');
             const txTable = document.querySelector('#tx-table tbody');
             const txCounter = document.getElementById('tx-counter');
             const txDetails = document.getElementById('tx-details');
@@ -184,8 +184,7 @@
                 txCounter.classList.add('error');
                 txDetails.style.display = 'none';
             } else {
-                // Izračunaj 24h iz dnevnih stats (ali uporabi transactions_today če na voljo)
-                const tx24h = statsData.result ? statsData.result[0]?.txns || 'N/A' : 'N/A'; // Dnevno iz daily
+                const tx24h = statsData.transactions_today || 'N/A'; // Iz v2 stats
                 txCounter.textContent = `${tx24h} (24h)`;
                 txCounter.classList.remove('loading');
                 txTable.innerHTML = (txData.items || []).map(tx => `
@@ -260,8 +259,8 @@
                 });
             }
             
-            // Network Activity (več blokov za 10 dni)
-            const blocksData = await fetchRest('/blocks?limit=1000'); // Max limit
+            // Network Activity (v2 blocks, timestamp *1000)
+            const blocksData = await fetchRest('/blocks?limit=1000');
             const activityDiv = document.getElementById('activity-info');
             const activityChartCtx = document.getElementById('activity-chart').getContext('2d');
             if (blocksData.error) {
@@ -269,7 +268,7 @@
                 activityDiv.classList.add('error');
             } else {
                 const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
-                const recentBlocks = (blocksData.items || []).filter(block => new Date(block.timestamp * 1000).getTime() > tenDaysAgo); // Timestamp v sekundah
+                const recentBlocks = (blocksData.items || []).filter(block => new Date(block.timestamp * 1000).getTime() > tenDaysAgo); // *1000 za ms
                 const dailyCounts = recentBlocks.reduce((acc, block) => {
                     const day = new Date(block.timestamp * 1000).toLocaleDateString('sl-SI');
                     acc[day] = (acc[day] || 0) + 1;
@@ -277,7 +276,7 @@
                 }, {});
                 activityDiv.innerHTML = Object.entries(dailyCounts).map(([day, count]) => `<p>${day}: ${count.toLocaleString()} blokov</p>`).join('') || '<p>Ni aktivnosti</p>';
                 activityDiv.classList.remove('loading');
-                const days = Object.keys(dailyCounts).sort().reverse().slice(0,10); // Zadnjih 10 dni
+                const days = Object.keys(dailyCounts).sort().reverse().slice(0,10);
                 if (activityChart) activityChart.destroy();
                 activityChart = new Chart(activityChartCtx, {
                     type: 'line',
