@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
-  --bg-dark:#0a1a2f; --bg-dark2:#0a1a2f; --text-light:#fff;
+  --bg-dark:#0a1a2f; --bg-dark2:#000; --text-light:#fff;
   --flare-pink:#ff007f; --accent-blue:#1e90ff; --accent-green:#20c997; --gold:#d4af37;
   --card-bg:#111; --toggle-width:60px; --toggle-height:28px;
 }
@@ -16,11 +16,11 @@ body { margin:0; font-family:Arial,sans-serif; color:var(--text-light); backgrou
 #bgOverlay { position: fixed; inset:0; pointer-events:none; z-index:0; background: url('background.jpg') center/cover no-repeat; opacity:0.25;}
 
 /* Navbar */
-.navbar { display:flex; justify-content:center; gap:20px; background:var(--bg-dark2); padding:0.5rem 0; position:fixed; top:0; width:100%; z-index:5;}
+.navbar { display:flex; justify-content:center; gap:20px; background:#000; padding:0.5rem 0; position:fixed; top:0; width:100%; z-index:5;}
 .navbar a, .dropdown-btn { color:var(--flare-pink); text-decoration:none; font-weight:bold; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; transition:0.3s; display:flex; align-items:center; line-height:normal;}
 .navbar a:hover, .dropdown-btn:hover { background:var(--accent-blue); color:#fff;}
 .dropdown { position:relative; display:inline-block; }
-.dropdown-content { display:none; position:absolute; background:var(--bg-dark2); min-width:220px; max-width:300px; padding:10px 0; box-shadow:0 12px 24px rgba(0,0,0,0.4); z-index:10; border-radius:12px;}
+.dropdown-content { display:none; position:absolute; background:#000; min-width:220px; max-width:300px; padding:10px 0; box-shadow:0 12px 24px rgba(0,0,0,0.4); z-index:10; border-radius:12px;}
 .dropdown-content a { color:var(--flare-pink); padding:12px 20px; text-decoration:none; display:block; }
 .dropdown-content a:hover { background:var(--accent-blue); color:#fff;}
 .dropdown:hover .dropdown-content { display:block; }
@@ -35,7 +35,7 @@ input:checked + .slider { background-color:var(--accent-blue); }
 input:checked + .slider:before { transform:translateX(32px); content:"🌙"; }
 
 /* Header */
-header { text-align:center; padding:5rem 2rem 3rem; position:relative; z-index:2; }
+header { text-align:center; padding:5rem 2rem 3rem; position:relative; z-index:2; background:#000; }
 header img#logo { width:200px; margin-bottom:20px; vertical-align:middle; }
 header .flare-combo { width:80px; display:block; margin:0 auto 15px; }
 header h1 { margin: 0; font-size: 3rem; line-height: 1.1; color: #fff; }
@@ -47,7 +47,7 @@ header p { margin-top: 0.3rem; font-size: 1.3rem; line-height: 1.2; color: #fff;
 
 /* Cards */
 .cards { display:flex; flex-wrap:wrap; justify-content:center; gap:24px; margin-top:2rem; }
-.card { background: var(--card-bg); padding: 2rem; border-radius: 16px; width: 350px; height: 250px; position: relative; overflow: hidden; transition: transform 0.3s; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-start; color:#fff;}
+.card { background: #000; padding: 2rem; border-radius: 16px; width: 350px; height: 250px; position: relative; overflow: hidden; transition: transform 0.3s; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-start; color:#fff;}
 .card h4, .card p { z-index:2; position: relative; margin:0 0 8px 0; }
 .card-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: rgba(0,0,0,0.95); color: var(--flare-pink); padding:15px; font-size:1rem; opacity:0; transition: opacity 0.5s ease, transform 0.5s ease; overflow-y:auto; border-top-left-radius:16px; border-top-right-radius:16px; transform: translateY(100%);}
 .card:hover { transform:translateY(-8px);}
@@ -181,44 +181,22 @@ Delegating your FLR brings several benefits: earning staking rewards, supporting
 </section>
 
 <footer>
-<div>Contact me via <a href="mailto:svensekmir@gmail.com">Email</a></div>
+<div>Contact me via <a href="mailto:svensekmir@gmail.com">svensekmir<span style="display:none">mir@gmail.com</span>@gmail.com</a></div>
 <div id="currentDate"></div>
 </footer>
 
 <script>
-// Theme toggle
-const themeToggle = document.getElementById('themeToggle');
-themeToggle?.addEventListener('change', ()=>document.body.classList.toggle('light-theme'));
-
-// FLR Chart
+// Chart.js
 const ctx = document.getElementById('flrChart').getContext('2d');
-let chartData = { labels: [], datasets:[{ label:'FLR (€)', data:[], borderColor:'#ff007f', backgroundColor:'rgba(255,0,127,0.2)', fill:true, tension:0.2, pointRadius:0 }] };
-let flrChart = new Chart(ctx, { 
-  type:'line', 
-  data:chartData, 
-  options:{ 
-    responsive:true, 
-    plugins:{ 
-      legend:{display:false}, 
-      tooltip:{ 
-        mode:'index', 
-        intersect:false, 
-        callbacks:{ label: (ctx)=>`€${ctx.parsed.y.toFixed(4)}`} 
-      } 
-    },
-    scales:{ 
-      x:{ ticks:{ color:'#fff' }}, 
-      y:{ ticks:{ color:'#fff' }} 
-    }
-  } 
-});
+const chartData = { labels:[], datasets:[{label:'FLR Price (EUR)', data:[], borderColor:'#ff007f', backgroundColor:'rgba(255,0,127,0.2)', tension:0.3 }]};
+const flrChart = new Chart(ctx,{ type:'line', data: chartData, options:{ responsive:true, plugins:{ legend:{ labels:{color:'#fff'} }, tooltip:{ mode:'index', intersect:false, callbacks:{ label: (ctx)=>`€${ctx.parsed.y.toFixed(4)}`} } }, scales:{ x:{ ticks:{ color:'#fff' }}, y:{ ticks:{ color:'#fff' }} } } });
 
 async function fetchPriceHistory(){
     try {
         const res = await fetch('https://api.coingecko.com/api/v3/coins/flare-networks/market_chart?vs_currency=eur&days=1&interval=hourly');
         const data = await res.json();
         const prices = data.prices;
-        chartData.labels = prices.map(p=>{ const d = new Date(p[0]); return d.getHours()+':'+('0'+d.getMinutes()).slice(-2); });
+        chartData.labels = prices.map(p=>{ const d=new Date(p[0]); return d.getHours()+':'+('0'+d.getMinutes()).slice(-2); });
         chartData.datasets[0].data = prices.map(p=>p[1]);
         flrChart.update();
     } catch(err){
