@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MirSFlr | Flare Validator Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --flare-pink: #ff4081;
+      --bg-dark: #0b0b0f;
+      --bg-light: #f5f5f5;
+      --text-dark: #111;
+      --text-light: #fff;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+      text-align: center;
+    }
+    header {
+      padding: 2rem 1rem;
+    }
+    #logo {
+      width: 100px;
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    header p {
+      margin-top: 0.5rem;
+      font-weight: bold;
+      color: var(--flare-pink);
+    }
+    .cards {
+      display: grid;
+      gap: 1rem;
+      max-width: 900px;
+      margin: 2rem auto;
+    }
+    .card {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(255,64,129,0.4);
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    canvas {
+      background: rgba(255,255,255,0.03);
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+    footer {
+      margin-top: 2rem;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: var(--flare-pink);
+    }
+    footer img {
+      vertical-align: middle;
+      margin-left: 6px;
+      filter: drop-shadow(0 0 5px var(--flare-pink));
+    }
+    /* Toggle */
+    .toggle-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+    }
+    .toggle-btn {
+      width: 50px;
+      height: 25px;
+      background: var(--flare-pink);
+      border-radius: 25px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--flare-pink);
+    }
+    .toggle-circle {
+      width: 21px;
+      height: 21px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: left 0.3s;
+    }
+    body.light {
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+    body.light .card {
+      background: rgba(0,0,0,0.05);
+      color: var(--text-dark);
+    }
+    body.light header p {
+      color: var(--flare-pink);
+    }
+  </style>
+</head>
+<body>
+  <div class="toggle-container">
+    <div class="toggle-btn" onclick="toggleTheme()">
+      <div class="toggle-circle"></div>
+    </div>
+  </div>
+
+  <header>
+    <img id="logo" src="logo.png" alt="MirSFlr Logo">
+    <h1>MirSFlr</h1>
+    <img src="flare-icon.png" alt="Flare Icon" style="width:60px; margin-top:10px;">
+    <p>A trusted validator on the Flare Network</p>
+    <p id="latestPrice">Loading...</p>
+  </header>
+
+  <div class="cards">
+    <div class="card"><h3>Validators</h3><p>Validators secure the Flare blockchain by producing and verifying blocks. They play a critical role in maintaining decentralization and stability.</p></div>
+    <div class="card"><h3>Delegators</h3><p>Delegators support validators by staking their FLR tokens, earning rewards while contributing to the overall security of the network.</p></div>
+    <div class="card"><h3>Providers</h3><p>Data providers feed external data into the network, enabling smart contracts to access real-world information in a decentralized way.</p></div>
+  </div>
+
+  <div class="charts-grid">
+    <canvas id="tokenChart"></canvas>
+    <canvas id="txChart"></canvas>
+    <canvas id="validatorsChart"></canvas>
+    <canvas id="activityChart"></canvas>
+  </div>
+
+  <footer>
+    © 2025 MirSFlr 
+    <img src="flare-icon.png" alt="Flare Footer Icon" width="20">
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+      const circle = document.querySelector('.toggle-circle');
+      if (document.body.classList.contains('light')) {
+        circle.style.left = '27px';
+      } else {
+        circle.style.left = '2px';
+      }
+    }
+
+    let tokenChart, txChart, validatorsChart, activityChart;
+
+    function initCharts() {
+      tokenChart = new Chart(document.getElementById('tokenChart'), {
+        type:'line',
+        data:{ labels:[], datasets:[{ label:'FLR (EUR)', data:[], borderColor:'#ff4081', backgroundColor:'rgba(255,64,129,0.2)', fill:true }] }
+      });
+      txChart = new Chart(document.getElementById('txChart'), {
+        type:'line',
+        data:{ labels:[], datasets:[{ label:'Transactions', data:[], borderColor:'#ff80aa', backgroundColor:'rgba(255,128,170,0.2)', fill:true }] }
+      });
+      validatorsChart = new Chart(document.getElementById('validatorsChart'), {
+        type:'line',
+        data:{ labels:[], datasets:[{ label:'Active Validators', data:[], borderColor:'#ffd166', backgroundColor:'rgba(255,209,102,0.25)', fill:true }] }
+      });
+      activityChart = new Chart(document.getElementById('activityChart'), {
+        type:'line',
+        data:{ labels:[], datasets:[
+          { label:'New Validators', data:[], borderColor:'#ff4081', backgroundColor:'rgba(255,64,129,0.25)', fill:true },
+          { label:'New Delegators', data:[], borderColor:'#ff80aa', backgroundColor:'rgba(255,128,170,0.25)', fill:true }
+        ]}}
+      );
+    }
+    initCharts();
+
+    async function fetchFLRPrice() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
+        const data = await res.json();
+        const price = data.flare?.eur || 0;
+        document.getElementById('latestPrice').textContent = `FLR Price: €${price.toFixed(4)}`;
+        const now = new Date();
+        const label = `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
+        tokenChart.data.labels.push(label);
+        tokenChart.data.datasets[0].data.push(price);
+        if(tokenChart.data.labels.length>10) {
+          tokenChart.data.labels.shift();
+          tokenChart.data.datasets[0].data.shift();
+        }
+        tokenChart.update();
+      } catch(e){ console.error(e); }
+    }
+    fetchFLRPrice();
+    setInterval(fetchFLRPrice, 60000);
+
+    async function fetchFlareData() {
+      try {
+        // Placeholder - zamenjaj z realnimi Flare API endpointi
+        const data = {
+          txCount: Math.floor(Math.random()*5000),
+          activeValidators: Math.floor(Math.random()*100),
+          newValidators: Math.floor(Math.random()*10),
+          newDelegators: Math.floor(Math.random()*20)
+        };
+        const now = new Date();
+        const label = `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+        txChart.data.labels.push(label);
+        txChart.data.datasets[0].data.push(data.txCount);
+        if(txChart.data.labels.length>10){ txChart.data.labels.shift(); txChart.data.datasets[0].data.shift(); }
+        txChart.update();
+
+        validatorsChart.data.labels.push(label);
+        validatorsChart.data.datasets[0].data.push(data.activeValidators);
+        if(validatorsChart.data.labels.length>10){ validatorsChart.data.labels.shift(); validatorsChart.data.datasets[0].data.shift(); }
+        validatorsChart.update();
+
+        activityChart.data.labels.push(label);
+        activityChart.data.datasets[0].data.push(data.newValidators);
+        activityChart.data.datasets[1].data.push(data.newDelegators);
+        if(activityChart.data.labels.length>10){
+          activityChart.data.labels.shift();
+          activityChart.data.datasets[0].data.shift();
+          activityChart.data.datasets[1].data.shift();
+        }
+        activityChart.update();
+      } catch(e){ console.error(e); }
+    }
+    fetchFlareData();
+    setInterval(fetchFlareData, 60000);
+  </script>
+</body>
+</html>
