@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MirSFlr</title>
+<link rel="icon" href="favicon-32x32.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg-dark:#0a1a2f; --bg-dark2:#142841; --text-light:#fff;
+  --accent-pink:#ff4081; --accent-green:#20c997; --gold:#d4af37;
+  --card-bg:#14283a; --toggle-width:60px; --toggle-height:28px;
+}
+body {
+  margin:0; font-family:Arial,sans-serif; color:var(--text-light);
+  background: var(--bg-dark);
+  transition:0.4s; position: relative; overflow-x:hidden;
+}
+#bgOverlay {
+  position: fixed; inset:0; pointer-events:none; z-index:0;
+  background: url('background.jpg') center/cover no-repeat;
+  opacity:0.25;
+}
+header { text-align:center; padding:3rem 2rem; position:relative; z-index:2; }
+header img#logo { width:160px; margin-bottom:20px; vertical-align:middle; }
+header h1 { margin:0; font-size:2.8rem; display:block; }
+header p { margin-top:0.5rem; color:#d1d9e6; }
+
+.theme-toggle-wrapper { position:fixed; top:20px; right:20px; z-index:10; }
+.theme-toggle { position:relative; display:inline-block; width:var(--toggle-width); height:var(--toggle-height); }
+.theme-toggle input { opacity:0; width:0; height:0; }
+.slider {
+  position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0;
+  background-color:#555; border-radius:34px; transition:.4s;
+  box-shadow:0 0 5px rgba(255,64,129,0.2);
+}
+.slider:before {
+  position:absolute; content:"💡"; height:24px; width:24px; left:2px; bottom:2px;
+  font-size:14px; display:flex; align-items:center; justify-content:center;
+  border-radius:50%; background-color:var(--accent-pink); transition:.4s;
+}
+input:checked + .slider { background-color:var(--accent-pink); }
+input:checked + .slider:before { transform:translateX(32px); content:"🌙"; }
+
+.cards { display:flex; flex-direction:column; gap:24px; margin-top:2rem; max-width:600px; margin-left:auto; margin-right:auto; }
+.card { background:var(--card-bg); padding:2rem; border-radius:16px;
+  transition:0.4s; cursor:pointer; box-shadow:0 8px 30px rgba(0,0,0,0.5); position:relative;}
+.card:hover { transform:translateY(-10px); box-shadow:0 20px 50px rgba(255,64,129,0.3); }
+.card h4 { margin:0 0 12px; font-size:1.5rem; }
+.card p { margin:0; color:#d1d9e6; }
+.card .tooltip { position:absolute; top:-2rem; left:50%; transform:translateX(-50%); background:var(--accent-pink); color:#fff; padding:4px 12px; border-radius:8px; font-size:0.85rem; opacity:0; pointer-events:none; transition:0.3s; }
+.card:hover .tooltip { opacity:1; }
+
+section { padding:4rem 2rem; max-width:1200px; margin:0 auto; position:relative; z-index:2; }
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.chart-box { background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+    padding:1rem; border-radius:12px; box-shadow:0 8px 30px rgba(0,0,0,0.5); position:relative;}
+canvas { width:100%!important; height:350px!important; border-radius:8px; }
+.chart-desc { margin-top:8px; font-size:0.85rem; text-align:center; color:#d1d9e6; }
+
+body.light-theme { background: linear-gradient(180deg,#f0f2f5,#e6eef6); color:#10202b; }
+body.light-theme .card { background: linear-gradient(135deg,#ffffff,#f2f7fb); color:#10202b; }
+body.light-theme .slider:before { background-color:var(--accent-pink); }
+body.light-theme #bgOverlay { opacity:0.15; }
+
+@media(max-width:1000px){ .charts-grid { grid-template-columns:1fr; } .card{width:100%;} }
+</style>
+</head>
+<body>
+<div id="bgOverlay"></div>
+
+<div class="theme-toggle-wrapper">
+<label class="theme-toggle">
+<input type="checkbox" id="themeToggle">
+<span class="slider"></span>
+</label>
+</div>
+
+<header>
+<img id="logo" src="logo.png" alt="MirSFlr Logo">
+<h1>MirSFlr</h1>
+<p>A trusted validator on the Flare Network</p>
+</header>
+
+<section id="roles">
+<h2>Roles in the Flare Network</h2>
+<div class="cards">
+<div class="card">
+<h4>🔒 Validators</h4>
+<p>Nodes responsible for validating blocks and securing the network. They ensure all transactions are legitimate and maintain blockchain stability.</p>
+<div class="tooltip">Validator recap: Secures the network and earns rewards for block validation.</div>
+</div>
+<div class="card">
+<h4>🤝 Delegators</h4>
+<p>Token holders who delegate FLR tokens to validators, earning rewards while helping decentralize and secure the network.</p>
+<div class="tooltip">Delegator recap: Supports validators and receives staking rewards.</div>
+</div>
+<div class="card">
+<h4>📡 Providers</h4>
+<p>Provide crucial oracle data and services for smart contracts and dApps, enabling reliable access to real-world information.</p>
+<div class="tooltip">Provider recap: Supplies data to the network, ensuring smart contract functionality.</div>
+</div>
+</div>
+</section>
+
+<section id="charts">
+<h2>Live Metrics</h2>
+<div class="charts-grid">
+<div class="chart-box" style="grid-column:span 2;">
+<h3>FLR Token Value (EUR)</h3>
+<p>Latest value: <strong id="latestPrice">-- €</strong></p>
+<canvas id="tokenChart"></canvas>
+<p class="chart-desc">Daily FLR token value in Euros (live from CoinGecko API).</p>
+</div>
+<div class="chart-box">
+<h3>Transactions (last 10 days)</h3>
+<canvas id="txChart"></canvas>
+<p class="chart-desc">Number of executed transactions in the Flare network.</p>
+</div>
+<div class="chart-box">
+<h3>Active Validators</h3>
+<canvas id="validatorsChart"></canvas>
+<p class="chart-desc">Number of validators actively confirming blocks.</p>
+</div>
+<div class="chart-box">
+<h3>Stake Distribution</h3>
+<canvas id="stakeChart"></canvas>
+<p class="chart-desc">Distribution of FLR tokens among Validators, Delegators, and Providers with flare pink gradient.</p>
+</div>
+</div>
+</section>
+
+<section id="contact">
+<h2>Contact</h2>
+<p style="text-align:center;color:#d1d9e6">Email: <a href="mailto:svensekmir@gmail.com" style="color:#fff;text-decoration:underline">svensekmir@gmail.com</a></p>
+</section>
+
+<footer style="text-align:center; padding:2rem; color:#d1d9e6;">
+© 2025 MirSFlr
+</footer>
+
+<script>
+// Theme toggle
+const themeCheckbox=document.getElementById('themeToggle');
+themeCheckbox.addEventListener('change',()=>{
+  document.body.classList.toggle('light-theme');
+  localStorage.setItem('mir_theme', themeCheckbox.checked ? 'light' : 'dark');
+});
+if(localStorage.getItem('mir_theme')==='light'){ document.body.classList.add('light-theme'); themeCheckbox.checked=true; }
+
+// Placeholder data
+let dates=[], tokenValues=[], txCounts=[], activeValidators=[], stakeData=[50,35,15];
+for(let i=9;i>=0;i--){
+  const d=new Date(); d.setDate(d.getDate()-i);
+  const dd=d.getDate().toString().padStart(2,'0');
+  const mm=(d.getMonth()+1).toString().padStart(2,'0');
+  dates.push(dd+'-'+mm);
+  tokenValues.push(0.027 + Math.random()*0.005);
+  txCounts.push(1000 + Math.floor(Math.random()*1000));
+  activeValidators.push(18 + Math.floor(Math.random()*5));
+}
+
+// Charts
+const tctx=document.getElementById('tokenChart').getContext('2d');
+const tokenChart=new Chart(tctx,{
+  type:'line',
+  data:{labels:dates,datasets:[{label:'FLR (EUR)',data:tokenValues,borderColor:'#ff4081',backgroundColor:'rgba(255,64,129,0.25)',fill:true,tension:0.25,pointRadius:4}]},
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'EUR'}},x:{title:{display:true,text:'Date'}}}}
+});
+const txctx=document.getElementById('txChart').getContext('2d');
+const txChart=new Chart(txctx,{type:'bar',data:{labels:dates,datasets:[{label:'Transactions',data:txCounts,backgroundColor:'rgba(32,201,151,0.7)'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:'Count'}},x:{title:{display:true,text:'Date'}}}}});
+const vctx=document.getElementById('validatorsChart').getContext('2d');
+const validatorsChart=new Chart(vctx,{type:'line',data:{labels:dates,datasets:[{label:'Active Validators',data:activeValidators,borderColor:'#ffd166',backgroundColor:'rgba(255,209,102,0.25)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+const sctx=document.getElementById('stakeChart').getContext('2d');
+const stakeChart=new Chart(sctx,{type:'doughnut',data:{labels:['Validators','Delegators','Providers'],datasets:[{data:stakeData,backgroundColor:['#ff4081','#ff80aa','#ffb6c1']}]},options:{responsive:true,plugins:{legend:{display:true,position:'bottom'}}}});
+
+// --- Live API fetch ---
+async function fetchLiveData(){
+  try{
+    // FLR price
+    const priceRes=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
+    const priceData=await priceRes.json();
+    const price=priceData.flare.eur;
+    document.getElementById('latestPrice').textContent=price.toFixed(4)+' €';
+    tokenValues.push(price); dates.push(new Date().getDate().toString().padStart(2,'0')+'-'+(new Date().getMonth()+1).toString().padStart(2,'0'));
+    if(tokenValues.length>10){ tokenValues.shift(); dates.shift(); }
+    tokenChart.update();
+
+    // Future: fetch transactions, active validators, stake distribution via Flare APIs
+
+  }catch(e){ console.error(e); }
+}
+
+// Run only on HTTP/HTTPS
+if(location.protocol.startsWith('http')) fetchLiveData();
+setInterval(()=>{ if(location.protocol.startsWith('http')) fetchLiveData(); },5*60*1000);
+
+</script>
+</body>
+</html>
