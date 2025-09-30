@@ -5,101 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MirSFlr</title>
 <link rel="icon" href="favicon-32x32.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
   --bg-dark:#0a1a2f; --bg-dark2:#0a1a2f; --text-light:#fff;
-  --flare-pink:#ff007f; --accent-blue:#1e90ff; --accent-green:#20c997; --gold:#d4af37;
-  --card-bg:#14283a; --toggle-width:60px; --toggle-height:28px;
+  --flare-pink:#ff007f; --accent-blue:#1e90ff; --card-bg:#000;
 }
-body { margin:0; font-family:Arial,sans-serif; color:var(--text-light); background: var(--bg-dark); transition:0.4s; position: relative; overflow-x:hidden;}
-#bgOverlay { position: fixed; inset:0; pointer-events:none; z-index:0; background: url('background.jpg') center/cover no-repeat; opacity:0.25;}
-
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:#fff;
+  background: url('background.jpg') center/cover no-repeat fixed;
+  transition:0.4s;
+}
 /* Navbar */
 .navbar { display:flex; justify-content:center; gap:20px; background:var(--bg-dark2); padding:0.5rem 0; position:fixed; top:0; width:100%; z-index:5;}
-.navbar a, .dropdown-btn { color:var(--flare-pink); text-decoration:none; font-weight:bold; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; transition:0.3s; display:flex; align-items:center; line-height:normal;}
-.navbar a:hover, .dropdown-btn:hover { background:var(--accent-blue); color:#fff;}
+.navbar a, .dropdown-btn { color:var(--flare-pink); text-decoration:none; font-weight:bold; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; display:flex; align-items:center;}
+.navbar a:hover, .dropdown-btn:hover { background:var(--accent-blue); color:#fff; }
 .dropdown { position:relative; display:inline-block; }
 .dropdown-content { display:none; position:absolute; background:var(--bg-dark2); min-width:220px; max-width:300px; padding:10px 0; box-shadow:0 12px 24px rgba(0,0,0,0.4); z-index:10; border-radius:12px;}
 .dropdown-content a { color:var(--flare-pink); padding:12px 20px; text-decoration:none; display:block; }
-.dropdown-content a:hover { background:var(--accent-blue); color:#fff;}
+.dropdown-content a:hover { background:var(--accent-blue); color:#fff; }
 .dropdown:hover .dropdown-content { display:block; }
-
 /* Theme toggle */
 .theme-toggle-wrapper { position:fixed; top:20px; right:20px; z-index:10; }
-.theme-toggle { position:relative; display:inline-block; width:var(--toggle-width); height:var(--toggle-height); }
+.theme-toggle { position:relative; display:inline-block; width:60px; height:28px; }
 .theme-toggle input { opacity:0; width:0; height:0; }
 .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#555; border-radius:34px; transition:.4s; }
 .slider:before { position:absolute; content:"💡"; height:24px; width:24px; left:2px; bottom:2px; font-size:14px; display:flex; align-items:center; justify-content:center; border-radius:50%; background-color:white; transition:.4s; }
 input:checked + .slider { background-color:var(--accent-blue); }
 input:checked + .slider:before { transform:translateX(32px); content:"🌙"; }
-
 /* Header */
-header { text-align:center; padding:5rem 2rem 3rem; position:relative; z-index:1; }
-header img#logo { width:200px; margin-bottom:20px; vertical-align:middle; }
-header .flare-combo { width:90px; display:block; margin:0 auto 15px; }
-header h1 { margin: 0; font-size: 3rem; line-height: 1.1; color: var(--flare-pink);}
-header p { margin-top: 0.3rem; font-size: 1.3rem; line-height: 1.2; color: var(--flare-pink); }
-
+header { text-align:center; padding:5rem 2rem 2rem; position:relative; z-index:2; }
+header img#logo { width:200px; margin-bottom:10px; }
+header img.flare-combo { width:80px; display:block; margin:0 auto 15px; }
+header h1 { margin:0; font-size:3rem; line-height:1.1; color:#fff; }
+header p { margin:0.3rem 0 2rem 0; font-size:1.3rem; line-height:1.2; color:#fff; }
+/* Chart */
+#priceChartContainer { max-width:800px; margin:0 auto 2rem auto; }
+canvas#flrChart { background: rgba(10,26,47,0.95); border-radius:12px; }
 /* About section */
-#aboutUs h3 { color: var(--flare-pink); font-size: 1.6rem; margin-bottom: 0.3rem; }
-#aboutUs p { font-size: 1.1rem; margin: 0.5rem 0; color: #d1d9e6; }
-
+#aboutUs { text-align:center; max-width:800px; margin:0 auto 2rem auto; }
+#aboutUs h3 { color: var(--flare-pink); font-size:1.6rem; margin-bottom:0.3rem; }
+#aboutUs p { color: var(--flare-pink); font-size:1.2rem; margin:0.3rem 0; }
 /* Cards */
 .cards { display:flex; flex-wrap:wrap; justify-content:center; gap:24px; margin-top:2rem; }
-.card { background: var(--card-bg); padding: 2rem; border-radius: 16px; width: 350px; height: 250px; position: relative; overflow: hidden; transition: transform 0.3s; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-start;}
+.card { background: #000; color:#fff; border:2px solid #111; padding:2rem; border-radius:16px; width:350px; height:250px; position:relative; overflow:hidden; transition:transform 0.3s; cursor:pointer; display:flex; flex-direction:column; justify-content:flex-start;}
 .card h4, .card p { z-index:2; position: relative; margin:0 0 8px 0; }
-.card-bottom { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: rgba(0,0,0,0.95); color: var(--flare-pink); padding:15px; font-size:1rem; opacity:0; transition: opacity 0.5s ease, transform 0.5s ease; overflow-y:auto; border-top-left-radius:16px; border-top-right-radius:16px; transform: translateY(100%);}
+.card-bottom { position: absolute; bottom:0; left:0; width:100%; height:50%; background: rgba(0,0,0,0.95); color: var(--flare-pink); padding:15px; font-size:1rem; opacity:0; transition: opacity 0.5s ease, transform 0.5s ease; overflow-y:auto; border-top-left-radius:16px; border-top-right-radius:16px; transform: translateY(100%);}
 .card:hover { transform:translateY(-8px);}
 .card:hover .card-bottom { opacity:1; transform: translateY(0);}
 .card-bottom::-webkit-scrollbar { width:6px;}
 .card-bottom::-webkit-scrollbar-thumb { background: var(--flare-pink); border-radius:3px; }
-
 /* Sections */
-section { padding:4rem 2rem; max-width:1200px; margin:0 auto; position:relative; z-index:1; }
+section { padding:4rem 2rem; max-width:1200px; margin:0 auto; position:relative; z-index:2; }
 h2 { margin-bottom:2rem; text-align:center; }
-
 /* Delegation section */
 #delegation { margin-top:2rem; }
 #delegation h2 { margin-top:0; }
-
 /* Footer */
-footer { background:#000; color:#fff; padding:1.5rem 2rem; display:flex; justify-content:space-between; align-items:center; position:relative; z-index:1;}
-footer .left { font-size:0.95rem; }
-footer .left a { color:var(--flare-pink); text-decoration:none; font-weight:bold; }
-footer .left a:hover { text-decoration:underline; }
-footer .right { font-size:0.9rem; color:#bbb; }
-
+footer { background:#000; color:#fff; display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; font-size:0.9rem; }
+footer a { color: var(--flare-pink); text-decoration:none; }
+footer a:hover { text-decoration:underline; }
 /* Responsive */
-@media(max-width:1000px){
-    .cards{width:100%; flex-direction:column; align-items:center;} 
-    .card{width:90%; height:auto;} 
-    .navbar{flex-direction:column; gap:10px;} 
-}
-@media(max-width:600px){
-    header h1 { font-size: 2rem; }
-    header p { font-size: 1rem; }
-    #aboutUs h3 { font-size:1.3rem; }
-    #aboutUs p { font-size:1rem; }
-    .navbar { flex-direction: column; gap: 10px; padding:0.5rem;}
-    .dropdown-content { min-width:90%; left:0; }
-    img { max-width:100%; height:auto; }
-    footer { flex-direction:column; gap:10px; text-align:center; }
-}
-
-/* Light theme */
-body.light-theme { background: linear-gradient(180deg,#f0f2f5,#e6eef6); color:#000; }
-body.light-theme p { color:#000; }
-body.light-theme #aboutUs p { color:#333; }
-body.light-theme .card { background: linear-gradient(135deg,#ffffff,#f2f7fb); color:#000; }
-body.light-theme .slider { background-color:#888; }
-body.light-theme .slider:before { background-color:#fff; }
-body.light-theme #bgOverlay { opacity:0.15; }
+@media(max-width:1000px){ .cards{width:100%; flex-direction:column; align-items:center;} .card{width:90%; height:auto;} .navbar{flex-direction:column; gap:10px;} }
+@media(max-width:600px){ header h1 { font-size: 2rem; } header p { font-size: 1rem; } #aboutUs h3 { font-size:1.3rem; } #aboutUs p { font-size:1rem; } .navbar { flex-direction: column; gap: 10px; padding:0.5rem;} .dropdown-content { min-width:90%; left:0; } img { max-width:100%; height:auto; } }
 </style>
 </head>
 <body>
-<div id="bgOverlay"></div>
 
-<!-- Navbar -->
 <div class="navbar">
 <a href="https://flare.network/" target="_blank">Official FLR</a>
 <a href="https://flaremetrics.io/" target="_blank">Metrics</a>
@@ -111,14 +85,6 @@ body.light-theme #bgOverlay { opacity:0.15; }
 </div>
 </div>
 
-<!-- Theme toggle -->
-<div class="theme-toggle-wrapper">
-<label class="theme-toggle">
-<input type="checkbox" id="themeToggle">
-<span class="slider"></span>
-</label>
-</div>
-
 <header>
 <img id="logo" src="logo.png" alt="MirSFlr Logo">
 <img src="flare-icon.png" class="flare-combo" alt="Flare Icon">
@@ -126,88 +92,103 @@ body.light-theme #bgOverlay { opacity:0.15; }
 <p>A trusted validator on the Flare Network</p>
 </header>
 
-<section id="aboutUs">
-<div style="text-align:center; max-width:800px; margin:2rem auto;">
-<h3>Flare Data Provider</h3>
-<p>Flare: 0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</p>
+<div id="priceChartContainer">
+<canvas id="flrChart"></canvas>
 </div>
 
-<p style="text-align:center; max-width:900px; margin:2rem auto;">
-We are a reliable and enthusiastic Flare data provider, passionate about contributing to the blockchain ecosystem. Our mission is to help secure the network, provide accurate real-time data, and be part of the future of decentralized finance. We actively maintain validator nodes and ensure the network operates reliably and securely.
-</p>
-
-<p style="text-align:center; max-width:900px; margin:1rem auto;">
-Flare is a smart contract platform interoperable with multiple blockchains, using the Ethereum Virtual Machine (EVM). It brings real-world data to blockchain applications via decentralized oracles, supports DeFi, NFTs, and enables fast, scalable transactions with unique consensus mechanisms that combine Proof-of-Stake and the Avalanche protocol.
-</p>
+<section id="aboutUs">
+<h3>Flare Data Provider</h3>
+<p>Flare: 0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</p>
+<p>We are a reliable and enthusiastic Flare data provider, passionate about contributing to the blockchain ecosystem. Our mission is to help secure the network, provide accurate real-time data, and be part of the future of decentralized finance. We actively maintain validator nodes and ensure the network operates reliably and securely.</p>
+<p>Flare is a smart contract platform interoperable with multiple blockchains, using the Ethereum Virtual Machine (EVM). It brings real-world data to blockchain applications via decentralized oracles, supports DeFi, NFTs, and enables fast, scalable transactions with unique consensus mechanisms that combine Proof-of-Stake and the Avalanche protocol.</p>
 </section>
 
 <section id="roles">
 <h2>Validators • Delegators • Providers</h2>
 <div class="cards">
-  <div class="card">
-    <h4>🔒 Validators</h4>
-    <p>Validators ensure the integrity of the network by verifying transactions and maintaining consensus.</p>
-    <div class="card-bottom">
-      They play a critical role in producing blocks, validating smart contract executions, and earning rewards while keeping the network secure. Validators also help maintain decentralization and high network availability.
-    </div>
-  </div>
-  <div class="card">
-    <h4>🤝 Delegators</h4>
-    <p>Delegators support the network by staking their FLR and participating indirectly in consensus.</p>
-    <div class="card-bottom">
-      This allows token holders to earn rewards without running a full node, while helping decentralize the network and improve its security. Delegators choose trusted validators to maximize efficiency and trust.
-    </div>
-  </div>
-  <div class="card">
-    <h4>📡 Providers</h4>
-    <p>Data providers feed reliable external information into the Flare blockchain for smart contracts.</p>
-    <div class="card-bottom">
-      Their work ensures that price feeds, oracle data, and other services operate accurately for all users, enabling DeFi apps, NFTs, and decentralized applications to function properly.
-    </div>
-  </div>
+<div class="card">
+<h4>🔒 Validators</h4>
+<p>Validators ensure the integrity of the network by verifying transactions and maintaining consensus.</p>
+<div class="card-bottom">
+They play a critical role in producing blocks, validating smart contract executions, and earning rewards while keeping the network secure. Validators also help maintain decentralization and high network availability.
+</div>
+</div>
+<div class="card">
+<h4>🤝 Delegators</h4>
+<p>Delegators support the network by staking their FLR and participating indirectly in consensus.</p>
+<div class="card-bottom">
+This allows token holders to earn rewards without running a full node, while helping decentralize the network and improve its security. Delegators choose trusted validators to maximize efficiency and trust.
+</div>
+</div>
+<div class="card">
+<h4>📡 Providers</h4>
+<p>Data providers feed reliable external information into the Flare blockchain for smart contracts.</p>
+<div class="card-bottom">
+Their work ensures that price feeds, oracle data, and other services operate accurately for all users, enabling DeFi apps, NFTs, and decentralized applications to function properly.
+</div>
+</div>
 </div>
 </section>
 
 <section id="delegation">
 <h2>Understanding Delegation</h2>
-<p style="text-align:center; max-width:800px; margin:1rem auto;">
-Delegation is the process of entrusting your voting or staking power to a trusted validator or delegator. It allows you to participate in the network's governance and security even if you don't run a node yourself.
-</p>
-<p style="text-align:center; max-width:800px; margin:0.5rem auto;">
-Delegating your FLR brings several benefits: earning staking rewards, supporting network security and decentralization, and maintaining a voice in governance.
-</p>
+<p>Delegation is the process of entrusting your voting or staking power to a trusted validator or delegator. It allows you to participate in the network's governance and security even if you don't run a node yourself.</p>
+<p>Delegating your FLR brings several benefits: earning staking rewards, supporting network security and decentralization, and maintaining a voice in governance.</p>
 </section>
 
 <footer>
-  <div class="left">
-    Contact me via <span id="email"></span>
-  </div>
-  <div class="right" id="date"></div>
+<div>Contact me via <a href="mailto:svensekmir@gmail.com">Email</a></div>
+<div id="currentDate"></div>
 </footer>
 
 <script>
-  // Date in footer
-  const dateElement = document.getElementById("date");
-  const today = new Date();
-  dateElement.textContent = today.toDateString();
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+themeToggle?.addEventListener('change', ()=>document.body.classList.toggle('light-theme'));
 
-  // Theme toggle
-  const toggle = document.getElementById("themeToggle");
-  toggle.addEventListener("change", () => {
-    document.body.classList.toggle("light-theme");
-  });
+// FLR Chart
+const ctx = document.getElementById('flrChart').getContext('2d');
+let chartData = { labels: [], datasets:[{ label:'FLR (€)', data:[], borderColor:'#ff007f', backgroundColor:'rgba(255,0,127,0.2)', fill:true, tension:0.2, pointRadius:0 }] };
+let flrChart = new Chart(ctx, { 
+  type:'line', 
+  data:chartData, 
+  options:{ 
+    responsive:true, 
+    plugins:{ 
+      legend:{display:false}, 
+      tooltip:{ 
+        enabled:true,
+        backgroundColor:'#000',
+        titleColor:'#fff',
+        bodyColor:'#ff007f',
+        mode:'index',
+        intersect:false,
+        callbacks:{ label:function(context){return `€${context.parsed.y.toFixed(4)}`;}}
+      }
+    },
+    scales:{ 
+      x:{ title:{display:true,text:'Time (last 24h)', color:'#fff'}, ticks:{color:'#fff', autoSkip:true, maxTicksLimit:13} }, 
+      y:{ title:{display:true,text:'Price (€)', color:'#fff'}, ticks:{color:'#fff'} } 
+    }
+  }
+});
+async function fetchPriceHistory(){
+    try {
+        const res = await fetch('https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=eur&days=1&interval=hourly');
+        const data = await res.json();
+        const prices = data.prices; 
+        chartData.labels = prices.map(p=>{ const d = new Date(p[0]); return d.getHours()+':'+('0'+d.getMinutes()).slice(-2); });
+        chartData.datasets[0].data = prices.map(p=>p[1]);
+        flrChart.update();
+    } catch(err){
+        console.error('FLR API error:', err);
+    }
+}
+fetchPriceHistory();
+setInterval(fetchPriceHistory, 600000);
 
-  // Obfuscate email
-  const emailUser = "svensekmir";
-  const emailDomain = "gmail.com";
-  const emailFull = emailUser + "@" + emailDomain;
-  const emailSpan = document.getElementById("email");
-  const mailLink = document.createElement("a");
-  mailLink.href = "mailto:" + emailFull;
-  mailLink.textContent = emailFull;
-  mailLink.style.color = "var(--flare-pink)";
-  mailLink.style.textDecoration = "none";
-  emailSpan.appendChild(mailLink);
+// Footer date
+document.getElementById('currentDate').innerText = new Date().toLocaleDateString();
 </script>
 
 </body>
