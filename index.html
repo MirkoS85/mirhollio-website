@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- CSP: Poskusi sprostiti, ampak GitHub mogoce ignorira; ce blokira, deploy na drug host -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://flare-explorer.flare.network https://flare-api.flare.network https://api.allorigins.win https://api.coingecko.com;">
     <title>MirSFlr - Flare Network Live Dashboard</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
@@ -64,16 +62,29 @@
 
     <script>
         const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
-        const FLARE_RPC = 'https://flare-api.flare.network/ext/P'; // Popravljeno na /ext/P za P-chain (staking)
-        const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url=';
+        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P'; // Popravljeno: /ext/bc/P za P-chain
+        const COINGECKO_PROXY = 'https://corsproxy.io/?'; // Boljši proxy za CoinGecko
         const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur';
-        const ATTO = BigInt("1000000000000000000"); // 1e18 za FLR
+        const ATTO = BigInt("1000000000000000000");
+        
+        // Cache za price (5 min)
+        function getCachedPrice() {
+            const cached = localStorage.getItem('flrPrice');
+            if (cached) {
+                const { value, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < 300000) return value;
+            }
+            return null;
+        }
+        function setCachedPrice(value) {
+            localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
+        }
         
         // Fetch REST
         async function fetchRest(endpoint) {
             try {
                 const response = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } catch (error) {
                 console.error('Blockscout Error:', error);
@@ -81,8 +92,8 @@
             }
         }
         
-        // Fetch RPC
-        async function fetchRpc(method, params = {}) {
+        // Fetch RPC - params: [{}] za prazne argumente
+        async function fetchRpc(method) {
             try {
                 const response = await fetch(FLARE_RPC, {
                     method: 'POST',
@@ -91,10 +102,10 @@
                         jsonrpc: '2.0',
                         id: 1,
                         method: method,
-                        params: [params]
+                        params: [{}]  // Prazni params kot array z objektom
                     })
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 if (data.error) throw new Error(data.error.message);
                 return data.result;
@@ -108,15 +119,24 @@
         async function updateDashboard() {
             // FLR Price
             const priceDiv = document.getElementById('flr-price');
+            let price = getCachedPrice();
+            if (price) {
+                priceDiv.textContent = `${price} €`;
+                priceDiv.classList.remove('loading');
+            }
             try {
-                const priceResponse = await fetch(COINGECKO_PROXY + encodeURIComponent(COINGECKO_URL));
-                if (!priceResponse.ok) throw new Error(await priceResponse.text());
+                const priceResponse = await fetch(COINGECKO_PROXY + COINGECKO_URL);
+                if (!priceResponse.ok) throw new Error('Proxy error');
                 const priceData = await priceResponse.json();
-                priceDiv.textContent = `${(priceData.flare?.eur || 0).toFixed(4)} €`;
+                price = (priceData.flare?.eur || 0).toFixed(4);
+                priceDiv.textContent = `${price} €`;
+                setCachedPrice(price);
                 priceDiv.classList.remove('loading');
             } catch (error) {
-                priceDiv.textContent = `Napaka: ${error.message}`;
-                priceDiv.classList.add('error');
+                if (!price) {
+                    priceDiv.textContent = `Napaka: ${error.message.slice(0,50)}...`;
+                    priceDiv.classList.add('error');
+                }
             }
             
             // Transactions
@@ -141,11 +161,11 @@
             }
             
             // Active Validators
-            const validatorsData = await fetchRpc('platform.getCurrentValidators', { subnetID: '0x01' }); // subnetID za Primary network
+            const validatorsData = await fetchRpc('platform.getCurrentValidators');
             const valTable = document.querySelector('#validators-table tbody');
             const valCounter = document.getElementById('validators-counter');
             if (validatorsData.error) {
-                valCounter.textContent = `Napaka: ${validatorsData.error}`;
+                valCounter.textContent = `Napaka: ${validatorsData.error.slice(0,50)}...`;
                 valCounter.classList.add('error');
             } else {
                 const validators = validatorsData.validators || [];
@@ -162,14 +182,19 @@
             }
             
             // Stake / Delegations
-            const totalStakeData = await fetchRpc('platform.getTotalStake', { subnetID: '0x01' });
+            const totalStakeData = await fetchRpc('platform.getTotalStake');
             const stakeDiv = document.getElementById('stake-info');
+            let totalDelegated = 0;
+            if (!validatorsData.error && validatorsData.validators) {
+                totalDelegated = validatorsData.validators.reduce((sum, val) => 
+                    sum + (val.delegatedAmount ? Number(BigInt(val.delegatedAmount) / ATTO) : 0), 0
+                );
+            }
             if (totalStakeData.error) {
-                stakeDiv.textContent = `Napaka: ${totalStakeData.error}`;
+                stakeDiv.innerHTML = `<p>Napaka: ${totalStakeData.error.slice(0,50)}...</p>`;
                 stakeDiv.classList.add('error');
             } else {
                 const totalStake = totalStakeData.stakeAmount ? Number(BigInt(totalStakeData.stakeAmount) / ATTO) : 0;
-                const totalDelegated = (validatorsData.validators || []).reduce((sum, val) => sum + (val.delegatedAmount ? Number(BigInt(val.delegatedAmount) / ATTO) : 0), 0);
                 stakeDiv.innerHTML = `
                     <p>Total Stake: ${totalStake.toFixed(0)} FLR</p>
                     <p>Total Delegations: ${totalDelegated.toFixed(0)} FLR</p>
@@ -178,7 +203,7 @@
             }
             
             // Network Activity
-            const blocksData = await fetchRest('/blocks?limit=100');
+            const blocksData = await fetchRest('/blocks?limit=500'); // Povečan limit za boljši approx
             const activityDiv = document.getElementById('activity-info');
             if (blocksData.error) {
                 activityDiv.textContent = `Napaka: ${blocksData.error}`;
@@ -191,7 +216,7 @@
                     acc[day] = (acc[day] || 0) + 1;
                     return acc;
                 }, {});
-                activityDiv.innerHTML = Object.entries(dailyCounts).map(([day, count]) => `<p>${day}: ${count} blokov</p>`).join('');
+                activityDiv.innerHTML = Object.entries(dailyCounts).map(([day, count]) => `<p>${day}: ${count} blokov</p>`).join('') || '<p>Ni aktivnosti v zadnjih 10 dneh</p>';
                 activityDiv.classList.remove('loading');
             }
         }
