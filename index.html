@@ -17,10 +17,12 @@
         th { background-color: #f8f9fa; }
         .loading { text-align: center; color: #666; }
         .error { color: #d93025; text-align: center; }
+        .no-data { text-align: center; color: #999; font-style: italic; }
         details { margin-top: 10px; width: 100%; }
         summary { cursor: pointer; font-weight: bold; color: #1a73e8; }
         .activity-text { font-size: 0.9em; color: #666; margin-bottom: 10px; width: 100%; }
-        canvas { max-width: 100%; height: 250px; }
+        canvas { max-width: 100%; height: 250px; display: block; }
+        .hidden { display: none; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
@@ -93,8 +95,8 @@
     </div>
 
     <script>
-        const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2'; // Popravljeno na v2
-        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P'; // Uradni P-chain URL
+        const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
+        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P';
         const COINGECKO_PROXY = 'https://api.allorigins.win/raw?url=';
         const COINGECKO_URL = encodeURIComponent('https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur');
         const ATTO = BigInt("1000000000000000000");
@@ -118,7 +120,7 @@
         async function fetchRest(endpoint) {
             try {
                 const response = await fetch(`${BLOCKSCOUT_BASE}${endpoint}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } catch (error) {
                 console.error('Blockscout Error:', error);
@@ -139,7 +141,7 @@
                         params: []
                     })
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
                 if (data.error) throw new Error(data.error.message);
                 return data.result;
@@ -155,72 +157,70 @@
             const priceDiv = document.getElementById('flr-price');
             let price = getCachedPrice();
             if (price) {
-                priceDiv.textContent = `${price} €`;
+                priceDiv.innerHTML = `<span>${price} €</span>`;
                 priceDiv.classList.remove('loading');
             }
             try {
                 const priceResponse = await fetch(COINGECKO_PROXY + COINGECKO_URL);
                 if (!priceResponse.ok) throw new Error('Proxy error');
                 const priceData = await priceResponse.json();
-                price = (priceData.flare?.eur || 0).toFixed(6);
-                priceDiv.textContent = `${price} €`;
+                price = (priceData.flare?.eur || 0).toFixed(4);
+                priceDiv.innerHTML = `<span>${price} €</span>`;
                 setCachedPrice(price);
                 priceDiv.classList.remove('loading');
             } catch (error) {
-                if (!price) {
-                    priceDiv.textContent = `Napaka: ${error.message.slice(0,50)}...`;
-                    priceDiv.classList.add('error');
-                }
+                priceDiv.innerHTML = `<span class="no-data">Ni podatkov</span>`;
             }
             
-            // Transactions (v2 stats in transactions)
+            // Transactions
             const statsData = await fetchRest('/stats');
             const txData = await fetchRest('/transactions?limit=100');
             const txTable = document.querySelector('#tx-table tbody');
             const txCounter = document.getElementById('tx-counter');
             const txDetails = document.getElementById('tx-details');
-            if (statsData.error || txData.error) {
-                txCounter.textContent = `Napaka: ${statsData.error || txData.error}`;
-                txCounter.classList.add('error');
-                txDetails.style.display = 'none';
+            if (statsData.error || txData.error || !txData.items) {
+                txCounter.innerHTML = `<span class="error">Napaka ali ni podatkov</span>`;
+                txDetails.classList.add('hidden');
             } else {
-                const tx24h = statsData.transactions_today || 'N/A'; // Iz v2 stats
-                txCounter.textContent = `${tx24h} (24h)`;
+                const tx24h = statsData.transactions_today || statsData.result?.transactions_today || 'N/A';
+                txCounter.innerHTML = `<span>${tx24h.toLocaleString()}</span> (24h)`;
                 txCounter.classList.remove('loading');
-                txTable.innerHTML = (txData.items || []).map(tx => `
+                txTable.innerHTML = (txData.items.slice(0,10) || []).map(tx => `
                     <tr>
                         <td>${(tx.hash || '').slice(0,10)}...</td>
                         <td>${(tx.from?.hash || '').slice(0,10)}...</td>
-                        <td>${tx.to ? tx.to.hash.slice(0,10)+'...' : 'Contract'}</td>
-                        <td>${tx.value ? (Number(BigInt(tx.value) / ATTO)).toFixed(6) + ' FLR' : '0'}</td>
+                        <td>${tx.to?.hash ? tx.to.hash.slice(0,10)+'...' : 'Contract'}</td>
+                        <td>${tx.value ? (Number(BigInt(tx.value) / ATTO)).toFixed(4) + ' FLR' : '0'}</td>
                     </tr>
                 `).join('');
-                txDetails.style.display = 'block';
+                txDetails.classList.remove('hidden');
             }
             
             // Active Validators
             const validatorsData = await fetchRpc('platform.getCurrentValidators');
             const valTable = document.querySelector('#validators-table tbody');
             const valCounter = document.getElementById('validators-counter');
-            const valChartCtx = document.getElementById('validators-chart').getContext('2d');
-            if (validatorsData.error) {
-                valCounter.textContent = `Napaka: ${validatorsData.error.slice(0,50)}...`;
-                valCounter.classList.add('error');
+            const valChartCtx = document.getElementById('validators-chart');
+            const valChart = document.getElementById('validators-chart');
+            if (validatorsData.error || !validatorsData.validators) {
+                valCounter.innerHTML = `<span class="error">Napaka ali ni podatkov</span>`;
+                valTable.innerHTML = '<tr><td colspan="4" class="no-data">Ni validatorjev</td></tr>';
+                valChart.classList.add('hidden');
             } else {
-                const validators = validatorsData.validators || [];
-                valCounter.textContent = `Aktivnih: ${validators.length}`;
+                const validators = validatorsData.validators;
+                valCounter.innerHTML = `<span>${validators.length}</span> aktivnih`;
                 valCounter.classList.remove('loading');
-                valTable.innerHTML = validators.slice(0,10).map(val => `
+                valTable.innerHTML = validators.slice(0,5).map(val => `
                     <tr>
                         <td>${(val.nodeID || '').slice(0,10)}...</td>
-                        <td>${val.stakeAmount ? (Number(BigInt(val.stakeAmount) / ATTO)).toFixed(6) + ' FLR' : 'N/A'}</td>
-                        <td>${val.delegatedAmount ? (Number(BigInt(val.delegatedAmount) / ATTO)).toFixed(6) + ' FLR' : '0'}</td>
+                        <td>${val.stakeAmount ? (Number(BigInt(val.stakeAmount) / ATTO)).toFixed(4) + ' FLR' : 'N/A'}</td>
+                        <td>${val.delegatedAmount ? (Number(BigInt(val.delegatedAmount) / ATTO)).toFixed(4) + ' FLR' : '0'}</td>
                         <td>Aktiven</td>
                     </tr>
                 `).join('');
                 const sortedVal = validators.sort((a,b) => Number(BigInt(b.stakeAmount || 0)) - Number(BigInt(a.stakeAmount || 0))).slice(0,5);
                 if (validatorsChart) validatorsChart.destroy();
-                validatorsChart = new Chart(valChartCtx, {
+                validatorsChart = new Chart(valChartCtx.getContext('2d'), {
                     type: 'bar',
                     data: {
                         labels: sortedVal.map(v => v.nodeID.slice(0,6)+'...'),
@@ -228,28 +228,30 @@
                     },
                     options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
+                valChart.classList.remove('hidden');
             }
             
             // Stake / Delegations
             const totalStakeData = await fetchRpc('platform.getTotalStake');
             const stakeDiv = document.getElementById('stake-info');
-            const stakeChartCtx = document.getElementById('stake-chart').getContext('2d');
+            const stakeChartCtx = document.getElementById('stake-chart');
+            const stakeChartEl = document.getElementById('stake-chart');
             let totalDelegated = 0;
             if (!validatorsData.error && validatorsData.validators) {
                 totalDelegated = validatorsData.validators.reduce((sum, val) => sum + (val.delegatedAmount ? Number(BigInt(val.delegatedAmount) / ATTO) : 0), 0);
             }
             if (totalStakeData.error) {
-                stakeDiv.innerHTML = `<p>Napaka: ${totalStakeData.error.slice(0,50)}...</p>`;
-                stakeDiv.classList.add('error');
+                stakeDiv.innerHTML = `<p class="no-data">Ni podatkov (stake: 0 FLR, delegations: 0 FLR)</p>`;
+                stakeChartEl.classList.add('hidden');
             } else {
                 const totalStake = totalStakeData.stakeAmount ? Number(BigInt(totalStakeData.stakeAmount) / ATTO) : 0;
                 stakeDiv.innerHTML = `
-                    <p>Total Stake: ${totalStake.toFixed(6)} FLR</p>
-                    <p>Total Delegations: ${totalDelegated.toFixed(6)} FLR</p>
+                    <p>Total Stake: ${totalStake.toFixed(4)} FLR</p>
+                    <p>Total Delegations: ${totalDelegated.toFixed(4)} FLR</p>
                 `;
                 stakeDiv.classList.remove('loading');
                 if (stakeChart) stakeChart.destroy();
-                stakeChart = new Chart(stakeChartCtx, {
+                stakeChart = new Chart(stakeChartCtx.getContext('2d'), {
                     type: 'pie',
                     data: {
                         labels: ['Total Stake', 'Total Delegations'],
@@ -257,28 +259,30 @@
                     },
                     options: { responsive: true }
                 });
+                stakeChartEl.classList.remove('hidden');
             }
             
-            // Network Activity (v2 blocks, timestamp *1000)
+            // Network Activity (ISO timestamp)
             const blocksData = await fetchRest('/blocks?limit=1000');
             const activityDiv = document.getElementById('activity-info');
-            const activityChartCtx = document.getElementById('activity-chart').getContext('2d');
-            if (blocksData.error) {
-                activityDiv.textContent = `Napaka: ${blocksData.error}`;
-                activityDiv.classList.add('error');
+            const activityChartCtx = document.getElementById('activity-chart');
+            const activityChartEl = document.getElementById('activity-chart');
+            if (blocksData.error || !blocksData.items) {
+                activityDiv.innerHTML = `<p class="no-data">Ni podatkov</p>`;
+                activityChartEl.classList.add('hidden');
             } else {
-                const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
-                const recentBlocks = (blocksData.items || []).filter(block => new Date(block.timestamp * 1000).getTime() > tenDaysAgo); // *1000 za ms
+                const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+                const recentBlocks = blocksData.items.filter(block => new Date(block.timestamp) > tenDaysAgo);
                 const dailyCounts = recentBlocks.reduce((acc, block) => {
-                    const day = new Date(block.timestamp * 1000).toLocaleDateString('sl-SI');
+                    const day = new Date(block.timestamp).toLocaleDateString('sl-SI');
                     acc[day] = (acc[day] || 0) + 1;
                     return acc;
                 }, {});
-                activityDiv.innerHTML = Object.entries(dailyCounts).map(([day, count]) => `<p>${day}: ${count.toLocaleString()} blokov</p>`).join('') || '<p>Ni aktivnosti</p>';
+                activityDiv.innerHTML = Object.entries(dailyCounts).sort(([a],[b]) => new Date(b) - new Date(a)).map(([day, count]) => `<p>${day}: ${count.toLocaleString()} blokov</p>`).join('') || '<p class="no-data">Ni aktivnosti</p>';
                 activityDiv.classList.remove('loading');
                 const days = Object.keys(dailyCounts).sort().reverse().slice(0,10);
                 if (activityChart) activityChart.destroy();
-                activityChart = new Chart(activityChartCtx, {
+                activityChart = new Chart(activityChartCtx.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: days,
@@ -286,6 +290,7 @@
                     },
                     options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
+                activityChartEl.classList.remove('hidden');
             }
         }
         
