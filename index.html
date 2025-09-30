@@ -11,10 +11,13 @@
         .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .counter { font-size: 2em; font-weight: bold; color: #1a73e8; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-size: 0.9em; }
         th { background-color: #f8f9fa; }
         .loading { text-align: center; color: #666; }
         .error { color: #d93025; text-align: center; }
+        details { margin-top: 10px; }
+        summary { cursor: pointer; font-weight: bold; color: #1a73e8; }
+        .activity-text { font-size: 0.9em; color: #666; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -31,10 +34,13 @@
         <div class="section">
             <h2>Transakcije (24h)</h2>
             <div id="tx-counter" class="counter loading">Nalagam...</div>
-            <table id="tx-table">
-                <thead><tr><th>Hash</th><th>Od</th><th>Do</th><th>Vrednost</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <details id="tx-details">
+                <summary>Razširi zadnjih 10 transakcij</summary>
+                <table id="tx-table">
+                    <thead><tr><th>Hash</th><th>Od</th><th>Do</th><th>Vrednost</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </details>
         </div>
         
         <!-- Active Validators -->
@@ -56,29 +62,17 @@
         <!-- Network Activity -->
         <div class="section">
             <h2>Network Activity (zadnjih 10 dni)</h2>
+            <div class="activity-text">To je približek aktivnosti preko števila novih blokov na dan – kaže network health (več blokov = večja aktivnost). Za natančne nove validatorje/delegatorje: ~2 novi validatorji, brez novih delegatorjev (vir: Flare Builders Tracker, sept 2025).</div>
             <div id="activity-info" class="loading">Nalagam...</div>
         </div>
     </div>
 
     <script>
         const BLOCKSCOUT_BASE = 'https://flare-explorer.flare.network/api/v2';
-        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P'; // Popravljeno: /ext/bc/P za P-chain
-        const COINGECKO_PROXY = 'https://corsproxy.io/?'; // Boljši proxy za CoinGecko
-        const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=flare&vs_currencies=eur';
+        const FLARE_RPC = 'https://flare-api.flare.network/ext/bc/P';
+        const COINCAP_URL = 'https://api.coincap.io/v2/assets/flare'; // Free alternative za price
+        const USD_TO_EUR = 0.92; // Približen tečaj (posodobi po potrebi)
         const ATTO = BigInt("1000000000000000000");
-        
-        // Cache za price (5 min)
-        function getCachedPrice() {
-            const cached = localStorage.getItem('flrPrice');
-            if (cached) {
-                const { value, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp < 300000) return value;
-            }
-            return null;
-        }
-        function setCachedPrice(value) {
-            localStorage.setItem('flrPrice', JSON.stringify({ value, timestamp: Date.now() }));
-        }
         
         // Fetch REST
         async function fetchRest(endpoint) {
@@ -92,7 +86,7 @@
             }
         }
         
-        // Fetch RPC - params: [{}] za prazne argumente
+        // Fetch RPC - params: [] za vse
         async function fetchRpc(method) {
             try {
                 const response = await fetch(FLARE_RPC, {
@@ -102,7 +96,7 @@
                         jsonrpc: '2.0',
                         id: 1,
                         method: method,
-                        params: [{}]  // Prazni params kot array z objektom
+                        params: []  // Prazno array za vse validatorje/stake
                     })
                 });
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -117,26 +111,19 @@
         
         // Osveži
         async function updateDashboard() {
-            // FLR Price
+            // FLR Price (CoinCap)
             const priceDiv = document.getElementById('flr-price');
-            let price = getCachedPrice();
-            if (price) {
-                priceDiv.textContent = `${price} €`;
-                priceDiv.classList.remove('loading');
-            }
             try {
-                const priceResponse = await fetch(COINGECKO_PROXY + COINGECKO_URL);
-                if (!priceResponse.ok) throw new Error('Proxy error');
+                const priceResponse = await fetch(COINCAP_URL);
+                if (!priceResponse.ok) throw new Error('CoinCap error');
                 const priceData = await priceResponse.json();
-                price = (priceData.flare?.eur || 0).toFixed(4);
-                priceDiv.textContent = `${price} €`;
-                setCachedPrice(price);
+                const usdPrice = parseFloat(priceData.data.priceUsd);
+                const eurPrice = (usdPrice * USD_TO_EUR).toFixed(4);
+                priceDiv.textContent = `${eurPrice} €`;
                 priceDiv.classList.remove('loading');
             } catch (error) {
-                if (!price) {
-                    priceDiv.textContent = `Napaka: ${error.message.slice(0,50)}...`;
-                    priceDiv.classList.add('error');
-                }
+                priceDiv.textContent = `Napaka: ${error.message.slice(0,50)}...`;
+                priceDiv.classList.add('error');
             }
             
             // Transactions
@@ -144,9 +131,11 @@
             const statsData = await fetchRest('/stats');
             const txTable = document.querySelector('#tx-table tbody');
             const txCounter = document.getElementById('tx-counter');
+            const txDetails = document.getElementById('tx-details');
             if (txData.error || statsData.error) {
                 txCounter.textContent = `Napaka: ${txData.error || statsData.error}`;
                 txCounter.classList.add('error');
+                txDetails.style.display = 'none';
             } else {
                 txCounter.textContent = `${statsData.transactions_today || 'N/A'} (24h)`;
                 txCounter.classList.remove('loading');
@@ -158,6 +147,7 @@
                         <td>${tx.value ? (Number(BigInt(tx.value) / ATTO)).toFixed(2) + ' FLR' : '0'}</td>
                     </tr>
                 `).join('');
+                txDetails.style.display = 'block';
             }
             
             // Active Validators
@@ -203,7 +193,7 @@
             }
             
             // Network Activity
-            const blocksData = await fetchRest('/blocks?limit=500'); // Povečan limit za boljši approx
+            const blocksData = await fetchRest('/blocks?limit=500');
             const activityDiv = document.getElementById('activity-info');
             if (blocksData.error) {
                 activityDiv.textContent = `Napaka: ${blocksData.error}`;
