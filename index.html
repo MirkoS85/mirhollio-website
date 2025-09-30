@@ -174,8 +174,7 @@ let flrChart = new Chart(ctx, {
 });
 async function fetchPriceHistory(){
     try {
-        const res = await fetch('- const res = await fetch('https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=eur&days=1&interval=hourly');
-+ const res = await fetch('https://api.coingecko.com/api/v3/coins/flare-networks/market_chart?vs_currency=eur&days=1&interval=hourly');
+        const res = await fetch('https://api.coingecko.com/api/v3/coins/flare-networks/market_chart?vs_currency=eur&days=1&interval=hourly');
 ');
         const data = await res.json();
         const prices = data.prices; 
