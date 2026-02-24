@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr — Flare Validator & FTSO Provider</title>
+
+  <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics, status, and delegation guidance — built for reliability." />
+  <meta name="theme-color" content="#0b1220" />
+  <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta property="og:description" content="Transparent metrics, status, and delegation guidance — built for reliability." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.mirhollio.com/" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#070b14;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.52);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --r:18px; --r2:28px;
+      --max:1120px;
+      --brand:#7c5cff;
+      --brand2:#23d5ff;
+      --ok:#33d69f;
+      --warn:#ffcc66;
+      --bad:#ff6b6b;
+      --ring:0 0 0 6px rgba(124,92,255,.16);
+    }
+    [data-theme="light"]{
+      --bg:#f7f9ff;
+      --text:rgba(10,14,25,.92);
+      --muted:rgba(10,14,25,.72);
+      --muted2:rgba(10,14,25,.56);
+      --panel:rgba(10,14,25,.06);
+      --panel2:rgba(10,14,25,.04);
+      --border:rgba(10,14,25,.12);
+      --shadow:0 18px 60px rgba(10,14,25,.12);
+      --ring:0 0 0 6px rgba(124,92,255,.14);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 15% 10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(35,213,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 50% 120%, rgba(51,214,159,.10), transparent 55%),
+        var(--bg);
+      overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 20px}
+
+    /* Animated glow */
+    .glow{
+      position:fixed; inset:-220px;
+      background:
+        radial-gradient(700px 520px at 10% 18%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(640px 460px at 86% 8%, rgba(35,213,255,.16), transparent 60%),
+        radial-gradient(740px 520px at 72% 84%, rgba(51,214,159,.11), transparent 65%);
+      filter:blur(32px);
+      pointer-events:none;
+      opacity:.92;
+      animation: drift 14s ease-in-out infinite alternate;
+    }
+    @keyframes drift{
+      from{transform:translate3d(-10px,-6px,0) scale(1.00)}
+      to{transform:translate3d(10px,8px,0) scale(1.03)}
+    }
+
+    /* Header / Nav */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,.18));
+    }
+    [data-theme="light"] header{
+      background: linear-gradient(to bottom, rgba(247,249,255,.86), rgba(247,249,255,.62));
+    }
+    .nav{
+      height:74px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:-0.02em;
+    }
+    .logoImg{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      object-fit:contain;
+      border:1px solid rgba(255,255,255,.22);
+      box-shadow: 0 14px 26px rgba(124,92,255,.22);
+      background: rgba(255,255,255,.06);
+    }
+    [data-theme="light"] .logoImg{
+      border:1px solid rgba(10,14,25,.12);
+    }
+    .navlinks{
+      display:flex; align-items:center; gap:12px;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .navlinks a{padding:10px 10px; border-radius:12px}
+    .navlinks a:hover{background:var(--panel2); color:var(--text)}
+    .actions{display:flex; align-items:center; gap:10px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:var(--panel2);
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px); background:var(--panel)}
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      background:linear-gradient(135deg, var(--brand), var(--brand2));
+      border-color:transparent;
+      color:rgba(255,255,255,.95);
+      box-shadow:0 18px 36px rgba(124,92,255,.18);
+    }
+    .btn.ghost{background:transparent}
+    .icon{width:18px; height:18px; display:inline-block}
+    @media (max-width: 920px){ .navlinks{display:none} }
+
+    /* Layout */
+    main{position:relative}
+    section{padding: 18px 0}
+    .card{
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius: var(--r2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .gridHero{
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:16px;
+      align-items:stretch;
+      margin-top: 18px;
+    }
+    @media (max-width: 920px){ .gridHero{grid-template-columns:1fr} }
+
+    .hero{
+      padding:22px;
+      min-height: 380px;
+      position:relative;
+    }
+    .spark{
+      position:absolute; right:-160px; top:-160px;
+      width:420px; height:420px; border-radius:50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.20), transparent 50%),
+        linear-gradient(135deg, rgba(124,92,255,.48), rgba(35,213,255,.34));
+      filter: blur(18px);
+      opacity:.55;
+      transform: rotate(18deg);
+      pointer-events:none;
+    }
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 12px; border-radius:999px;
+      background: rgba(124,92,255,.12);
+      border:1px solid rgba(124,92,255,.22);
+      font-weight:700;
+      font-size:13px;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--ok); box-shadow:0 0 0 4px rgba(51,214,159,.14)}
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(30px, 3.2vw, 46px);
+      letter-spacing:-0.035em;
+      line-height:1.06;
+    }
+    .lead{
+      margin:0 0 14px;
+      color:var(--muted);
+      line-height:1.65;
+      max-width: 62ch;
+      font-size: 16px;
+    }
+    .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+    .badgeRow{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; color:var(--muted2); font-size:13px}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:9px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border:1px solid var(--border);
+    }
+
+    /* Side */
+    .side{padding:18px}
+    .titleRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
+    .titleRow h2{margin:0; font-size:16px; letter-spacing:-0.02em}
+    .kpis{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width:520px){ .kpis{grid-template-columns:1fr} } /* phone friendly */
+    .kpi{
+      padding:12px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      min-height: 68px;
+    }
+    .kpi .label{color:var(--muted2); font-size:12px; margin-bottom:6px}
+    .kpi .value{font-weight:800; letter-spacing:-0.02em}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+    .box{
+      margin-top: 12px;
+      padding:12px;
+      border-radius: 16px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.12);
+    }
+    [data-theme="light"] .box{background: rgba(10,14,25,.04)}
+    .boxHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .tiny{font-size:12px; color:var(--muted2)}
+    .addr{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .divider{height:1px; background:var(--border); margin:12px 0}
+
+    /* Sections / panels */
+    .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+    @media (max-width: 920px){ .grid3{grid-template-columns:1fr} }
+    .feature{
+      padding:16px;
+      border-radius: var(--r);
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      position:relative;
+      overflow:hidden;
+    }
+    .feature:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background:
+        radial-gradient(240px 120px at 18% 0%, rgba(124,92,255,.18), transparent 60%),
+        radial-gradient(240px 120px at 92% 20%, rgba(35,213,255,.12), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .feature > *{position:relative}
+    .feature h3{margin:0 0 8px; letter-spacing:-0.02em}
+    .feature p{margin:0; color:var(--muted); line-height:1.6}
+
+    .split{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    @media (max-width: 920px){ .split{grid-template-columns:1fr} }
+    .panel{
+      padding:16px;
+      border-radius: var(--r2);
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow: var(--shadow);
+    }
+    .panel h2{margin:0 0 10px; font-size:18px; letter-spacing:-0.02em}
+    .muted{color:var(--muted)}
+    .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
+
+    /* Tabs */
+    .tabs{display:flex; flex-wrap:wrap; gap:10px; margin: 6px 0 12px}
+    .tab{
+      padding:9px 12px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+    }
+    .tab[aria-selected="true"]{
+      background: rgba(124,92,255,.14);
+      border-color: rgba(124,92,255,.28);
+      color: var(--text);
+      box-shadow: var(--ring);
+    }
+    .tabpanes > div{display:none}
+    .tabpanes > div.active{display:block}
+
+    /* Status */
+    .statusRow{display:grid; grid-template-columns: 1.3fr .7fr; gap:14px}
+    @media (max-width:920px){ .statusRow{grid-template-columns:1fr} }
+    .statusLine{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px;
+      border-radius: 18px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      margin-bottom:10px;
+    }
+    .statusLeft{display:flex; align-items:center; gap:10px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-weight:800;
+      font-size:12px;
+    }
+    .chip.ok{border-color: rgba(51,214,159,.30); background: rgba(51,214,159,.10); color: var(--text)}
+    .chip.warn{border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.12); color: var(--text)}
+    .dotSm{width:8px;height:8px;border-radius:999px; background:var(--ok)}
+    .dotSm.warn{background:var(--warn)}
+
+    /* FAQ */
+    details{
+      border:1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      padding: 12px 14px;
+      margin-bottom:10px;
+      transition: box-shadow .12s ease;
+    }
+    details[open]{box-shadow: var(--ring)}
+    summary{
+      cursor:pointer;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-weight:900;
+      letter-spacing:-0.01em;
+    }
+    summary::-webkit-details-marker{display:none}
+    details p{margin:10px 0 0; color:var(--muted); line-height:1.65}
+    .chev{transition: transform .12s ease}
+    details[open] .chev{transform: rotate(180deg)}
+
+    /* Footer */
+    footer{padding: 26px 0 40px; color:var(--muted2)}
+    .foot{
+      display:flex; flex-wrap:wrap; gap:12px;
+      align-items:center; justify-content:space-between;
+      border-top:1px solid var(--border);
+      padding-top:18px;
+    }
+    .links{display:flex; flex-wrap:wrap; gap:10px; color:var(--muted)}
+    .links a{padding:8px 10px; border-radius:12px}
+    .links a:hover{background: var(--panel2); color: var(--text)}
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: rgba(255,255,255,0.92);
+      border:1px solid rgba(255,255,255,0.14);
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .16s ease, transform .16s ease;
+      font-weight:800;
+      font-size: 13px;
+      z-index: 60;
+      max-width: calc(100vw - 32px);
+      text-align:center;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+    [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
+    .sr{position:absolute; left:-9999px}
+
+    /* Embedded explorer */
+    .iframeWrap{
+      border-radius: 18px;
+      border:1px solid var(--border);
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+    }
+    iframe{width:100%; height:520px; border:0}
+    @media (max-width:920px){ iframe{height:540px} }
+
+    /* Price layout: desktop 2 cols, mobile 1 col */
+    .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
+    @media (max-width: 920px){ .splitWide{grid-template-columns:1fr} }
+
+    /* Collapsible card styling */
+    .cardDetails{
+      border:1px solid var(--border);
+      border-radius: var(--r2);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow: none;
+      overflow:hidden;
+    }
+    .cardDetails summary{
+      padding: 14px 16px;
+      font-weight:900;
+      letter-spacing:-0.02em;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      cursor:pointer;
+      list-style:none;
+    }
+    .cardDetails summary::-webkit-details-marker{display:none}
+    .cardDetails .inner{padding: 0 16px 16px}
+    .cardDetails .chev{transition: transform .12s ease}
+    .cardDetails[open] .chev{transform: rotate(180deg)}
+  </style>
+</head>
+
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <header>
+    <div class="container">
+      <div class="nav">
+        <!-- Needs logo.png in repo root -->
+        <a class="brand" href="#top" aria-label="MirSFlr Home">
+          <img src="assets/logo.png" alt="MirSFlr logo" class="logoImg">
+          <span>MirSFlr</span>
+        </a>
+
+        <nav class="navlinks" aria-label="Primary">
+          <a href="#about">About</a>
+          <a href="#price">Price</a>
+          <a href="#metrics">Metrics</a>
+          <a href="#delegation">Delegation</a>
+          <a href="#status">Status</a>
+          <a href="#faq">FAQ</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="actions">
+          <button class="btn ghost" id="themeBtn" type="button" aria-label="Toggle theme">
+            <span class="icon" aria-hidden="true">🌗</span>
+            <span class="tiny" id="themeLabel">Theme</span>
+          </button>
+          <a class="btn primary" href="#delegation">
+            <span class="icon" aria-hidden="true">⚡</span> Delegate
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section>
+      <div class="gridHero">
+        <div class="card hero">
+          <div class="spark" aria-hidden="true"></div>
+          <span class="pill"><span class="dot" aria-hidden="true"></span> Online • Monitored • Transparent</span>
+
+          <h1>Validator + FTSO Provider built for uptime, signal quality, and trust.</h1>
+          <p class="lead">
+            MirSFlr helps secure the Flare network and supports FTSO data delivery with an ops-first approach:
+            disciplined maintenance, clear status, and public metrics you can verify.
+          </p>
+
+          <div class="row">
+            <a class="btn primary" id="btnMetrics" href="#metrics"><span class="icon" aria-hidden="true">📈</span>Metrics dashboard</a>
+            <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">↗</span>CoinGecko</a>
+            <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">↗</span>FlareMetrics</a>
+            <a class="btn" href="https://flare.network/" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">🌐</span>flare.network</a>
+            <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">𝕏</span>X</a>
+            <a class="btn" href="https://t.me/Mirhollio" target="_blank" rel="noopener"><span class="icon" aria-hidden="true">✈️</span>Telegram</a>
+            <button class="btn" type="button" id="copyAllBtn"><span class="icon" aria-hidden="true">📋</span>Copy key addresses</button>
+          </div>
+
+          <div class="badgeRow">
+            <span class="badge"><span aria-hidden="true">🔒</span> Security-first ops</span>
+            <span class="badge"><span aria-hidden="true">🛠️</span> Continuous improvements</span>
+            <span class="badge"><span aria-hidden="true">🧭</span> Clear delegation guidance</span>
+          </div>
+        </div>
+
+        <aside class="card side" aria-label="Quick snapshot">
+          <div class="titleRow">
+            <h2>Quick Snapshot</h2>
+            <a class="btn" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener" style="padding:8px 10px;">
+              <span class="icon" aria-hidden="true">↗</span>Explorer
+            </a>
+          </div>
+
+          <div class="kpis" role="list">
+            <div class="kpi" role="listitem">
+              <div class="label">Role</div>
+              <div class="value">Validator</div>
+            </div>
+            <div class="kpi" role="listitem">
+              <div class="label">Also</div>
+              <div class="value">FTSO Provider</div>
+            </div>
+            <div class="kpi" role="listitem">
+              <div class="label">Monitoring</div>
+              <div class="value">24/7 Alerts</div>
+            </div>
+            <div class="kpi" role="listitem">
+              <div class="label">Focus</div>
+              <div class="value">Stability</div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="boxHead">
+              <div class="tiny">Delegation address</div>
+              <button class="btn" id="copyDelegateBtn" type="button" style="padding:8px 10px;"><span aria-hidden="true">📋</span>Copy</button>
+            </div>
+            <div class="addr mono" id="delegateAddr" title=""></div>
+            <div class="divider"></div>
+
+            <div class="boxHead">
+              <div class="tiny">FTSO provider (identity)</div>
+              <button class="btn" id="copyFtsoBtn" type="button" style="padding:8px 10px;"><span aria-hidden="true">📋</span>Copy</button>
+            </div>
+            <div class="addr mono" id="ftsoAddr" title=""></div>
+
+            <div class="divider"></div>
+            <div class="tiny">Tip: Always verify identity on trusted sources before delegating.</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- FLR Price (CoinGecko) -->
+    <section id="price">
+      <div class="panel">
+        <div class="titleRow" style="margin-bottom:10px">
+          <h2>FLR Price (CoinGecko)</h2>
+          <span class="tiny" id="cgStatus">Loading…</span>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Price range">
+          <button class="tab" role="tab" aria-selected="true" data-days="7" type="button">7D</button>
+          <button class="tab" role="tab" aria-selected="false" data-days="30" type="button">30D</button>
+          <button class="tab" role="tab" aria-selected="false" data-days="90" type="button">90D</button>
+          <button class="tab" role="tab" aria-selected="false" data-days="365" type="button">1Y</button>
+        </div>
+
+        <div class="splitWide">
+          <div class="panel" style="box-shadow:none">
+            <div class="iframeWrap" style="padding:12px">
+              <canvas id="flrChart" height="140" aria-label="FLR price chart"></canvas>
+            </div>
+            <div class="row" style="margin-top:12px">
+              <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">
+                <span aria-hidden="true">↗</span>Open on CoinGecko
+              </a>
+              <button class="btn primary" id="cgRefresh" type="button"><span aria-hidden="true">⟳</span>Refresh</button>
+            </div>
+          </div>
+
+          <details class="cardDetails" open>
+            <summary>Market snapshot <span class="chev" aria-hidden="true">▾</span></summary>
+            <div class="inner">
+              <h2 style="margin-top:0">Market snapshot</h2>
+              <div class="kpis">
+                <div class="kpi">
+                  <div class="label">Price (USD)</div>
+                  <div class="value" id="cgPriceUsd">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="label">24h Change</div>
+                  <div class="value" id="cgChg24h">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="label">24h Volume</div>
+                  <div class="value" id="cgVol24h">—</div>
+                </div>
+                <div class="kpi">
+                  <div class="label">Market Cap</div>
+                  <div class="value" id="cgMcap">—</div>
+                </div>
+              </div>
+              <p class="tiny" style="margin-top:10px">
+                Data source: CoinGecko API. If it fails, it’s usually rate limiting or blocked requests.
+              </p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="grid3" aria-label="Highlights">
+        <div class="feature">
+          <h3>Reliability</h3>
+          <p>Monitoring + alerting, careful updates, and incident discipline to protect uptime.</p>
+        </div>
+        <div class="feature">
+          <h3>Transparency</h3>
+          <p>Public metrics, status, and clear links — easy to verify, easy to trust.</p>
+        </div>
+        <div class="feature">
+          <h3>Delegator-friendly</h3>
+          <p>Wallet-oriented guidance, simple checklists, and practical support when things look off.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="metrics">
+      <div class="panel">
+        <div class="titleRow" style="margin-bottom:10px">
+          <h2>Metrics Dashboard</h2>
+          <div class="tiny">Live links + optional auto-refresh attempt (depends on CORS)</div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Metrics tabs">
+          <button class="tab" role="tab" aria-selected="true" aria-controls="pane-overview" id="tab-overview" type="button">Overview</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="pane-ftso" id="tab-ftso" type="button">FTSO</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="pane-validator" id="tab-validator" type="button">Validator</button>
+        </div>
+
+        <div class="tabpanes">
+          <div id="pane-overview" class="active" role="tabpanel" aria-labelledby="tab-overview">
+            <div class="split">
+              <div class="panel" style="box-shadow:none">
+                <h2>What to look at</h2>
+                <ul class="list">
+                  <li><b>Availability</b> (last 6h / 24h) — are systems consistently online?</li>
+                  <li><b>Success rate</b> — are submissions landing successfully?</li>
+                  <li><b>Rewards</b> — primary/secondary earned within recent rounds/epochs.</li>
+                  <li><b>Per-feed availability</b> — key for FTSO signal quality.</li>
+                </ul>
+                <div class="row" style="margin-top:12px">
+                  <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">↗</span>Open FTSO provider page
+                  </a>
+                  <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">↗</span>Open FlareMetrics
+                  </a>
+                  <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">𝕏</span>Official X
+                  </a>
+                </div>
+              </div>
+
+              <details class="cardDetails" open>
+                <summary>Quick numbers (auto) <span class="chev" aria-hidden="true">▾</span></summary>
+                <div class="inner">
+                  <h2 style="margin-top:0">Quick numbers (auto)</h2>
+                  <p class="muted" style="margin:0 0 10px; line-height:1.65">
+                    This panel <b>tries</b> to fetch headline metrics from the Flare Systems Explorer. If your browser blocks cross-site requests,
+                    you’ll still have the embedded explorer view in the FTSO tab.
+                  </p>
+
+                  <div class="kpis">
+                    <div class="kpi">
+                      <div class="label">FTSO Availability (6h)</div>
+                      <div class="value" id="m_av6h">—</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="label">FTSO Success Rate (6h)</div>
+                      <div class="value" id="m_sr6h">—</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="label">FTSO Availability (24h)</div>
+                      <div class="value" id="m_av24h">—</div>
+                    </div>
+                    <div class="kpi">
+                      <div class="label">FTSO Success Rate (24h)</div>
+                      <div class="value" id="m_sr24h">—</div>
+                    </div>
+                  </div>
+
+                  <div class="row" style="margin-top:12px">
+                    <button class="btn primary" id="refreshMetricsBtn" type="button"><span aria-hidden="true">⟳</span>Refresh now</button>
+                    <span class="tiny" id="metricsNote">Not loaded yet.</span>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <div id="pane-ftso" role="tabpanel" aria-labelledby="tab-ftso">
+            <div class="split">
+              <div class="panel" style="box-shadow:none">
+                <h2>FTSO Provider metrics (embedded)</h2>
+                <p class="muted" style="margin:0 0 10px; line-height:1.65">
+                  This is a live embed of your provider page. Use it as the “source of truth” when you share the site.
+                </p>
+                <div class="iframeWrap">
+                  <iframe
+                    title="Flare Systems Explorer — FTSO Provider"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                    src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
+                  </iframe>
+                </div>
+                <div class="row" style="margin-top:12px">
+                  <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
+                    <span aria-hidden="true">↗</span>Open in new tab
+                  </a>
+                </div>
+              </div>
+
+              <div class="panel" style="box-shadow:none">
+                <h2>FTSO identity & keys</h2>
+                <p class="muted" style="margin:0 0 10px; line-height:1.65">
+                  Keep these consistent everywhere you publish. Delegators should always verify the same identity.
+                </p>
+                <div class="box" style="margin-top:0">
+                  <div class="tiny">FTSO provider identity address</div>
+                  <div class="addr mono" id="ftsoAddr2"></div>
+                  <div class="divider"></div>
+
+                  <div class="tiny">Delegation address (your site address)</div>
+                  <div class="addr mono" id="delegateAddr2"></div>
+
+                  <div class="divider"></div>
+                  <div class="tiny">Explorer link</div>
+                  <a class="btn" style="margin-top:10px" target="_blank" rel="noopener"
+                     href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
+                    <span aria-hidden="true">↗</span>flare-systems-explorer
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pane-validator" role="tabpanel" aria-labelledby="tab-validator">
+            <div class="split">
+              <div class="panel" style="box-shadow:none">
+                <h2>Validator metrics</h2>
+                <p class="muted" style="margin:0 0 10px; line-height:1.65">
+                  If you have a specific validator page URL (e.g., on FlareMetrics), paste it in the CONFIG to surface it here.
+                </p>
+                <ul class="list">
+                  <li><b>Uptime</b> and missed blocks (if available).</li>
+                  <li><b>Commission</b> / fee and delegator reward rate (where shown).</li>
+                  <li><b>Stake / weight</b> trends.</li>
+                </ul>
+                <div class="row" style="margin-top:12px">
+                  <a class="btn primary" id="validatorLinkBtn" href="https://flaremetrics.io/" target="_blank" rel="noopener">
+                    <span aria-hidden="true">↗</span>Open validator metrics
+                  </a>
+                </div>
+              </div>
+
+              <div class="panel" style="box-shadow:none">
+                <h2>Publish-ready “trust pack”</h2>
+                <p class="muted" style="margin:0 0 12px; line-height:1.65">
+                  Copy this block into Discord / X / Telegram so people have a clean verification trail.
+                </p>
+                <div class="box" style="margin-top:0">
+                  <div class="tiny">Trust pack</div>
+                  <div class="divider"></div>
+                  <pre class="mono" id="trustPack" style="margin:0; white-space:pre-wrap; color:var(--text); font-size:12px; line-height:1.55"></pre>
+                  <div class="row" style="margin-top:10px">
+                    <button class="btn primary" id="copyTrustBtn" type="button"><span aria-hidden="true">📋</span>Copy trust pack</button>
+                  </div>
+                </div>
+
+                <p class="tiny" style="margin-top:10px">
+                  Reminder: never share seed phrases, never “verify” via random DMs.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="delegation">
+      <div class="split">
+        <div class="panel">
+          <h2>Delegation guide (wallet-oriented)</h2>
+          <p class="muted" style="margin:0 0 10px; line-height:1.65">
+            The UI differs per wallet, but the checklist stays the same. Keep it simple: verify identity, delegate, confirm epoch rules.
+          </p>
+
+          <div class="steps" style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
+            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
+              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">1</div>
+              <div><b style="display:block;margin-bottom:4px">Verify identity first</b><span style="color:var(--muted);line-height:1.55">Open the Explorer/FlareMetrics links and confirm the address matches what you’re about to delegate to.</span></div>
+            </div>
+            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
+              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">2</div>
+              <div><b style="display:block;margin-bottom:4px">Paste the delegation address</b><span style="color:var(--muted);line-height:1.55">Use the “Copy delegation address” button on this page to avoid typos.</span></div>
+            </div>
+            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
+              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">3</div>
+              <div><b style="display:block;margin-bottom:4px">Confirm fees + epoch timing</b><span style="color:var(--muted);line-height:1.55">Rewards often depend on snapshot/epoch timing. Your wallet should show the effective epoch and parameters.</span></div>
+            </div>
+            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
+              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">4</div>
+              <div><b style="display:block;margin-bottom:4px">Sanity-check after</b><span style="color:var(--muted);line-height:1.55">Verify your delegation shows up (wallet + metrics). If something looks off, send the tx hash.</span></div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:14px">
+            <button class="btn primary" id="copyDelegateBtn2" type="button"><span aria-hidden="true">📋</span>Copy delegation address</button>
+            <a class="btn" href="#faq"><span aria-hidden="true">❓</span>Read FAQ</a>
+          </div>
+
+          <p class="tiny" style="margin-top:10px">Not financial advice. Always verify addresses and understand wallet-specific rules.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Official channels (anti-scam)</h2>
+          <ul class="list">
+            <li><b>Official X:</b> <a href="https://x.com/mirsFlR_" target="_blank" rel="noopener">@mirsFlR_</a></li>
+            <li><b>Official Telegram:</b> <a href="https://t.me/Mirhollio" target="_blank" rel="noopener">@Mirhollio</a></li>
+            <li><b>Security:</b> I never ask for seed phrases. I don’t DM first about “wallet issues”.</li>
+          </ul>
+
+          <div class="divider"></div>
+
+          <h2>Wallet quick notes</h2>
+          <ul class="list">
+            <li><b>MetaMask</b>: double-check network + contract prompts before approving.</li>
+            <li><b>Bifrost</b>: locate delegation/FTSO section; verify provider identity via link.</li>
+            <li><b>Hardware wallets</b>: confirm on-device display matches address/transaction details.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="status">
+      <div class="panel">
+        <div class="titleRow" style="margin-bottom:10px">
+          <h2>Status</h2>
+          <span class="tiny">A simple public-facing status section (manual incident log for now)</span>
+        </div>
+
+        <div class="statusRow">
+          <div>
+            <div class="statusLine">
+              <div class="statusLeft">
+                <span class="dotSm" aria-hidden="true"></span>
+                <div>
+                  <div style="font-weight:900">Validator</div>
+                  <div class="tiny">Operational</div>
+                </div>
+              </div>
+              <span class="chip ok"><span class="dotSm" aria-hidden="true"></span> OK</span>
+            </div>
+
+            <div class="statusLine">
+              <div class="statusLeft">
+                <span class="dotSm" aria-hidden="true"></span>
+                <div>
+                  <div style="font-weight:900">FTSO Provider</div>
+                  <div class="tiny">Operational</div>
+                </div>
+              </div>
+              <span class="chip ok"><span class="dotSm" aria-hidden="true"></span> OK</span>
+            </div>
+
+            <div class="statusLine">
+              <div class="statusLeft">
+                <span class="dotSm warn" aria-hidden="true"></span>
+                <div>
+                  <div style="font-weight:900">Status page</div>
+                  <div class="tiny">Manual updates (roadmap: automated)</div>
+                </div>
+              </div>
+              <span class="chip warn"><span class="dotSm warn" aria-hidden="true"></span> Manual</span>
+            </div>
+          </div>
+
+          <div class="box" style="margin-top:0">
+            <div class="tiny">Incident log (editable in HTML)</div>
+            <div class="divider"></div>
+            <div class="tiny"><b>No incidents reported recently.</b></div>
+            <div class="tiny" style="margin-top:8px">Add entries here when needed: date, duration, impact, resolution.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="panel">
+        <div class="titleRow">
+          <h2>FAQ</h2>
+          <span class="tiny">Click to expand</span>
+        </div>
+
+        <details>
+          <summary>How do I verify MirSFlr is legit?<span class="chev" aria-hidden="true">▾</span></summary>
+          <p>Use Flare Systems Explorer + FlareMetrics and cross-check the provider identity/delegation address. Avoid random DMs or unofficial lists.</p>
+        </details>
+
+        <details>
+          <summary>Do I keep custody of funds when delegating?<span class="chev" aria-hidden="true">▾</span></summary>
+          <p>Usually yes (you keep control in your wallet), but exact mechanics depend on the wallet/app and protocol rules. Always read what your wallet confirms.</p>
+        </details>
+
+        <details>
+          <summary>When do rewards show up?<span class="chev" aria-hidden="true">▾</span></summary>
+          <p>Typically based on epochs/snapshots. Your wallet UI and official documentation are the best sources for exact timing.</p>
+        </details>
+
+        <details>
+          <summary>I delegated but something looks wrong — what now?<span class="chev" aria-hidden="true">▾</span></summary>
+          <p>Verify address + network, then compare your wallet status with the Explorer/FlareMetrics. If stuck, contact me with the transaction hash.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="split">
+        <div class="panel">
+          <h2>Contact</h2>
+          <p class="muted" style="margin:0 0 12px; line-height:1.65">
+            Fastest: email. If you message on Telegram, verify it’s the official link on this site.
+          </p>
+
+          <form id="mailForm">
+            <label class="sr" for="subject">Subject</label>
+            <input id="subject" name="subject" placeholder="Subject (e.g. Delegation help)" required
+              style="width:100%; padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:var(--text); outline:none; margin-bottom:10px;" />
+            <label class="sr" for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Message (include tx hash if relevant)" required rows="5"
+              style="width:100%; padding:12px 12px; border-radius:14px; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:var(--text); outline:none; resize:vertical;"></textarea>
+
+            <div class="row">
+              <button class="btn primary" type="submit"><span aria-hidden="true">✉️</span>Compose Email</button>
+              <button class="btn" type="button" id="copyEmailBtn"><span aria-hidden="true">📎</span>Copy email</button>
+            </div>
+
+            <p class="tiny" style="margin-top:10px">
+              This uses your default email client (mailto). For a real backend form later, add Formspree/Netlify Forms.
+            </p>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Trust & safety</h2>
+          <ul class="list">
+            <li>Never share seed phrases or private keys.</li>
+            <li>Double-check network + address before confirming transactions.</li>
+            <li>Prefer official docs + reputable metrics sources.</li>
+            <li>If someone DMs you asking to “fix” your wallet — assume it’s a scam.</li>
+          </ul>
+
+          <div class="divider"></div>
+
+          <h2>Roadmap</h2>
+          <ul class="list">
+            <li>Automated status page + incident history.</li>
+            <li>Wallet-specific delegation guides with screenshots.</li>
+            <li>Optional charts for success rate / availability trends (if data source allows).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="foot">
+        <div>
+          <div style="font-weight:900; color:var(--text); letter-spacing:-0.02em">MirSFlr</div>
+          <div class="tiny">© <span id="year"></span> — Single-file site for GitHub Pages</div>
+        </div>
+        <div class="links" aria-label="Footer links">
+          <a href="https://flare.network/" target="_blank" rel="noopener">flare.network</a>
+          <a href="https://flaremetrics.io/" target="_blank" rel="noopener">flaremetrics.io</a>
+          <a href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">coingecko</a>
+          <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">systems explorer</a>
+          <a href="https://x.com/mirsFlR_" target="_blank" rel="noopener">X</a>
+          <a href="https://t.me/Mirhollio" target="_blank" rel="noopener">Telegram</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // ====== CONFIG (EDIT IF NEEDED) ======
+    const CONFIG = {
+      delegationAddress: "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
+      ftsoProviderIdentity: "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
+      validatorMetricsUrl: "https://flaremetrics.io/",
+      contactEmail: "mirsven@icloud.com",
+      xUrl: "https://x.com/mirsFlR_",
+      telegramUrl: "https://t.me/Mirhollio"
+    };
+
+    // ===== Theme (persisted) =====
+    const root = document.documentElement;
+    const themeBtn = document.getElementById("themeBtn");
+    const themeLabel = document.getElementById("themeLabel");
+    function setTheme(theme){
+      root.setAttribute("data-theme", theme);
+      localStorage.setItem("theme", theme);
+      themeLabel.textContent = theme === "light" ? "Light" : "Dark";
+    }
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light" || savedTheme === "dark") setTheme(savedTheme);
+    themeBtn.addEventListener("click", () => {
+      const cur = root.getAttribute("data-theme") || "dark";
+      setTheme(cur === "dark" ? "light" : "dark");
+    });
+
+    // ===== Toast =====
+    const toast = document.getElementById("toast");
+    let toastT;
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastT);
+      toastT = setTimeout(() => toast.classList.remove("show"), 1500);
+    }
+
+    // ===== Clipboard helper =====
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        showToast("Copied ✅");
+      }catch(e){
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("Copied ✅");
+      }
+    }
+
+    // ===== Fill addresses =====
+    const delegateAddr = document.getElementById("delegateAddr");
+    const ftsoAddr = document.getElementById("ftsoAddr");
+    const ftsoAddr2 = document.getElementById("ftsoAddr2");
+    const delegateAddr2 = document.getElementById("delegateAddr2");
+
+    delegateAddr.textContent = CONFIG.delegationAddress;
+    delegateAddr.title = CONFIG.delegationAddress;
+
+    ftsoAddr.textContent = CONFIG.ftsoProviderIdentity;
+    ftsoAddr.title = CONFIG.ftsoProviderIdentity;
+
+    ftsoAddr2.textContent = CONFIG.ftsoProviderIdentity;
+    delegateAddr2.textContent = CONFIG.delegationAddress;
+
+    document.getElementById("copyDelegateBtn").addEventListener("click", () => copyText(CONFIG.delegationAddress));
+    document.getElementById("copyDelegateBtn2").addEventListener("click", () => copyText(CONFIG.delegationAddress));
+    document.getElementById("copyFtsoBtn").addEventListener("click", () => copyText(CONFIG.ftsoProviderIdentity));
+
+    document.getElementById("copyAllBtn").addEventListener("click", () => {
+      const block = [
+        "MirSFlr — verification addresses",
+        "",
+        "Delegation address:",
+        CONFIG.delegationAddress,
+        "",
+        "FTSO provider identity:",
+        CONFIG.ftsoProviderIdentity,
+        "",
+        "X:",
+        CONFIG.xUrl,
+        "Telegram:",
+        CONFIG.telegramUrl
+      ].join("\n");
+      copyText(block);
+    });
+
+    // Validator link
+    const validatorLinkBtn = document.getElementById("validatorLinkBtn");
+    validatorLinkBtn.href = CONFIG.validatorMetricsUrl;
+
+    // Trust pack
+    const trustPack = document.getElementById("trustPack");
+    const explorerUrl = "https://flare-systems-explorer.flare.network/providers/ftso/" + CONFIG.ftsoProviderIdentity;
+    trustPack.textContent =
+`MirSFlr — Flare Validator & FTSO Provider
+
+Delegation address:
+${CONFIG.delegationAddress}
+
+FTSO provider identity (verify here):
+${CONFIG.ftsoProviderIdentity}
+${explorerUrl}
+
+FlareMetrics:
+https://flaremetrics.io/
+
+Official X:
+${CONFIG.xUrl}
+
+Official Telegram:
+${CONFIG.telegramUrl}
+
+Security: I never ask for seed phrases. I don’t DM first about “wallet issues”.`;
+
+    document.getElementById("copyTrustBtn").addEventListener("click", () => copyText(trustPack.textContent));
+
+    // ===== Tabs (Metrics section only) =====
+    const tabs = Array.from(document.querySelectorAll("#metrics .tab"));
+    const panes = Array.from(document.querySelectorAll("#metrics .tabpanes > div"));
+    function activateTab(tabId){
+      tabs.forEach(t => t.setAttribute("aria-selected", t.id === tabId ? "true" : "false"));
+      panes.forEach(p => p.classList.toggle("active", p.id === document.getElementById(tabId).getAttribute("aria-controls")));
+    }
+    tabs.forEach(t => t.addEventListener("click", () => activateTab(t.id)));
+
+    // ===== Contact mailto =====
+    const mailForm = document.getElementById("mailForm");
+    document.getElementById("copyEmailBtn").addEventListener("click", () => copyText(CONFIG.contactEmail));
+    mailForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const subj = document.getElementById("subject").value.trim();
+      const msg = document.getElementById("message").value.trim();
+      const mailto = `mailto:${encodeURIComponent(CONFIG.contactEmail)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(msg)}`;
+      window.location.href = mailto;
+    });
+
+    // ===== Footer year =====
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // ===== Optional: attempt to fetch headline metrics from the explorer page =====
+    // NOTE: This may fail if CORS disallows cross-site fetch from your domain.
+    const NOTE = document.getElementById("metricsNote");
+    const av6 = document.getElementById("m_av6h");
+    const sr6 = document.getElementById("m_sr6h");
+    const av24 = document.getElementById("m_av24h");
+    const sr24 = document.getElementById("m_sr24h");
+
+    function setMetrics({av6h, sr6h, av24h, sr24h}, note){
+      av6.textContent = av6h ?? "—";
+      sr6.textContent = sr6h ?? "—";
+      av24.textContent = av24h ?? "—";
+      sr24.textContent = sr24h ?? "—";
+      NOTE.textContent = note;
+    }
+
+    async function refreshMetrics(){
+      NOTE.textContent = "Refreshing…";
+      try{
+        const res = await fetch(explorerUrl, { mode: "cors" });
+        const html = await res.text();
+
+        const pct = (s) => (s && s.match(/\b\d{1,3}(?:\.\d{1,2})?\s*%/g)) ? s.match(/\b\d{1,3}(?:\.\d{1,2})?\s*%/g) : null;
+        const aIdx = html.toLowerCase().indexOf("availability");
+        const sIdx = html.toLowerCase().indexOf("success rate");
+        const slice = html.slice(Math.max(0, Math.min(aIdx, sIdx) - 1200), Math.max(aIdx, sIdx) + 2600);
+
+        const all = pct(slice) || pct(html) || [];
+        const [p1,p2,p3,p4] = all;
+
+        if (p1 && p2 && p3 && p4){
+          setMetrics({av6h:p1, sr6h:p2, av24h:p3, sr24h:p4}, "Loaded (best-effort). If it looks wrong, use the embedded Explorer tab.");
+        }else{
+          setMetrics({}, "Could not parse. Use the embedded Explorer tab.");
+        }
+      }catch(err){
+        setMetrics({}, "Blocked by browser (CORS) or network error. Use the embedded Explorer tab.");
+      }
+    }
+    document.getElementById("refreshMetricsBtn").addEventListener("click", refreshMetrics);
+    const explorerUrl = "https://flare-systems-explorer.flare.network/providers/ftso/" + CONFIG.ftsoProviderIdentity;
+    refreshMetrics();
+
+    // ===== CoinGecko FLR price (chart + snapshot) =====
+    const CG = { coinId: "flare", vs: "usd", daysDefault: 7, base: "https://api.coingecko.com/api/v3" };
+
+    const cgStatus = document.getElementById("cgStatus");
+    const cgPriceUsd = document.getElementById("cgPriceUsd");
+    const cgChg24h = document.getElementById("cgChg24h");
+    const cgVol24h = document.getElementById("cgVol24h");
+    const cgMcap = document.getElementById("cgMcap");
+    const cgRefresh = document.getElementById("cgRefresh");
+
+    const chartCanvas = document.getElementById("flrChart");
+    const ctx = chartCanvas.getContext("2d");
+
+    function fmtNum(n){
+      try{ return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(n); }
+      catch{ return String(n); }
+    }
+    function fmtMoney(n){
+      try{ return new Intl.NumberFormat(undefined, { style:"currency", currency:"USD", maximumFractionDigits: 6 }).format(n); }
+      catch{ return "$" + n; }
+    }
+    function fmtBig(n){
+      if (n == null || isNaN(n)) return "—";
+      const abs = Math.abs(n);
+      const units = [[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]];
+      for (const [v,s] of units){
+        if (abs >= v) return (n/v).toFixed(2) + s;
+      }
+      return fmtNum(n);
+    }
+
+    let cgSeries = [];
+    function drawChart(series){
+      const w = chartCanvas.clientWidth;
+      const h = chartCanvas.height;
+      const dpr = window.devicePixelRatio || 1;
+      chartCanvas.width = Math.floor(w * dpr);
+      chartCanvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.clearRect(0,0,w,h);
+
+      if (!series || series.length < 2){
+        ctx.globalAlpha = 0.8;
+        ctx.font = "800 14px Inter, system-ui, sans-serif";
+        ctx.fillText("No data", 12, 28);
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      const pad = 14;
+      const xs = series.map(p => p[0]);
+      const ys = series.map(p => p[1]);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const range = (maxY - minY) || 1;
+
+      ctx.globalAlpha = 0.14;
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border");
+      ctx.lineWidth = 1;
+      for (let i=1;i<=3;i++){
+        const y = pad + (h - 2*pad) * (i/4);
+        ctx.beginPath();
+        ctx.moveTo(pad, y);
+        ctx.lineTo(w-pad, y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      const x0 = xs[0], x1 = xs[xs.length-1];
+      const toX = (x) => pad + (w - 2*pad) * ((x - x0) / (x1 - x0 || 1));
+      const toY = (y) => pad + (h - 2*pad) * (1 - ((y - minY) / range));
+
+      const grad = ctx.createLinearGradient(0, pad, 0, h-pad);
+      grad.addColorStop(0, "rgba(124,92,255,0.22)");
+      grad.addColorStop(1, "rgba(35,213,255,0.02)");
+
+      ctx.beginPath();
+      ctx.moveTo(toX(xs[0]), toY(ys[0]));
+      for (let i=1;i<series.length;i++){
+        ctx.lineTo(toX(xs[i]), toY(ys[i]));
+      }
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = "rgba(124,92,255,0.95)";
+      ctx.stroke();
+
+      ctx.lineTo(toX(xs[xs.length-1]), h-pad);
+      ctx.lineTo(toX(xs[0]), h-pad);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.globalAlpha = 0.9;
+      ctx.font = "800 12px Inter, system-ui, sans-serif";
+      ctx.fillStyle = getComputedStyle(document.body).color;
+      ctx.fillText(fmtMoney(maxY), pad, pad+12);
+      ctx.fillText(fmtMoney(minY), pad, h-pad+12);
+      ctx.globalAlpha = 1;
+    }
+
+    function setCgStatus(msg){ cgStatus.textContent = msg; }
+
+    async function loadCgSnapshot(){
+      const url = `${CG.base}/simple/price?ids=${encodeURIComponent(CG.coinId)}&vs_currencies=${encodeURIComponent(CG.vs)}&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`;
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("CoinGecko simple/price failed");
+      const j = await res.json();
+      const d = j[CG.coinId];
+      if (!d) throw new Error("No data from CoinGecko");
+
+      cgPriceUsd.textContent = fmtMoney(d.usd);
+      const chg = d.usd_24h_change;
+      const sign = chg >= 0 ? "+" : "";
+      cgChg24h.textContent = `${sign}${chg.toFixed(2)}%`;
+      cgVol24h.textContent = "$" + fmtBig(d.usd_24h_vol);
+      cgMcap.textContent = "$" + fmtBig(d.usd_market_cap);
+    }
+
+    async function loadCgSeries(days){
+      const url = `${CG.base}/coins/${encodeURIComponent(CG.coinId)}/market_chart?vs_currency=${encodeURIComponent(CG.vs)}&days=${encodeURIComponent(days)}&interval=hourly`;
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("CoinGecko market_chart failed");
+      const j = await res.json();
+      if (!j.prices) throw new Error("No prices array");
+      cgSeries = j.prices;
+      drawChart(cgSeries);
+    }
+
+    async function refreshCg(days){
+      setCgStatus("Loading…");
+      try{
+        await Promise.all([loadCgSnapshot(), loadCgSeries(days)]);
+        setCgStatus(`Updated • ${days}D`);
+      }catch(e){
+        setCgStatus("Could not load (rate limit / blocked).");
+      }
+    }
+
+    const priceSection = document.getElementById("price");
+    const priceTabs = Array.from(priceSection.querySelectorAll(".tab[data-days]"));
+    function setPriceTab(selected){
+      priceTabs.forEach(t => t.setAttribute("aria-selected", t === selected ? "true" : "false"));
+    }
+    priceTabs.forEach(t => t.addEventListener("click", () => {
+      setPriceTab(t);
+      const days = Number(t.getAttribute("data-days")) || CG.daysDefault;
+      refreshCg(days);
+    }));
+
+    cgRefresh.addEventListener("click", () => {
+      const sel = priceTabs.find(t => t.getAttribute("aria-selected") === "true") || priceTabs[0];
+      const days = Number(sel.getAttribute("data-days")) || CG.daysDefault;
+      refreshCg(days);
+    });
+
+    window.addEventListener("resize", () => drawChart(cgSeries));
+    refreshCg(CG.daysDefault);
+  </script>
+</body>
+</html>
