@@ -1,22 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="sl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MirSFlr — Flare Validator & FTSO Provider</title>
 
-  <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics and delegation guidance — built for reliability." />
+  <meta name="description" content="MirSFlr — Flare validator and FTSO provider. Transparent metrics, delegation guide, live embeds." />
   <meta name="theme-color" content="#0b1220" />
 
-  <!-- Favicons (upload both files) -->
+  <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-
-  <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
-  <meta property="og:description" content="Transparent metrics and delegation guidance — built for reliability." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.mirhollio.com/" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,19 +35,17 @@
       --brand:#7c5cff;
       --brand2:#23d5ff;
       --ok:#33d69f;
-      --ring:0 0 0 6px rgba(124,92,255,.16);
 
       /* === EMBED CROP (DESKTOP) ===
-         - show provider header + logo
-         - show Availability + Success Rate + some RE table
-         - HIDE everything from "Price Feeds Last 6H"
+         Cilj: header + logo + Availability + Success Rate + začetek RE tabele
+         NE: Price Feeds Last 6H
       */
-      --embed-shift: 112px;     /* smaller => more top/header visible */
-      --embed-scale: 1.06;
-      --embed-height: 455px;    /* smaller => cuts bottom earlier */
+      --embed-shift: 70px;     /* MANJ = embed gre bolj gor (bolj vidiš header/logo) */
+      --embed-scale: 1.05;
+      --embed-height: 420px;   /* MANJ = prej odreže spodaj */
 
       /* Chart fixed height */
-      --chart-h: 190px;
+      --chart-h: 210px;
       --chart-h-mobile: 180px;
     }
 
@@ -65,7 +58,6 @@
       --panel2:rgba(10,14,25,.04);
       --border:rgba(10,14,25,.12);
       --shadow:0 18px 60px rgba(10,14,25,.12);
-      --ring:0 0 0 6px rgba(124,92,255,.14);
     }
 
     *{box-sizing:border-box}
@@ -83,22 +75,6 @@
     }
     a{color:inherit; text-decoration:none}
     .container{max-width:var(--max); margin:0 auto; padding:0 20px}
-
-    .glow{
-      position:fixed; inset:-220px;
-      background:
-        radial-gradient(700px 520px at 10% 18%, rgba(124,92,255,.22), transparent 60%),
-        radial-gradient(640px 460px at 86% 8%, rgba(35,213,255,.16), transparent 60%),
-        radial-gradient(740px 520px at 72% 84%, rgba(51,214,159,.11), transparent 65%);
-      filter:blur(32px);
-      pointer-events:none;
-      opacity:.92;
-      animation: drift 14s ease-in-out infinite alternate;
-    }
-    @keyframes drift{
-      from{transform:translate3d(-10px,-6px,0) scale(1.00)}
-      to{transform:translate3d(10px,8px,0) scale(1.03)}
-    }
 
     header{
       position:sticky; top:0; z-index:50;
@@ -150,6 +126,17 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+    .panel{
+      padding:16px;
+      border-radius: var(--r2);
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow: var(--shadow);
+    }
+    .titleRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
+    .titleRow h2{margin:0; font-size:18px; letter-spacing:-0.02em}
+    .tiny{font-size:12px; color:var(--muted2)}
+    .muted{color:var(--muted)}
 
     .gridHero{
       display:grid;
@@ -161,38 +148,11 @@
     @media (max-width: 980px){ .gridHero{grid-template-columns:1fr} }
 
     .hero{padding:22px; min-height: 380px; position:relative;}
-    .spark{
-      position:absolute; right:-160px; top:-160px;
-      width:420px; height:420px; border-radius:50%;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.20), transparent 50%),
-        linear-gradient(135deg, rgba(124,92,255,.48), rgba(35,213,255,.34));
-      filter: blur(18px);
-      opacity:.55;
-      transform: rotate(18deg);
-      pointer-events:none;
-    }
-
-    .pill{
-      display:inline-flex; gap:8px; align-items:center;
-      padding:8px 12px; border-radius:999px;
-      background: rgba(124,92,255,.12);
-      border:1px solid rgba(124,92,255,.22);
-      font-weight:900; font-size:13px;
-    }
-    .dot{width:8px;height:8px;border-radius:999px;background:var(--ok); box-shadow:0 0 0 4px rgba(51,214,159,.14)}
-
     h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
     .lead{margin:0 0 14px; color:var(--muted); line-height:1.65; max-width: 62ch; font-size: 16px;}
-
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
-    .badgeRow{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; color:var(--muted2); font-size:13px}
-    .badge{display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius: 14px; background: rgba(255,255,255,0.04); border:1px solid var(--border);}
 
     .side{padding:18px}
-    .titleRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
-    .titleRow h2{margin:0; font-size:16px; letter-spacing:-0.02em}
-
     .kpis{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width:520px){ .kpis{grid-template-columns:1fr} }
     .kpi{padding:12px; border-radius: 16px; border:1px solid var(--border); background: rgba(255,255,255,.04); min-height: 68px;}
@@ -215,77 +175,9 @@
       background: rgba(10,14,25,.04);
       border: 1px solid rgba(10,14,25,.12);
     }
-    .tiny{font-size:12px; color:var(--muted2)}
     .divider{height:1px; background:var(--border); margin:12px 0}
-    .box{
-      margin-top: 12px;
-      padding:12px;
-      border-radius: 16px;
-      border:1px solid var(--border);
-      background: rgba(0,0,0,.12);
-    }
-    [data-theme="light"] .box{background: rgba(10,14,25,.04)}
-    .boxHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
 
-    .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
-    @media (max-width: 980px){ .grid3{grid-template-columns:1fr} }
-    .feature{
-      padding:16px;
-      border-radius: var(--r);
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      position:relative; overflow:hidden;
-    }
-    .feature:before{
-      content:"";
-      position:absolute; inset:-1px;
-      background:
-        radial-gradient(240px 120px at 18% 0%, rgba(124,92,255,.18), transparent 60%),
-        radial-gradient(240px 120px at 92% 20%, rgba(35,213,255,.12), transparent 60%);
-      opacity:.9; pointer-events:none;
-    }
-    .feature > *{position:relative}
-    .feature h3{margin:0 0 8px; letter-spacing:-0.02em}
-    .feature p{margin:0; color:var(--muted); line-height:1.6}
-
-    .panel{
-      padding:16px;
-      border-radius: var(--r2);
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow: var(--shadow);
-    }
-    .panel h2{margin:0 0 10px; font-size:18px; letter-spacing:-0.02em}
-    .muted{color:var(--muted)}
-    .split{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-    @media (max-width: 980px){ .split{grid-template-columns:1fr} }
-    .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
-    @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
-
-    .cardDetails{
-      border:1px solid var(--border);
-      border-radius: var(--r2);
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow: none;
-      overflow:hidden;
-    }
-    .cardDetails summary{
-      padding: 14px 16px;
-      font-weight:900;
-      letter-spacing:-0.02em;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      cursor:pointer;
-      list-style:none;
-    }
-    .cardDetails summary::-webkit-details-marker{display:none}
-    .cardDetails .inner{padding: 0 16px 16px}
-    .chev{transition: transform .12s ease}
-    details[open] .chev{transform: rotate(180deg)}
-
-    /* PRICE chart */
-    .chartViewport{max-height: 280px; overflow:hidden;}
+    /* === PRICE CHART (X=price, Y=time) === */
     .chartWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -294,7 +186,7 @@
       overflow:hidden;
       position: relative;
     }
-    .chartCanvas{
+    canvas#flr24h{
       width:100%;
       height: var(--chart-h);
       display:block;
@@ -310,7 +202,6 @@
       color: var(--muted2);
       font-size: 12px;
     }
-    .legendLeft{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
     .chip{
       padding:6px 10px;
       border-radius: 999px;
@@ -319,7 +210,6 @@
       font-weight:900;
     }
 
-    /* Tooltip */
     .tooltip{
       position:absolute;
       pointer-events:none;
@@ -341,16 +231,7 @@
       border:1px solid rgba(10,14,25,.18);
     }
 
-    /* Widget fallback */
-    .iframeWrap{
-      border-radius: 18px;
-      border:1px solid var(--border);
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-    }
-    iframe{width:100%; border:0}
-
-    /* CROPPED EMBED */
+    /* === EMBED CROP (NO "Price Feeds Last 6H") === */
     .cropWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -360,17 +241,20 @@
       position: relative;
     }
     .cropWrap iframe{
-      height: 1200px;
-      transform: translateY(calc(-1 * var(--embed-shift))) scale(var(--embed-scale));
-      transform-origin: top left;
       width: 100%;
+      height: 1100px; /* velik "canvas", mi cropamo */
+      border: 0;
+      transform:
+        translateY(calc(-1 * var(--embed-shift)))
+        scale(var(--embed-scale));
+      transform-origin: top center;
     }
-    /* Bottom fade to hide anything starting near "Price Feeds Last 6H" */
+    /* hard mask bottom */
     .cropWrap::after{
       content:"";
       position:absolute;
       left:0; right:0; bottom:0;
-      height: 95px;
+      height: 160px; /* več = bolj agresivno skrije spodaj */
       background: linear-gradient(to bottom, rgba(7,11,20,0), rgba(7,11,20,1));
       pointer-events:none;
     }
@@ -378,67 +262,30 @@
       background: linear-gradient(to bottom, rgba(247,249,255,0), rgba(247,249,255,1));
     }
 
-    /* Mobile tuning: same crop intent */
+    /* Layout helpers */
+    .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
+    @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
+
+    /* Mobile tweaks */
     @media (max-width: 980px){
       :root{
-        --embed-shift: 145px;
-        --embed-scale: 1.04;
-        --embed-height: 560px;
-        --chart-h: 180px;
+        --embed-shift: 95px;
+        --embed-scale: 1.03;
+        --embed-height: 520px;
+        --chart-h: 190px;
       }
     }
     @media (max-width: 520px){
       :root{
-        --embed-shift: 168px;
+        --embed-shift: 110px;
         --embed-scale: 1.02;
-        --embed-height: 590px;
+        --embed-height: 560px;
         --chart-h: var(--chart-h-mobile);
       }
       .btn{width:100%; justify-content:center}
       .hero{min-height:auto}
       .logoImg{width:36px;height:36px}
     }
-
-    /* Delegation windows */
-    .steps{display:flex; flex-direction:column; gap:12px; margin-top:10px}
-    .step{
-      padding:14px;
-      border-radius: 18px;
-      border:1px solid rgba(124,92,255,.18);
-      background:
-        radial-gradient(420px 140px at 15% 0%, rgba(124,92,255,.16), transparent 60%),
-        rgba(255,255,255,.04);
-    }
-    .stepTop{display:flex; align-items:flex-start; gap:12px}
-    .n{
-      width:30px; height:30px; border-radius: 12px;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:900;
-      background: rgba(124,92,255,.18);
-      border:1px solid rgba(124,92,255,.28);
-      box-shadow: 0 10px 24px rgba(124,92,255,.12);
-      flex:0 0 auto;
-    }
-    .step h3{margin:0; font-size:16px; letter-spacing:-0.02em}
-    .step p{margin:6px 0 0; color:var(--muted); line-height:1.55}
-
-    .rightBox{
-      border-radius: var(--r2);
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .rightBox .head{
-      padding:16px;
-      border-bottom: 1px solid var(--border);
-      font-weight:900;
-      letter-spacing:-0.02em;
-    }
-    .rightBox .body{padding:16px}
-    .rightBox ul{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
-    .rightBox .sub{margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
-    .rightBox .sub h4{margin:0 0 10px; font-size:16px; letter-spacing:-0.02em}
 
     footer{padding: 26px 0 40px; color:var(--muted2)}
     .foot{
@@ -478,8 +325,6 @@
 </head>
 
 <body>
-  <div class="glow" aria-hidden="true"></div>
-
   <header>
     <div class="container">
       <div class="nav">
@@ -489,52 +334,37 @@
         </a>
 
         <nav class="navlinks" aria-label="Primary">
-          <a href="#about">About</a>
           <a href="#price">Price</a>
           <a href="#metrics">Metrics</a>
-          <a href="#delegation">Delegation</a>
-          <a href="#faq">FAQ</a>
           <a href="#contact">Contact</a>
         </nav>
 
         <div class="actions">
           <button class="btn ghost" id="themeBtn" type="button" aria-label="Toggle theme">
-            <span aria-hidden="true">🌗</span>
-            <span class="tiny" id="themeLabel">Theme</span>
+            🌗 <span class="tiny" id="themeLabel">Theme</span>
           </button>
-          <a class="btn primary" href="#delegation">⚡ Delegate</a>
+          <a class="btn primary" href="#metrics">📈 Metrics</a>
         </div>
       </div>
     </div>
   </header>
 
   <main id="top" class="container">
+
     <!-- HERO -->
     <section>
       <div class="gridHero">
         <div class="card hero">
-          <div class="spark" aria-hidden="true"></div>
-          <span class="pill"><span class="dot" aria-hidden="true"></span> Online • Monitored • Transparent</span>
-
-          <h1>Validator + FTSO Provider built for uptime, signal quality, and trust.</h1>
+          <h1>Validator + FTSO Provider (MirSFlr)</h1>
           <p class="lead">
-            MirSFlr helps secure the Flare network and supports FTSO data delivery with an ops-first approach:
-            disciplined maintenance, clear status, and public metrics you can verify.
+            Transparent metrics + clear identity + simple delegation guidance.
           </p>
 
           <div class="row">
-            <a class="btn primary" href="#metrics">📈 Metrics dashboard</a>
-            <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ FlareMetrics</a>
-            <a class="btn" href="https://flare.network/" target="_blank" rel="noopener">🌐 flare.network</a>
             <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">𝕏 @mirsFlR_</a>
             <a class="btn" href="https://t.me/Mirhollio" target="_blank" rel="noopener">✈️ @Mirhollio</a>
+            <a class="btn" href="mailto:mirsven@icloud.com">✉️ mirsven@icloud.com</a>
             <button class="btn" type="button" id="copyAllBtn">📋 Copy key addresses</button>
-          </div>
-
-          <div class="badgeRow">
-            <span class="badge">🔒 Security-first ops</span>
-            <span class="badge">🛠️ Continuous improvements</span>
-            <span class="badge">🧭 Clear delegation guidance</span>
           </div>
         </div>
 
@@ -548,132 +378,104 @@
             </a>
           </div>
 
-          <div class="kpis" role="list">
-            <div class="kpi" role="listitem">
+          <div class="kpis">
+            <div class="kpi">
               <div class="label">Role</div>
               <div class="value">Validator</div>
             </div>
-            <div class="kpi" role="listitem">
+            <div class="kpi">
               <div class="label">Also</div>
               <div class="value">FTSO Provider</div>
             </div>
-            <div class="kpi" role="listitem">
+            <div class="kpi">
               <div class="label">Monitoring</div>
               <div class="value">24/7 Alerts</div>
             </div>
-            <div class="kpi" role="listitem">
+            <div class="kpi">
               <div class="label">Focus</div>
               <div class="value">Stability</div>
             </div>
           </div>
 
-          <div class="box">
-            <div class="boxHead">
-              <div class="tiny">Delegation address</div>
-              <button class="btn" id="copyDelegateBtn" type="button" style="padding:8px 10px;">📋 Copy</button>
-            </div>
-            <div class="addr mono" id="delegateAddr">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</div>
+          <div style="margin-top:12px">
+            <div class="tiny">Delegation address</div>
+            <div class="addr mono" id="delegateAddr"></div>
 
             <div class="divider"></div>
 
-            <div class="boxHead">
-              <div class="tiny">FTSO provider (identity)</div>
-              <button class="btn" id="copyFtsoBtn" type="button" style="padding:8px 10px;">📋 Copy</button>
-            </div>
-            <div class="addr mono" id="ftsoAddr">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</div>
+            <div class="tiny">FTSO provider (identity)</div>
+            <div class="addr mono" id="ftsoAddr"></div>
 
             <div class="divider"></div>
-            <div class="tiny">Tip: Always verify identity on trusted sources before delegating.</div>
+            <div class="tiny">Tip: verify identity on trusted sources before delegating.</div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn" id="copyDelegateBtn" type="button">📋 Copy delegation</button>
+            <button class="btn" id="copyFtsoBtn" type="button">📋 Copy identity</button>
           </div>
         </aside>
-      </div>
-    </section>
-
-    <!-- HIGHLIGHTS -->
-    <section id="about">
-      <div class="grid3" aria-label="Highlights">
-        <div class="feature">
-          <h3>Reliability</h3>
-          <p>Monitoring + alerting, careful updates, and incident discipline to protect uptime.</p>
-        </div>
-        <div class="feature">
-          <h3>Transparency</h3>
-          <p>Public metrics + explorer embeds. Easy to verify, easy to trust.</p>
-        </div>
-        <div class="feature">
-          <h3>Delegator-friendly</h3>
-          <p>Wallet-oriented guidance, checklists, and help when something looks off.</p>
-        </div>
       </div>
     </section>
 
     <!-- PRICE -->
     <section id="price">
       <div class="panel">
-        <div class="titleRow" style="margin-bottom:10px">
+        <div class="titleRow">
           <h2>FLR Price</h2>
           <span class="tiny" id="priceStatus">Loading…</span>
         </div>
 
         <div class="splitWide">
-          <div class="panel" style="box-shadow:none">
-            <div class="chartViewport">
-              <div class="chartWrap" id="chartWrap">
-                <div class="tooltip" id="tooltip"></div>
-                <canvas id="flr24h" class="chartCanvas" aria-label="FLR 24h chart"></canvas>
-                <div class="chartLegend">
-                  <div class="legendLeft">
-                    <span class="chip" id="usdChip">USD: —</span>
-                    <span class="chip" id="eurChip">EUR: —</span>
-                  </div>
-                  <div class="tiny" id="chartStatus">Loading…</div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <div class="chartWrap" id="chartWrap">
+              <div class="tooltip" id="tooltip"></div>
+              <canvas id="flr24h"></canvas>
 
-            <div class="iframeWrap" id="cgWidgetWrap" style="margin-top:12px; display:none">
-              <iframe
-                title="CoinGecko — FLR widget"
-                loading="lazy"
-                referrerpolicy="no-referrer"
-                src="https://www.coingecko.com/en/coins/flare/widget?locale=en"
-                style="height:520px">
-              </iframe>
+              <div class="chartLegend">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <span class="chip" id="usdChip">USD: —</span>
+                  <span class="chip" id="eurChip">EUR: —</span>
+                </div>
+                <div class="tiny" id="chartStatus">Loading…</div>
+              </div>
+              <div class="tiny" style="margin-top:8px">
+                Graf je rotiran po tvoji želji: <b>X = cena</b>, <b>Y = čas</b>. Hover/touch pokaže točno vrednost.
+              </div>
             </div>
 
             <div class="row" style="margin-top:12px">
-              <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">↗ Open on CoinGecko</a>
               <button class="btn primary" id="priceRefresh" type="button">⟳ Refresh</button>
+              <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">↗ CoinGecko</a>
             </div>
           </div>
 
-          <details class="cardDetails" open>
-            <summary>Market snapshot <span class="chev" aria-hidden="true">▾</span></summary>
-            <div class="inner">
-              <h2 style="margin-top:0">Market snapshot</h2>
-              <div class="kpis">
-                <div class="kpi">
-                  <div class="label">FLR Spot (USD)</div>
-                  <div class="value" id="spotUsd">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="label">FLR Spot (EUR)</div>
-                  <div class="value" id="spotEur">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="label">Last updated</div>
-                  <div class="value" id="spotTime">—</div>
-                </div>
-                <div class="kpi">
-                  <div class="label">Chart mode</div>
-                  <div class="value" id="chartMode">—</div>
-                </div>
+          <div class="card" style="padding:16px; box-shadow:none">
+            <h2 style="margin:0 0 10px">Market snapshot</h2>
+            <div class="kpis">
+              <div class="kpi">
+                <div class="label">FLR Spot (USD)</div>
+                <div class="value" id="spotUsd">—</div>
               </div>
-              <p class="tiny" style="margin-top:10px">
-                Tooltip: hover/touch the curve to see exact time + USD/EUR.
-              </p>
+              <div class="kpi">
+                <div class="label">FLR Spot (EUR)</div>
+                <div class="value" id="spotEur">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Last updated</div>
+                <div class="value" id="spotTime">—</div>
+              </div>
+              <div class="kpi">
+                <div class="label">Chart source</div>
+                <div class="value" id="chartMode">—</div>
+              </div>
             </div>
-          </details>
+
+            <div class="tiny" style="margin-top:10px">
+              CoinGecko je “best effort” (lahko blokira). Če faila, graf avtomatsko preklopi na Coinbase candles.
+              Brez broken widget box-ov.
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -681,149 +483,29 @@
     <!-- METRICS -->
     <section id="metrics">
       <div class="panel">
-        <div class="titleRow" style="margin-bottom:10px">
-          <h2>Metrics Dashboard</h2>
-          <div class="tiny">Cropped to show only the important section.</div>
-        </div>
-
-        <div class="panel" style="box-shadow:none">
-          <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
-          <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            Header + logo + Availability + Success Rate + RE table (bottom cut before “Price Feeds Last 6H”).
-          </p>
-
-          <div class="cropWrap" aria-label="Cropped FTSO provider embed">
-            <iframe
-              title="Flare Systems Explorer — FTSO Provider (cropped)"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-              src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
-            </iframe>
-          </div>
-
-          <div class="row" style="margin-top:12px">
-            <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
-              ↗ Open full page
-            </a>
-            <a class="btn" href="#delegation">⚡ Delegation guide</a>
-          </div>
-
-          <div class="tiny" style="margin-top:10px">
-            Manual tuning: adjust <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> (desktop + mobile).
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DELEGATION -->
-    <section id="delegation">
-      <div class="split">
-        <div class="panel">
-          <div class="titleRow" style="margin-bottom:8px">
-            <h2>Delegation guide (wallet-oriented)</h2>
-          </div>
-          <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            Verify identity, delegate, confirm epoch rules. Keep it simple.
-          </p>
-
-          <div class="steps">
-            <div class="step">
-              <div class="stepTop">
-                <div class="n">1</div>
-                <div>
-                  <h3>Verify identity first</h3>
-                  <p>Open explorer links and confirm the address matches what you’re about to delegate to.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="stepTop">
-                <div class="n">2</div>
-                <div>
-                  <h3>Paste the delegation address</h3>
-                  <p>Use the “Copy delegation address” button to avoid typos.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="stepTop">
-                <div class="n">3</div>
-                <div>
-                  <h3>Confirm fees + epoch timing</h3>
-                  <p>Rewards depend on snapshot/epoch timing. Your wallet should show the effective epoch.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="step">
-              <div class="stepTop">
-                <div class="n">4</div>
-                <div>
-                  <h3>Sanity-check after</h3>
-                  <p>Refresh metrics and wait for the next snapshot/epoch before judging.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:16px">
-            <button class="btn primary" id="copyDelegateBtn2" type="button">📋 Copy delegation address</button>
-            <a class="btn" href="#faq">❓ Read FAQ</a>
-          </div>
-        </div>
-
-        <div class="rightBox">
-          <div class="head">Wallet quick notes</div>
-          <div class="body">
-            <ul>
-              <li><b>MetaMask</b>: double-check network + contract prompts before approving.</li>
-              <li><b>Bifrost</b>: locate delegation/FTSO section; verify provider identity via link.</li>
-              <li><b>Hardware wallets</b>: confirm on-device display matches address/transaction details.</li>
-              <li><b>Epoch timing</b>: changes apply from the next epoch; don’t panic if it’s not instant.</li>
-              <li><b>Fees</b>: review provider fee before confirming.</li>
-              <li><b>Security</b>: never share seed phrases; beware of fake support DMs.</li>
-            </ul>
-
-            <div class="sub">
-              <h4>Extra checklist</h4>
-              <ul>
-                <li>Compare identity across Explorer + FlareMetrics.</li>
-                <li>Use “copy” buttons to avoid typos.</li>
-                <li>If something looks off, wait one epoch and re-check metrics.</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq">
-      <div class="panel">
         <div class="titleRow">
-          <h2>FAQ</h2>
-          <span class="tiny">Click to expand</span>
+          <h2>FTSO Provider metrics (cropped)</h2>
+          <div class="tiny">Brez “Price Feeds Last 6H” sekcije.</div>
         </div>
 
-        <details class="cardDetails" style="margin-top:10px">
-          <summary>How do I verify MirSFlr is legit? <span class="chev" aria-hidden="true">▾</span></summary>
-          <div class="inner">
-            <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Verify identity + delegation address match the explorer page. Never share seed phrases.
-            </p>
-          </div>
-        </details>
+        <div class="cropWrap">
+          <iframe
+            title="Flare Systems Explorer — FTSO Provider"
+            loading="lazy"
+            referrerpolicy="no-referrer"
+            src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
+          </iframe>
+        </div>
 
-        <details class="cardDetails" style="margin-top:10px">
-          <summary>Why can charts fail sometimes? <span class="chev" aria-hidden="true">▾</span></summary>
-          <div class="inner">
-            <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Some APIs rate-limit or block browser requests. This page uses multi-source + widget fallback.
-            </p>
-          </div>
-        </details>
+        <div class="row" style="margin-top:12px">
+          <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
+            ↗ Open full page
+          </a>
+        </div>
+
+        <div class="tiny" style="margin-top:10px">
+          Če se ti še kdaj pokaže 6H del: znižaj <span class="mono">--embed-height</span> ali povečaj mask height v <span class="mono">.cropWrap::after</span>.
+        </div>
       </div>
     </section>
 
@@ -847,17 +529,15 @@
       <div class="foot">
         <div>
           <div style="font-weight:900; color:var(--text); letter-spacing:-0.02em">MirSFlr</div>
-          <div class="tiny">© <span id="year"></span> — Single-file site for GitHub Pages</div>
+          <div class="tiny">© <span id="year"></span> — GitHub Pages</div>
         </div>
-        <div class="links" aria-label="Footer links">
-          <a href="https://flare.network/" target="_blank" rel="noopener">flare.network</a>
+        <div class="links">
           <a href="https://flaremetrics.io/" target="_blank" rel="noopener">flaremetrics.io</a>
-          <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">systems explorer</a>
-          <a href="https://x.com/mirsFlR_" target="_blank" rel="noopener">X</a>
-          <a href="https://t.me/Mirhollio" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://flare.network/" target="_blank" rel="noopener">flare.network</a>
         </div>
       </div>
     </footer>
+
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -918,15 +598,13 @@
     if (delegateAddr) delegateAddr.textContent = CONFIG.delegationAddress;
     if (ftsoAddr) ftsoAddr.textContent = CONFIG.ftsoProviderIdentity;
 
-    // Copy buttons
+    // Buttons
     const copyDelegateBtn = document.getElementById("copyDelegateBtn");
-    const copyDelegateBtn2 = document.getElementById("copyDelegateBtn2");
     const copyFtsoBtn = document.getElementById("copyFtsoBtn");
     const copyAllBtn = document.getElementById("copyAllBtn");
     const copyEmailBtn = document.getElementById("copyEmailBtn");
 
     if (copyDelegateBtn) copyDelegateBtn.addEventListener("click", () => copyText(CONFIG.delegationAddress));
-    if (copyDelegateBtn2) copyDelegateBtn2.addEventListener("click", () => copyText(CONFIG.delegationAddress));
     if (copyFtsoBtn) copyFtsoBtn.addEventListener("click", () => copyText(CONFIG.ftsoProviderIdentity));
     if (copyEmailBtn) copyEmailBtn.addEventListener("click", () => copyText(CONFIG.contactEmail));
 
@@ -951,37 +629,28 @@
     const year = document.getElementById("year");
     if (year) year.textContent = new Date().getFullYear();
 
-    // Market snapshot
+    // ===== PRICE + CHART =====
+    const priceStatus = document.getElementById("priceStatus");
     const spotUsd = document.getElementById("spotUsd");
     const spotEur = document.getElementById("spotEur");
     const spotTime = document.getElementById("spotTime");
-    const priceStatus = document.getElementById("priceStatus");
-    const priceRefresh = document.getElementById("priceRefresh");
     const chartMode = document.getElementById("chartMode");
+    const priceRefresh = document.getElementById("priceRefresh");
 
     const usdChip = document.getElementById("usdChip");
     const eurChip = document.getElementById("eurChip");
+    const chartStatus = document.getElementById("chartStatus");
 
-    // Chart elements
     const canvas = document.getElementById("flr24h");
     const ctx = canvas?.getContext("2d");
-    const chartStatus = document.getElementById("chartStatus");
-    const cgWidgetWrap = document.getElementById("cgWidgetWrap");
     const tooltip = document.getElementById("tooltip");
     const chartWrap = document.getElementById("chartWrap");
 
     let seriesUSD = null; // [[ts, price], ...]
     let seriesEUR = null;
-    let lastDraw = null;  // cached draw params
+    let drawCache = null;
 
     function setChartStatus(t){ if (chartStatus) chartStatus.textContent = t; }
-
-    function showWidgetFallback(reason){
-      setChartStatus(reason || "Chart blocked — showing widget.");
-      if (cgWidgetWrap) cgWidgetWrap.style.display = "block";
-      if (chartMode) chartMode.textContent = "Widget fallback";
-      if (tooltip) tooltip.style.display = "none";
-    }
 
     function fmtTime(ts){
       const d = new Date(ts);
@@ -991,177 +660,192 @@
     }
 
     function resizeCanvas(){
-      if (!canvas || !ctx) return;
+      if (!canvas || !ctx) return null;
       const w = canvas.clientWidth;
-      const h = parseInt(getComputedStyle(canvas).height, 10) || 190;
+      const h = parseInt(getComputedStyle(canvas).height, 10) || 210;
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      return {w, h};
+      return {w,h};
     }
 
-    function computeDrawParams(series){
-      const xs = series.map(p => p[0]);
-      const ys = series.map(p => p[1]);
-      const minY = Math.min(...ys);
-      const maxY = Math.max(...ys);
-      const range = (maxY - minY) || 1;
-      const x0 = xs[0], x1 = xs[xs.length - 1];
-      return {xs, ys, minY, maxY, range, x0, x1};
-    }
-
-    function drawBase(series){
+    // Rotiran graf: X = price, Y = time
+    function drawRotated(series){
       if (!canvas || !ctx || !series || series.length < 2) return;
-      const {w,h} = resizeCanvas() || {};
-      if (!w || !h) return;
+      const sz = resizeCanvas();
+      if (!sz) return;
+      const {w,h} = sz;
 
       ctx.clearRect(0,0,w,h);
 
-      const padL = 14, padR = 10, padT = 16, padB = 26;
-      const P = computeDrawParams(series);
+      const padL = 44;  // left: time labels
+      const padR = 14;
+      const padT = 14;
+      const padB = 32;  // bottom: price labels
 
-      const toX = (x) => padL + (w - padL - padR) * ((x - P.x0) / (P.x1 - P.x0 || 1));
-      const toY = (y) => padT + (h - padT - padB) * (1 - ((y - P.minY) / P.range));
+      // time range
+      const xs = series.map(p=>p[1]); // price -> X axis
+      const ys = series.map(p=>p[0]); // time  -> Y axis
 
-      // store for hover
-      lastDraw = {w,h,padL,padR,padT,padB,toX,toY, P};
+      const minP = Math.min(...xs), maxP = Math.max(...xs);
+      const minT = Math.min(...ys), maxT = Math.max(...ys);
+
+      const toX = (p) => padL + (w - padL - padR) * ((p - minP) / ((maxP - minP)||1));
+      // time grows downward (older top, newer bottom)
+      const toY = (t) => padT + (h - padT - padB) * ((t - minT) / ((maxT - minT)||1));
+
+      drawCache = {w,h,padL,padR,padT,padB,minP,maxP,minT,maxT,toX,toY};
 
       // grid
       ctx.globalAlpha = 0.18;
       ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "rgba(255,255,255,.12)";
       ctx.lineWidth = 1;
+
+      // horizontal (time) grid lines
       for (let i=1;i<=3;i++){
         const gy = padT + (h - padT - padB) * (i/4);
         ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(w-padR, gy); ctx.stroke();
       }
+      // vertical (price) grid lines
+      for (let i=1;i<=3;i++){
+        const gx = padL + (w - padL - padR) * (i/4);
+        ctx.beginPath(); ctx.moveTo(gx, padT); ctx.lineTo(gx, h-padB); ctx.stroke();
+      }
       ctx.globalAlpha = 1;
 
-      // gradient fill
-      const grad = ctx.createLinearGradient(0, padT, 0, h-padB);
-      grad.addColorStop(0, "rgba(124,92,255,0.22)");
-      grad.addColorStop(1, "rgba(35,213,255,0.02)");
+      // line + fill
+      const grad = ctx.createLinearGradient(padL, 0, w-padR, 0);
+      grad.addColorStop(0, "rgba(124,92,255,0.20)");
+      grad.addColorStop(1, "rgba(35,213,255,0.08)");
 
-      // line
       ctx.beginPath();
-      ctx.moveTo(toX(P.xs[0]), toY(P.ys[0]));
-      for (let i=1;i<P.xs.length;i++) ctx.lineTo(toX(P.xs[i]), toY(P.ys[i]));
+      ctx.moveTo(toX(xs[0]), toY(ys[0]));
+      for (let i=1;i<series.length;i++){
+        ctx.lineTo(toX(xs[i]), toY(ys[i]));
+      }
       ctx.lineWidth = 2.2;
       ctx.strokeStyle = "rgba(124,92,255,0.95)";
       ctx.stroke();
 
-      // fill area
-      ctx.lineTo(toX(P.xs[P.xs.length-1]), h-padB);
-      ctx.lineTo(toX(P.xs[0]), h-padB);
+      // fill to baseline (min price)
+      ctx.lineTo(toX(minP), toY(ys[ys.length-1]));
+      ctx.lineTo(toX(minP), toY(ys[0]));
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // time ticks
-      const ticks = 4;
-      ctx.globalAlpha = 0.75;
-      ctx.font = "700 11px Inter, system-ui, sans-serif";
+      // left labels (time)
+      ctx.globalAlpha = 0.78;
       ctx.fillStyle = "rgba(255,255,255,.72)";
+      ctx.font = "700 11px Inter, system-ui, sans-serif";
+      for (let i=0;i<=4;i++){
+        const t = minT + (maxT-minT)*(i/4);
+        const y = toY(t);
+        ctx.fillText(fmtTime(t), 8, y+4);
+      }
+
+      // bottom labels (price)
+      const ticks = 4;
       for (let i=0;i<=ticks;i++){
-        const t = P.x0 + (P.x1-P.x0) * (i/ticks);
-        const x = toX(t);
-        const label = (i === ticks) ? "now" : fmtTime(t);
-        ctx.fillText(label, Math.max(2, x-14), h-8);
+        const p = minP + (maxP-minP)*(i/ticks);
+        const x = toX(p);
+        const label = "$" + p.toFixed(4);
+        ctx.fillText(label, Math.max(padL, x-16), h-10);
       }
       ctx.globalAlpha = 1;
 
-      // update top chips with latest values
-      const lastUsd = P.ys[P.ys.length-1];
+      // chips
+      const lastUsd = series[series.length-1][1];
       if (usdChip) usdChip.textContent = "USD: $" + Number(lastUsd).toFixed(6);
 
       if (seriesEUR && seriesEUR.length){
         const eurLast = seriesEUR[seriesEUR.length-1][1];
         if (eurChip) eurChip.textContent = "EUR: €" + Number(eurLast).toFixed(6);
-      }else{
+      } else {
         if (eurChip) eurChip.textContent = "EUR: —";
       }
     }
 
-    function nearestIndexFromX(clientX){
-      if (!lastDraw || !seriesUSD) return null;
+    function showTooltip(clientX, clientY){
+      if (!drawCache || !seriesUSD) return;
       const rect = canvas.getBoundingClientRect();
       const x = clientX - rect.left;
-      const ratio = Math.min(1, Math.max(0, x / rect.width));
-      const idx = Math.round(ratio * (seriesUSD.length-1));
-      return { idx, x };
-    }
+      const y = clientY - rect.top;
 
-    function drawHover(clientX){
-      if (!seriesUSD || !seriesUSD.length || !lastDraw) return;
-      drawBase(seriesUSD);
+      // find nearest by Y (time)
+      const {padT,padB,h,minT,maxT} = drawCache;
+      const yClamped = Math.max(padT, Math.min(h-padB, y));
+      const ratio = (yClamped - padT) / ((h - padT - padB) || 1);
+      const tApprox = minT + (maxT-minT)*ratio;
 
-      const { idx, x } = nearestIndexFromX(clientX) || {};
-      if (idx == null) return;
+      // nearest index by time
+      let bestI = 0;
+      let bestD = Infinity;
+      for (let i=0;i<seriesUSD.length;i++){
+        const d = Math.abs(seriesUSD[i][0] - tApprox);
+        if (d < bestD){ bestD = d; bestI = i; }
+      }
 
-      const ts = seriesUSD[idx][0];
-      const usd = seriesUSD[idx][1];
-      const eur = (seriesEUR && seriesEUR[idx]) ? seriesEUR[idx][1] : null;
+      const ts = seriesUSD[bestI][0];
+      const usd = seriesUSD[bestI][1];
+      const eur = (seriesEUR && seriesEUR[bestI]) ? seriesEUR[bestI][1] : null;
 
-      // vertical line + point
-      const {w,h,padT,padB,toX,toY,P} = lastDraw;
-      const px = x;
-      const py = toY(usd);
+      // redraw + hover marker (crosshair)
+      drawRotated(seriesUSD);
+
+      const {toX,toY} = drawCache;
+      const px = toX(usd);
+      const py = toY(ts);
 
       ctx.globalAlpha = 0.35;
       ctx.strokeStyle = "rgba(255,255,255,.55)";
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(px, padT);
-      ctx.lineTo(px, h-padB);
-      ctx.stroke();
+
+      ctx.beginPath(); ctx.moveTo(px, drawCache.padT); ctx.lineTo(px, drawCache.h-drawCache.padB); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(drawCache.padL, py); ctx.lineTo(drawCache.w-drawCache.padR, py); ctx.stroke();
       ctx.globalAlpha = 1;
 
-      ctx.fillStyle = "rgba(255,255,255,.9)";
-      ctx.beginPath();
-      ctx.arc(px, py, 3.5, 0, Math.PI*2);
-      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.92)";
+      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI*2); ctx.fill();
 
-      // tooltip position
       if (tooltip && chartWrap){
         tooltip.style.display = "block";
-        const rect = chartWrap.getBoundingClientRect();
-        const left = (clientX - rect.left);
-        tooltip.style.left = left + "px";
+        const wrapRect = chartWrap.getBoundingClientRect();
+        tooltip.style.left = (clientX - wrapRect.left) + "px";
         tooltip.style.top = (py + 10) + "px";
         tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
       }
     }
 
-    function clearHover(){
+    function hideTooltip(){
       if (tooltip) tooltip.style.display = "none";
-      if (seriesUSD) drawBase(seriesUSD);
+      if (seriesUSD) drawRotated(seriesUSD);
     }
 
     function attachHover(){
       if (!canvas) return;
+      canvas.addEventListener("mousemove", (e)=> showTooltip(e.clientX, e.clientY));
+      canvas.addEventListener("mouseleave", hideTooltip);
 
-      canvas.addEventListener("mousemove", (e)=> drawHover(e.clientX));
-      canvas.addEventListener("mouseleave", ()=> clearHover());
-
-      // touch support
       canvas.addEventListener("touchstart", (e)=>{
         const t = e.touches?.[0]; if (!t) return;
-        drawHover(t.clientX);
+        showTooltip(t.clientX, t.clientY);
       }, {passive:true});
 
       canvas.addEventListener("touchmove", (e)=>{
         const t = e.touches?.[0]; if (!t) return;
-        drawHover(t.clientX);
+        showTooltip(t.clientX, t.clientY);
       }, {passive:true});
 
-      canvas.addEventListener("touchend", ()=> clearHover(), {passive:true});
+      canvas.addEventListener("touchend", hideTooltip, {passive:true});
     }
 
     async function loadSpot(){
       if (priceStatus) priceStatus.textContent = "Loading…";
       try{
         const resUSD = await fetch("https://api.coinbase.com/v2/prices/FLR-USD/spot", { mode:"cors" });
-        if (!resUSD.ok) throw new Error("spot fail");
+        if (!resUSD.ok) throw new Error("spot usd fail");
         const jUSD = await resUSD.json();
         const amtUSD = Number(jUSD?.data?.amount);
         if (!isFinite(amtUSD)) throw new Error("bad usd");
@@ -1181,53 +865,103 @@
         if (spotTime) spotTime.textContent = new Date().toLocaleString();
         if (priceStatus) priceStatus.textContent = "Updated";
       }catch(e){
-        if (priceStatus) priceStatus.textContent = "Could not load spot price";
+        if (priceStatus) priceStatus.textContent = "Spot failed (Coinbase)";
       }
     }
 
-    async function loadChart24h(){
-      setChartStatus("Loading 24h chart…");
-      if (cgWidgetWrap) cgWidgetWrap.style.display = "none";
+    // === Chart data sources ===
+    async function fetchCoinGecko24h(vs){
+      // Best effort only (often blocked). If blocked, we silently fallback.
+      const url = `https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=${vs}&days=1&interval=hourly`;
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("CG blocked");
+      const j = await res.json();
+      if (!j?.prices?.length) throw new Error("CG no data");
+      return j.prices; // [[ts, price], ...]
+    }
 
+    async function fetchCoinbaseCandles24h(){
+      const end = new Date();
+      const start = new Date(end.getTime() - 24*60*60*1000);
+      const url = `https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=3600&start=${start.toISOString()}&end=${end.toISOString()}`;
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("CB candles blocked");
+      const arr = await res.json();
+      if (!Array.isArray(arr) || arr.length < 2) throw new Error("CB candles no data");
+      const sorted = arr.slice().sort((a,b)=>a[0]-b[0]);
+      // [time, low, high, open, close, volume] -> use close
+      return sorted.map(c => [c[0]*1000, c[4]]);
+    }
+
+    async function loadChart(){
+      setChartStatus("Loading chart…");
+
+      // 1) Try CoinGecko quietly (no widget, no errors)
       try{
-        // CoinGecko 24h (USD + EUR) – tooltip shows both
-        const [usdRes, eurRes] = await Promise.all([
-          fetch("https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=usd&days=1&interval=hourly", { mode:"cors" }),
-          fetch("https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=eur&days=1&interval=hourly", { mode:"cors" })
+        const [usd, eur] = await Promise.all([
+          fetchCoinGecko24h("usd"),
+          fetchCoinGecko24h("eur")
         ]);
-        if (!usdRes.ok) throw new Error("cg usd blocked");
-        if (!eurRes.ok) throw new Error("cg eur blocked");
-
-        const usd = await usdRes.json();
-        const eur = await eurRes.json();
-
-        if (!usd?.prices?.length) throw new Error("cg no usd");
-        seriesUSD = usd.prices;
-        seriesEUR = eur?.prices?.length ? eur.prices : null;
-
-        drawBase(seriesUSD);
-        setChartStatus("Hover/touch the curve for exact price.");
-        if (chartMode) chartMode.textContent = "CoinGecko 24h (USD+EUR)";
+        seriesUSD = usd;
+        seriesEUR = eur;
+        drawRotated(seriesUSD);
+        setChartStatus("Hover/touch for exact value.");
+        if (chartMode) chartMode.textContent = "CoinGecko 24h";
         return;
-      }catch(e){}
+      }catch(_){ /* silent */ }
 
-      // fallback widget
-      showWidgetFallback("Chart blocked — showing widget.");
+      // 2) Fallback: Coinbase candles for USD, EUR from FX (EURUSD) approximated
+      try{
+        const usd = await fetchCoinbaseCandles24h();
+        seriesUSD = usd;
+
+        // EUR approximate using EUR-USD FX spot
+        let eurPerUsd = null;
+        try{
+          const fxRes = await fetch("https://api.coinbase.com/v2/prices/EUR-USD/spot", { mode:"cors" });
+          if (fxRes.ok){
+            const j = await fxRes.json();
+            const eurUsd = Number(j?.data?.amount); // USD per 1 EUR
+            if (isFinite(eurUsd) && eurUsd > 0) eurPerUsd = 1 / eurUsd;
+          }
+        }catch(_){}
+
+        if (eurPerUsd){
+          seriesEUR = usd.map(([ts,p]) => [ts, p * eurPerUsd]);
+        } else {
+          seriesEUR = null;
+        }
+
+        drawRotated(seriesUSD);
+        setChartStatus("Hover/touch for exact value.");
+        if (chartMode) chartMode.textContent = "Coinbase candles 24h";
+        return;
+      }catch(e){
+        // last resort: show empty but no “broken widget”
+        seriesUSD = null;
+        seriesEUR = null;
+        setChartStatus("Chart unavailable (blocked).");
+        if (chartMode) chartMode.textContent = "Unavailable";
+      }
     }
 
     async function refreshAll(){
       await loadSpot();
-      await loadChart24h();
+      await loadChart();
     }
 
     if (priceRefresh) priceRefresh.addEventListener("click", refreshAll);
 
+    // init
     attachHover();
     refreshAll();
 
     window.addEventListener("resize", () => {
-      if (seriesUSD) drawBase(seriesUSD);
+      if (seriesUSD) drawRotated(seriesUSD);
     });
+
+    // Copy email
+    if (copyEmailBtn) copyEmailBtn.addEventListener("click", () => copyText(CONFIG.contactEmail));
   </script>
 </body>
 </html>
