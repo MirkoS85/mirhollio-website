@@ -8,10 +8,11 @@
   <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics and delegation guidance — built for reliability." />
   <meta name="theme-color" content="#0b1220" />
 
-  <!-- Your assets -->
+  <!-- Favicons (more sizes helps visibility/sharpness) -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="icon" href="logo.png">
-  <link rel="apple-touch-icon" href="logo.png">
 
   <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
   <meta property="og:description" content="Transparent metrics and delegation guidance — built for reliability." />
@@ -42,14 +43,18 @@
       --ok:#33d69f;
       --ring:0 0 0 6px rgba(124,92,255,.16);
 
-      /* CROPPED EMBED TUNING (desktop) */
-      --embed-shift: 135px;  /* smaller shift => show header + icon */
-      --embed-scale: 1.06;   /* mild zoom */
-      --embed-height: 505px; /* shorter => avoids token list */
+      /* === EMBED CROP (DESKTOP) ===
+         Goal: show provider header + logo + Availability + Success Rate + start of RE table.
+         If you want MORE header/logo: lower shift (e.g. 120px)
+         If token list appears: lower height (e.g. 470px)
+      */
+      --embed-shift: 120px;
+      --embed-scale: 1.07;
+      --embed-height: 490px;
 
-      /* CHART FIXED HEIGHTS */
-      --chart-h: 170px;
-      --chart-h-mobile: 180px;
+      /* === CHART fixed height === */
+      --chart-h: 190px;
+      --chart-h-mobile: 200px;
     }
 
     [data-theme="light"]{
@@ -280,7 +285,8 @@
     .chev{transition: transform .12s ease}
     details[open] .chev{transform: rotate(180deg)}
 
-    /* PRICE chart - fixed height, no stretching */
+    /* PRICE chart - fixed height, with axis labels */
+    .chartViewport{max-height: 280px; overflow:hidden;}
     .chartWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -290,12 +296,28 @@
     }
     .chartCanvas{
       width:100%;
-      height: var(--chart-h);   /* fixed */
+      height: var(--chart-h);
       display:block;
     }
-    .chartViewport{
-      max-height: 260px; /* prevents huge vertical expansion */
-      overflow:hidden;
+    .chartLegend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top:10px;
+      color: var(--muted2);
+      font-size: 12px;
+    }
+    .legendLeft{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .chip{
+      padding:6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      font-weight:900;
     }
 
     /* Widget fallback */
@@ -323,20 +345,20 @@
       width: 100%;
     }
 
-    /* Mobile tuning */
+    /* Mobile tuning: same intent (show logo/header, crop bottom harder) */
     @media (max-width: 980px){
       :root{
-        --embed-shift: 165px;
-        --embed-scale: 1.03;
+        --embed-shift: 150px;
+        --embed-scale: 1.04;
         --embed-height: 560px;
-        --chart-h: 175px;
+        --chart-h: 195px;
       }
     }
     @media (max-width: 520px){
       :root{
-        --embed-shift: 190px;
+        --embed-shift: 175px;
         --embed-scale: 1.02;
-        --embed-height: 610px;
+        --embed-height: 600px;
         --chart-h: var(--chart-h-mobile);
       }
       .btn{width:100%; justify-content:center}
@@ -344,7 +366,7 @@
       .logoImg{width:36px;height:36px}
     }
 
-    /* Delegation two windows */
+    /* Delegation windows */
     .steps{display:flex; flex-direction:column; gap:12px; margin-top:10px}
     .step{
       padding:14px;
@@ -562,22 +584,26 @@
 
         <div class="splitWide">
           <div class="panel" style="box-shadow:none">
-            <!-- Fixed-height chart to avoid mobile stretching -->
             <div class="chartViewport">
               <div class="chartWrap">
                 <canvas id="flr24h" class="chartCanvas" aria-label="FLR 24h chart"></canvas>
-                <div class="tiny" id="chartStatus" style="margin-top:10px">Loading 24h chart…</div>
+                <div class="chartLegend">
+                  <div class="legendLeft">
+                    <span class="chip" id="usdChip">USD: —</span>
+                    <span class="chip" id="eurChip">EUR: —</span>
+                  </div>
+                  <div class="tiny" id="chartStatus">Loading 24h chart…</div>
+                </div>
               </div>
             </div>
 
-            <!-- widget fallback -->
             <div class="iframeWrap" id="cgWidgetWrap" style="margin-top:12px; display:none">
               <iframe
                 title="CoinGecko — FLR widget"
                 loading="lazy"
                 referrerpolicy="no-referrer"
                 src="https://www.coingecko.com/en/coins/flare/widget?locale=en"
-                style="height:540px">
+                style="height:520px">
               </iframe>
             </div>
 
@@ -597,8 +623,8 @@
                   <div class="value" id="spotUsd">—</div>
                 </div>
                 <div class="kpi">
-                  <div class="label">Source</div>
-                  <div class="value">Coinbase</div>
+                  <div class="label">FLR Spot (EUR)</div>
+                  <div class="value" id="spotEur">—</div>
                 </div>
                 <div class="kpi">
                   <div class="label">Last updated</div>
@@ -610,7 +636,7 @@
                 </div>
               </div>
               <p class="tiny" style="margin-top:10px">
-                Chart tries: CoinGecko 24h → Coinbase candles → fallback widget.
+                EUR is derived from FX (EURUSD). Chart shows 24h line with time ticks.
               </p>
             </div>
           </details>
@@ -618,12 +644,12 @@
       </div>
     </section>
 
-    <!-- METRICS (single view, no tabs) -->
+    <!-- METRICS -->
     <section id="metrics">
       <div class="panel">
         <div class="titleRow" style="margin-bottom:10px">
           <h2>Metrics Dashboard</h2>
-          <div class="tiny">Showing only the important section (no scrolling).</div>
+          <div class="tiny">Showing only the important section (cropped).</div>
         </div>
 
         <div class="panel" style="box-shadow:none">
@@ -649,7 +675,7 @@
           </div>
 
           <div class="tiny" style="margin-top:10px">
-            Fine-tune crop: edit <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> at the top of CSS.
+            Manual tuning: change <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> at the top of CSS (desktop + mobile).
           </div>
         </div>
       </div>
@@ -721,21 +747,20 @@
               <li><b>MetaMask</b>: double-check network + contract prompts before approving.</li>
               <li><b>Bifrost</b>: locate delegation/FTSO section; verify provider identity via link.</li>
               <li><b>Hardware wallets</b>: confirm on-device display matches address/transaction details.</li>
+              <li><b>Epoch timing</b>: changes apply from the next epoch; don’t panic if it’s not instant.</li>
+              <li><b>Fees</b>: check provider fee and ensure you’re comfortable before confirming.</li>
+              <li><b>Security</b>: never share seed phrases; beware of fake support DMs.</li>
             </ul>
 
             <div class="sub">
-              <h4>When to contact me</h4>
+              <h4>Common checks</h4>
               <ul>
-                <li>Delegation doesn’t show up after an expected period.</li>
-                <li>You see inconsistent identity/address across sites.</li>
-                <li>You need help verifying a transaction hash.</li>
+                <li>Verify the address in wallet equals the one on this page.</li>
+                <li>After delegation, refresh metrics and wait for the next snapshot/epoch.</li>
+                <li>If something looks wrong, compare across FlareMetrics + Explorer.</li>
               </ul>
-
-              <div class="row" style="margin-top:14px">
-                <a class="btn primary" href="mailto:mirsven@icloud.com">✉️ Email</a>
-                <a class="btn" href="https://t.me/Mirhollio" target="_blank" rel="noopener">✈️ Telegram</a>
-              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -896,10 +921,31 @@
 
     // Market snapshot
     const spotUsd = document.getElementById("spotUsd");
+    const spotEur = document.getElementById("spotEur");
     const spotTime = document.getElementById("spotTime");
     const priceStatus = document.getElementById("priceStatus");
     const priceRefresh = document.getElementById("priceRefresh");
     const chartMode = document.getElementById("chartMode");
+
+    const usdChip = document.getElementById("usdChip");
+    const eurChip = document.getElementById("eurChip");
+
+    let eurPerUsd = null; // 1 USD -> EUR
+
+    async function loadFxEurUsd(){
+      try{
+        // Coinbase FX: EUR-USD spot gives 1 EUR in USD. Convert to EUR per USD:
+        // eurUsd = USD per 1 EUR => EUR per 1 USD = 1 / eurUsd
+        const res = await fetch("https://api.coinbase.com/v2/prices/EUR-USD/spot", { mode:"cors" });
+        if (!res.ok) throw new Error("FX fail");
+        const j = await res.json();
+        const eurUsd = Number(j?.data?.amount);
+        if (!isFinite(eurUsd) || eurUsd <= 0) throw new Error("FX bad");
+        eurPerUsd = 1 / eurUsd;
+      }catch(e){
+        eurPerUsd = null; // fallback handled in UI
+      }
+    }
 
     async function loadSpot(){
       if (priceStatus) priceStatus.textContent = "Loading…";
@@ -910,7 +956,15 @@
         const j = await res.json();
         const amt = Number(j?.data?.amount);
         if (!isFinite(amt)) throw new Error("Bad amount");
+
         if (spotUsd) spotUsd.textContent = "$" + amt.toFixed(6);
+
+        if (eurPerUsd && spotEur){
+          spotEur.textContent = "€" + (amt * eurPerUsd).toFixed(6);
+        }else if (spotEur){
+          spotEur.textContent = "€ —";
+        }
+
         if (spotTime) spotTime.textContent = new Date().toLocaleString();
         if (priceStatus) priceStatus.textContent = "Updated";
       }catch(e){
@@ -931,12 +985,19 @@
       if (chartMode) chartMode.textContent = "Widget fallback";
     }
 
+    function fmtTime(ts){
+      const d = new Date(ts);
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${hh}:${mm}`;
+    }
+
     function drawLine(series){
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
 
       const w = canvas.clientWidth;
-      const h = parseInt(getComputedStyle(canvas).height, 10) || 170;
+      const h = parseInt(getComputedStyle(canvas).height, 10) || 190;
 
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.floor(w * dpr);
@@ -952,29 +1013,30 @@
         return;
       }
 
-      const pad = 14;
+      const padL = 14, padR = 10, padT = 16, padB = 26; // bottom for time ticks
       const xs = series.map(p => p[0]);
       const ys = series.map(p => p[1]);
+
       const minY = Math.min(...ys);
       const maxY = Math.max(...ys);
       const range = (maxY - minY) || 1;
 
       const x0 = xs[0], x1 = xs[xs.length - 1];
-      const toX = (x) => pad + (w - 2*pad) * ((x - x0) / (x1 - x0 || 1));
-      const toY = (y) => pad + (h - 2*pad) * (1 - ((y - minY) / range));
+      const toX = (x) => padL + (w - padL - padR) * ((x - x0) / (x1 - x0 || 1));
+      const toY = (y) => padT + (h - padT - padB) * (1 - ((y - minY) / range));
 
       // grid
       ctx.globalAlpha = 0.18;
       ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "rgba(255,255,255,.12)";
       ctx.lineWidth = 1;
       for (let i=1;i<=3;i++){
-        const gy = pad + (h - 2*pad) * (i/4);
-        ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(w-pad, gy); ctx.stroke();
+        const gy = padT + (h - padT - padB) * (i/4);
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(w-padR, gy); ctx.stroke();
       }
       ctx.globalAlpha = 1;
 
       // gradient fill
-      const grad = ctx.createLinearGradient(0, pad, 0, h-pad);
+      const grad = ctx.createLinearGradient(0, padT, 0, h-padB);
       grad.addColorStop(0, "rgba(124,92,255,0.22)");
       grad.addColorStop(1, "rgba(35,213,255,0.02)");
 
@@ -987,18 +1049,35 @@
       ctx.stroke();
 
       // fill area
-      ctx.lineTo(toX(xs[xs.length-1]), h-pad);
-      ctx.lineTo(toX(xs[0]), h-pad);
+      ctx.lineTo(toX(xs[xs.length-1]), h-padB);
+      ctx.lineTo(toX(xs[0]), h-padB);
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // label last
-      const last = ys[ys.length-1];
-      ctx.globalAlpha = 0.9;
-      ctx.font = "900 13px Inter, system-ui, sans-serif";
-      ctx.fillText(`24h: $${Number(last).toFixed(6)}`, 12, 22);
+      // time ticks
+      const ticks = 4; // 0%, 25%, 50%, 75%, 100%
+      ctx.globalAlpha = 0.75;
+      ctx.font = "700 11px Inter, system-ui, sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,.72)";
+      for (let i=0;i<=ticks;i++){
+        const t = x0 + (x1-x0) * (i/ticks);
+        const x = toX(t);
+        const label = i === ticks ? "now" : fmtTime(t);
+        ctx.fillText(label, Math.max(2, x-14), h-8);
+      }
       ctx.globalAlpha = 1;
+
+      // update chips (USD + EUR)
+      const lastUsd = ys[ys.length-1];
+      if (usdChip) usdChip.textContent = "USD: $" + Number(lastUsd).toFixed(6);
+      if (eurChip){
+        if (eurPerUsd){
+          eurChip.textContent = "EUR: €" + Number(lastUsd * eurPerUsd).toFixed(6);
+        }else{
+          eurChip.textContent = "EUR: € —";
+        }
+      }
     }
 
     async function fetchCoinGecko24h(){
@@ -1047,13 +1126,15 @@
       showWidgetFallback("24h chart blocked — showing widget.");
     }
 
-    if (priceRefresh) priceRefresh.addEventListener("click", async () => {
+    async function refreshAll(){
+      await loadFxEurUsd();
       await loadSpot();
       await load24hChart();
-    });
+    }
 
-    loadSpot();
-    load24hChart();
+    if (priceRefresh) priceRefresh.addEventListener("click", refreshAll);
+
+    refreshAll();
 
     window.addEventListener("resize", () => {
       if (lastSeries) drawLine(lastSeries);
