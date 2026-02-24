@@ -42,13 +42,14 @@
       --ok:#33d69f;
       --ring:0 0 0 6px rgba(124,92,255,.16);
 
-      /* === CROPPED EMBED TUNING (desktop) ===
-         If the visible part is slightly off, change ONLY these values.
-         More shift = move iframe content UP (show lower content).
-      */
-      --embed-shift: 210px;  /* how much we "scroll" down by moving iframe up */
-      --embed-scale: 1.08;   /* zoom */
-      --embed-height: 560px; /* viewport height of the cropped window */
+      /* CROPPED EMBED TUNING (desktop) */
+      --embed-shift: 135px;  /* smaller shift => show header + icon */
+      --embed-scale: 1.06;   /* mild zoom */
+      --embed-height: 505px; /* shorter => avoids token list */
+
+      /* CHART FIXED HEIGHTS */
+      --chart-h: 170px;
+      --chart-h-mobile: 180px;
     }
 
     [data-theme="light"]{
@@ -118,6 +119,7 @@
     .navlinks a{padding:10px 10px; border-radius:12px}
     .navlinks a:hover{background:var(--panel2); color:var(--text)}
     .actions{display:flex; align-items:center; gap:10px}
+    @media (max-width: 980px){ .navlinks{display:none} }
 
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
@@ -135,7 +137,6 @@
       box-shadow:0 18px 36px rgba(124,92,255,.18);
     }
     .btn.ghost{background:transparent}
-    @media (max-width: 980px){ .navlinks{display:none} }
 
     section{padding: 18px 0}
     .card{
@@ -179,6 +180,7 @@
 
     h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
     .lead{margin:0 0 14px; color:var(--muted); line-height:1.65; max-width: 62ch; font-size: 16px;}
+
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
     .badgeRow{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; color:var(--muted2); font-size:13px}
     .badge{display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius: 14px; background: rgba(255,255,255,0.04); border:1px solid var(--border);}
@@ -251,31 +253,10 @@
     }
     .panel h2{margin:0 0 10px; font-size:18px; letter-spacing:-0.02em}
     .muted{color:var(--muted)}
-    .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
     .split{display:grid; grid-template-columns:1fr 1fr; gap:14px}
     @media (max-width: 980px){ .split{grid-template-columns:1fr} }
     .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
     @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
-
-    .tabs{display:flex; flex-wrap:wrap; gap:10px; margin: 6px 0 12px}
-    .tab{
-      padding:9px 12px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-    }
-    .tab[aria-selected="true"]{
-      background: rgba(124,92,255,.14);
-      border-color: rgba(124,92,255,.28);
-      color: var(--text);
-      box-shadow: var(--ring);
-    }
-    .tabpanes > div{display:none}
-    .tabpanes > div.active{display:block}
 
     .cardDetails{
       border:1px solid var(--border);
@@ -299,7 +280,7 @@
     .chev{transition: transform .12s ease}
     details[open] .chev{transform: rotate(180deg)}
 
-    /* PRICE chart canvas */
+    /* PRICE chart - fixed height, no stretching */
     .chartWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -307,9 +288,17 @@
       padding:12px;
       overflow:hidden;
     }
-    canvas{width:100%; display:block}
+    .chartCanvas{
+      width:100%;
+      height: var(--chart-h);   /* fixed */
+      display:block;
+    }
+    .chartViewport{
+      max-height: 260px; /* prevents huge vertical expansion */
+      overflow:hidden;
+    }
 
-    /* Widget fallback (optional) */
+    /* Widget fallback */
     .iframeWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -318,7 +307,7 @@
     }
     iframe{width:100%; border:0}
 
-    /* === CROPPED EMBED === */
+    /* CROPPED EMBED */
     .cropWrap{
       border-radius: 18px;
       border:1px solid var(--border);
@@ -328,32 +317,34 @@
       position: relative;
     }
     .cropWrap iframe{
-      height: 1200px; /* big so we can crop */
+      height: 1200px;
       transform: translateY(calc(-1 * var(--embed-shift))) scale(var(--embed-scale));
       transform-origin: top left;
       width: 100%;
     }
 
-    /* Mobile tune for the crop (usually different offset) */
+    /* Mobile tuning */
     @media (max-width: 980px){
       :root{
-        --embed-shift: 235px;
-        --embed-scale: 1.05;
-        --embed-height: 640px;
+        --embed-shift: 165px;
+        --embed-scale: 1.03;
+        --embed-height: 560px;
+        --chart-h: 175px;
       }
     }
     @media (max-width: 520px){
       :root{
-        --embed-shift: 260px;
+        --embed-shift: 190px;
         --embed-scale: 1.02;
-        --embed-height: 720px;
+        --embed-height: 610px;
+        --chart-h: var(--chart-h-mobile);
       }
       .btn{width:100%; justify-content:center}
       .hero{min-height:auto}
       .logoImg{width:36px;height:36px}
     }
 
-    /* Delegation “two windows” */
+    /* Delegation two windows */
     .steps{display:flex; flex-direction:column; gap:12px; margin-top:10px}
     .step{
       padding:14px;
@@ -571,10 +562,12 @@
 
         <div class="splitWide">
           <div class="panel" style="box-shadow:none">
-            <!-- Simple 24h chart -->
-            <div class="chartWrap">
-              <canvas id="flr24h" height="170" aria-label="FLR 24h chart"></canvas>
-              <div class="tiny" id="chartStatus" style="margin-top:10px">Loading 24h chart…</div>
+            <!-- Fixed-height chart to avoid mobile stretching -->
+            <div class="chartViewport">
+              <div class="chartWrap">
+                <canvas id="flr24h" class="chartCanvas" aria-label="FLR 24h chart"></canvas>
+                <div class="tiny" id="chartStatus" style="margin-top:10px">Loading 24h chart…</div>
+              </div>
             </div>
 
             <!-- widget fallback -->
@@ -584,7 +577,7 @@
                 loading="lazy"
                 referrerpolicy="no-referrer"
                 src="https://www.coingecko.com/en/coins/flare/widget?locale=en"
-                style="height:560px">
+                style="height:540px">
               </iframe>
             </div>
 
@@ -612,7 +605,7 @@
                   <div class="value" id="spotTime">—</div>
                 </div>
                 <div class="kpi">
-                  <div class="label">Mode</div>
+                  <div class="label">Chart mode</div>
                   <div class="value" id="chartMode">—</div>
                 </div>
               </div>
@@ -625,7 +618,7 @@
       </div>
     </section>
 
-    <!-- METRICS -->
+    <!-- METRICS (single view, no tabs) -->
     <section id="metrics">
       <div class="panel">
         <div class="titleRow" style="margin-bottom:10px">
@@ -633,58 +626,32 @@
           <div class="tiny">Showing only the important section (no scrolling).</div>
         </div>
 
-        <div class="tabs" role="tablist" aria-label="Metrics tabs">
-          <button class="tab" role="tab" aria-selected="true" aria-controls="pane-overview" id="tab-overview" type="button">Overview</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="pane-ftso" id="tab-ftso" type="button">FTSO</button>
-        </div>
+        <div class="panel" style="box-shadow:none">
+          <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
+          <p class="muted" style="margin:0 0 10px; line-height:1.65">
+            This view shows your provider header + the key parts (Availability + Success Rate + RE table).
+          </p>
 
-        <div class="tabpanes">
-          <!-- Overview -->
-          <div id="pane-overview" class="active" role="tabpanel" aria-labelledby="tab-overview">
-            <div class="panel" style="box-shadow:none">
-              <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
-              <p class="muted" style="margin:0 0 10px; line-height:1.65">
-                This view shows only the key parts (Availability + Success Rate + RE table).
-              </p>
-
-              <!-- Cropped embed (no internal scrolling visible) -->
-              <div class="cropWrap" aria-label="Cropped FTSO provider embed">
-                <iframe
-                  title="Flare Systems Explorer — FTSO Provider (cropped)"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
-                </iframe>
-              </div>
-
-              <div class="row" style="margin-top:12px">
-                <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
-                  ↗ Open full page
-                </a>
-                <a class="btn" href="#delegation">⚡ Delegation guide</a>
-              </div>
-              <div class="tiny" style="margin-top:10px">
-                If the crop is a bit off, adjust <span class="mono">--embed-shift</span> / <span class="mono">--embed-scale</span> at the top of CSS.
-              </div>
-            </div>
+          <div class="cropWrap" aria-label="Cropped FTSO provider embed">
+            <iframe
+              title="Flare Systems Explorer — FTSO Provider (cropped)"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
+            </iframe>
           </div>
 
-          <!-- FTSO Tab (same cropped view) -->
-          <div id="pane-ftso" role="tabpanel" aria-labelledby="tab-ftso">
-            <div class="panel" style="box-shadow:none">
-              <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
-              <div class="cropWrap">
-                <iframe
-                  title="Flare Systems Explorer — FTSO Provider (cropped tab)"
-                  loading="lazy"
-                  referrerpolicy="no-referrer"
-                  src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
-                </iframe>
-              </div>
-            </div>
+          <div class="row" style="margin-top:12px">
+            <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
+              ↗ Open full page
+            </a>
+            <a class="btn" href="#delegation">⚡ Delegation guide</a>
+          </div>
+
+          <div class="tiny" style="margin-top:10px">
+            Fine-tune crop: edit <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> at the top of CSS.
           </div>
         </div>
-
       </div>
     </section>
 
@@ -839,9 +806,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // =======================
-    // CONFIG (edit if needed)
-    // =======================
     const CONFIG = {
       delegationAddress: "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
       ftsoProviderIdentity: "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
@@ -926,20 +890,11 @@
       copyText(block);
     });
 
-    // Tabs (metrics)
-    const tabs = Array.from(document.querySelectorAll("#metrics .tab"));
-    const panes = Array.from(document.querySelectorAll("#metrics .tabpanes > div"));
-    function activateTab(tabId){
-      tabs.forEach(t => t.setAttribute("aria-selected", t.id === tabId ? "true" : "false"));
-      panes.forEach(p => p.classList.toggle("active", p.id === document.getElementById(tabId).getAttribute("aria-controls")));
-    }
-    tabs.forEach(t => t.addEventListener("click", () => activateTab(t.id)));
-
     // Footer year
     const year = document.getElementById("year");
     if (year) year.textContent = new Date().getFullYear();
 
-    // Market snapshot (Coinbase spot)
+    // Market snapshot
     const spotUsd = document.getElementById("spotUsd");
     const spotTime = document.getElementById("spotTime");
     const priceStatus = document.getElementById("priceStatus");
@@ -956,25 +911,20 @@
         const amt = Number(j?.data?.amount);
         if (!isFinite(amt)) throw new Error("Bad amount");
         if (spotUsd) spotUsd.textContent = "$" + amt.toFixed(6);
-        const t = new Date();
-        if (spotTime) spotTime.textContent = t.toLocaleString();
+        if (spotTime) spotTime.textContent = new Date().toLocaleString();
         if (priceStatus) priceStatus.textContent = "Updated";
       }catch(e){
         if (priceStatus) priceStatus.textContent = "Could not load spot price";
       }
     }
 
-    // =======================
-    // SIMPLE 24H CHART (two sources) + widget fallback
-    // =======================
+    // 24H chart
     const canvas = document.getElementById("flr24h");
     const chartStatus = document.getElementById("chartStatus");
     const cgWidgetWrap = document.getElementById("cgWidgetWrap");
-
     let lastSeries = null;
 
     function setChartStatus(t){ if (chartStatus) chartStatus.textContent = t; }
-
     function showWidgetFallback(reason){
       setChartStatus(reason || "Chart blocked — showing widget.");
       if (cgWidgetWrap) cgWidgetWrap.style.display = "block";
@@ -986,13 +936,12 @@
       const ctx = canvas.getContext("2d");
 
       const w = canvas.clientWidth;
-      const h = canvas.height;
+      const h = parseInt(getComputedStyle(canvas).height, 10) || 170;
 
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-
       ctx.clearRect(0,0,w,h);
 
       if (!series || series.length < 2){
@@ -1058,12 +1007,10 @@
       if (!res.ok) throw new Error("CoinGecko blocked");
       const j = await res.json();
       if (!j || !Array.isArray(j.prices) || j.prices.length < 2) throw new Error("CoinGecko no data");
-      return j.prices; // [ts, price]
+      return j.prices;
     }
 
     async function fetchCoinbaseCandles24h(){
-      // Coinbase candles: returns [ time, low, high, open, close, volume ]
-      // We'll use close as price. granularity 3600 = 1h.
       const end = new Date();
       const start = new Date(end.getTime() - 24*60*60*1000);
       const url = `https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=3600&start=${start.toISOString()}&end=${end.toISOString()}`;
@@ -1071,7 +1018,6 @@
       if (!res.ok) throw new Error("Coinbase candles blocked");
       const arr = await res.json();
       if (!Array.isArray(arr) || arr.length < 2) throw new Error("Coinbase candles no data");
-      // API often returns reverse chronological
       const sorted = arr.slice().sort((a,b)=>a[0]-b[0]);
       return sorted.map(c => [c[0]*1000, c[4]]);
     }
@@ -1079,6 +1025,7 @@
     async function load24hChart(){
       setChartStatus("Loading 24h chart…");
       if (cgWidgetWrap) cgWidgetWrap.style.display = "none";
+
       try{
         const series = await fetchCoinGecko24h();
         lastSeries = series;
@@ -1086,9 +1033,8 @@
         setChartStatus("24h chart updated (CoinGecko).");
         if (chartMode) chartMode.textContent = "CoinGecko 24h";
         return;
-      }catch(e1){
-        // try fallback
-      }
+      }catch(e){}
+
       try{
         const series = await fetchCoinbaseCandles24h();
         lastSeries = series;
@@ -1096,22 +1042,19 @@
         setChartStatus("24h chart updated (Coinbase candles).");
         if (chartMode) chartMode.textContent = "Coinbase 24h";
         return;
-      }catch(e2){
-        showWidgetFallback("24h chart blocked — showing widget.");
-      }
+      }catch(e){}
+
+      showWidgetFallback("24h chart blocked — showing widget.");
     }
 
-    // Refresh button loads both
     if (priceRefresh) priceRefresh.addEventListener("click", async () => {
       await loadSpot();
       await load24hChart();
     });
 
-    // First load
     loadSpot();
     load24hChart();
 
-    // Redraw on resize using last series (no refetch spam)
     window.addEventListener("resize", () => {
       if (lastSeries) drawLine(lastSeries);
     });
