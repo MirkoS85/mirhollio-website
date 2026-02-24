@@ -8,11 +8,10 @@
   <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics and delegation guidance — built for reliability." />
   <meta name="theme-color" content="#0b1220" />
 
-  <!-- Favicons (more sizes helps visibility/sharpness) -->
+  <!-- Favicons (upload both files) -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
-  <link rel="icon" href="logo.png">
 
   <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
   <meta property="og:description" content="Transparent metrics and delegation guidance — built for reliability." />
@@ -44,17 +43,17 @@
       --ring:0 0 0 6px rgba(124,92,255,.16);
 
       /* === EMBED CROP (DESKTOP) ===
-         Goal: show provider header + logo + Availability + Success Rate + start of RE table.
-         If you want MORE header/logo: lower shift (e.g. 120px)
-         If token list appears: lower height (e.g. 470px)
+         - show provider header + logo
+         - show Availability + Success Rate + some RE table
+         - HIDE everything from "Price Feeds Last 6H"
       */
-      --embed-shift: 120px;
-      --embed-scale: 1.07;
-      --embed-height: 490px;
+      --embed-shift: 112px;     /* smaller => more top/header visible */
+      --embed-scale: 1.06;
+      --embed-height: 455px;    /* smaller => cuts bottom earlier */
 
-      /* === CHART fixed height === */
+      /* Chart fixed height */
       --chart-h: 190px;
-      --chart-h-mobile: 200px;
+      --chart-h-mobile: 180px;
     }
 
     [data-theme="light"]{
@@ -285,7 +284,7 @@
     .chev{transition: transform .12s ease}
     details[open] .chev{transform: rotate(180deg)}
 
-    /* PRICE chart - fixed height, with axis labels */
+    /* PRICE chart */
     .chartViewport{max-height: 280px; overflow:hidden;}
     .chartWrap{
       border-radius: 18px;
@@ -293,11 +292,13 @@
       background: rgba(255,255,255,.03);
       padding:12px;
       overflow:hidden;
+      position: relative;
     }
     .chartCanvas{
       width:100%;
       height: var(--chart-h);
       display:block;
+      touch-action: pan-y;
     }
     .chartLegend{
       display:flex;
@@ -309,15 +310,35 @@
       color: var(--muted2);
       font-size: 12px;
     }
-    .legendLeft{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-    }
+    .legendLeft{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
     .chip{
       padding:6px 10px;
       border-radius: 999px;
       border:1px solid var(--border);
       background: rgba(255,255,255,.04);
       font-weight:900;
+    }
+
+    /* Tooltip */
+    .tooltip{
+      position:absolute;
+      pointer-events:none;
+      padding:8px 10px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(10px);
+      color: rgba(255,255,255,.92);
+      font-size: 12px;
+      font-weight: 900;
+      transform: translate(-50%, -110%);
+      display:none;
+      white-space: nowrap;
+      z-index: 2;
+    }
+    [data-theme="light"] .tooltip{
+      background: rgba(10,14,25,.72);
+      border:1px solid rgba(10,14,25,.18);
     }
 
     /* Widget fallback */
@@ -344,21 +365,33 @@
       transform-origin: top left;
       width: 100%;
     }
+    /* Bottom fade to hide anything starting near "Price Feeds Last 6H" */
+    .cropWrap::after{
+      content:"";
+      position:absolute;
+      left:0; right:0; bottom:0;
+      height: 95px;
+      background: linear-gradient(to bottom, rgba(7,11,20,0), rgba(7,11,20,1));
+      pointer-events:none;
+    }
+    [data-theme="light"] .cropWrap::after{
+      background: linear-gradient(to bottom, rgba(247,249,255,0), rgba(247,249,255,1));
+    }
 
-    /* Mobile tuning: same intent (show logo/header, crop bottom harder) */
+    /* Mobile tuning: same crop intent */
     @media (max-width: 980px){
       :root{
-        --embed-shift: 150px;
+        --embed-shift: 145px;
         --embed-scale: 1.04;
         --embed-height: 560px;
-        --chart-h: 195px;
+        --chart-h: 180px;
       }
     }
     @media (max-width: 520px){
       :root{
-        --embed-shift: 175px;
+        --embed-shift: 168px;
         --embed-scale: 1.02;
-        --embed-height: 600px;
+        --embed-height: 590px;
         --chart-h: var(--chart-h-mobile);
       }
       .btn{width:100%; justify-content:center}
@@ -585,14 +618,15 @@
         <div class="splitWide">
           <div class="panel" style="box-shadow:none">
             <div class="chartViewport">
-              <div class="chartWrap">
+              <div class="chartWrap" id="chartWrap">
+                <div class="tooltip" id="tooltip"></div>
                 <canvas id="flr24h" class="chartCanvas" aria-label="FLR 24h chart"></canvas>
                 <div class="chartLegend">
                   <div class="legendLeft">
                     <span class="chip" id="usdChip">USD: —</span>
                     <span class="chip" id="eurChip">EUR: —</span>
                   </div>
-                  <div class="tiny" id="chartStatus">Loading 24h chart…</div>
+                  <div class="tiny" id="chartStatus">Loading…</div>
                 </div>
               </div>
             </div>
@@ -609,7 +643,7 @@
 
             <div class="row" style="margin-top:12px">
               <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">↗ Open on CoinGecko</a>
-              <button class="btn primary" id="priceRefresh" type="button">⟳ Refresh spot + chart</button>
+              <button class="btn primary" id="priceRefresh" type="button">⟳ Refresh</button>
             </div>
           </div>
 
@@ -636,7 +670,7 @@
                 </div>
               </div>
               <p class="tiny" style="margin-top:10px">
-                EUR is derived from FX (EURUSD). Chart shows 24h line with time ticks.
+                Tooltip: hover/touch the curve to see exact time + USD/EUR.
               </p>
             </div>
           </details>
@@ -649,13 +683,13 @@
       <div class="panel">
         <div class="titleRow" style="margin-bottom:10px">
           <h2>Metrics Dashboard</h2>
-          <div class="tiny">Showing only the important section (cropped).</div>
+          <div class="tiny">Cropped to show only the important section.</div>
         </div>
 
         <div class="panel" style="box-shadow:none">
           <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
           <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            This view shows your provider header + the key parts (Availability + Success Rate + RE table).
+            Header + logo + Availability + Success Rate + RE table (bottom cut before “Price Feeds Last 6H”).
           </p>
 
           <div class="cropWrap" aria-label="Cropped FTSO provider embed">
@@ -675,7 +709,7 @@
           </div>
 
           <div class="tiny" style="margin-top:10px">
-            Manual tuning: change <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> at the top of CSS (desktop + mobile).
+            Manual tuning: adjust <span class="mono">--embed-shift</span> / <span class="mono">--embed-height</span> (desktop + mobile).
           </div>
         </div>
       </div>
@@ -689,7 +723,7 @@
             <h2>Delegation guide (wallet-oriented)</h2>
           </div>
           <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            The UI differs per wallet, but the checklist stays the same. Verify identity, delegate, confirm epoch rules.
+            Verify identity, delegate, confirm epoch rules. Keep it simple.
           </p>
 
           <div class="steps">
@@ -728,7 +762,7 @@
                 <div class="n">4</div>
                 <div>
                   <h3>Sanity-check after</h3>
-                  <p>Verify delegation shows up (wallet + metrics). If something looks off, send the tx hash.</p>
+                  <p>Refresh metrics and wait for the next snapshot/epoch before judging.</p>
                 </div>
               </div>
             </div>
@@ -748,19 +782,18 @@
               <li><b>Bifrost</b>: locate delegation/FTSO section; verify provider identity via link.</li>
               <li><b>Hardware wallets</b>: confirm on-device display matches address/transaction details.</li>
               <li><b>Epoch timing</b>: changes apply from the next epoch; don’t panic if it’s not instant.</li>
-              <li><b>Fees</b>: check provider fee and ensure you’re comfortable before confirming.</li>
+              <li><b>Fees</b>: review provider fee before confirming.</li>
               <li><b>Security</b>: never share seed phrases; beware of fake support DMs.</li>
             </ul>
 
             <div class="sub">
-              <h4>Common checks</h4>
+              <h4>Extra checklist</h4>
               <ul>
-                <li>Verify the address in wallet equals the one on this page.</li>
-                <li>After delegation, refresh metrics and wait for the next snapshot/epoch.</li>
-                <li>If something looks wrong, compare across FlareMetrics + Explorer.</li>
+                <li>Compare identity across Explorer + FlareMetrics.</li>
+                <li>Use “copy” buttons to avoid typos.</li>
+                <li>If something looks off, wait one epoch and re-check metrics.</li>
               </ul>
             </div>
-
           </div>
         </div>
       </div>
@@ -778,8 +811,7 @@
           <summary>How do I verify MirSFlr is legit? <span class="chev" aria-hidden="true">▾</span></summary>
           <div class="inner">
             <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Use the explorer page and verify identity + delegation address match what you see here.
-              Never share seed phrases.
+              Verify identity + delegation address match the explorer page. Never share seed phrases.
             </p>
           </div>
         </details>
@@ -788,7 +820,7 @@
           <summary>Why can charts fail sometimes? <span class="chev" aria-hidden="true">▾</span></summary>
           <div class="inner">
             <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Some public APIs rate-limit or block browser requests. This site tries multiple sources + falls back to widget.
+              Some APIs rate-limit or block browser requests. This page uses multi-source + widget fallback.
             </p>
           </div>
         </details>
@@ -930,59 +962,25 @@
     const usdChip = document.getElementById("usdChip");
     const eurChip = document.getElementById("eurChip");
 
-    let eurPerUsd = null; // 1 USD -> EUR
-
-    async function loadFxEurUsd(){
-      try{
-        // Coinbase FX: EUR-USD spot gives 1 EUR in USD. Convert to EUR per USD:
-        // eurUsd = USD per 1 EUR => EUR per 1 USD = 1 / eurUsd
-        const res = await fetch("https://api.coinbase.com/v2/prices/EUR-USD/spot", { mode:"cors" });
-        if (!res.ok) throw new Error("FX fail");
-        const j = await res.json();
-        const eurUsd = Number(j?.data?.amount);
-        if (!isFinite(eurUsd) || eurUsd <= 0) throw new Error("FX bad");
-        eurPerUsd = 1 / eurUsd;
-      }catch(e){
-        eurPerUsd = null; // fallback handled in UI
-      }
-    }
-
-    async function loadSpot(){
-      if (priceStatus) priceStatus.textContent = "Loading…";
-      try{
-        const url = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
-        const res = await fetch(url, { mode:"cors" });
-        if (!res.ok) throw new Error("Coinbase spot failed");
-        const j = await res.json();
-        const amt = Number(j?.data?.amount);
-        if (!isFinite(amt)) throw new Error("Bad amount");
-
-        if (spotUsd) spotUsd.textContent = "$" + amt.toFixed(6);
-
-        if (eurPerUsd && spotEur){
-          spotEur.textContent = "€" + (amt * eurPerUsd).toFixed(6);
-        }else if (spotEur){
-          spotEur.textContent = "€ —";
-        }
-
-        if (spotTime) spotTime.textContent = new Date().toLocaleString();
-        if (priceStatus) priceStatus.textContent = "Updated";
-      }catch(e){
-        if (priceStatus) priceStatus.textContent = "Could not load spot price";
-      }
-    }
-
-    // 24H chart
+    // Chart elements
     const canvas = document.getElementById("flr24h");
+    const ctx = canvas?.getContext("2d");
     const chartStatus = document.getElementById("chartStatus");
     const cgWidgetWrap = document.getElementById("cgWidgetWrap");
-    let lastSeries = null;
+    const tooltip = document.getElementById("tooltip");
+    const chartWrap = document.getElementById("chartWrap");
+
+    let seriesUSD = null; // [[ts, price], ...]
+    let seriesEUR = null;
+    let lastDraw = null;  // cached draw params
 
     function setChartStatus(t){ if (chartStatus) chartStatus.textContent = t; }
+
     function showWidgetFallback(reason){
       setChartStatus(reason || "Chart blocked — showing widget.");
       if (cgWidgetWrap) cgWidgetWrap.style.display = "block";
       if (chartMode) chartMode.textContent = "Widget fallback";
+      if (tooltip) tooltip.style.display = "none";
     }
 
     function fmtTime(ts){
@@ -992,38 +990,42 @@
       return `${hh}:${mm}`;
     }
 
-    function drawLine(series){
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-
+    function resizeCanvas(){
+      if (!canvas || !ctx) return;
       const w = canvas.clientWidth;
       const h = parseInt(getComputedStyle(canvas).height, 10) || 190;
-
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.floor(w * dpr);
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr,0,0,dpr,0,0);
-      ctx.clearRect(0,0,w,h);
+      return {w, h};
+    }
 
-      if (!series || series.length < 2){
-        ctx.globalAlpha = 0.9;
-        ctx.font = "900 14px Inter, system-ui, sans-serif";
-        ctx.fillText("No chart data", 12, 26);
-        ctx.globalAlpha = 1;
-        return;
-      }
-
-      const padL = 14, padR = 10, padT = 16, padB = 26; // bottom for time ticks
+    function computeDrawParams(series){
       const xs = series.map(p => p[0]);
       const ys = series.map(p => p[1]);
-
       const minY = Math.min(...ys);
       const maxY = Math.max(...ys);
       const range = (maxY - minY) || 1;
-
       const x0 = xs[0], x1 = xs[xs.length - 1];
-      const toX = (x) => padL + (w - padL - padR) * ((x - x0) / (x1 - x0 || 1));
-      const toY = (y) => padT + (h - padT - padB) * (1 - ((y - minY) / range));
+      return {xs, ys, minY, maxY, range, x0, x1};
+    }
+
+    function drawBase(series){
+      if (!canvas || !ctx || !series || series.length < 2) return;
+      const {w,h} = resizeCanvas() || {};
+      if (!w || !h) return;
+
+      ctx.clearRect(0,0,w,h);
+
+      const padL = 14, padR = 10, padT = 16, padB = 26;
+      const P = computeDrawParams(series);
+
+      const toX = (x) => padL + (w - padL - padR) * ((x - P.x0) / (P.x1 - P.x0 || 1));
+      const toY = (y) => padT + (h - padT - padB) * (1 - ((y - P.minY) / P.range));
+
+      // store for hover
+      lastDraw = {w,h,padL,padR,padT,padB,toX,toY, P};
 
       // grid
       ctx.globalAlpha = 0.18;
@@ -1042,102 +1044,189 @@
 
       // line
       ctx.beginPath();
-      ctx.moveTo(toX(xs[0]), toY(ys[0]));
-      for (let i=1;i<series.length;i++) ctx.lineTo(toX(xs[i]), toY(ys[i]));
+      ctx.moveTo(toX(P.xs[0]), toY(P.ys[0]));
+      for (let i=1;i<P.xs.length;i++) ctx.lineTo(toX(P.xs[i]), toY(P.ys[i]));
       ctx.lineWidth = 2.2;
       ctx.strokeStyle = "rgba(124,92,255,0.95)";
       ctx.stroke();
 
       // fill area
-      ctx.lineTo(toX(xs[xs.length-1]), h-padB);
-      ctx.lineTo(toX(xs[0]), h-padB);
+      ctx.lineTo(toX(P.xs[P.xs.length-1]), h-padB);
+      ctx.lineTo(toX(P.xs[0]), h-padB);
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
 
       // time ticks
-      const ticks = 4; // 0%, 25%, 50%, 75%, 100%
+      const ticks = 4;
       ctx.globalAlpha = 0.75;
       ctx.font = "700 11px Inter, system-ui, sans-serif";
       ctx.fillStyle = "rgba(255,255,255,.72)";
       for (let i=0;i<=ticks;i++){
-        const t = x0 + (x1-x0) * (i/ticks);
+        const t = P.x0 + (P.x1-P.x0) * (i/ticks);
         const x = toX(t);
-        const label = i === ticks ? "now" : fmtTime(t);
+        const label = (i === ticks) ? "now" : fmtTime(t);
         ctx.fillText(label, Math.max(2, x-14), h-8);
       }
       ctx.globalAlpha = 1;
 
-      // update chips (USD + EUR)
-      const lastUsd = ys[ys.length-1];
+      // update top chips with latest values
+      const lastUsd = P.ys[P.ys.length-1];
       if (usdChip) usdChip.textContent = "USD: $" + Number(lastUsd).toFixed(6);
-      if (eurChip){
-        if (eurPerUsd){
-          eurChip.textContent = "EUR: €" + Number(lastUsd * eurPerUsd).toFixed(6);
-        }else{
-          eurChip.textContent = "EUR: € —";
-        }
+
+      if (seriesEUR && seriesEUR.length){
+        const eurLast = seriesEUR[seriesEUR.length-1][1];
+        if (eurChip) eurChip.textContent = "EUR: €" + Number(eurLast).toFixed(6);
+      }else{
+        if (eurChip) eurChip.textContent = "EUR: —";
       }
     }
 
-    async function fetchCoinGecko24h(){
-      const url = "https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=usd&days=1&interval=hourly";
-      const res = await fetch(url, { mode:"cors" });
-      if (!res.ok) throw new Error("CoinGecko blocked");
-      const j = await res.json();
-      if (!j || !Array.isArray(j.prices) || j.prices.length < 2) throw new Error("CoinGecko no data");
-      return j.prices;
+    function nearestIndexFromX(clientX){
+      if (!lastDraw || !seriesUSD) return null;
+      const rect = canvas.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const ratio = Math.min(1, Math.max(0, x / rect.width));
+      const idx = Math.round(ratio * (seriesUSD.length-1));
+      return { idx, x };
     }
 
-    async function fetchCoinbaseCandles24h(){
-      const end = new Date();
-      const start = new Date(end.getTime() - 24*60*60*1000);
-      const url = `https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=3600&start=${start.toISOString()}&end=${end.toISOString()}`;
-      const res = await fetch(url, { mode:"cors" });
-      if (!res.ok) throw new Error("Coinbase candles blocked");
-      const arr = await res.json();
-      if (!Array.isArray(arr) || arr.length < 2) throw new Error("Coinbase candles no data");
-      const sorted = arr.slice().sort((a,b)=>a[0]-b[0]);
-      return sorted.map(c => [c[0]*1000, c[4]]);
+    function drawHover(clientX){
+      if (!seriesUSD || !seriesUSD.length || !lastDraw) return;
+      drawBase(seriesUSD);
+
+      const { idx, x } = nearestIndexFromX(clientX) || {};
+      if (idx == null) return;
+
+      const ts = seriesUSD[idx][0];
+      const usd = seriesUSD[idx][1];
+      const eur = (seriesEUR && seriesEUR[idx]) ? seriesEUR[idx][1] : null;
+
+      // vertical line + point
+      const {w,h,padT,padB,toX,toY,P} = lastDraw;
+      const px = x;
+      const py = toY(usd);
+
+      ctx.globalAlpha = 0.35;
+      ctx.strokeStyle = "rgba(255,255,255,.55)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px, padT);
+      ctx.lineTo(px, h-padB);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = "rgba(255,255,255,.9)";
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI*2);
+      ctx.fill();
+
+      // tooltip position
+      if (tooltip && chartWrap){
+        tooltip.style.display = "block";
+        const rect = chartWrap.getBoundingClientRect();
+        const left = (clientX - rect.left);
+        tooltip.style.left = left + "px";
+        tooltip.style.top = (py + 10) + "px";
+        tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
+      }
     }
 
-    async function load24hChart(){
+    function clearHover(){
+      if (tooltip) tooltip.style.display = "none";
+      if (seriesUSD) drawBase(seriesUSD);
+    }
+
+    function attachHover(){
+      if (!canvas) return;
+
+      canvas.addEventListener("mousemove", (e)=> drawHover(e.clientX));
+      canvas.addEventListener("mouseleave", ()=> clearHover());
+
+      // touch support
+      canvas.addEventListener("touchstart", (e)=>{
+        const t = e.touches?.[0]; if (!t) return;
+        drawHover(t.clientX);
+      }, {passive:true});
+
+      canvas.addEventListener("touchmove", (e)=>{
+        const t = e.touches?.[0]; if (!t) return;
+        drawHover(t.clientX);
+      }, {passive:true});
+
+      canvas.addEventListener("touchend", ()=> clearHover(), {passive:true});
+    }
+
+    async function loadSpot(){
+      if (priceStatus) priceStatus.textContent = "Loading…";
+      try{
+        const resUSD = await fetch("https://api.coinbase.com/v2/prices/FLR-USD/spot", { mode:"cors" });
+        if (!resUSD.ok) throw new Error("spot fail");
+        const jUSD = await resUSD.json();
+        const amtUSD = Number(jUSD?.data?.amount);
+        if (!isFinite(amtUSD)) throw new Error("bad usd");
+
+        let amtEUR = null;
+        try{
+          const resEUR = await fetch("https://api.coinbase.com/v2/prices/FLR-EUR/spot", { mode:"cors" });
+          if (resEUR.ok){
+            const jEUR = await resEUR.json();
+            const v = Number(jEUR?.data?.amount);
+            if (isFinite(v)) amtEUR = v;
+          }
+        }catch(_){}
+
+        if (spotUsd) spotUsd.textContent = "$" + amtUSD.toFixed(6);
+        if (spotEur) spotEur.textContent = (amtEUR!=null) ? ("€" + amtEUR.toFixed(6)) : "€ —";
+        if (spotTime) spotTime.textContent = new Date().toLocaleString();
+        if (priceStatus) priceStatus.textContent = "Updated";
+      }catch(e){
+        if (priceStatus) priceStatus.textContent = "Could not load spot price";
+      }
+    }
+
+    async function loadChart24h(){
       setChartStatus("Loading 24h chart…");
       if (cgWidgetWrap) cgWidgetWrap.style.display = "none";
 
       try{
-        const series = await fetchCoinGecko24h();
-        lastSeries = series;
-        drawLine(series);
-        setChartStatus("24h chart updated (CoinGecko).");
-        if (chartMode) chartMode.textContent = "CoinGecko 24h";
+        // CoinGecko 24h (USD + EUR) – tooltip shows both
+        const [usdRes, eurRes] = await Promise.all([
+          fetch("https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=usd&days=1&interval=hourly", { mode:"cors" }),
+          fetch("https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=eur&days=1&interval=hourly", { mode:"cors" })
+        ]);
+        if (!usdRes.ok) throw new Error("cg usd blocked");
+        if (!eurRes.ok) throw new Error("cg eur blocked");
+
+        const usd = await usdRes.json();
+        const eur = await eurRes.json();
+
+        if (!usd?.prices?.length) throw new Error("cg no usd");
+        seriesUSD = usd.prices;
+        seriesEUR = eur?.prices?.length ? eur.prices : null;
+
+        drawBase(seriesUSD);
+        setChartStatus("Hover/touch the curve for exact price.");
+        if (chartMode) chartMode.textContent = "CoinGecko 24h (USD+EUR)";
         return;
       }catch(e){}
 
-      try{
-        const series = await fetchCoinbaseCandles24h();
-        lastSeries = series;
-        drawLine(series);
-        setChartStatus("24h chart updated (Coinbase candles).");
-        if (chartMode) chartMode.textContent = "Coinbase 24h";
-        return;
-      }catch(e){}
-
-      showWidgetFallback("24h chart blocked — showing widget.");
+      // fallback widget
+      showWidgetFallback("Chart blocked — showing widget.");
     }
 
     async function refreshAll(){
-      await loadFxEurUsd();
       await loadSpot();
-      await load24hChart();
+      await loadChart24h();
     }
 
     if (priceRefresh) priceRefresh.addEventListener("click", refreshAll);
 
+    attachHover();
     refreshAll();
 
     window.addEventListener("resize", () => {
-      if (lastSeries) drawLine(lastSeries);
+      if (seriesUSD) drawBase(seriesUSD);
     });
   </script>
 </body>
