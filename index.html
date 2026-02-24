@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MirSFlr — Flare Validator & FTSO Provider</title>
 
-  <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics, status, and delegation guidance — built for reliability." />
+  <meta name="description" content="MirSFlr is a Flare validator and FTSO data provider. Transparent metrics and delegation guidance — built for reliability." />
   <meta name="theme-color" content="#0b1220" />
 
-  <!-- Use YOUR favicon + logo -->
+  <!-- Your assets -->
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
 
   <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
-  <meta property="og:description" content="Transparent metrics, status, and delegation guidance — built for reliability." />
+  <meta property="og:description" content="Transparent metrics and delegation guidance — built for reliability." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.mirhollio.com/" />
 
@@ -32,7 +32,6 @@
       --panel:rgba(255,255,255,.06);
       --panel2:rgba(255,255,255,.04);
       --border:rgba(255,255,255,.10);
-
       --shadow:0 18px 60px rgba(0,0,0,.45);
 
       --r:18px; --r2:28px;
@@ -41,8 +40,15 @@
       --brand:#7c5cff;
       --brand2:#23d5ff;
       --ok:#33d69f;
-
       --ring:0 0 0 6px rgba(124,92,255,.16);
+
+      /* === CROPPED EMBED TUNING (desktop) ===
+         If the visible part is slightly off, change ONLY these values.
+         More shift = move iframe content UP (show lower content).
+      */
+      --embed-shift: 210px;  /* how much we "scroll" down by moving iframe up */
+      --embed-scale: 1.08;   /* zoom */
+      --embed-height: 560px; /* viewport height of the cropped window */
     }
 
     [data-theme="light"]{
@@ -50,18 +56,15 @@
       --text:rgba(10,14,25,.92);
       --muted:rgba(10,14,25,.72);
       --muted2:rgba(10,14,25,.56);
-
       --panel:rgba(10,14,25,.06);
       --panel2:rgba(10,14,25,.04);
       --border:rgba(10,14,25,.12);
-
       --shadow:0 18px 60px rgba(10,14,25,.12);
       --ring:0 0 0 6px rgba(124,92,255,.14);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
-
     body{
       margin:0;
       font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -73,7 +76,6 @@
         var(--bg);
       overflow-x:hidden;
     }
-
     a{color:inherit; text-decoration:none}
     .container{max-width:var(--max); margin:0 auto; padding:0 20px}
 
@@ -102,14 +104,8 @@
     [data-theme="light"] header{
       background: linear-gradient(to bottom, rgba(247,249,255,.86), rgba(247,249,255,.62));
     }
-
-    .nav{
-      height:74px; display:flex; align-items:center; justify-content:space-between; gap:16px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:-0.02em;
-    }
+    .nav{height:74px; display:flex; align-items:center; justify-content:space-between; gap:16px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:-0.02em;}
     .logoImg{
       width:38px; height:38px; border-radius:14px;
       object-fit:contain;
@@ -118,10 +114,7 @@
       background: rgba(255,255,255,.06);
     }
     [data-theme="light"] .logoImg{border:1px solid rgba(10,14,25,.12);}
-
-    .navlinks{
-      display:flex; align-items:center; gap:12px; color:var(--muted); font-weight:600;
-    }
+    .navlinks{display:flex; align-items:center; gap:12px; color:var(--muted); font-weight:700;}
     .navlinks a{padding:10px 10px; border-radius:12px}
     .navlinks a:hover{background:var(--panel2); color:var(--text)}
     .actions{display:flex; align-items:center; gap:10px}
@@ -130,10 +123,9 @@
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
       padding:10px 14px; border-radius:14px;
       background:var(--panel2); border:1px solid var(--border);
-      color:var(--text); font-weight:800; cursor:pointer;
+      color:var(--text); font-weight:900; cursor:pointer;
       transition: transform .12s ease, background .12s ease, border-color .12s ease;
-      user-select:none;
-      white-space:nowrap;
+      user-select:none; white-space:nowrap;
     }
     .btn:hover{transform:translateY(-1px); background:var(--panel)}
     .btn.primary{
@@ -143,12 +135,9 @@
       box-shadow:0 18px 36px rgba(124,92,255,.18);
     }
     .btn.ghost{background:transparent}
-
     @media (max-width: 980px){ .navlinks{display:none} }
 
-    main{position:relative}
     section{padding: 18px 0}
-
     .card{
       background: linear-gradient(180deg, var(--panel), var(--panel2));
       border:1px solid var(--border);
@@ -184,31 +173,15 @@
       padding:8px 12px; border-radius:999px;
       background: rgba(124,92,255,.12);
       border:1px solid rgba(124,92,255,.22);
-      font-weight:800; font-size:13px;
+      font-weight:900; font-size:13px;
     }
     .dot{width:8px;height:8px;border-radius:999px;background:var(--ok); box-shadow:0 0 0 4px rgba(51,214,159,.14)}
 
-    h1{
-      margin: 14px 0 10px;
-      font-size: clamp(30px, 3.2vw, 46px);
-      letter-spacing:-0.035em;
-      line-height:1.06;
-    }
-    .lead{
-      margin:0 0 14px;
-      color:var(--muted);
-      line-height:1.65;
-      max-width: 62ch;
-      font-size: 16px;
-    }
-
+    h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
+    .lead{margin:0 0 14px; color:var(--muted); line-height:1.65; max-width: 62ch; font-size: 16px;}
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
     .badgeRow{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; color:var(--muted2); font-size:13px}
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:9px 12px; border-radius: 14px;
-      background: rgba(255,255,255,0.04); border:1px solid var(--border);
-    }
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius: 14px; background: rgba(255,255,255,0.04); border:1px solid var(--border);}
 
     .side{padding:18px}
     .titleRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
@@ -216,20 +189,11 @@
 
     .kpis{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width:520px){ .kpis{grid-template-columns:1fr} }
-
-    .kpi{
-      padding:12px; border-radius: 16px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      min-height: 68px;
-    }
+    .kpi{padding:12px; border-radius: 16px; border:1px solid var(--border); background: rgba(255,255,255,.04); min-height: 68px;}
     .kpi .label{color:var(--muted2); font-size:12px; margin-bottom:6px}
     .kpi .value{font-weight:900; letter-spacing:-0.02em}
 
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
-
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
     .addr{
       font-size:12px;
       color: rgba(255,255,255,.86);
@@ -245,10 +209,8 @@
       background: rgba(10,14,25,.04);
       border: 1px solid rgba(10,14,25,.12);
     }
-
     .tiny{font-size:12px; color:var(--muted2)}
     .divider{height:1px; background:var(--border); margin:12px 0}
-
     .box{
       margin-top: 12px;
       padding:12px;
@@ -261,14 +223,12 @@
 
     .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
     @media (max-width: 980px){ .grid3{grid-template-columns:1fr} }
-
     .feature{
       padding:16px;
       border-radius: var(--r);
       border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      position:relative;
-      overflow:hidden;
+      position:relative; overflow:hidden;
     }
     .feature:before{
       content:"";
@@ -276,8 +236,7 @@
       background:
         radial-gradient(240px 120px at 18% 0%, rgba(124,92,255,.18), transparent 60%),
         radial-gradient(240px 120px at 92% 20%, rgba(35,213,255,.12), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
+      opacity:.9; pointer-events:none;
     }
     .feature > *{position:relative}
     .feature h3{margin:0 0 8px; letter-spacing:-0.02em}
@@ -293,10 +252,8 @@
     .panel h2{margin:0 0 10px; font-size:18px; letter-spacing:-0.02em}
     .muted{color:var(--muted)}
     .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
-
     .split{display:grid; grid-template-columns:1fr 1fr; gap:14px}
     @media (max-width: 980px){ .split{grid-template-columns:1fr} }
-
     .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
     @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
 
@@ -320,17 +277,6 @@
     .tabpanes > div{display:none}
     .tabpanes > div.active{display:block}
 
-    .iframeWrap{
-      border-radius: 18px;
-      border:1px solid var(--border);
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-    }
-
-    iframe{width:100%; height:560px; border:0}
-    @media (max-width:980px){ iframe{height:620px} }
-    @media (max-width:520px){ iframe{height:720px} }
-
     .cardDetails{
       border:1px solid var(--border);
       border-radius: var(--r2);
@@ -353,7 +299,61 @@
     .chev{transition: transform .12s ease}
     details[open] .chev{transform: rotate(180deg)}
 
-    /* Delegation cards like your screenshot */
+    /* PRICE chart canvas */
+    .chartWrap{
+      border-radius: 18px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      padding:12px;
+      overflow:hidden;
+    }
+    canvas{width:100%; display:block}
+
+    /* Widget fallback (optional) */
+    .iframeWrap{
+      border-radius: 18px;
+      border:1px solid var(--border);
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+    }
+    iframe{width:100%; border:0}
+
+    /* === CROPPED EMBED === */
+    .cropWrap{
+      border-radius: 18px;
+      border:1px solid var(--border);
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
+      height: var(--embed-height);
+      position: relative;
+    }
+    .cropWrap iframe{
+      height: 1200px; /* big so we can crop */
+      transform: translateY(calc(-1 * var(--embed-shift))) scale(var(--embed-scale));
+      transform-origin: top left;
+      width: 100%;
+    }
+
+    /* Mobile tune for the crop (usually different offset) */
+    @media (max-width: 980px){
+      :root{
+        --embed-shift: 235px;
+        --embed-scale: 1.05;
+        --embed-height: 640px;
+      }
+    }
+    @media (max-width: 520px){
+      :root{
+        --embed-shift: 260px;
+        --embed-scale: 1.02;
+        --embed-height: 720px;
+      }
+      .btn{width:100%; justify-content:center}
+      .hero{min-height:auto}
+      .logoImg{width:36px;height:36px}
+    }
+
+    /* Delegation “two windows” */
     .steps{display:flex; flex-direction:column; gap:12px; margin-top:10px}
     .step{
       padding:14px;
@@ -391,17 +391,8 @@
     }
     .rightBox .body{padding:16px}
     .rightBox ul{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
-    .rightBox .sub{
-      margin-top:14px;
-      padding-top:14px;
-      border-top:1px solid var(--border);
-    }
-    .rightBox .sub h4{
-      margin:0 0 10px;
-      font-size:16px;
-      letter-spacing:-0.02em;
-      color:var(--text);
-    }
+    .rightBox .sub{margin-top:14px; padding-top:14px; border-top:1px solid var(--border);}
+    .rightBox .sub h4{margin:0 0 10px; font-size:16px; letter-spacing:-0.02em}
 
     footer{padding: 26px 0 40px; color:var(--muted2)}
     .foot{
@@ -437,16 +428,6 @@
     }
     .toast.show{opacity:1; transform: translateX(-50%) translateY(-6px);}
     [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
-    .sr{position:absolute; left:-9999px}
-
-    /* Mobile polish */
-    @media (max-width:520px){
-      .btn{width:100%; justify-content:center}
-      .row{gap:10px}
-      .hero{min-height:auto}
-      .kpi{min-height:auto}
-      .logoImg{width:36px;height:36px}
-    }
   </style>
 </head>
 
@@ -475,9 +456,7 @@
             <span aria-hidden="true">🌗</span>
             <span class="tiny" id="themeLabel">Theme</span>
           </button>
-          <a class="btn primary" href="#delegation">
-            <span aria-hidden="true">⚡</span> Delegate
-          </a>
+          <a class="btn primary" href="#delegation">⚡ Delegate</a>
         </div>
       </div>
     </div>
@@ -499,7 +478,6 @@
 
           <div class="row">
             <a class="btn primary" href="#metrics">📈 Metrics dashboard</a>
-            <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">↗ CoinGecko</a>
             <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ FlareMetrics</a>
             <a class="btn" href="https://flare.network/" target="_blank" rel="noopener">🌐 flare.network</a>
             <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">𝕏 @mirsFlR_</a>
@@ -574,11 +552,11 @@
         </div>
         <div class="feature">
           <h3>Transparency</h3>
-          <p>Public metrics, status, and clear links — easy to verify, easy to trust.</p>
+          <p>Public metrics + explorer embeds. Easy to verify, easy to trust.</p>
         </div>
         <div class="feature">
           <h3>Delegator-friendly</h3>
-          <p>Wallet-oriented guidance, simple checklists, and practical support when things look off.</p>
+          <p>Wallet-oriented guidance, checklists, and help when something looks off.</p>
         </div>
       </div>
     </section>
@@ -593,18 +571,26 @@
 
         <div class="splitWide">
           <div class="panel" style="box-shadow:none">
-            <div class="iframeWrap">
+            <!-- Simple 24h chart -->
+            <div class="chartWrap">
+              <canvas id="flr24h" height="170" aria-label="FLR 24h chart"></canvas>
+              <div class="tiny" id="chartStatus" style="margin-top:10px">Loading 24h chart…</div>
+            </div>
+
+            <!-- widget fallback -->
+            <div class="iframeWrap" id="cgWidgetWrap" style="margin-top:12px; display:none">
               <iframe
                 title="CoinGecko — FLR widget"
                 loading="lazy"
                 referrerpolicy="no-referrer"
-                src="https://www.coingecko.com/en/coins/flare/widget?locale=en">
+                src="https://www.coingecko.com/en/coins/flare/widget?locale=en"
+                style="height:560px">
               </iframe>
             </div>
 
             <div class="row" style="margin-top:12px">
               <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">↗ Open on CoinGecko</a>
-              <button class="btn primary" id="priceRefresh" type="button">⟳ Refresh spot</button>
+              <button class="btn primary" id="priceRefresh" type="button">⟳ Refresh spot + chart</button>
             </div>
           </div>
 
@@ -612,7 +598,6 @@
             <summary>Market snapshot <span class="chev" aria-hidden="true">▾</span></summary>
             <div class="inner">
               <h2 style="margin-top:0">Market snapshot</h2>
-
               <div class="kpis">
                 <div class="kpi">
                   <div class="label">FLR Spot (USD)</div>
@@ -627,13 +612,12 @@
                   <div class="value" id="spotTime">—</div>
                 </div>
                 <div class="kpi">
-                  <div class="label">Notes</div>
-                  <div class="value">No API keys</div>
+                  <div class="label">Mode</div>
+                  <div class="value" id="chartMode">—</div>
                 </div>
               </div>
-
               <p class="tiny" style="margin-top:10px">
-                Chart uses CoinGecko embed (stable). Snapshot uses Coinbase spot endpoint.
+                Chart tries: CoinGecko 24h → Coinbase candles → fallback widget.
               </p>
             </div>
           </details>
@@ -641,82 +625,61 @@
       </div>
     </section>
 
-    <!-- METRICS (IMPACT: Snapshot always visible) -->
+    <!-- METRICS -->
     <section id="metrics">
       <div class="panel">
         <div class="titleRow" style="margin-bottom:10px">
           <h2>Metrics Dashboard</h2>
-          <div class="tiny">Explorer embed = “source of truth”</div>
+          <div class="tiny">Showing only the important section (no scrolling).</div>
         </div>
 
         <div class="tabs" role="tablist" aria-label="Metrics tabs">
           <button class="tab" role="tab" aria-selected="true" aria-controls="pane-overview" id="tab-overview" type="button">Overview</button>
           <button class="tab" role="tab" aria-selected="false" aria-controls="pane-ftso" id="tab-ftso" type="button">FTSO</button>
-          <button class="tab" role="tab" aria-selected="false" aria-controls="pane-validator" id="tab-validator" type="button">Validator</button>
         </div>
 
         <div class="tabpanes">
           <!-- Overview -->
           <div id="pane-overview" class="active" role="tabpanel" aria-labelledby="tab-overview">
             <div class="panel" style="box-shadow:none">
-              <h2 style="margin-bottom:6px">FTSO Provider metrics (embedded)</h2>
+              <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
               <p class="muted" style="margin:0 0 10px; line-height:1.65">
-                This is a live embed of your provider page. Use it as the “source of truth” when you share the site.
+                This view shows only the key parts (Availability + Success Rate + RE table).
               </p>
-              <div class="iframeWrap">
+
+              <!-- Cropped embed (no internal scrolling visible) -->
+              <div class="cropWrap" aria-label="Cropped FTSO provider embed">
                 <iframe
-                  title="Flare Systems Explorer — FTSO Provider"
+                  title="Flare Systems Explorer — FTSO Provider (cropped)"
                   loading="lazy"
                   referrerpolicy="no-referrer"
                   src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
                 </iframe>
               </div>
+
               <div class="row" style="margin-top:12px">
                 <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
-                  ↗ Open in new tab
+                  ↗ Open full page
                 </a>
                 <a class="btn" href="#delegation">⚡ Delegation guide</a>
               </div>
+              <div class="tiny" style="margin-top:10px">
+                If the crop is a bit off, adjust <span class="mono">--embed-shift</span> / <span class="mono">--embed-scale</span> at the top of CSS.
+              </div>
             </div>
           </div>
 
-          <!-- FTSO Tab -->
+          <!-- FTSO Tab (same cropped view) -->
           <div id="pane-ftso" role="tabpanel" aria-labelledby="tab-ftso">
             <div class="panel" style="box-shadow:none">
-              <h2 style="margin-bottom:6px">FTSO Provider metrics (embedded)</h2>
-              <p class="muted" style="margin:0 0 10px; line-height:1.65">
-                This is a live embed of your provider page. Use it as the “source of truth” when you share the site.
-              </p>
-              <div class="iframeWrap">
+              <h2 style="margin-bottom:6px">FTSO Provider metrics (cropped)</h2>
+              <div class="cropWrap">
                 <iframe
-                  title="Flare Systems Explorer — FTSO Provider (tab)"
+                  title="Flare Systems Explorer — FTSO Provider (cropped tab)"
                   loading="lazy"
                   referrerpolicy="no-referrer"
                   src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
                 </iframe>
-              </div>
-            </div>
-          </div>
-
-          <!-- Validator Tab -->
-          <div id="pane-validator" role="tabpanel" aria-labelledby="tab-validator">
-            <div class="panel" style="box-shadow:none">
-              <h2>Validator metrics</h2>
-              <p class="muted" style="margin:0 0 12px; line-height:1.65">
-                Use FlareMetrics (or your preferred validator dashboard) for uptime/rewards context.
-              </p>
-              <div class="row" style="margin-top:0">
-                <a class="btn primary" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ Open FlareMetrics</a>
-              </div>
-
-              <div class="box">
-                <div class="tiny">Verification addresses</div>
-                <div class="divider"></div>
-                <div class="tiny">FTSO provider identity</div>
-                <div class="addr mono" id="ftsoAddr2">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</div>
-                <div class="divider"></div>
-                <div class="tiny">Delegation address</div>
-                <div class="addr mono" id="delegateAddr2">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</div>
               </div>
             </div>
           </div>
@@ -725,7 +688,7 @@
       </div>
     </section>
 
-    <!-- DELEGATION (2 windows like your screenshot) -->
+    <!-- DELEGATION -->
     <section id="delegation">
       <div class="split">
         <div class="panel">
@@ -733,7 +696,7 @@
             <h2>Delegation guide (wallet-oriented)</h2>
           </div>
           <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            The UI differs per wallet, but the checklist stays the same. Keep it simple: verify identity, delegate, confirm epoch rules.
+            The UI differs per wallet, but the checklist stays the same. Verify identity, delegate, confirm epoch rules.
           </p>
 
           <div class="steps">
@@ -742,7 +705,7 @@
                 <div class="n">1</div>
                 <div>
                   <h3>Verify identity first</h3>
-                  <p>Open the Explorer/FlareMetrics links and confirm the address matches what you’re about to delegate to.</p>
+                  <p>Open explorer links and confirm the address matches what you’re about to delegate to.</p>
                 </div>
               </div>
             </div>
@@ -752,7 +715,7 @@
                 <div class="n">2</div>
                 <div>
                   <h3>Paste the delegation address</h3>
-                  <p>Use the “Copy delegation address” button on this page to avoid typos.</p>
+                  <p>Use the “Copy delegation address” button to avoid typos.</p>
                 </div>
               </div>
             </div>
@@ -762,7 +725,7 @@
                 <div class="n">3</div>
                 <div>
                   <h3>Confirm fees + epoch timing</h3>
-                  <p>Rewards often depend on snapshot/epoch timing. Your wallet should show the effective epoch and parameters.</p>
+                  <p>Rewards depend on snapshot/epoch timing. Your wallet should show the effective epoch.</p>
                 </div>
               </div>
             </div>
@@ -772,7 +735,7 @@
                 <div class="n">4</div>
                 <div>
                   <h3>Sanity-check after</h3>
-                  <p>Verify your delegation shows up (wallet + metrics). If something looks off, send the tx hash.</p>
+                  <p>Verify delegation shows up (wallet + metrics). If something looks off, send the tx hash.</p>
                 </div>
               </div>
             </div>
@@ -823,18 +786,17 @@
           <summary>How do I verify MirSFlr is legit? <span class="chev" aria-hidden="true">▾</span></summary>
           <div class="inner">
             <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Use the Flare Systems Explorer embed on this site + cross-check the identity and delegation address.
-              Never trust random DMs or “support” asking for seed phrases.
+              Use the explorer page and verify identity + delegation address match what you see here.
+              Never share seed phrases.
             </p>
           </div>
         </details>
 
         <details class="cardDetails" style="margin-top:10px">
-          <summary>Why doesn’t the site show all market stats? <span class="chev" aria-hidden="true">▾</span></summary>
+          <summary>Why can charts fail sometimes? <span class="chev" aria-hidden="true">▾</span></summary>
           <div class="inner">
             <p class="muted" style="margin:10px 0 0; line-height:1.65">
-              Many market APIs block direct browser requests (CORS/rate-limits). The chart is embedded for stability,
-              and the price snapshot is fetched from a CORS-friendly endpoint.
+              Some public APIs rate-limit or block browser requests. This site tries multiple sources + falls back to widget.
             </p>
           </div>
         </details>
@@ -866,7 +828,6 @@
         <div class="links" aria-label="Footer links">
           <a href="https://flare.network/" target="_blank" rel="noopener">flare.network</a>
           <a href="https://flaremetrics.io/" target="_blank" rel="noopener">flaremetrics.io</a>
-          <a href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">coingecko</a>
           <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">systems explorer</a>
           <a href="https://x.com/mirsFlR_" target="_blank" rel="noopener">X</a>
           <a href="https://t.me/Mirhollio" target="_blank" rel="noopener">Telegram</a>
@@ -930,26 +891,23 @@
       }
     }
 
-    // Fill addresses (always visible)
+    // Fill addresses
     const delegateAddr = document.getElementById("delegateAddr");
     const ftsoAddr = document.getElementById("ftsoAddr");
-    const ftsoAddr2 = document.getElementById("ftsoAddr2");
-    const delegateAddr2 = document.getElementById("delegateAddr2");
-
     if (delegateAddr) delegateAddr.textContent = CONFIG.delegationAddress;
     if (ftsoAddr) ftsoAddr.textContent = CONFIG.ftsoProviderIdentity;
-    if (ftsoAddr2) ftsoAddr2.textContent = CONFIG.ftsoProviderIdentity;
-    if (delegateAddr2) delegateAddr2.textContent = CONFIG.delegationAddress;
 
     // Copy buttons
     const copyDelegateBtn = document.getElementById("copyDelegateBtn");
     const copyDelegateBtn2 = document.getElementById("copyDelegateBtn2");
     const copyFtsoBtn = document.getElementById("copyFtsoBtn");
     const copyAllBtn = document.getElementById("copyAllBtn");
+    const copyEmailBtn = document.getElementById("copyEmailBtn");
 
     if (copyDelegateBtn) copyDelegateBtn.addEventListener("click", () => copyText(CONFIG.delegationAddress));
     if (copyDelegateBtn2) copyDelegateBtn2.addEventListener("click", () => copyText(CONFIG.delegationAddress));
     if (copyFtsoBtn) copyFtsoBtn.addEventListener("click", () => copyText(CONFIG.ftsoProviderIdentity));
+    if (copyEmailBtn) copyEmailBtn.addEventListener("click", () => copyText(CONFIG.contactEmail));
 
     if (copyAllBtn) copyAllBtn.addEventListener("click", () => {
       const block = [
@@ -968,10 +926,7 @@
       copyText(block);
     });
 
-    const copyEmailBtn = document.getElementById("copyEmailBtn");
-    if (copyEmailBtn) copyEmailBtn.addEventListener("click", () => copyText(CONFIG.contactEmail));
-
-    // Tabs (metrics only)
+    // Tabs (metrics)
     const tabs = Array.from(document.querySelectorAll("#metrics .tab"));
     const panes = Array.from(document.querySelectorAll("#metrics .tabpanes > div"));
     function activateTab(tabId){
@@ -984,11 +939,12 @@
     const year = document.getElementById("year");
     if (year) year.textContent = new Date().getFullYear();
 
-    // Coinbase spot price (stable-ish for browser)
+    // Market snapshot (Coinbase spot)
     const spotUsd = document.getElementById("spotUsd");
     const spotTime = document.getElementById("spotTime");
     const priceStatus = document.getElementById("priceStatus");
     const priceRefresh = document.getElementById("priceRefresh");
+    const chartMode = document.getElementById("chartMode");
 
     async function loadSpot(){
       if (priceStatus) priceStatus.textContent = "Loading…";
@@ -1007,8 +963,158 @@
         if (priceStatus) priceStatus.textContent = "Could not load spot price";
       }
     }
-    if (priceRefresh) priceRefresh.addEventListener("click", loadSpot);
+
+    // =======================
+    // SIMPLE 24H CHART (two sources) + widget fallback
+    // =======================
+    const canvas = document.getElementById("flr24h");
+    const chartStatus = document.getElementById("chartStatus");
+    const cgWidgetWrap = document.getElementById("cgWidgetWrap");
+
+    let lastSeries = null;
+
+    function setChartStatus(t){ if (chartStatus) chartStatus.textContent = t; }
+
+    function showWidgetFallback(reason){
+      setChartStatus(reason || "Chart blocked — showing widget.");
+      if (cgWidgetWrap) cgWidgetWrap.style.display = "block";
+      if (chartMode) chartMode.textContent = "Widget fallback";
+    }
+
+    function drawLine(series){
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      const w = canvas.clientWidth;
+      const h = canvas.height;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+
+      ctx.clearRect(0,0,w,h);
+
+      if (!series || series.length < 2){
+        ctx.globalAlpha = 0.9;
+        ctx.font = "900 14px Inter, system-ui, sans-serif";
+        ctx.fillText("No chart data", 12, 26);
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      const pad = 14;
+      const xs = series.map(p => p[0]);
+      const ys = series.map(p => p[1]);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const range = (maxY - minY) || 1;
+
+      const x0 = xs[0], x1 = xs[xs.length - 1];
+      const toX = (x) => pad + (w - 2*pad) * ((x - x0) / (x1 - x0 || 1));
+      const toY = (y) => pad + (h - 2*pad) * (1 - ((y - minY) / range));
+
+      // grid
+      ctx.globalAlpha = 0.18;
+      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--border").trim() || "rgba(255,255,255,.12)";
+      ctx.lineWidth = 1;
+      for (let i=1;i<=3;i++){
+        const gy = pad + (h - 2*pad) * (i/4);
+        ctx.beginPath(); ctx.moveTo(pad, gy); ctx.lineTo(w-pad, gy); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // gradient fill
+      const grad = ctx.createLinearGradient(0, pad, 0, h-pad);
+      grad.addColorStop(0, "rgba(124,92,255,0.22)");
+      grad.addColorStop(1, "rgba(35,213,255,0.02)");
+
+      // line
+      ctx.beginPath();
+      ctx.moveTo(toX(xs[0]), toY(ys[0]));
+      for (let i=1;i<series.length;i++) ctx.lineTo(toX(xs[i]), toY(ys[i]));
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = "rgba(124,92,255,0.95)";
+      ctx.stroke();
+
+      // fill area
+      ctx.lineTo(toX(xs[xs.length-1]), h-pad);
+      ctx.lineTo(toX(xs[0]), h-pad);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // label last
+      const last = ys[ys.length-1];
+      ctx.globalAlpha = 0.9;
+      ctx.font = "900 13px Inter, system-ui, sans-serif";
+      ctx.fillText(`24h: $${Number(last).toFixed(6)}`, 12, 22);
+      ctx.globalAlpha = 1;
+    }
+
+    async function fetchCoinGecko24h(){
+      const url = "https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=usd&days=1&interval=hourly";
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("CoinGecko blocked");
+      const j = await res.json();
+      if (!j || !Array.isArray(j.prices) || j.prices.length < 2) throw new Error("CoinGecko no data");
+      return j.prices; // [ts, price]
+    }
+
+    async function fetchCoinbaseCandles24h(){
+      // Coinbase candles: returns [ time, low, high, open, close, volume ]
+      // We'll use close as price. granularity 3600 = 1h.
+      const end = new Date();
+      const start = new Date(end.getTime() - 24*60*60*1000);
+      const url = `https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=3600&start=${start.toISOString()}&end=${end.toISOString()}`;
+      const res = await fetch(url, { mode:"cors" });
+      if (!res.ok) throw new Error("Coinbase candles blocked");
+      const arr = await res.json();
+      if (!Array.isArray(arr) || arr.length < 2) throw new Error("Coinbase candles no data");
+      // API often returns reverse chronological
+      const sorted = arr.slice().sort((a,b)=>a[0]-b[0]);
+      return sorted.map(c => [c[0]*1000, c[4]]);
+    }
+
+    async function load24hChart(){
+      setChartStatus("Loading 24h chart…");
+      if (cgWidgetWrap) cgWidgetWrap.style.display = "none";
+      try{
+        const series = await fetchCoinGecko24h();
+        lastSeries = series;
+        drawLine(series);
+        setChartStatus("24h chart updated (CoinGecko).");
+        if (chartMode) chartMode.textContent = "CoinGecko 24h";
+        return;
+      }catch(e1){
+        // try fallback
+      }
+      try{
+        const series = await fetchCoinbaseCandles24h();
+        lastSeries = series;
+        drawLine(series);
+        setChartStatus("24h chart updated (Coinbase candles).");
+        if (chartMode) chartMode.textContent = "Coinbase 24h";
+        return;
+      }catch(e2){
+        showWidgetFallback("24h chart blocked — showing widget.");
+      }
+    }
+
+    // Refresh button loads both
+    if (priceRefresh) priceRefresh.addEventListener("click", async () => {
+      await loadSpot();
+      await load24hChart();
+    });
+
+    // First load
     loadSpot();
+    load24hChart();
+
+    // Redraw on resize using last series (no refetch spam)
+    window.addEventListener("resize", () => {
+      if (lastSeries) drawLine(lastSeries);
+    });
   </script>
 </body>
 </html>
