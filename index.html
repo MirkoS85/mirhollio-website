@@ -12,6 +12,11 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.mirhollio.com/" />
 
+  <!-- ✅ WHITE favicon (always visible) -->
+  <link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="%237c5cff"/><stop offset="1" stop-color="%2323d5ff"/></linearGradient></defs><rect x="6" y="6" width="52" height="52" rx="18" fill="url(%23g)"/><path d="M22 44V20h6l4 10 4-10h6v24h-6V32l-4 10h-2l-4-10v12z" fill="white"/></svg>'>
+  <!-- fallback to your file -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -63,7 +68,6 @@
     a{color:inherit; text-decoration:none}
     .container{max-width:var(--max); margin:0 auto; padding:0 20px}
 
-    /* Animated glow */
     .glow{
       position:fixed; inset:-220px;
       background:
@@ -80,7 +84,6 @@
       to{transform:translate3d(10px,8px,0) scale(1.03)}
     }
 
-    /* Header / Nav */
     header{
       position:sticky; top:0; z-index:50;
       backdrop-filter: blur(14px);
@@ -90,49 +93,30 @@
     [data-theme="light"] header{
       background: linear-gradient(to bottom, rgba(247,249,255,.86), rgba(247,249,255,.62));
     }
-    .nav{
-      height:74px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:16px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:-0.02em;
-    }
+    .nav{height:74px; display:flex; align-items:center; justify-content:space-between; gap:16px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-0.02em;}
     .logoImg{
-      width:38px;
-      height:38px;
-      border-radius:14px;
+      width:38px; height:38px; border-radius:14px;
       object-fit:contain;
       border:1px solid rgba(255,255,255,.22);
       box-shadow: 0 14px 26px rgba(124,92,255,.22);
       background: rgba(255,255,255,.06);
     }
-    [data-theme="light"] .logoImg{
-      border:1px solid rgba(10,14,25,.12);
-    }
-    .navlinks{
-      display:flex; align-items:center; gap:12px;
-      color:var(--muted);
-      font-weight:600;
-    }
+    [data-theme="light"] .logoImg{border:1px solid rgba(10,14,25,.12);}
+
+    .navlinks{display:flex; align-items:center; gap:12px; color:var(--muted); font-weight:600;}
     .navlinks a{padding:10px 10px; border-radius:12px}
     .navlinks a:hover{background:var(--panel2); color:var(--text)}
     .actions{display:flex; align-items:center; gap:10px}
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding:10px 14px;
-      border-radius:14px;
-      background:var(--panel2);
-      border:1px solid var(--border);
-      color:var(--text);
-      font-weight:700;
-      cursor:pointer;
+      padding:10px 14px; border-radius:14px;
+      background:var(--panel2); border:1px solid var(--border);
+      color:var(--text); font-weight:700; cursor:pointer;
       transition: transform .12s ease, background .12s ease, border-color .12s ease;
       user-select:none;
     }
     .btn:hover{transform:translateY(-1px); background:var(--panel)}
-    .btn:active{transform:translateY(0)}
     .btn.primary{
       background:linear-gradient(135deg, var(--brand), var(--brand2));
       border-color:transparent;
@@ -143,13 +127,12 @@
     .icon{width:18px; height:18px; display:inline-block}
     @media (max-width: 920px){ .navlinks{display:none} }
 
-    /* Layout */
     main{position:relative}
     section{padding: 18px 0}
     .card{
       background: linear-gradient(180deg, var(--panel), var(--panel2));
       border:1px solid var(--border);
-      border-radius: var(--r2);
+      border-radius: 28px;
       box-shadow: var(--shadow);
       overflow:hidden;
     }
@@ -162,11 +145,7 @@
     }
     @media (max-width: 920px){ .gridHero{grid-template-columns:1fr} }
 
-    .hero{
-      padding:22px;
-      min-height: 380px;
-      position:relative;
-    }
+    .hero{padding:22px; min-height: 380px; position:relative;}
     .spark{
       position:absolute; right:-160px; top:-160px;
       width:420px; height:420px; border-radius:50%;
@@ -183,49 +162,29 @@
       padding:8px 12px; border-radius:999px;
       background: rgba(124,92,255,.12);
       border:1px solid rgba(124,92,255,.22);
-      font-weight:700;
-      font-size:13px;
+      font-weight:700; font-size:13px;
     }
-    .dot{width:8px;height:8px;border-radius:999px;background:var(--ok); box-shadow:0 0 0 4px rgba(51,214,159,.14)}
-    h1{
-      margin: 14px 0 10px;
-      font-size: clamp(30px, 3.2vw, 46px);
-      letter-spacing:-0.035em;
-      line-height:1.06;
-    }
-    .lead{
-      margin:0 0 14px;
-      color:var(--muted);
-      line-height:1.65;
-      max-width: 62ch;
-      font-size: 16px;
-    }
+    .dot{width:8px;height:8px;border-radius:999px;background:#33d69f; box-shadow:0 0 0 4px rgba(51,214,159,.14)}
+    h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
+    .lead{margin:0 0 14px; color:var(--muted); line-height:1.65; max-width: 62ch; font-size: 16px;}
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
     .badgeRow{display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; color:var(--muted2); font-size:13px}
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:9px 12px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.04);
-      border:1px solid var(--border);
-    }
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius: 14px; background: rgba(255,255,255,0.04); border:1px solid var(--border);}
 
-    /* Side */
     .side{padding:18px}
     .titleRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
     .titleRow h2{margin:0; font-size:16px; letter-spacing:-0.02em}
     .kpis{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width:520px){ .kpis{grid-template-columns:1fr} } /* phone friendly */
-    .kpi{
-      padding:12px;
-      border-radius: 16px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      min-height: 68px;
-    }
+    @media (max-width:520px){ .kpis{grid-template-columns:1fr} }
+    .kpi{padding:12px; border-radius: 16px; border:1px solid var(--border); background: rgba(255,255,255,.04); min-height: 68px;}
     .kpi .label{color:var(--muted2); font-size:12px; margin-bottom:6px}
     .kpi .value{font-weight:800; letter-spacing:-0.02em}
+
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .addr{font-size:12px; color:rgba(255,255,255,.84); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    [data-theme="light"] .addr{color:rgba(10,14,25,.80)}
+    .tiny{font-size:12px; color:var(--muted2)}
+    .divider{height:1px; background:var(--border); margin:12px 0}
 
     .box{
       margin-top: 12px;
@@ -236,16 +195,12 @@
     }
     [data-theme="light"] .box{background: rgba(10,14,25,.04)}
     .boxHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
-    .tiny{font-size:12px; color:var(--muted2)}
-    .addr{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-    .divider{height:1px; background:var(--border); margin:12px 0}
 
-    /* Sections / panels */
     .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
     @media (max-width: 920px){ .grid3{grid-template-columns:1fr} }
     .feature{
       padding:16px;
-      border-radius: var(--r);
+      border-radius: 18px;
       border:1px solid var(--border);
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       position:relative;
@@ -268,7 +223,7 @@
     @media (max-width: 920px){ .split{grid-template-columns:1fr} }
     .panel{
       padding:16px;
-      border-radius: var(--r2);
+      border-radius: 28px;
       border:1px solid var(--border);
       background: linear-gradient(180deg, var(--panel), var(--panel2));
       box-shadow: var(--shadow);
@@ -277,7 +232,6 @@
     .muted{color:var(--muted)}
     .list{margin:0; padding-left:18px; color:var(--muted); line-height:1.75}
 
-    /* Tabs */
     .tabs{display:flex; flex-wrap:wrap; gap:10px; margin: 6px 0 12px}
     .tab{
       padding:9px 12px;
@@ -298,59 +252,40 @@
     .tabpanes > div{display:none}
     .tabpanes > div.active{display:block}
 
-    /* Status */
-    .statusRow{display:grid; grid-template-columns: 1.3fr .7fr; gap:14px}
-    @media (max-width:920px){ .statusRow{grid-template-columns:1fr} }
-    .statusLine{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:12px;
+    .iframeWrap{
       border-radius: 18px;
       border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      margin-bottom:10px;
+      overflow:hidden;
+      background: rgba(255,255,255,.03);
     }
-    .statusLeft{display:flex; align-items:center; gap:10px}
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color: var(--muted);
-      font-weight:800;
-      font-size:12px;
-    }
-    .chip.ok{border-color: rgba(51,214,159,.30); background: rgba(51,214,159,.10); color: var(--text)}
-    .chip.warn{border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.12); color: var(--text)}
-    .dotSm{width:8px;height:8px;border-radius:999px; background:var(--ok)}
-    .dotSm.warn{background:var(--warn)}
+    iframe{width:100%; height:520px; border:0}
+    @media (max-width:920px){ iframe{height:540px} }
 
-    /* FAQ */
-    details{
+    .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
+    @media (max-width: 920px){ .splitWide{grid-template-columns:1fr} }
+
+    .cardDetails{
       border:1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(255,255,255,.04);
-      padding: 12px 14px;
-      margin-bottom:10px;
-      transition: box-shadow .12s ease;
+      border-radius: 28px;
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow: none;
+      overflow:hidden;
     }
-    details[open]{box-shadow: var(--ring)}
-    summary{
-      cursor:pointer;
-      list-style:none;
+    .cardDetails summary{
+      padding: 14px 16px;
+      font-weight:900;
+      letter-spacing:-0.02em;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
-      font-weight:900;
-      letter-spacing:-0.01em;
+      cursor:pointer;
+      list-style:none;
     }
-    summary::-webkit-details-marker{display:none}
-    details p{margin:10px 0 0; color:var(--muted); line-height:1.65}
+    .cardDetails summary::-webkit-details-marker{display:none}
+    .cardDetails .inner{padding: 0 16px 16px}
     .chev{transition: transform .12s ease}
     details[open] .chev{transform: rotate(180deg)}
 
-    /* Footer */
     footer{padding: 26px 0 40px; color:var(--muted2)}
     .foot{
       display:flex; flex-wrap:wrap; gap:12px;
@@ -362,7 +297,6 @@
     .links a{padding:8px 10px; border-radius:12px}
     .links a:hover{background: var(--panel2); color: var(--text)}
 
-    /* Toast */
     .toast{
       position: fixed;
       left: 50%;
@@ -384,49 +318,14 @@
       max-width: calc(100vw - 32px);
       text-align:center;
     }
-    .toast.show{
-      opacity:1;
-      transform: translateX(-50%) translateY(-6px);
-    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-6px);}
     [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
     .sr{position:absolute; left:-9999px}
 
-    /* Embedded explorer */
-    .iframeWrap{
-      border-radius: 18px;
-      border:1px solid var(--border);
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-    }
-    iframe{width:100%; height:520px; border:0}
-    @media (max-width:920px){ iframe{height:540px} }
-
-    /* Price layout: desktop 2 cols, mobile 1 col */
-    .splitWide{display:grid; grid-template-columns: 1.35fr .65fr; gap:14px}
-    @media (max-width: 920px){ .splitWide{grid-template-columns:1fr} }
-
-    /* Collapsible card styling */
-    .cardDetails{
-      border:1px solid var(--border);
-      border-radius: var(--r2);
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow: none;
-      overflow:hidden;
-    }
-    .cardDetails summary{
-      padding: 14px 16px;
-      font-weight:900;
-      letter-spacing:-0.02em;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      cursor:pointer;
-      list-style:none;
-    }
-    .cardDetails summary::-webkit-details-marker{display:none}
-    .cardDetails .inner{padding: 0 16px 16px}
-    .cardDetails .chev{transition: transform .12s ease}
-    .cardDetails[open] .chev{transform: rotate(180deg)}
+    /* ✅ CoinGecko fallback iframe block */
+    #cgFallback{display:none}
+    #cgFallback.show{display:block}
+    #flrChartWrap.hide{display:none}
   </style>
 </head>
 
@@ -436,9 +335,8 @@
   <header>
     <div class="container">
       <div class="nav">
-        <!-- Needs logo.png in repo root -->
         <a class="brand" href="#top" aria-label="MirSFlr Home">
-          <img src="assets/logo.png" alt="MirSFlr logo" class="logoImg">
+          <img src="logo.png" alt="MirSFlr logo" class="logoImg">
           <span>MirSFlr</span>
         </a>
 
@@ -527,14 +425,19 @@
               <div class="tiny">Delegation address</div>
               <button class="btn" id="copyDelegateBtn" type="button" style="padding:8px 10px;"><span aria-hidden="true">📋</span>Copy</button>
             </div>
-            <div class="addr mono" id="delegateAddr" title=""></div>
+
+            <!-- ✅ Always visible (fallback), tech font -->
+            <div class="addr mono" id="delegateAddr" title="0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</div>
+
             <div class="divider"></div>
 
             <div class="boxHead">
               <div class="tiny">FTSO provider (identity)</div>
               <button class="btn" id="copyFtsoBtn" type="button" style="padding:8px 10px;"><span aria-hidden="true">📋</span>Copy</button>
             </div>
-            <div class="addr mono" id="ftsoAddr" title=""></div>
+
+            <!-- ✅ Always visible (fallback), tech font -->
+            <div class="addr mono" id="ftsoAddr" title="0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</div>
 
             <div class="divider"></div>
             <div class="tiny">Tip: Always verify identity on trusted sources before delegating.</div>
@@ -543,7 +446,7 @@
       </div>
     </section>
 
-    <!-- FLR Price (CoinGecko) -->
+    <!-- FLR Price -->
     <section id="price">
       <div class="panel">
         <div class="titleRow" style="margin-bottom:10px">
@@ -560,9 +463,21 @@
 
         <div class="splitWide">
           <div class="panel" style="box-shadow:none">
-            <div class="iframeWrap" style="padding:12px">
+            <!-- ✅ API chart -->
+            <div id="flrChartWrap" class="iframeWrap" style="padding:12px">
               <canvas id="flrChart" height="140" aria-label="FLR price chart"></canvas>
             </div>
+
+            <!-- ✅ Fallback chart (if API is blocked) -->
+            <div id="cgFallback" class="iframeWrap" style="margin-top:12px">
+              <iframe
+                title="CoinGecko — FLR chart"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                src="https://www.coingecko.com/en/coins/flare/widget?locale=en">
+              </iframe>
+            </div>
+
             <div class="row" style="margin-top:12px">
               <a class="btn" href="https://www.coingecko.com/en/coins/flare" target="_blank" rel="noopener">
                 <span aria-hidden="true">↗</span>Open on CoinGecko
@@ -594,7 +509,7 @@
                 </div>
               </div>
               <p class="tiny" style="margin-top:10px">
-                Data source: CoinGecko API. If it fails, it’s usually rate limiting or blocked requests.
+                Data source: CoinGecko API (with auto-fallback if blocked).
               </p>
             </div>
           </details>
@@ -649,9 +564,6 @@
                   </a>
                   <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">
                     <span class="icon" aria-hidden="true">↗</span>Open FlareMetrics
-                  </a>
-                  <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">
-                    <span class="icon" aria-hidden="true">𝕏</span>Official X
                   </a>
                 </div>
               </div>
@@ -722,11 +634,11 @@
                 </p>
                 <div class="box" style="margin-top:0">
                   <div class="tiny">FTSO provider identity address</div>
-                  <div class="addr mono" id="ftsoAddr2"></div>
+                  <div class="addr mono" id="ftsoAddr2">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</div>
                   <div class="divider"></div>
 
-                  <div class="tiny">Delegation address (your site address)</div>
-                  <div class="addr mono" id="delegateAddr2"></div>
+                  <div class="tiny">Delegation address</div>
+                  <div class="addr mono" id="delegateAddr2">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</div>
 
                   <div class="divider"></div>
                   <div class="tiny">Explorer link</div>
@@ -743,9 +655,6 @@
             <div class="split">
               <div class="panel" style="box-shadow:none">
                 <h2>Validator metrics</h2>
-                <p class="muted" style="margin:0 0 10px; line-height:1.65">
-                  If you have a specific validator page URL (e.g., on FlareMetrics), paste it in the CONFIG to surface it here.
-                </p>
                 <ul class="list">
                   <li><b>Uptime</b> and missed blocks (if available).</li>
                   <li><b>Commission</b> / fee and delegator reward rate (where shown).</li>
@@ -771,13 +680,11 @@
                     <button class="btn primary" id="copyTrustBtn" type="button"><span aria-hidden="true">📋</span>Copy trust pack</button>
                   </div>
                 </div>
-
-                <p class="tiny" style="margin-top:10px">
-                  Reminder: never share seed phrases, never “verify” via random DMs.
-                </p>
+                <p class="tiny" style="margin-top:10px">Reminder: never share seed phrases, never “verify” via random DMs.</p>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -785,36 +692,16 @@
     <section id="delegation">
       <div class="split">
         <div class="panel">
-          <h2>Delegation guide (wallet-oriented)</h2>
+          <h2>Delegation guide</h2>
           <p class="muted" style="margin:0 0 10px; line-height:1.65">
-            The UI differs per wallet, but the checklist stays the same. Keep it simple: verify identity, delegate, confirm epoch rules.
+            Verify identity, paste delegation address, confirm epoch timing, sanity-check after.
           </p>
-
-          <div class="steps" style="display:flex; flex-direction:column; gap:10px; margin-top:10px">
-            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
-              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">1</div>
-              <div><b style="display:block;margin-bottom:4px">Verify identity first</b><span style="color:var(--muted);line-height:1.55">Open the Explorer/FlareMetrics links and confirm the address matches what you’re about to delegate to.</span></div>
-            </div>
-            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
-              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">2</div>
-              <div><b style="display:block;margin-bottom:4px">Paste the delegation address</b><span style="color:var(--muted);line-height:1.55">Use the “Copy delegation address” button on this page to avoid typos.</span></div>
-            </div>
-            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
-              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">3</div>
-              <div><b style="display:block;margin-bottom:4px">Confirm fees + epoch timing</b><span style="color:var(--muted);line-height:1.55">Rewards often depend on snapshot/epoch timing. Your wallet should show the effective epoch and parameters.</span></div>
-            </div>
-            <div class="step" style="display:flex; gap:12px; padding:12px; border-radius: 18px; border:1px solid var(--border); background: rgba(255,255,255,.04);">
-              <div style="width:30px;height:30px;border-radius:12px;background: rgba(124,92,255,.16);border:1px solid rgba(124,92,255,.22);display:flex;align-items:center;justify-content:center;font-weight:900;">4</div>
-              <div><b style="display:block;margin-bottom:4px">Sanity-check after</b><span style="color:var(--muted);line-height:1.55">Verify your delegation shows up (wallet + metrics). If something looks off, send the tx hash.</span></div>
-            </div>
-          </div>
 
           <div class="row" style="margin-top:14px">
             <button class="btn primary" id="copyDelegateBtn2" type="button"><span aria-hidden="true">📋</span>Copy delegation address</button>
             <a class="btn" href="#faq"><span aria-hidden="true">❓</span>Read FAQ</a>
           </div>
-
-          <p class="tiny" style="margin-top:10px">Not financial advice. Always verify addresses and understand wallet-specific rules.</p>
+          <p class="tiny" style="margin-top:10px">Not financial advice. Always verify addresses.</p>
         </div>
 
         <div class="panel">
@@ -824,68 +711,6 @@
             <li><b>Official Telegram:</b> <a href="https://t.me/Mirhollio" target="_blank" rel="noopener">@Mirhollio</a></li>
             <li><b>Security:</b> I never ask for seed phrases. I don’t DM first about “wallet issues”.</li>
           </ul>
-
-          <div class="divider"></div>
-
-          <h2>Wallet quick notes</h2>
-          <ul class="list">
-            <li><b>MetaMask</b>: double-check network + contract prompts before approving.</li>
-            <li><b>Bifrost</b>: locate delegation/FTSO section; verify provider identity via link.</li>
-            <li><b>Hardware wallets</b>: confirm on-device display matches address/transaction details.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="status">
-      <div class="panel">
-        <div class="titleRow" style="margin-bottom:10px">
-          <h2>Status</h2>
-          <span class="tiny">A simple public-facing status section (manual incident log for now)</span>
-        </div>
-
-        <div class="statusRow">
-          <div>
-            <div class="statusLine">
-              <div class="statusLeft">
-                <span class="dotSm" aria-hidden="true"></span>
-                <div>
-                  <div style="font-weight:900">Validator</div>
-                  <div class="tiny">Operational</div>
-                </div>
-              </div>
-              <span class="chip ok"><span class="dotSm" aria-hidden="true"></span> OK</span>
-            </div>
-
-            <div class="statusLine">
-              <div class="statusLeft">
-                <span class="dotSm" aria-hidden="true"></span>
-                <div>
-                  <div style="font-weight:900">FTSO Provider</div>
-                  <div class="tiny">Operational</div>
-                </div>
-              </div>
-              <span class="chip ok"><span class="dotSm" aria-hidden="true"></span> OK</span>
-            </div>
-
-            <div class="statusLine">
-              <div class="statusLeft">
-                <span class="dotSm warn" aria-hidden="true"></span>
-                <div>
-                  <div style="font-weight:900">Status page</div>
-                  <div class="tiny">Manual updates (roadmap: automated)</div>
-                </div>
-              </div>
-              <span class="chip warn"><span class="dotSm warn" aria-hidden="true"></span> Manual</span>
-            </div>
-          </div>
-
-          <div class="box" style="margin-top:0">
-            <div class="tiny">Incident log (editable in HTML)</div>
-            <div class="divider"></div>
-            <div class="tiny"><b>No incidents reported recently.</b></div>
-            <div class="tiny" style="margin-top:8px">Add entries here when needed: date, duration, impact, resolution.</div>
-          </div>
         </div>
       </div>
     </section>
@@ -899,22 +724,12 @@
 
         <details>
           <summary>How do I verify MirSFlr is legit?<span class="chev" aria-hidden="true">▾</span></summary>
-          <p>Use Flare Systems Explorer + FlareMetrics and cross-check the provider identity/delegation address. Avoid random DMs or unofficial lists.</p>
+          <p>Use Flare Systems Explorer + FlareMetrics and cross-check the provider identity/delegation address.</p>
         </details>
 
         <details>
           <summary>Do I keep custody of funds when delegating?<span class="chev" aria-hidden="true">▾</span></summary>
-          <p>Usually yes (you keep control in your wallet), but exact mechanics depend on the wallet/app and protocol rules. Always read what your wallet confirms.</p>
-        </details>
-
-        <details>
-          <summary>When do rewards show up?<span class="chev" aria-hidden="true">▾</span></summary>
-          <p>Typically based on epochs/snapshots. Your wallet UI and official documentation are the best sources for exact timing.</p>
-        </details>
-
-        <details>
-          <summary>I delegated but something looks wrong — what now?<span class="chev" aria-hidden="true">▾</span></summary>
-          <p>Verify address + network, then compare your wallet status with the Explorer/FlareMetrics. If stuck, contact me with the transaction hash.</p>
+          <p>Usually yes, but it depends on wallet/protocol rules. Always read what your wallet confirms.</p>
         </details>
       </div>
     </section>
@@ -924,7 +739,7 @@
         <div class="panel">
           <h2>Contact</h2>
           <p class="muted" style="margin:0 0 12px; line-height:1.65">
-            Fastest: email. If you message on Telegram, verify it’s the official link on this site.
+            Fastest: email. Telegram is public via username link.
           </p>
 
           <form id="mailForm">
@@ -939,10 +754,6 @@
               <button class="btn primary" type="submit"><span aria-hidden="true">✉️</span>Compose Email</button>
               <button class="btn" type="button" id="copyEmailBtn"><span aria-hidden="true">📎</span>Copy email</button>
             </div>
-
-            <p class="tiny" style="margin-top:10px">
-              This uses your default email client (mailto). For a real backend form later, add Formspree/Netlify Forms.
-            </p>
           </form>
         </div>
 
@@ -951,17 +762,7 @@
           <ul class="list">
             <li>Never share seed phrases or private keys.</li>
             <li>Double-check network + address before confirming transactions.</li>
-            <li>Prefer official docs + reputable metrics sources.</li>
             <li>If someone DMs you asking to “fix” your wallet — assume it’s a scam.</li>
-          </ul>
-
-          <div class="divider"></div>
-
-          <h2>Roadmap</h2>
-          <ul class="list">
-            <li>Automated status page + incident history.</li>
-            <li>Wallet-specific delegation guides with screenshots.</li>
-            <li>Optional charts for success rate / availability trends (if data source allows).</li>
           </ul>
         </div>
       </div>
@@ -998,7 +799,7 @@
       telegramUrl: "https://t.me/Mirhollio"
     };
 
-    // ===== Theme (persisted) =====
+    // ===== Theme =====
     const root = document.documentElement;
     const themeBtn = document.getElementById("themeBtn");
     const themeLabel = document.getElementById("themeLabel");
@@ -1040,20 +841,16 @@
       }
     }
 
-    // ===== Fill addresses =====
+    // ===== Fill addresses (keeps fallback visible even if JS dies) =====
     const delegateAddr = document.getElementById("delegateAddr");
     const ftsoAddr = document.getElementById("ftsoAddr");
     const ftsoAddr2 = document.getElementById("ftsoAddr2");
     const delegateAddr2 = document.getElementById("delegateAddr2");
 
-    delegateAddr.textContent = CONFIG.delegationAddress;
-    delegateAddr.title = CONFIG.delegationAddress;
-
-    ftsoAddr.textContent = CONFIG.ftsoProviderIdentity;
-    ftsoAddr.title = CONFIG.ftsoProviderIdentity;
-
-    ftsoAddr2.textContent = CONFIG.ftsoProviderIdentity;
-    delegateAddr2.textContent = CONFIG.delegationAddress;
+    if (delegateAddr) { delegateAddr.textContent = CONFIG.delegationAddress; delegateAddr.title = CONFIG.delegationAddress; }
+    if (ftsoAddr) { ftsoAddr.textContent = CONFIG.ftsoProviderIdentity; ftsoAddr.title = CONFIG.ftsoProviderIdentity; }
+    if (ftsoAddr2) ftsoAddr2.textContent = CONFIG.ftsoProviderIdentity;
+    if (delegateAddr2) delegateAddr2.textContent = CONFIG.delegationAddress;
 
     document.getElementById("copyDelegateBtn").addEventListener("click", () => copyText(CONFIG.delegationAddress));
     document.getElementById("copyDelegateBtn2").addEventListener("click", () => copyText(CONFIG.delegationAddress));
@@ -1076,36 +873,6 @@
       ].join("\n");
       copyText(block);
     });
-
-    // Validator link
-    const validatorLinkBtn = document.getElementById("validatorLinkBtn");
-    validatorLinkBtn.href = CONFIG.validatorMetricsUrl;
-
-    // Trust pack
-    const trustPack = document.getElementById("trustPack");
-    const explorerUrl = "https://flare-systems-explorer.flare.network/providers/ftso/" + CONFIG.ftsoProviderIdentity;
-    trustPack.textContent =
-`MirSFlr — Flare Validator & FTSO Provider
-
-Delegation address:
-${CONFIG.delegationAddress}
-
-FTSO provider identity (verify here):
-${CONFIG.ftsoProviderIdentity}
-${explorerUrl}
-
-FlareMetrics:
-https://flaremetrics.io/
-
-Official X:
-${CONFIG.xUrl}
-
-Official Telegram:
-${CONFIG.telegramUrl}
-
-Security: I never ask for seed phrases. I don’t DM first about “wallet issues”.`;
-
-    document.getElementById("copyTrustBtn").addEventListener("click", () => copyText(trustPack.textContent));
 
     // ===== Tabs (Metrics section only) =====
     const tabs = Array.from(document.querySelectorAll("#metrics .tab"));
@@ -1130,8 +897,35 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
     // ===== Footer year =====
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // ===== Optional: attempt to fetch headline metrics from the explorer page =====
-    // NOTE: This may fail if CORS disallows cross-site fetch from your domain.
+    // ===== Trust pack =====
+    const trustPack = document.getElementById("trustPack");
+    const explorerUrl = "https://flare-systems-explorer.flare.network/providers/ftso/" + CONFIG.ftsoProviderIdentity;
+    if (trustPack){
+      trustPack.textContent =
+`MirSFlr — Flare Validator & FTSO Provider
+
+Delegation address:
+${CONFIG.delegationAddress}
+
+FTSO provider identity (verify here):
+${CONFIG.ftsoProviderIdentity}
+${explorerUrl}
+
+FlareMetrics:
+https://flaremetrics.io/
+
+Official X:
+${CONFIG.xUrl}
+
+Official Telegram:
+${CONFIG.telegramUrl}
+
+Security: I never ask for seed phrases. I don’t DM first about “wallet issues”.`;
+    }
+    const copyTrustBtn = document.getElementById("copyTrustBtn");
+    if (copyTrustBtn) copyTrustBtn.addEventListener("click", () => copyText(trustPack.textContent));
+
+    // ===== Optional: fetch headline metrics from explorer (may fail due to CORS) =====
     const NOTE = document.getElementById("metricsNote");
     const av6 = document.getElementById("m_av6h");
     const sr6 = document.getElementById("m_sr6h");
@@ -1139,20 +933,20 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
     const sr24 = document.getElementById("m_sr24h");
 
     function setMetrics({av6h, sr6h, av24h, sr24h}, note){
-      av6.textContent = av6h ?? "—";
-      sr6.textContent = sr6h ?? "—";
-      av24.textContent = av24h ?? "—";
-      sr24.textContent = sr24h ?? "—";
-      NOTE.textContent = note;
+      if (av6) av6.textContent = av6h ?? "—";
+      if (sr6) sr6.textContent = sr6h ?? "—";
+      if (av24) av24.textContent = av24h ?? "—";
+      if (sr24) sr24.textContent = sr24h ?? "—";
+      if (NOTE) NOTE.textContent = note;
     }
 
     async function refreshMetrics(){
-      NOTE.textContent = "Refreshing…";
+      if (NOTE) NOTE.textContent = "Refreshing…";
       try{
         const res = await fetch(explorerUrl, { mode: "cors" });
         const html = await res.text();
-
         const pct = (s) => (s && s.match(/\b\d{1,3}(?:\.\d{1,2})?\s*%/g)) ? s.match(/\b\d{1,3}(?:\.\d{1,2})?\s*%/g) : null;
+
         const aIdx = html.toLowerCase().indexOf("availability");
         const sIdx = html.toLowerCase().indexOf("success rate");
         const slice = html.slice(Math.max(0, Math.min(aIdx, sIdx) - 1200), Math.max(aIdx, sIdx) + 2600);
@@ -1161,21 +955,20 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
         const [p1,p2,p3,p4] = all;
 
         if (p1 && p2 && p3 && p4){
-          setMetrics({av6h:p1, sr6h:p2, av24h:p3, sr24h:p4}, "Loaded (best-effort). If it looks wrong, use the embedded Explorer tab.");
+          setMetrics({av6h:p1, sr6h:p2, av24h:p3, sr24h:p4}, "Loaded (best-effort). If wrong, use embedded Explorer tab.");
         }else{
-          setMetrics({}, "Could not parse. Use the embedded Explorer tab.");
+          setMetrics({}, "Could not parse. Use embedded Explorer tab.");
         }
       }catch(err){
-        setMetrics({}, "Blocked by browser (CORS) or network error. Use the embedded Explorer tab.");
+        setMetrics({}, "Blocked by browser (CORS) or network error. Use embedded Explorer tab.");
       }
     }
-    document.getElementById("refreshMetricsBtn").addEventListener("click", refreshMetrics);
-    const explorerUrl = "https://flare-systems-explorer.flare.network/providers/ftso/" + CONFIG.ftsoProviderIdentity;
+    const refreshMetricsBtn = document.getElementById("refreshMetricsBtn");
+    if (refreshMetricsBtn) refreshMetricsBtn.addEventListener("click", refreshMetrics);
     refreshMetrics();
 
-    // ===== CoinGecko FLR price (chart + snapshot) =====
+    // ===== CoinGecko (API + fallback) =====
     const CG = { coinId: "flare", vs: "usd", daysDefault: 7, base: "https://api.coingecko.com/api/v3" };
-
     const cgStatus = document.getElementById("cgStatus");
     const cgPriceUsd = document.getElementById("cgPriceUsd");
     const cgChg24h = document.getElementById("cgChg24h");
@@ -1184,12 +977,10 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
     const cgRefresh = document.getElementById("cgRefresh");
 
     const chartCanvas = document.getElementById("flrChart");
-    const ctx = chartCanvas.getContext("2d");
+    const ctx = chartCanvas?.getContext("2d");
+    const flrChartWrap = document.getElementById("flrChartWrap");
+    const cgFallback = document.getElementById("cgFallback");
 
-    function fmtNum(n){
-      try{ return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(n); }
-      catch{ return String(n); }
-    }
     function fmtMoney(n){
       try{ return new Intl.NumberFormat(undefined, { style:"currency", currency:"USD", maximumFractionDigits: 6 }).format(n); }
       catch{ return "$" + n; }
@@ -1198,14 +989,14 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
       if (n == null || isNaN(n)) return "—";
       const abs = Math.abs(n);
       const units = [[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]];
-      for (const [v,s] of units){
-        if (abs >= v) return (n/v).toFixed(2) + s;
-      }
-      return fmtNum(n);
+      for (const [v,s] of units){ if (abs >= v) return (n/v).toFixed(2) + s; }
+      return String(n);
     }
 
     let cgSeries = [];
     function drawChart(series){
+      if (!ctx || !chartCanvas) return;
+
       const w = chartCanvas.clientWidth;
       const h = chartCanvas.height;
       const dpr = window.devicePixelRatio || 1;
@@ -1234,10 +1025,7 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
       ctx.lineWidth = 1;
       for (let i=1;i<=3;i++){
         const y = pad + (h - 2*pad) * (i/4);
-        ctx.beginPath();
-        ctx.moveTo(pad, y);
-        ctx.lineTo(w-pad, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(w-pad, y); ctx.stroke();
       }
       ctx.globalAlpha = 1;
 
@@ -1251,9 +1039,7 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
 
       ctx.beginPath();
       ctx.moveTo(toX(xs[0]), toY(ys[0]));
-      for (let i=1;i<series.length;i++){
-        ctx.lineTo(toX(xs[i]), toY(ys[i]));
-      }
+      for (let i=1;i<series.length;i++) ctx.lineTo(toX(xs[i]), toY(ys[i]));
       ctx.lineWidth = 2.2;
       ctx.strokeStyle = "rgba(124,92,255,0.95)";
       ctx.stroke();
@@ -1263,37 +1049,39 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
-
-      ctx.globalAlpha = 0.9;
-      ctx.font = "800 12px Inter, system-ui, sans-serif";
-      ctx.fillStyle = getComputedStyle(document.body).color;
-      ctx.fillText(fmtMoney(maxY), pad, pad+12);
-      ctx.fillText(fmtMoney(minY), pad, h-pad+12);
-      ctx.globalAlpha = 1;
     }
 
-    function setCgStatus(msg){ cgStatus.textContent = msg; }
+    function setCgStatus(msg){ if (cgStatus) cgStatus.textContent = msg; }
+
+    function enableCgFallback(){
+      if (flrChartWrap) flrChartWrap.classList.add("hide");
+      if (cgFallback) cgFallback.classList.add("show");
+    }
+    function disableCgFallback(){
+      if (flrChartWrap) flrChartWrap.classList.remove("hide");
+      if (cgFallback) cgFallback.classList.remove("show");
+    }
 
     async function loadCgSnapshot(){
       const url = `${CG.base}/simple/price?ids=${encodeURIComponent(CG.coinId)}&vs_currencies=${encodeURIComponent(CG.vs)}&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true`;
       const res = await fetch(url, { mode:"cors" });
-      if (!res.ok) throw new Error("CoinGecko simple/price failed");
+      if (!res.ok) throw new Error("CoinGecko snapshot blocked");
       const j = await res.json();
       const d = j[CG.coinId];
-      if (!d) throw new Error("No data from CoinGecko");
+      if (!d) throw new Error("No snapshot data");
 
-      cgPriceUsd.textContent = fmtMoney(d.usd);
+      if (cgPriceUsd) cgPriceUsd.textContent = fmtMoney(d.usd);
       const chg = d.usd_24h_change;
       const sign = chg >= 0 ? "+" : "";
-      cgChg24h.textContent = `${sign}${chg.toFixed(2)}%`;
-      cgVol24h.textContent = "$" + fmtBig(d.usd_24h_vol);
-      cgMcap.textContent = "$" + fmtBig(d.usd_market_cap);
+      if (cgChg24h) cgChg24h.textContent = `${sign}${chg.toFixed(2)}%`;
+      if (cgVol24h) cgVol24h.textContent = "$" + fmtBig(d.usd_24h_vol);
+      if (cgMcap) cgMcap.textContent = "$" + fmtBig(d.usd_market_cap);
     }
 
     async function loadCgSeries(days){
       const url = `${CG.base}/coins/${encodeURIComponent(CG.coinId)}/market_chart?vs_currency=${encodeURIComponent(CG.vs)}&days=${encodeURIComponent(days)}&interval=hourly`;
       const res = await fetch(url, { mode:"cors" });
-      if (!res.ok) throw new Error("CoinGecko market_chart failed");
+      if (!res.ok) throw new Error("CoinGecko chart blocked");
       const j = await res.json();
       if (!j.prices) throw new Error("No prices array");
       cgSeries = j.prices;
@@ -1302,11 +1090,15 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
 
     async function refreshCg(days){
       setCgStatus("Loading…");
+      disableCgFallback();
+
       try{
         await Promise.all([loadCgSnapshot(), loadCgSeries(days)]);
         setCgStatus(`Updated • ${days}D`);
       }catch(e){
-        setCgStatus("Could not load (rate limit / blocked).");
+        // ✅ fallback mode (works even if API is blocked)
+        enableCgFallback();
+        setCgStatus("Fallback mode • API blocked");
       }
     }
 
@@ -1321,7 +1113,7 @@ Security: I never ask for seed phrases. I don’t DM first about “wallet issue
       refreshCg(days);
     }));
 
-    cgRefresh.addEventListener("click", () => {
+    if (cgRefresh) cgRefresh.addEventListener("click", () => {
       const sel = priceTabs.find(t => t.getAttribute("aria-selected") === "true") || priceTabs[0];
       const days = Number(sel.getAttribute("data-days")) || CG.daysDefault;
       refreshCg(days);
