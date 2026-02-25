@@ -372,6 +372,10 @@
       height: var(--embed-height);
       position: relative;
      contain: paint;  /* ✅ zacementira risanje znotraj okvira */
+      .ftsoEmbedWrap{
+  width: 100%;
+  max-width: 100%;
+}
     }
     .ftsoEmbedWrap iframe{
       width: 100%;
@@ -385,6 +389,9 @@
       transform: translateY(calc(-1 * var(--embed-shift))) scale(var(--embed-scale));
       transform-origin: top center;
     }
+    .ftsoEmbedWrap iframe{
+  overflow: hidden;    /* dodatna zaščita */
+}
     .ftsoEmbedWrap::after{
       content:"";
       position:absolute;
