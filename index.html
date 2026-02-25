@@ -505,6 +505,11 @@ footer{
   background:#33d69f;
   box-shadow:0 0 10px rgba(51,214,159,.8);
 }
+   .flarePink{
+  color:#ff2f92;
+  font-weight:800;
+  text-shadow: 0 0 10px rgba(255,47,146,.25);
+}
   </style>
 </head>
 
@@ -545,7 +550,8 @@ footer{
   </div>
 
   <div class="heroTitle">
-    Validator + FTSO Provider built for uptime, signal quality, and <span class="mutedWord">trust.</span>
+   Validator + FTSO Provider built for uptime, signal quality, and 
+<span class="flarePink">trust.</span>
   </div>
 <div class="opsStatus" id="opsStatus">
   <span class="dot"></span>
@@ -1224,7 +1230,7 @@ footer{
 
   el.innerHTML =
     `<span class="dot"></span>
-     Online · Monitoring active · Last checked ${now.getHours()}:${mins}`;
+     Online · Monitoring active · Last checked Recently`;
 }
 
 updateOpsStatus();
