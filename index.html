@@ -31,7 +31,7 @@
 
       --r:18px; --r2:28px;
       --max: min(92vw, 1600px);
-      
+
       --brand:#7c5cff;
       --brand2:#23d5ff;
       --ok:#33d69f;
@@ -40,9 +40,9 @@
          cilj: vidi header+logo, Availability, Success Rate, RE table
          ne: Price Feeds Last 6H (token pari)
       */
-      --embed-shift: 70px;
-      --embed-scale: 1.05;
-      --embed-height: 560px;
+      --embed-shift: 58px;
+      --embed-scale: 1.00; /* scale OFF = brez "out of frame" glitcha */
+      --embed-height: 460px;
 
       /* chart heights */
       --chart-h: 210px;
@@ -110,33 +110,23 @@
       padding:10px 14px; border-radius:14px;
       background:var(--panel2); border:1px solid var(--border);
       color:var(--text); font-weight:900; cursor:pointer;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
       user-select:none; white-space:nowrap;
     }
-    .btn:hover{transform:translateY(-1px); background:var(--panel)}
     .btn:hover{
-  transform:translateY(-1px);
-  background:var(--panel);
-  border-color: rgba(124,92,255,.22);
-  box-shadow: 0 18px 36px rgba(124,92,255,.14);
-}
-    .btn:hover{
-  background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(35,213,255,.10));
-}
+      transform:translateY(-1px);
+      background: linear-gradient(135deg, rgba(124,92,255,.22), rgba(35,213,255,.10));
+      border-color: rgba(124,92,255,.22);
+      box-shadow: 0 18px 36px rgba(124,92,255,.14);
+    }
     .btn.primary{
       background:linear-gradient(135deg, var(--brand), var(--brand2));
       border-color:transparent;
       color:rgba(255,255,255,.95);
       box-shadow:0 18px 36px rgba(124,92,255,.18);
-      /* Hero: make the first button “primary on hover” only */
-.heroBtns .btn:first-child:hover{
-  background: linear-gradient(135deg, var(--brand), var(--brand2));
-  border-color: transparent;
-  color: rgba(255,255,255,.95);
-  box-shadow: 0 18px 36px rgba(124,92,255,.18);
-}
     }
     .btn.ghost{background:transparent}
+    .btn.ghost:hover{background:var(--panel)}
 
     section{padding: 12px 0}
     .card{
@@ -148,7 +138,7 @@
       backdrop-filter: blur(12px);
     }
     .panel{
-       padding:20px 22px;
+      padding:20px 22px;
       border-radius: var(--r2);
       border:1px solid var(--border);
       background: linear-gradient(180deg, var(--panel), var(--panel2));
@@ -162,99 +152,105 @@
     .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
 
     .gridHero{
-  display:grid;
-  grid-template-columns: 1.35fr 0.65fr;
-  gap:16px;
-  align-items:stretch;
-  margin-top:18px;
-}
-    .hero{
-  max-width: 980px;
-}
+      display:grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap:16px;
+      align-items:stretch;
+      margin-top:18px;
+    }
     @media (max-width: 980px){ .gridHero{grid-template-columns:1fr} }
 
     .hero{padding:22px; min-height: 360px;}
-    /* spacing between ONLINE badge and description */
-.hero .statusBadge{
-  margin-bottom:22px;
-}
-      /* === HERO V2 (top section) === */
-.heroPill{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:10px 14px;
-  border-radius:999px;
-  background: rgba(124,92,255,.14);
-  border:1px solid rgba(124,92,255,.28);
-  box-shadow: 0 18px 40px rgba(124,92,255,.10);
-  font-weight:900;
-  color: rgba(255,255,255,.88);
+    @media (min-width: 981px){
+      .hero{max-width: 980px;}
+    }
 
- margin-bottom:clamp(22px,2vw,32px);  /* ← TO DODAJ */
-}
-.heroPillDot{
-  width:10px; height:10px; border-radius:999px;
-  background: var(--ok);
-  box-shadow: 0 0 0 6px rgba(51,214,159,.12);
-}
+    /* === HERO V2 === */
+    .heroTitle{
+      margin: 18px 0 12px;
+      font-size: clamp(32px, 3.1vw, 48px);
+      letter-spacing:-0.035em;
+      line-height: 1.06;
+      font-weight: 800;
+    }
 
-.heroTitle{
-  margin: 18px 0 12px;
-  font-size: clamp(32px, 3.1vw, 48px);
-  letter-spacing:-0.035em;
-  line-height: 1.06;
-}
-.heroTitle .mutedWord{ color: rgba(255,255,255,.70); }
+    .opsStatus{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      margin-top:10px;
+      margin-bottom: clamp(18px, 2vw, 26px);
+      padding:6px 12px;
 
-.heroSub{
-  margin: 0 0 18px;
-  color: var(--muted);
-  line-height: 1.72;
-  max-width: 66ch;     /* omeji širino */
-  font-size: 15.5px;   /* rahlo manj */
-  font-weight: 500;    /* manj odebeljeno */
-  .heroSub{ margin-top: 10px; }
-}
+      border-radius:999px;
+      border:1px solid rgba(51,214,159,.25);
+      background:rgba(51,214,159,.08);
+      color:#9ff0cc;
 
-.heroBtns{
-  display:flex; flex-wrap:wrap; gap:12px;
-  margin-top: 16px;
-}
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.02em;
+    }
+    .opsStatus .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#33d69f;
+      box-shadow:0 0 10px rgba(51,214,159,.8);
+    }
 
-.heroChips{
-  display:flex; flex-wrap:wrap; gap:10px;
-  margin-top: 14px;
-}
+    .flarePink{
+      color:#ff2f92;
+      font-weight:800;
+      text-shadow: 0 0 10px rgba(255,47,146,.25);
+    }
 
-.chipBtn{
-  display:inline-flex; align-items:center; gap:10px;
-  padding:12px 14px;
-  border-radius:16px;
-  background: rgba(255,255,255,.04);
-  border:1px solid var(--border);
-  color: var(--text);
-  font-weight:900;
-}
-.chipBtn:hover{ background: rgba(255,255,255,.06); transform: translateY(-1px); }
+    .heroSub{
+      margin: 0 0 18px;
+      line-height: 1.72;
+      max-width: 66ch;
+      font-size: 15.5px;
+      font-weight: 500;
+    }
+    .heroSub p{ margin: 0 0 12px; }
+    .heroSub p:last-child{ margin-bottom: 0; }
 
-.chipMuted{
-  opacity:.55;
-  cursor: default;
-}
+    .heroEmphasis{
+      font-weight: 650; /* rahlo odebeljen stavek */
+    }
 
-/* Mobile: make hero buttons nicer */
-@media (max-width: 520px){
-  .heroBtns .btn{ width: 100%; }
-  .heroChips .chipBtn{ width: 100%; justify-content:center; }
-}
-    h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
-    .lead{
-  margin-top: 18px;     /* ← GLAVNI FIX */
-  margin-bottom: 18px;
-  color:var(--muted);
-  line-height:1.7;
-  max-width: 72ch;
-  font-size:16px;
-}
+    .heroBtns{
+      display:flex; flex-wrap:wrap; gap:12px;
+      margin-top: 16px;
+    }
+
+    .heroChips{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top: 14px;
+    }
+
+    .chipBtn{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      background: rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      color: var(--text);
+      font-weight:900;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .chipBtn:hover{ background: rgba(255,255,255,.06); transform: translateY(-1px); }
+
+    .chipMuted{
+      opacity:.55;
+      cursor: default;
+    }
+
+    @media (max-width: 520px){
+      .heroBtns .btn{ width: 100%; }
+      .heroChips .chipBtn{ width: 100%; justify-content:center; }
+    }
+
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
 
     .side{padding:18px}
@@ -282,11 +278,11 @@
     .divider{height:1px; background:var(--border); margin:12px 0}
 
     /* ===== PRICE CHART (normal) ===== */
-   .splitWide{
-  display:grid;
-  grid-template-columns: 1.5fr .5fr;
-  gap:18px;
-}
+    .splitWide{
+      display:grid;
+      grid-template-columns: 1.5fr .5fr;
+      gap:18px;
+    }
     @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
 
     .chartWrap{
@@ -341,28 +337,6 @@
       border:1px solid rgba(10,14,25,.18);
     }
 
-    <section>
-  <div class="panel">
-    <div class="titleRow">
-      <h2>Operational approach</h2>
-    </div>
-
-    <p class="muted" style="max-width:900px; line-height:1.7">
-      Infrastructure is operated with redundancy and continuous monitoring across validator and FTSO components. 
-      Updates are staged and applied outside critical reward periods, with health checks and alerting in place to detect anomalies early.
-      Performance is evaluated over epochs rather than short-term fluctuations, ensuring stable participation and predictable delegation outcomes.
-    </p>
-
-    <div class="row" style="margin-top:14px">
-      <span class="chip">24/7 monitoring</span>
-      <span class="chip">Epoch-aware maintenance</span>
-      <span class="chip">Redundant services</span>
-      <span class="chip">Public verification</span>
-      <span class="chip">No delegation automation risk</span>
-    </div>
-  </div>
-</section>
-
     /* ===== FTSO EMBED PATCH ===== */
     .ftsoEmbedWrap{
       border-radius: 18px;
@@ -371,32 +345,24 @@
       background: rgba(255,255,255,.03);
       height: var(--embed-height);
       position: relative;
-     contain: paint;  /* ✅ zacementira risanje znotraj okvira */
-      .ftsoEmbedWrap{
-  width: 100%;
-  max-width: 100%;
-}
+      width: 100%;
+      max-width: 100%;
+      contain: paint;
     }
     .ftsoEmbedWrap iframe{
       width: 100%;
       height: 1100px; /* large, we crop the viewport */
       border: 0;
-
- display: block;       /* ✅ pomembno: odstrani inline layout glitch */
-  max-width: 100%;      /* ✅ prepreči overflow po širini */
-
-      
-      transform: translateY(calc(-1 * var(--embed-shift))) scale(var(--embed-scale));
+      display: block;
+      max-width: 100%;
+      transform: translateY(calc(-1 * var(--embed-shift)));
       transform-origin: top center;
     }
-    .ftsoEmbedWrap iframe{
-  overflow: hidden;    /* dodatna zaščita */
-}
     .ftsoEmbedWrap::after{
       content:"";
       position:absolute;
       left:0; right:0; bottom:0;
-      height: 160px; /* hides Price Feeds section */
+      height: 140px; /* hides Price Feeds section */
       background: linear-gradient(to bottom, rgba(7,11,20,0), rgba(7,11,20,1));
       pointer-events:none;
     }
@@ -451,16 +417,16 @@
     /* Mobile tweaks */
     @media (max-width: 980px){
       :root{
-        --embed-shift: 95px;
-        --embed-scale: 1.03;
+        --embed-shift: 72px;
+        --embed-scale: 1.00;
         --embed-height: 520px;
         --chart-h: 190px;
       }
     }
     @media (max-width: 520px){
       :root{
-        --embed-shift: 110px;
-        --embed-scale: 1.02;
+        --embed-shift: 82px;
+        --embed-scale: 1.00;
         --embed-height: 560px;
         --chart-h: var(--chart-h-mobile);
       }
@@ -503,64 +469,27 @@
     }
     .toast.show{opacity:1; transform: translateX(-50%) translateY(-6px);}
     [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
+
     /* ===== Glass edge fade ===== */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-
-  background:
-    radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.85), transparent 60%),
-    radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.85), transparent 60%);
-}
-
-/* light theme adjustment */
-[data-theme="light"] body::before{
-  background:
-    radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.9), transparent 60%),
-    radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.9), transparent 60%);
-}
-
-/* keep content above fade */
-header,
-main,
-footer{
-  position:relative;
-  z-index:1;
-}
-    /* ===== Ops status badge ===== */
-.opsStatus{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  margin-top:10px;
-  padding:6px 12px;
-
-  border-radius:999px;
-  border:1px solid rgba(51,214,159,.25);
-
-  background:rgba(51,214,159,.08);
-  color:#9ff0cc;
-
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:.02em;
-}
-
-.opsStatus .dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#33d69f;
-  box-shadow:0 0 10px rgba(51,214,159,.8);
-}
-   .flarePink{
-  color:#ff2f92;
-  font-weight:800;
-  text-shadow: 0 0 10px rgba(255,47,146,.25);
-}
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.85), transparent 60%),
+        radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.85), transparent 60%);
+    }
+    [data-theme="light"] body::before{
+      background:
+        radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.9), transparent 60%),
+        radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.9), transparent 60%);
+    }
+    header, main, footer{
+      position:relative;
+      z-index:1;
+    }
   </style>
 </head>
 
@@ -594,54 +523,56 @@ footer{
     <!-- HERO -->
     <section>
       <div class="gridHero">
-      <div class="card hero">
-  <div class="heroPill">
-    <span class="heroPillDot"></span>
-    Online • Monitored • Transparent
-  </div>
+        <div class="card hero">
 
-  <div class="heroTitle">
-   Validator + FTSO Provider built for uptime, signal quality, and 
-<span class="flarePink">trust.</span>
-  </div>
-<div class="opsStatus" id="opsStatus">
-  <span class="dot"></span>
-  Online · Monitoring active · Status updating…
-</div>
-  <p class="heroSub">
-   <p class="muted">   
-MirSFlr operates validator and FTSO infrastructure on the Flare network with a strong focus on reliability, signal consistency, and transparent operations. 
-</p>
-FTSO submissions are backed by continuously monitored systems designed to minimise missed rounds and maintain consistent data delivery under changing network conditions. 
-<p class="muted">
-The goal is simple: provide dependable infrastructure delegates can trust long-term — without marketing noise, hidden changes, or operational surprises.
-  </p>
-<p class="muted">
-All identities, delegation targets, and performance metrics are publicly verifiable through independent explorers and analytics tools.
-  </p>
+          <div class="heroTitle">
+            Validator + FTSO Provider built for uptime, signal quality, and
+            <span class="flarePink">trust.</span>
+          </div>
 
-  </p>
+          <div class="opsStatus" id="opsStatus">
+            <span class="dot"></span>
+            Online · Monitoring active · Last checked Recently
+          </div>
 
-  <div class="heroBtns">
-    <a class="btn" href="#ftso">📈 Metrics dashboard</a>
-    <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ FlareMetrics</a>
-  </div>
+          <div class="heroSub">
+            <p class="muted">
+              MirSFlr operates validator and FTSO infrastructure on the Flare network with a strong focus on reliability, signal consistency, and transparent operations.
+            </p>
 
-  <div class="heroChips">
-    <a class="chipBtn" href="https://flare.network/" target="_blank" rel="noopener">🌐 flare.network</a>
-    <button class="chipBtn" type="button" id="copyAllBtn">📋 Copy key addresses</button>
+            <p class="muted">
+              FTSO submissions are backed by continuously monitored systems designed to minimise missed rounds and maintain consistent data delivery under changing network conditions.
+            </p>
 
-    <div class="chipBtn chipMuted">🔒 Security-first ops</div>
-    <div class="chipBtn chipMuted">🛠 Continuous improvements</div>
-    <div class="chipBtn chipMuted">🧭 Clear delegation guidance</div>
-  </div>
+            <p class="muted heroEmphasis">
+              The goal is simple: provide dependable infrastructure delegates can trust long-term — without marketing noise, hidden changes, or operational surprises.
+            </p>
 
-  <div class="row" style="margin-top:14px">
-    <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">𝕏 @mirsFlR_</a>
-    <a class="btn" href="https://t.me/Mirhollio" target="_blank" rel="noopener">✈️ @Mirhollio</a>
-    <a class="btn" href="mailto:mirsven@icloud.com">✉️ mirsven@icloud.com</a>
-  </div>
-</div>
+            <p class="muted">
+              All identities, delegation targets, and performance metrics are publicly verifiable through independent explorers and analytics tools.
+            </p>
+          </div>
+
+          <div class="heroBtns">
+            <a class="btn" href="#ftso">📈 Metrics dashboard</a>
+            <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ FlareMetrics</a>
+          </div>
+
+          <div class="heroChips">
+            <a class="chipBtn" href="https://flare.network/" target="_blank" rel="noopener">🌐 flare.network</a>
+            <button class="chipBtn" type="button" id="copyAllBtn">📋 Copy key addresses</button>
+
+            <div class="chipBtn chipMuted">🔒 Security-first ops</div>
+            <div class="chipBtn chipMuted">🛠 Continuous improvements</div>
+            <div class="chipBtn chipMuted">🧭 Clear delegation guidance</div>
+          </div>
+
+          <div class="row" style="margin-top:14px">
+            <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">𝕏 @mirsFlR_</a>
+            <a class="btn" href="https://t.me/Mirhollio" target="_blank" rel="noopener">✈️ @Mirhollio</a>
+            <a class="btn" href="mailto:mirsven@icloud.com">✉️ mirsven@icloud.com</a>
+          </div>
+        </div>
 
         <!-- QUICK SNAPSHOT -->
         <aside class="card side" aria-label="Quick snapshot">
@@ -747,9 +678,7 @@ All identities, delegation targets, and performance metrics are publicly verifia
               </div>
             </div>
 
-            <div class="tiny" style="margin-top:10px">
-     
-            </div>
+            <div class="tiny" style="margin-top:10px"></div>
           </div>
         </div>
       </div>
@@ -760,7 +689,6 @@ All identities, delegation targets, and performance metrics are publicly verifia
       <div class="panel">
         <div class="titleRow">
           <h2>FTSO Provider metrics</h2>
-      
         </div>
 
         <div class="ftsoEmbedWrap" aria-label="FTSO provider embed">
@@ -778,14 +706,10 @@ All identities, delegation targets, and performance metrics are publicly verifia
           </a>
           <a class="btn" href="#delegation">⚡ Delegation guide</a>
         </div>
-
-        <div class="tiny" style="margin-top:10px">
-  
-        </div>
       </div>
     </section>
 
-    <!-- WINDOWS under FTSO (back again) -->
+    <!-- WINDOWS under FTSO -->
     <section id="delegation">
       <div class="split">
         <div class="panel">
@@ -873,7 +797,6 @@ All identities, delegation targets, and performance metrics are publicly verifia
       <div class="panel">
         <div class="titleRow">
           <h2>Contact</h2>
-          
         </div>
         <div class="row" style="margin-top:0">
           <a class="btn primary" href="mailto:mirsven@icloud.com">✉️ Email</a>
@@ -1282,20 +1205,14 @@ All identities, delegation targets, and performance metrics are publicly verifia
     window.addEventListener("resize", () => {
       if (seriesUSD) drawNormal(seriesUSD);
     });
+
+    // Ops status: keep stable text (no random time)
     function updateOpsStatus(){
-  const el = document.getElementById("opsStatus");
-  if(!el) return;
-
-  const now = new Date();
-  const mins = now.getMinutes().toString().padStart(2,"0");
-
-  el.innerHTML =
-    `<span class="dot"></span>
-     Online · Monitoring active · Last checked Recently`;
-}
-
-updateOpsStatus();
-setInterval(updateOpsStatus, 60000);
+      const el = document.getElementById("opsStatus");
+      if(!el) return;
+      el.innerHTML = `<span class="dot"></span> Online · Monitoring active · Last checked Recently`;
+    }
+    updateOpsStatus();
   </script>
 </body>
 </html>
