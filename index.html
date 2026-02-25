@@ -247,7 +247,14 @@
   .heroChips .chipBtn{ width: 100%; justify-content:center; }
 }
     h1{margin: 14px 0 10px; font-size: clamp(30px, 3.2vw, 46px); letter-spacing:-0.035em; line-height:1.06;}
-    .lead{margin:0 0 14px; color:var(--muted); line-height:1.65;  max-width: 920px; font-size: 16px;}
+    .lead{
+  margin-top: 18px;     /* ← GLAVNI FIX */
+  margin-bottom: 18px;
+  color:var(--muted);
+  line-height:1.7;
+  max-width: 72ch;
+  font-size:16px;
+}
     .row{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
 
     .side{padding:18px}
