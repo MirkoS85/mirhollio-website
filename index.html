@@ -119,6 +119,13 @@
       border-color:transparent;
       color:rgba(255,255,255,.95);
       box-shadow:0 18px 36px rgba(124,92,255,.18);
+      /* Hero: make the first button “primary on hover” only */
+.heroBtns .btn:first-child:hover{
+  background: linear-gradient(135deg, var(--brand), var(--brand2));
+  border-color: transparent;
+  color: rgba(255,255,255,.95);
+  box-shadow: 0 18px 36px rgba(124,92,255,.18);
+}
     }
     .btn.ghost{background:transparent}
 
@@ -174,18 +181,19 @@
 
 .heroTitle{
   margin: 18px 0 12px;
-  font-size: clamp(34px, 3.7vw, 54px);
-  letter-spacing:-0.04em;
-  line-height: 1.04;
+  font-size: clamp(32px, 3.1vw, 48px);
+  letter-spacing:-0.035em;
+  line-height: 1.06;
 }
 .heroTitle .mutedWord{ color: rgba(255,255,255,.70); }
 
 .heroSub{
   margin: 0 0 18px;
   color: var(--muted);
-  line-height: 1.7;
-  max-width: 72ch;
-  font-size: 16px;
+  line-height: 1.72;
+  max-width: 66ch;     /* omeji širino */
+  font-size: 15.5px;   /* rahlo manj */
+  font-weight: 500;    /* manj odebeljeno */
 }
 
 .heroBtns{
@@ -483,7 +491,7 @@ footer{
           <button class="btn ghost" id="themeBtn" type="button" aria-label="Toggle theme">
             🌗 <span class="tiny" id="themeLabel">Theme</span>
           </button>
-          <a class="btn primary" href="#ftso">📊 Metrics</a>
+          <a class="btn" href="#ftso">📈 Metrics dashboard</a>
         </div>
       </div>
     </div>
@@ -501,8 +509,7 @@ footer{
   </div>
 
   <div class="heroTitle">
-    Validator + FTSO Provider built<br/>
-    for uptime, signal quality, and <span class="mutedWord">trust.</span>
+    Validator + FTSO Provider built for uptime, signal quality, and <span class="mutedWord">trust.</span>
   </div>
 
   <p class="heroSub">
