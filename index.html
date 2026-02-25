@@ -469,6 +469,32 @@ footer{
   position:relative;
   z-index:1;
 }
+    /* ===== Ops status badge ===== */
+.opsStatus{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  padding:6px 12px;
+
+  border-radius:999px;
+  border:1px solid rgba(51,214,159,.25);
+
+  background:rgba(51,214,159,.08);
+  color:#9ff0cc;
+
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+
+.opsStatus .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#33d69f;
+  box-shadow:0 0 10px rgba(51,214,159,.8);
+}
   </style>
 </head>
 
@@ -511,10 +537,12 @@ footer{
   <div class="heroTitle">
     Validator + FTSO Provider built for uptime, signal quality, and <span class="mutedWord">trust.</span>
   </div>
-
+<div class="opsStatus" id="opsStatus">
+  <span class="dot"></span>
+  Online · Monitoring active · Status updating…
+</div>
   <p class="heroSub">
-    MirSFlr helps secure the Flare network and supports FTSO data delivery with an ops-first approach:
-    disciplined maintenance, clear status, and public metrics you can verify.
+    MirSFlr helps secure the Flare network and supports FTSO data delivery with an ops-first approach: disciplined maintenance, clear status, and public metrics you can verify.
   </p>
 
   <div class="heroBtns">
@@ -1177,6 +1205,20 @@ footer{
     window.addEventListener("resize", () => {
       if (seriesUSD) drawNormal(seriesUSD);
     });
+    function updateOpsStatus(){
+  const el = document.getElementById("opsStatus");
+  if(!el) return;
+
+  const now = new Date();
+  const mins = now.getMinutes().toString().padStart(2,"0");
+
+  el.innerHTML =
+    `<span class="dot"></span>
+     Online · Monitoring active · Last checked ${now.getHours()}:${mins}`;
+}
+
+updateOpsStatus();
+setInterval(updateOpsStatus, 60000);
   </script>
 </body>
 </html>
