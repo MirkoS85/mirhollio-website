@@ -72,6 +72,7 @@
         radial-gradient(900px 700px at 50% 120%, rgba(51,214,159,.10), transparent 55%),
         var(--bg);
       overflow-x:hidden;
+      position:relative;
     }
     a{color:inherit; text-decoration:none}
     .container{max-width:var(--max); margin:0 auto; padding:0 20px}
@@ -128,6 +129,7 @@
       border-radius: var(--r2);
       box-shadow: var(--shadow);
       overflow:hidden;
+      backdrop-filter: blur(12px);
     }
     .panel{
        padding:20px 22px;
@@ -432,6 +434,33 @@
     }
     .toast.show{opacity:1; transform: translateX(-50%) translateY(-6px);}
     [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
+    /* ===== Glass edge fade ===== */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+
+  background:
+    radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.85), transparent 60%),
+    radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.85), transparent 60%);
+}
+
+/* light theme adjustment */
+[data-theme="light"] body::before{
+  background:
+    radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.9), transparent 60%),
+    radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.9), transparent 60%);
+}
+
+/* keep content above fade */
+header,
+main,
+footer{
+  position:relative;
+  z-index:1;
+}
   </style>
 </head>
 
