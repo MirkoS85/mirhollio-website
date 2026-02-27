@@ -1107,39 +1107,29 @@
     }
 
     function hideTooltip(){
-      if (tooltip && chartWrap){
+   if (tooltip && chartWrap){
   tooltip.style.display = "block";
   tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
 
   const wrapRect = chartWrap.getBoundingClientRect();
   const xInWrap = clientX - wrapRect.left;
 
-  // temp show to measure width reliably
-  tooltip.style.left = "0px";
-  tooltip.style.top = "0px";
-  tooltip.dataset.align = "left";
+  // Measure safely (works reliably across browsers)
+  const ttRect = tooltip.getBoundingClientRect();
+  const ttW = ttRect.width || 180;
 
-  const ttW = tooltip.offsetWidth || 160;
   const pad = 12;
 
-  // Decide alignment: if near right edge -> anchor right
-  const nearRight = (xInWrap + ttW + pad) > wrapRect.width;
-  tooltip.dataset.align = nearRight ? "right" : "left";
+  // Clamp so tooltip never leaves the card
+  let left = xInWrap - (ttW / 2);
+  left = Math.max(pad, Math.min(left, wrapRect.width - ttW - pad));
 
-  // Place tooltip with padding so it never clips
-  if (nearRight){
-    // right-anchored: tooltip's right edge near pointer
-    tooltip.style.left = Math.max(pad, xInWrap) + "px";
-  }else{
-    // left-anchored: tooltip's left edge near pointer
-    tooltip.style.left = Math.min(wrapRect.width - pad, xInWrap) + "px";
-  }
+  tooltip.style.left = left + "px";
 
-  // Vertical: keep above curve but inside wrap
-  const y = py + 10; // same as before
-  tooltip.style.top = Math.max(20, y) + "px";
+  // Put tooltip a bit above the line-point, but inside
+  const top = Math.max(28, py + 10);
+  tooltip.style.top = top + "px";
 }
-
     function attachHover(){
       if (!canvas) return;
       canvas.addEventListener("mousemove", (e)=> showTooltip(e.clientX));
