@@ -317,21 +317,56 @@
       font-weight:900;
     }
     .tooltip{
-      position:absolute;
-      pointer-events:none;
-      padding:8px 10px;
-      border-radius: 12px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.62);
-      backdrop-filter: blur(10px);
-      color: rgba(255,255,255,.92);
-      font-size: 12px;
-      font-weight: 900;
-      transform: translate(-50%, -110%);
-      display:none;
-      white-space: nowrap;
-      z-index: 2;
-    }
+  position:absolute;
+  pointer-events:none;
+  padding:8px 10px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.62);
+  backdrop-filter: blur(10px);
+  color: rgba(255,255,255,.92);
+  font-size: 12px;
+  font-weight: 900;
+  display:none;
+  white-space: nowrap;
+  z-index: 2;
+
+  /* new: no forced centering */
+  transform: translateY(-110%);
+}
+
+.tooltip[data-align="left"]{
+  transform: translateY(-110%); /* anchored left edge */
+}
+
+.tooltip[data-align="right"]{
+  transform: translate(-100%, -110%); /* anchored right edge */
+}
+
+.tooltip::after{
+  content:"";
+  position:absolute;
+  bottom:-6px;
+  width:10px; height:10px;
+  transform: rotate(45deg);
+  background: rgba(0,0,0,.62);
+  border-right:1px solid rgba(255,255,255,.14);
+  border-bottom:1px solid rgba(255,255,255,.14);
+}
+
+/* arrow position depends on align */
+.tooltip[data-align="left"]::after{ left:14px; }
+.tooltip[data-align="right"]::after{ right:14px; }
+
+[data-theme="light"] .tooltip{
+  background: rgba(10,14,25,.72);
+  border:1px solid rgba(10,14,25,.18);
+}
+[data-theme="light"] .tooltip::after{
+  background: rgba(10,14,25,.72);
+  border-right:1px solid rgba(10,14,25,.18);
+  border-bottom:1px solid rgba(10,14,25,.18);
+}
     [data-theme="light"] .tooltip{
       background: rgba(10,14,25,.72);
       border:1px solid rgba(10,14,25,.18);
@@ -1072,9 +1107,38 @@
     }
 
     function hideTooltip(){
-      if (tooltip) tooltip.style.display = "none";
-      if (seriesUSD) drawNormal(seriesUSD);
-    }
+      if (tooltip && chartWrap){
+  tooltip.style.display = "block";
+  tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
+
+  const wrapRect = chartWrap.getBoundingClientRect();
+  const xInWrap = clientX - wrapRect.left;
+
+  // temp show to measure width reliably
+  tooltip.style.left = "0px";
+  tooltip.style.top = "0px";
+  tooltip.dataset.align = "left";
+
+  const ttW = tooltip.offsetWidth || 160;
+  const pad = 12;
+
+  // Decide alignment: if near right edge -> anchor right
+  const nearRight = (xInWrap + ttW + pad) > wrapRect.width;
+  tooltip.dataset.align = nearRight ? "right" : "left";
+
+  // Place tooltip with padding so it never clips
+  if (nearRight){
+    // right-anchored: tooltip's right edge near pointer
+    tooltip.style.left = Math.max(pad, xInWrap) + "px";
+  }else{
+    // left-anchored: tooltip's left edge near pointer
+    tooltip.style.left = Math.min(wrapRect.width - pad, xInWrap) + "px";
+  }
+
+  // Vertical: keep above curve but inside wrap
+  const y = py + 10; // same as before
+  tooltip.style.top = Math.max(20, y) + "px";
+}
 
     function attachHover(){
       if (!canvas) return;
