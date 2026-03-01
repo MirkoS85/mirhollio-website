@@ -316,11 +316,11 @@
       background: rgba(255,255,255,.04);
       font-weight:900;
     }
-    .tooltip{
+.tooltip{
   position:absolute;
   pointer-events:none;
   padding:8px 10px;
-  border-radius: 12px;
+  border-radius:12px;
   border:1px solid rgba(255,255,255,.16);
   background: rgba(0,0,0,.62);
   backdrop-filter: blur(10px);
@@ -329,18 +329,7 @@
   font-weight: 900;
   display:none;
   white-space: nowrap;
-  z-index: 2;
-
-  /* new: no forced centering */
-  transform: translateY(-110%);
-}
-
-.tooltip[data-align="left"]{
-  transform: translateY(-110%); /* anchored left edge */
-}
-
-.tooltip[data-align="right"]{
-  transform: translate(-100%, -110%); /* anchored right edge */
+  z-index: 10;
 }
 
 .tooltip::after{
@@ -1063,48 +1052,68 @@
       }
     }
 
-    function showTooltip(clientX){
-      if (!drawCache || !seriesUSD) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = clientX - rect.left;
+   function showTooltip(clientX){
+  if (!drawCache || !seriesUSD || !canvas || !tooltip || !chartWrap) return;
 
-      const {padL,padR,w,x0,x1,toX,toY,h,padT,padB} = drawCache;
-      const xClamped = Math.max(padL, Math.min(w-padR, x));
-      const ratio = (xClamped - padL) / ((w - padL - padR) || 1);
-      const tApprox = x0 + (x1-x0)*ratio;
+  const rect = canvas.getBoundingClientRect();
+  const x = clientX - rect.left;
 
-      let bestI = 0, bestD = Infinity;
-      for (let i=0;i<seriesUSD.length;i++){
-        const d = Math.abs(seriesUSD[i][0] - tApprox);
-        if (d < bestD){ bestD = d; bestI = i; }
-      }
+  const {padL,padR,w,x0,x1,toX,toY,h,padT,padB} = drawCache;
+  const xClamped = Math.max(padL, Math.min(w - padR, x));
+  const ratio = (xClamped - padL) / ((w - padL - padR) || 1);
+  const tApprox = x0 + (x1 - x0) * ratio;
 
-      const ts = seriesUSD[bestI][0];
-      const usd = seriesUSD[bestI][1];
-      const eur = (seriesEUR && seriesEUR[bestI]) ? seriesEUR[bestI][1] : null;
+  let bestI = 0, bestD = Infinity;
+  for (let i = 0; i < seriesUSD.length; i++){
+    const d = Math.abs(seriesUSD[i][0] - tApprox);
+    if (d < bestD){ bestD = d; bestI = i; }
+  }
 
-      drawNormal(seriesUSD);
+  const ts = seriesUSD[bestI][0];
+  const usd = seriesUSD[bestI][1];
+  const eur = (seriesEUR && seriesEUR[bestI]) ? seriesEUR[bestI][1] : null;
 
-      const px = toX(ts);
-      const py = toY(usd);
+  // redraw
+  drawNormal(seriesUSD);
 
-      ctx.globalAlpha = 0.35;
-      ctx.strokeStyle = "rgba(255,255,255,.55)";
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, h-padB); ctx.stroke();
-      ctx.globalAlpha = 1;
+  const px = toX(ts);
+  const py = toY(usd);
 
-      ctx.fillStyle = "rgba(255,255,255,.92)";
-      ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI*2); ctx.fill();
+  // marker line
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = "rgba(255,255,255,.55)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(px, padT); ctx.lineTo(px, h - padB); ctx.stroke();
+  ctx.globalAlpha = 1;
 
-      if (tooltip && chartWrap){
-        tooltip.style.display = "block";
-        const wrapRect = chartWrap.getBoundingClientRect();
-        tooltip.style.left = (clientX - wrapRect.left) + "px";
-        tooltip.style.top = Math.max(10, py - 46) + "px"; // tooltip nad piko
-        tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
-      }
-    }
+  // point
+  ctx.fillStyle = "rgba(255,255,255,.92)";
+  ctx.beginPath(); ctx.arc(px, py, 3.5, 0, Math.PI * 2); ctx.fill();
+
+  // tooltip text
+  tooltip.style.display = "block";
+  tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
+
+  const wrapRect = chartWrap.getBoundingClientRect();
+
+  // X inside chartWrap using px (stable), then clamp
+  const xInWrap = (rect.left - wrapRect.left) + px;
+
+  // measure tooltip after display:block
+  const ttRect = tooltip.getBoundingClientRect();
+  const ttW = ttRect.width || 180;
+  const ttH = ttRect.height || 28;
+  const pad = 10;
+
+  let left = xInWrap - ttW / 2;
+  left = Math.max(pad, Math.min(left, wrapRect.width - ttW - pad));
+  tooltip.style.left = left + "px";
+
+  // Y: above the point, clamped
+  let top = (rect.top - wrapRect.top) + py - ttH - 14;
+  top = Math.max(pad, Math.min(top, wrapRect.height - ttH - pad));
+  tooltip.style.top = top + "px";
+}
 
    function hideTooltip(){
   if (tooltip) tooltip.style.display = "none";
