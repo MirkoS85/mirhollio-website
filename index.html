@@ -1106,29 +1106,9 @@
       }
     }
 
-    function hideTooltip(){
-   if (tooltip && chartWrap){
-  tooltip.style.display = "block";
-  tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
-
-  const wrapRect = chartWrap.getBoundingClientRect();
-  const xInWrap = clientX - wrapRect.left;
-
-  // Measure safely (works reliably across browsers)
-  const ttRect = tooltip.getBoundingClientRect();
-  const ttW = ttRect.width || 180;
-
-  const pad = 12;
-
-  // Clamp so tooltip never leaves the card
-  let left = xInWrap - (ttW / 2);
-  left = Math.max(pad, Math.min(left, wrapRect.width - ttW - pad));
-
-  tooltip.style.left = left + "px";
-
-  // Put tooltip a bit above the line-point, but inside
-  const top = Math.max(28, py + 10);
-  tooltip.style.top = top + "px";
+   function hideTooltip(){
+  if (tooltip) tooltip.style.display = "none";
+  if (seriesUSD) drawNormal(seriesUSD);
 }
     function attachHover(){
       if (!canvas) return;
