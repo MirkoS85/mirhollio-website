@@ -1101,7 +1101,7 @@
         tooltip.style.display = "block";
         const wrapRect = chartWrap.getBoundingClientRect();
         tooltip.style.left = (clientX - wrapRect.left) + "px";
-        tooltip.style.top = (py + 10) + "px";
+        tooltip.style.top = Math.max(10, py - 46) + "px"; // tooltip nad piko
         tooltip.textContent = `${fmtTime(ts)} • $${usd.toFixed(6)}${eur!=null ? " • €"+eur.toFixed(6) : ""}`;
       }
     }
