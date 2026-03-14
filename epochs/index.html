@@ -269,8 +269,7 @@
       return `${pct.toFixed(decimals)}%`;
     }
 
-    function findProviderDeep(data) {
-      function drawRewardChart(history) {
+ function drawRewardChart(history) {
   const svg = document.getElementById("rewardChart");
   if (!svg || !history.length) return;
 
@@ -345,41 +344,42 @@
     ${xLabels}
   `;
 }
-      let found = null;
 
-      function walk(node) {
-        if (found || node == null) return;
+function findProviderDeep(data) {
+  let found = null;
 
-        if (Array.isArray(node)) {
-          for (const item of node) walk(item);
-          return;
-        }
+  function walk(node) {
+    if (found || node == null) return;
 
-        if (typeof node === "object") {
-          const voter = String(node.voterAddress || "").toLowerCase();
-          const delegation = String(node.delegationAddress || "").toLowerCase();
-          const name = String(node.dataProviderName || "").toLowerCase();
-
-          if (
-            voter === TARGET_VOTER ||
-            delegation === TARGET_DELEGATION ||
-            name === "mirsflr"
-          ) {
-            found = node;
-            return;
-          }
-
-          for (const value of Object.values(node)) {
-            walk(value);
-            if (found) return;
-          }
-        }
-      }
-
-      walk(data);
-      return found;
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item);
+      return;
     }
 
+    if (typeof node === "object") {
+      const voter = String(node.voterAddress || "").toLowerCase();
+      const delegation = String(node.delegationAddress || "").toLowerCase();
+      const name = String(node.dataProviderName || "").toLowerCase();
+
+      if (
+        voter === TARGET_VOTER ||
+        delegation === TARGET_DELEGATION ||
+        name === "mirsflr"
+      ) {
+        found = node;
+        return;
+      }
+
+      for (const value of Object.values(node)) {
+        walk(value);
+        if (found) return;
+      }
+    }
+  }
+
+  walk(data);
+  return found;
+}
     async function loadEpochs() {
       const loadingEl = document.getElementById("loading");
       const errorEl = document.getElementById("error");
@@ -397,8 +397,8 @@
 
         const history = [...(provider.epochData || [])]
           .sort((a, b) => Number(b.epoch) - Number(a.epoch));
+tbody.innerHTML = "";
 drawRewardChart(history);
-        tbody.innerHTML = "";
 
         if (!history.length) {
           const tr = document.createElement("tr");
