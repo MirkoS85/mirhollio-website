@@ -155,7 +155,34 @@ border:1px solid rgba(255,165,0,.18);
     @media (max-width: 980px){ .navlinks{display:none} }
 
     .actions{display:flex; align-items:center; gap:10px}
+    .themeIconBtn{
+  width:46px;
+  height:46px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border-radius:14px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  color:var(--text);
+  cursor:pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
 
+.themeIconBtn:hover{
+  transform:translateY(-1px);
+  background:linear-gradient(135deg, rgba(124,92,255,.18), rgba(35,213,255,.08));
+  border-color:rgba(124,92,255,.22);
+  box-shadow:0 14px 28px rgba(124,92,255,.12);
+}
+
+#themeGlyph{
+  font-size:22px;
+  line-height:1;
+  display:inline-block;
+  transform:translateY(-1px);
+}
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
       padding:10px 14px; border-radius:14px;
@@ -1008,14 +1035,18 @@ border:1px solid rgba(255,165,0,.18);
     };
 
     // Theme
-    const root = document.documentElement;
-    const themeBtn = document.getElementById("themeBtn");
-    const themeLabel = document.getElementById("themeLabel");
-    function setTheme(theme){
-      root.setAttribute("data-theme", theme);
-      localStorage.setItem("theme", theme);
-      if (themeLabel) themeLabel.textContent = theme === "light" ? "Light" : "Dark";
-    }
+const root = document.documentElement;
+const themeBtn = document.getElementById("themeBtn");
+const themeGlyph = document.getElementById("themeGlyph");
+
+function setTheme(theme){
+  root.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+
+  if (themeGlyph){
+    themeGlyph.textContent = theme === "light" ? "☀" : "☾";
+  }
+}
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "light" || savedTheme === "dark") setTheme(savedTheme);
     if (themeBtn) themeBtn.addEventListener("click", () => {
