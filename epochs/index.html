@@ -185,6 +185,21 @@
   color:var(--muted);
   font-size:13px;
 }
+    .chartTooltip{
+  position:absolute;
+  display:none;
+  padding:8px 10px;
+  border-radius:10px;
+  background:rgba(10,14,25,.92);
+  border:1px solid rgba(255,255,255,.12);
+  color:white;
+  font-size:12px;
+  font-weight:700;
+  pointer-events:none;
+  z-index:20;
+  white-space:nowrap;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
   </style>
 </head>
 <body>
@@ -215,9 +230,10 @@
 
   <div class="chartCard">
     <div class="chartTitle">Reward per Epoch</div>
-    <div class="chartWrap">
-      <svg id="rewardChart" class="chartSvg" viewBox="0 0 1000 260" preserveAspectRatio="none"></svg>
-    </div>
+   <div class="chartWrap" style="position:relative;">
+  <svg id="rewardChart" class="chartSvg" viewBox="0 0 1000 260" preserveAspectRatio="none"></svg>
+  <div id="chartTooltip" class="chartTooltip"></div>
+</div>
     <div class="chartMeta">Last 20 epochs • fee-based reward amount</div>
   </div>
 
@@ -269,8 +285,9 @@
       return `${pct.toFixed(decimals)}%`;
     }
 
- function drawRewardChart(history) {
+function drawRewardChart(history) {
   const svg = document.getElementById("rewardChart");
+  const tooltip = document.getElementById("chartTooltip");
   if (!svg || !history.length) return;
 
   const width = 1000;
@@ -309,12 +326,6 @@
     `${points[points.length - 1].x},${height - padY}`
   ].join(" ");
 
-  const circles = points.map(p => `
-    <circle cx="${p.x}" cy="${p.y}" r="3.5" fill="white">
-      <title>Epoch ${p.epoch} • ${p.reward.toLocaleString(undefined, {maximumFractionDigits: 2})}</title>
-    </circle>
-  `).join("");
-
   const xLabels = [
     points[0],
     points[Math.floor(points.length / 2)],
@@ -323,6 +334,18 @@
     <text x="${p.x}" y="${height - 4}" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="12">
       ${p.epoch}
     </text>
+  `).join("");
+
+  const circles = points.map((p, i) => `
+    <circle cx="${p.x}" cy="${p.y}" r="4" fill="white"></circle>
+    <circle
+      cx="${p.x}"
+      cy="${p.y}"
+      r="14"
+      fill="transparent"
+      data-index="${i}"
+      style="cursor:pointer;"
+    ></circle>
   `).join("");
 
   svg.innerHTML = `
@@ -343,6 +366,32 @@
     ${circles}
     ${xLabels}
   `;
+
+  const hoverTargets = svg.querySelectorAll('circle[data-index]');
+
+  hoverTargets.forEach(target => {
+    target.addEventListener("mouseenter", (e) => {
+      const index = Number(target.dataset.index);
+      const point = points[index];
+      if (!point || !tooltip) return;
+
+      tooltip.innerHTML = `Epoch ${point.epoch}<br>Reward: ${point.reward.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+      tooltip.style.display = "block";
+
+      const wrapRect = svg.parentElement.getBoundingClientRect();
+      const svgRect = svg.getBoundingClientRect();
+
+      const left = ((point.x / width) * svgRect.width);
+      const top = ((point.y / height) * svgRect.height);
+
+      tooltip.style.left = `${Math.max(8, left - 40)}px`;
+      tooltip.style.top = `${Math.max(8, top - 50)}px`;
+    });
+
+    target.addEventListener("mouseleave", () => {
+      if (tooltip) tooltip.style.display = "none";
+    });
+  });
 }
 
 function findProviderDeep(data) {
