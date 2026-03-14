@@ -429,6 +429,11 @@ function findProviderDeep(data) {
       }
     }
   }
+
+  walk(data);
+  return found;
+}
+
 function updateLastUpdated() {
   const el = document.getElementById("lastUpdated");
   if (!el) return;
@@ -445,9 +450,6 @@ function updateLastUpdated() {
       minute: "2-digit",
       timeZoneName: "short"
     });
-}
-  walk(data);
-  return found;
 }
     async function loadEpochs() {
       const loadingEl = document.getElementById("loading");
