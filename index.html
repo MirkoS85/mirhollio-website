@@ -757,6 +757,39 @@ backdrop-filter:none;
 background:rgba(255,255,255,.03);
 border:1px solid rgba(255,255,255,.08);
 }
+    /* ADDRESS COPY BUTTON */
+
+.addrRow{
+display:flex;
+align-items:center;
+gap:10px;
+margin-top:6px;
+}
+
+.copyBtn{
+display:flex;
+align-items:center;
+justify-content:center;
+
+width:36px;
+height:36px;
+
+border-radius:10px;
+
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.10);
+
+cursor:pointer;
+font-size:16px;
+
+transition:all .15s ease;
+}
+
+.copyBtn:hover{
+background:rgba(255,255,255,.12);
+border-color:#7c5cff;
+transform:translateY(-1px);
+}
   </style>
 </head>
 
@@ -871,15 +904,29 @@ border:1px solid rgba(255,255,255,.08);
 
          <div class="addressGrid">
 
-  <div class="addressCard">
-    <div class="addrLabel">Delegation address</div>
-    <div class="addr mono" id="delegateAddr"></div>
+ <div class="addressCard">
+
+  <div class="addrLabel">Delegation address</div>
+
+  <div class="addrRow">
+    <div class="addr">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</div>
+    <button class="copyBtn" onclick="copyDelegate()">📋</button>
   </div>
 
-  <div class="addressCard">
-    <div class="addrLabel">FTSO identity</div>
-    <div class="addr mono" id="ftsoAddr"></div>
+</div>
+
+
+ <div class="addressCard">
+
+  <div class="addrLabel">FTSO identity</div>
+
+  <div class="addrRow">
+    <div class="addr">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</div>
+    <button class="copyBtn" onclick="copyFtso()">📋</button>
   </div>
+
+</div>
+
 
 </div>
 
