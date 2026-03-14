@@ -123,6 +123,37 @@
       color:var(--muted2);
       font-size:13px;
     }
+    .statusCard{
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:20px;
+}
+
+.statusTitle{
+  font-size:14px;
+  color:var(--muted2);
+  margin-bottom:10px;
+}
+
+.statusBadge{
+  display:inline-block;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:800;
+  background:rgba(51,214,159,.16);
+  color:#9ff0cc;
+  border:1px solid rgba(51,214,159,.35);
+}
+
+.statusSub{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+}
   </style>
 </head>
 <body>
@@ -144,6 +175,12 @@
     <div id="error" class="error" style="display:none;"></div>
 
     <div id="content" style="display:none;">
+
+  <div class="statusCard">
+    <div class="statusTitle">Next Epoch Registration</div>
+    <div class="statusBadge">PRE-REGISTERED</div>
+    <div class="statusSub">Manual status placeholder for upcoming epoch.</div>
+  </div>
       <div class="tableWrap">
         <table>
           <thead>
