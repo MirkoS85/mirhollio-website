@@ -416,7 +416,7 @@
 
       const history = [...(provider.epochData || [])]
         .sort((a, b) => Number(b.epoch) - Number(a.epoch))
-        .slice(0, 12);
+        .slice(0, 5);
 
       if (!history.length) {
         const tr = document.createElement("tr");
