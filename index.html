@@ -350,6 +350,66 @@ border:1px solid rgba(255,165,0,.18);
   grid-template-columns:repeat(4,1fr);
   gap:12px;
 }
+    .marketBox{
+padding:22px 22px;
+box-shadow:none;
+}
+
+.marketBox .kpis{
+grid-template-columns:1fr;
+gap:18px;
+}
+.marketBox .kpi{
+padding:16px 18px;
+
+border-radius:16px;
+
+background:
+linear-gradient(
+180deg,
+rgba(255,255,255,.05),
+rgba(255,255,255,.02)
+);
+
+border:1px solid rgba(255,255,255,.08);
+
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.04),
+0 8px 20px rgba(0,0,0,.25);
+}
+/* USD cena velika */
+.marketBox .kpi:nth-child(1) .value{
+font-size:30px;
+font-weight:900;
+letter-spacing:-0.02em;
+}
+
+/* EUR cena srednja */
+.marketBox .kpi:nth-child(2) .value{
+font-size:22px;
+font-weight:800;
+}
+
+/* Last updated subtilen */
+.marketBox .kpi:nth-child(3) .value{
+font-size:14px;
+color:var(--muted);
+font-weight:600;
+}
+
+/* Chart source kot badge */
+.marketBox .kpi:nth-child(4) .value{
+font-size:13px;
+font-weight:700;
+
+display:inline-block;
+
+padding:4px 10px;
+border-radius:999px;
+
+background:rgba(124,92,255,.15);
+border:1px solid rgba(124,92,255,.25);
+}
     @media (max-width:980px){
   .kpis{
     grid-template-columns:1fr 1fr;
@@ -384,10 +444,11 @@ border:1px solid rgba(255,165,0,.18);
 
     /* ===== PRICE CHART (normal) ===== */
     .splitWide{
-      display:grid;
-      grid-template-columns: 1.5fr .5fr;
-      gap:18px;
-    }
+  display:grid;
+  grid-template-columns: 2.3fr .7fr;
+  gap:22px;
+  align-items:start;
+}
     @media (max-width: 980px){ .splitWide{grid-template-columns:1fr} }
 
     .chartWrap{
@@ -832,7 +893,7 @@ border:1px solid rgba(255,165,0,.18);
             </div>
           </div>
 
-          <div class="card" style="padding:16px; box-shadow:none">
+          <div class="card marketBox">
             <h2 style="margin:0 0 10px">Market snapshot</h2>
             <div class="kpis">
               <div class="kpi">
