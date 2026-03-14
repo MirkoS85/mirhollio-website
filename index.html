@@ -48,7 +48,58 @@
       --chart-h: 210px;
       --chart-h-mobile: 180px;
     }
+    .addressGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:14px;
+}
 
+@media (max-width:720px){
+.addressGrid{
+grid-template-columns:1fr;
+}
+}
+
+.addressCard{
+padding:14px 16px;
+border-radius:16px;
+
+background:
+linear-gradient(
+180deg,
+rgba(255,255,255,.05),
+rgba(255,255,255,.02)
+);
+
+border:1px solid rgba(255,255,255,.10);
+
+box-shadow:
+inset 0 1px 0 rgba(255,255,255,.04),
+0 10px 24px rgba(0,0,0,.25);
+}
+
+.addrLabel{
+font-size:12px;
+color:rgba(255,255,255,.55);
+margin-bottom:6px;
+font-weight:600;
+letter-spacing:.02em;
+}
+
+.securityNote{
+margin-top:12px;
+padding:10px 12px;
+border-radius:12px;
+
+font-size:13px;
+font-weight:600;
+
+color:rgba(255,255,255,.85);
+
+background:rgba(255,165,0,.06);
+border:1px solid rgba(255,165,0,.18);
+}
     [data-theme="light"]{
       --bg:#f7f9ff;
       --text:rgba(10,14,25,.92);
@@ -726,19 +777,23 @@
             </div>
           </div>
 
-          <div style="margin-top:12px">
-            <div class="tiny">Delegation address</div>
-            <div class="addr mono" id="delegateAddr"></div>
+         <div class="addressGrid">
 
-            <div class="divider"></div>
+  <div class="addressCard">
+    <div class="addrLabel">Delegation address</div>
+    <div class="addr mono" id="delegateAddr"></div>
+  </div>
 
-            <div class="tiny">FTSO provider identity</div>
-            <div class="addr mono" id="ftsoAddr"></div>
+  <div class="addressCard">
+    <div class="addrLabel">FTSO identity</div>
+    <div class="addr mono" id="ftsoAddr"></div>
+  </div>
 
-            <div class="divider"></div>
-            <div class="tiny">Tip: verify identity on trusted sources before delegating.</div>
-          </div>
+</div>
 
+<div class="securityNote">
+⚠ Verify provider identity on trusted sources before delegating.
+</div>
           <div class="row" style="margin-top:12px">
             <button class="btn" id="copyDelegateBtn" type="button">📋 Copy delegation</button>
             <button class="btn" id="copyFtsoBtn" type="button">📋 Copy identity</button>
