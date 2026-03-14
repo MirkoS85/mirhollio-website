@@ -1,1 +1,288 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Epoch History</title>
+
+  <style>
+    :root{
+      --bg:#070b14;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.52);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --r2:28px;
+      --max:min(94vw, 1400px);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 15% 10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(35,213,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 50% 120%, rgba(51,214,159,.10), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max);margin:0 auto;padding:24px 20px 60px}
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:24px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:var(--panel2);
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:800;
+    }
+
+    .btn:hover{
+      background:rgba(255,255,255,.08);
+    }
+
+    .title{
+      font-size:clamp(30px, 4vw, 42px);
+      font-weight:900;
+      letter-spacing:-0.03em;
+      margin:10px 0 8px;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:24px;
+    }
+
+    .loading,.error{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:var(--panel2);
+      margin-bottom:20px;
+    }
+
+    .tableWrap{
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--r2);
+      box-shadow:var(--shadow);
+      overflow:auto;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1100px;
+    }
+
+    th, td{
+      padding:14px 16px;
+      text-align:left;
+      border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+
+    th{
+      color:var(--muted2);
+      font-size:13px;
+      position:sticky;
+      top:0;
+      background:#111827;
+      z-index:1;
+    }
+
+    tr:last-child td{
+      border-bottom:none;
+    }
+
+    .note{
+      margin-top:14px;
+      color:var(--muted2);
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="btn" href="/">← Back to home</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn" href="/stats/">Stats</a>
+        <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+      </div>
+    </div>
+
+    <div class="title">MirSFlr Epoch History</div>
+    <div class="subtitle">
+      Detailed epoch data for MirSFlr from Oracle Daemon API.
+    </div>
+
+    <div id="loading" class="loading">Loading epochs…</div>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div id="content" style="display:none;">
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Epoch</th>
+              <th>Reward</th>
+              <th>Reward Rate</th>
+              <th>Total Weight</th>
+              <th>Delegation Weight</th>
+              <th>Stake Weight</th>
+              <th>FTSO Hits</th>
+              <th>FDC Participation</th>
+              <th>Eligible</th>
+              <th>Passes</th>
+              <th>Strikes</th>
+            </tr>
+          </thead>
+          <tbody id="epochsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="note">
+        Scroll horizontally if needed on smaller screens.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
+    const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+    const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
+
+    function fmtNum(value, decimals = 2) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "-";
+      return n.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function fmtPct(value, decimals = 2) {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "-";
+      const pct = n <= 1 ? n * 100 : n;
+      return `${pct.toFixed(decimals)}%`;
+    }
+
+    function findProviderDeep(data) {
+      let found = null;
+
+      function walk(node) {
+        if (found || node == null) return;
+
+        if (Array.isArray(node)) {
+          for (const item of node) walk(item);
+          return;
+        }
+
+        if (typeof node === "object") {
+          const voter = String(node.voterAddress || "").toLowerCase();
+          const delegation = String(node.delegationAddress || "").toLowerCase();
+          const name = String(node.dataProviderName || "").toLowerCase();
+
+          if (
+            voter === TARGET_VOTER ||
+            delegation === TARGET_DELEGATION ||
+            name === "mirsflr"
+          ) {
+            found = node;
+            return;
+          }
+
+          for (const value of Object.values(node)) {
+            walk(value);
+            if (found) return;
+          }
+        }
+      }
+
+      walk(data);
+      return found;
+    }
+
+    async function loadEpochs() {
+      const loadingEl = document.getElementById("loading");
+      const errorEl = document.getElementById("error");
+      const contentEl = document.getElementById("content");
+      const tbody = document.getElementById("epochsBody");
+
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("API request failed");
+
+        const data = await res.json();
+        const provider = findProviderDeep(data);
+
+        if (!provider) throw new Error("MirSFlr provider not found");
+
+        const history = [...(provider.epochData || [])]
+          .sort((a, b) => Number(b.epoch) - Number(a.epoch));
+
+        tbody.innerHTML = "";
+
+        if (!history.length) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td colspan="11">No epoch history available.</td>`;
+          tbody.appendChild(tr);
+        } else {
+          history.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${item.epoch ?? "-"}</td>
+              <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
+              <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
+              <td>${item.m_dTotalWeight != null ? fmtNum(item.m_dTotalWeight, 0) : "-"}</td>
+              <td>${item.m_dDelegationWeight != null ? fmtNum(item.m_dDelegationWeight, 0) : "-"}</td>
+              <td>${item.m_dStakeWeight != null ? fmtNum(item.m_dStakeWeight, 2) : "-"}</td>
+              <td>${item.ftsoScaling?.hitPercentage != null ? fmtPct(item.ftsoScaling.hitPercentage) : "-"}</td>
+              <td>${item.fdc?.participationPercentage != null ? fmtPct(item.fdc.participationPercentage) : "-"}</td>
+              <td>${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
+              <td>${item.passes ?? "-"}</td>
+              <td>${item.strikes ?? "-"}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        loadingEl.style.display = "none";
+        contentEl.style.display = "block";
+      } catch (err) {
+        loadingEl.style.display = "none";
+        errorEl.style.display = "block";
+        errorEl.textContent = "Could not load epochs: " + err.message;
+        console.error(err);
+      }
+    }
+
+    loadEpochs();
+  </script>
+</body>
+</html>
