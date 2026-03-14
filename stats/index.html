@@ -286,155 +286,227 @@
       </div>
     </div>
   </div>
+<script>
+  const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
 
-  <script>
-    const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
-    const PROVIDER_NAME = "MirSFlr";
+  const TARGETS = {
+    providerName: "MirSFlr",
+    identityAddress: "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3".toLowerCase(),
+    delegationAddress: "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade".toLowerCase()
+  };
 
-    function formatNumber(value, decimals = 2) {
-      if (value === null || value === undefined || value === "") return "-";
-      const num = Number(value);
-      if (Number.isNaN(num)) return String(value);
-      return num.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: decimals
-      });
-    }
+  function formatNumber(value, decimals = 2) {
+    if (value === null || value === undefined || value === "") return "-";
+    const num = Number(value);
+    if (Number.isNaN(num)) return String(value);
+    return num.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: decimals
+    });
+  }
 
-    function formatPercent(value) {
-      if (value === null || value === undefined || value === "") return "-";
-      const num = Number(value);
-      if (Number.isNaN(num)) return String(value);
-      return `${num.toFixed(2)}%`;
-    }
+  function formatPercent(value) {
+    if (value === null || value === undefined || value === "") return "-";
+    const num = Number(value);
+    if (Number.isNaN(num)) return String(value);
+    return `${num.toFixed(2)}%`;
+  }
 
-    function getVotePower(provider) {
-      return (
-        provider.votePower ??
-        provider.votingPower ??
-        provider.totalVotePower ??
-        provider.delegatedVotePower ??
-        provider.delegationAmount ??
-        null
-      );
-    }
+  function normalizeAddress(value) {
+    if (!value) return "";
+    return String(value).trim().toLowerCase();
+  }
 
-    function getAPR(provider) {
-      return (
-        provider.m_dAvgRewardRate ??
-        provider.avgRewardRate ??
-        provider.apr ??
-        null
-      );
-    }
+  function flattenProviders(input) {
+    const results = [];
 
-    function getTotalRewards(provider) {
-      return (
-        provider.totalRewards ??
-        provider.rewards ??
-        provider.cumulativeRewards ??
-        null
-      );
-    }
+    function walk(value) {
+      if (!value) return;
 
-    function getPerformance(provider) {
-      const perf = provider.ftsoPerformance ?? {};
-      return (
-        perf.availability ??
-        perf.performance ??
-        perf.performance1 ??
-        provider.performance ??
-        null
-      );
-    }
+      if (Array.isArray(value)) {
+        value.forEach(walk);
+        return;
+      }
 
-    function getEpochHistory(provider) {
-      return provider.epochData ?? provider.rewardHistory ?? [];
-    }
+      if (typeof value === "object") {
+        const hasProviderSignals =
+          "providerName" in value ||
+          "voterAddress" in value ||
+          "delegationAddress" in value ||
+          "submitAddress" in value ||
+          "signingPolicyAddress" in value;
 
-    async function loadStats() {
-      const loadingEl = document.getElementById("loading");
-      const errorEl = document.getElementById("error");
-      const contentEl = document.getElementById("content");
-
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("API request failed");
-
-        const data = await res.json();
-        const list = Array.isArray(data) ? data : (data.providers ?? []);
-
-        const provider =
-          list.find(p => (p.providerName || "").toLowerCase() === PROVIDER_NAME.toLowerCase()) ||
-          list.find(p => (p.providerName || "").toLowerCase().includes("mir"));
-
-        if (!provider) {
-          throw new Error("MirSFlr provider not found in API response");
+        if (hasProviderSignals) {
+          results.push(value);
         }
 
-        document.getElementById("aprValue").textContent = formatPercent(getAPR(provider));
-        document.getElementById("votePowerValue").textContent = formatNumber(getVotePower(provider), 0);
-        document.getElementById("totalRewardsValue").textContent = formatNumber(getTotalRewards(provider), 2);
-        document.getElementById("providerNameText").textContent = provider.providerName || "MirSFlr";
-
-        const performance = Number(getPerformance(provider));
-        if (!Number.isNaN(performance)) {
-          const safePerformance = Math.max(0, Math.min(performance, 100));
-          document.getElementById("performanceBar").style.width = `${safePerformance}%`;
-          document.getElementById("performanceText").textContent = `${safePerformance.toFixed(2)}%`;
-        } else {
-          document.getElementById("performanceText").textContent = "-";
-        }
-
-        const tbody = document.getElementById("historyTableBody");
-        tbody.innerHTML = "";
-
-        const history = getEpochHistory(provider).slice(-10).reverse();
-
-        if (!history.length) {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td colspan="3">No reward history available yet.</td>`;
-          tbody.appendChild(tr);
-        } else {
-          history.forEach(item => {
-            const epoch =
-              item.epochId ??
-              item.epoch ??
-              item.votingEpochId ??
-              "-";
-
-            const reward =
-              item.reward ??
-              item.amount ??
-              item.epochReward ??
-              "-";
-
-            const rate =
-              item.successRate ??
-              item.rate ??
-              item.performance ??
-              "-";
-
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${epoch}</td>
-              <td>${typeof reward === "number" ? formatNumber(reward, 2) : reward}</td>
-              <td>${typeof rate === "number" ? formatPercent(rate) : rate}</td>
-            `;
-            tbody.appendChild(tr);
-          });
-        }
-
-        loadingEl.style.display = "none";
-        contentEl.style.display = "block";
-      } catch (err) {
-        loadingEl.style.display = "none";
-        errorEl.style.display = "block";
-        errorEl.textContent = "Could not load stats: " + err.message;
+        Object.values(value).forEach(walk);
       }
     }
 
-    loadStats();
-  </script>
+    walk(input);
+    return results;
+  }
+
+  function findProvider(list) {
+    return list.find((p) => {
+      const providerName = String(p.providerName || "").trim().toLowerCase();
+      const voterAddress = normalizeAddress(p.voterAddress);
+      const delegationAddress = normalizeAddress(p.delegationAddress);
+      const submitAddress = normalizeAddress(p.submitAddress);
+      const submitSignatureAddress = normalizeAddress(p.submitSignatureAddress);
+      const signingPolicyAddress = normalizeAddress(p.signingPolicyAddress);
+
+      return (
+        providerName === TARGETS.providerName.toLowerCase() ||
+        providerName.includes("mirsflr") ||
+        voterAddress === TARGETS.identityAddress ||
+        delegationAddress === TARGETS.delegationAddress ||
+        submitAddress === TARGETS.identityAddress ||
+        submitSignatureAddress === TARGETS.identityAddress ||
+        signingPolicyAddress === TARGETS.identityAddress
+      );
+    });
+  }
+
+  function getVotePower(provider) {
+    return (
+      provider.votePower ??
+      provider.votingPower ??
+      provider.totalVotePower ??
+      provider.totalWeight ??
+      provider.weight ??
+      provider.delegatedVotePower ??
+      provider.delegationAmount ??
+      provider.delegation ??
+      null
+    );
+  }
+
+  function getAPR(provider) {
+    return (
+      provider.m_dAvgRewardRate ??
+      provider.avgRewardRate ??
+      provider.apr ??
+      provider.rewardRate ??
+      null
+    );
+  }
+
+  function getTotalRewards(provider) {
+    return (
+      provider.totalRewards ??
+      provider.rewards ??
+      provider.cumulativeRewards ??
+      provider.totalReward ??
+      null
+    );
+  }
+
+  function getPerformance(provider) {
+    const perf = provider.ftsoPerformance ?? {};
+    return (
+      perf.availability ??
+      perf.performance ??
+      perf.performance1 ??
+      provider.availability ??
+      provider.performance ??
+      null
+    );
+  }
+
+  function getEpochHistory(provider) {
+    return (
+      provider.epochData ??
+      provider.rewardHistory ??
+      provider.history ??
+      []
+    );
+  }
+
+  async function loadStats() {
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const contentEl = document.getElementById("content");
+
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("API request failed");
+
+      const data = await res.json();
+      const providers = flattenProviders(data);
+      const provider = findProvider(providers);
+
+      if (!provider) {
+        console.log("API response:", data);
+        console.log("Flattened providers:", providers);
+        throw new Error("MirSFlr provider not found in parsed API response");
+      }
+
+      document.getElementById("aprValue").textContent = formatPercent(getAPR(provider));
+      document.getElementById("votePowerValue").textContent = formatNumber(getVotePower(provider), 0);
+      document.getElementById("totalRewardsValue").textContent = formatNumber(getTotalRewards(provider), 2);
+      document.getElementById("providerNameText").textContent = provider.providerName || "MirSFlr";
+
+      const performance = Number(getPerformance(provider));
+      if (!Number.isNaN(performance)) {
+        const safePerformance = Math.max(0, Math.min(performance, 100));
+        document.getElementById("performanceBar").style.width = `${safePerformance}%`;
+        document.getElementById("performanceText").textContent = `${safePerformance.toFixed(2)}%`;
+      } else {
+        document.getElementById("performanceText").textContent = "-";
+      }
+
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = "";
+
+      const history = getEpochHistory(provider).slice(-10).reverse();
+
+      if (!history.length) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="3">No reward history available yet.</td>`;
+        tbody.appendChild(tr);
+      } else {
+        history.forEach(item => {
+          const epoch =
+            item.epochId ??
+            item.epoch ??
+            item.votingEpochId ??
+            "-";
+
+          const reward =
+            item.reward ??
+            item.amount ??
+            item.epochReward ??
+            "-";
+
+          const rate =
+            item.successRate ??
+            item.rate ??
+            item.performance ??
+            "-";
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${epoch}</td>
+            <td>${typeof reward === "number" ? formatNumber(reward, 2) : reward}</td>
+            <td>${typeof rate === "number" ? formatPercent(rate) : rate}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";
+    } catch (err) {
+      loadingEl.style.display = "none";
+      errorEl.style.display = "block";
+      errorEl.textContent = "Could not load stats: " + err.message;
+      console.error(err);
+    }
+  }
+
+  loadStats();
+</script>
 </body>
 </html>
