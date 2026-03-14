@@ -517,46 +517,16 @@
           </div>
         </div>
       `;
-
-      let detailSection = document.getElementById("detailEpochSection");
-      if (!detailSection) {
-        detailSection = document.createElement("div");
-        detailSection.id = "detailEpochSection";
-        detailSection.style.marginTop = "24px";
-        contentEl.appendChild(detailSection);
+      let epochsLink = document.getElementById("epochsLinkBox");
+      if (!epochsLink) {
+        epochsLink = document.createElement("div");
+        epochsLink.id = "epochsLinkBox";
+        epochsLink.style.marginTop = "18px";
+        epochsLink.innerHTML = `
+          <a class="btn" href="/epochs/">View full epoch history</a>
+        `;
+        contentEl.appendChild(epochsLink);
       }
-
-      detailSection.innerHTML = `
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Epoch</th>
-                <th>Total Weight</th>
-                <th>Delegation Weight</th>
-                <th>Reward</th>
-                <th>Reward Rate</th>
-                <th>FTSO Hits</th>
-                <th>FDC Participation</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${history.map(item => `
-                <tr>
-                  <td>${item.epoch ?? "-"}</td>
-                  <td>${item.m_dTotalWeight != null ? fmtNum(item.m_dTotalWeight, 0) : "-"}</td>
-                  <td>${item.m_dDelegationWeight != null ? fmtNum(item.m_dDelegationWeight, 0) : "-"}</td>
-                  <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
-                  <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
-                  <td>${item.ftsoScaling?.hitPercentage != null ? fmtPct(item.ftsoScaling.hitPercentage) : "-"}</td>
-                  <td>${item.fdc?.participationPercentage != null ? fmtPct(item.fdc.participationPercentage) : "-"}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
     } catch (err) {
