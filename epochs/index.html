@@ -123,6 +123,37 @@
       color:var(--muted2);
       font-size:13px;
     }
+    .chartCard{
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:20px;
+}
+
+.chartTitle{
+  font-size:14px;
+  color:var(--muted2);
+  margin-bottom:12px;
+}
+
+.chartWrap{
+  width:100%;
+  overflow:hidden;
+}
+
+.chartSvg{
+  width:100%;
+  height:260px;
+  display:block;
+}
+
+.chartMeta{
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+}
     .statusCard{
   background:linear-gradient(180deg, var(--panel), var(--panel2));
   border:1px solid var(--border);
@@ -181,7 +212,16 @@
     <div class="statusBadge">PRE-REGISTERED</div>
     <div class="statusSub">Manual status placeholder for upcoming epoch.</div>
   </div>
-      <div class="tableWrap">
+
+  <div class="chartCard">
+    <div class="chartTitle">Reward per Epoch</div>
+    <div class="chartWrap">
+      <svg id="rewardChart" class="chartSvg" viewBox="0 0 1000 260" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="chartMeta">Last 20 epochs • fee-based reward amount</div>
+  </div>
+
+  <div class="tableWrap">
         <table>
           <thead>
             <tr>
@@ -230,6 +270,81 @@
     }
 
     function findProviderDeep(data) {
+      function drawRewardChart(history) {
+  const svg = document.getElementById("rewardChart");
+  if (!svg || !history.length) return;
+
+  const width = 1000;
+  const height = 260;
+  const padX = 40;
+  const padY = 20;
+
+  const pointsData = history
+    .slice()
+    .sort((a, b) => Number(a.epoch) - Number(b.epoch))
+    .slice(-20)
+    .map(item => ({
+      epoch: Number(item.epoch),
+      reward: Number(item.totalRewardAmount || 0)
+    }));
+
+  if (!pointsData.length) return;
+
+  const minY = Math.min(...pointsData.map(p => p.reward));
+  const maxY = Math.max(...pointsData.map(p => p.reward));
+  const rangeY = (maxY - minY) || 1;
+
+  const stepX = (width - padX * 2) / Math.max(pointsData.length - 1, 1);
+
+  const points = pointsData.map((p, i) => {
+    const x = padX + i * stepX;
+    const y = height - padY - ((p.reward - minY) / rangeY) * (height - padY * 2);
+    return { ...p, x, y };
+  });
+
+  const polylinePoints = points.map(p => `${p.x},${p.y}`).join(" ");
+
+  const areaPoints = [
+    `${points[0].x},${height - padY}`,
+    ...points.map(p => `${p.x},${p.y}`),
+    `${points[points.length - 1].x},${height - padY}`
+  ].join(" ");
+
+  const circles = points.map(p => `
+    <circle cx="${p.x}" cy="${p.y}" r="3.5" fill="white">
+      <title>Epoch ${p.epoch} • ${p.reward.toLocaleString(undefined, {maximumFractionDigits: 2})}</title>
+    </circle>
+  `).join("");
+
+  const xLabels = [
+    points[0],
+    points[Math.floor(points.length / 2)],
+    points[points.length - 1]
+  ].map(p => `
+    <text x="${p.x}" y="${height - 4}" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="12">
+      ${p.epoch}
+    </text>
+  `).join("");
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="lineGrad" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="#7c5cff" />
+        <stop offset="100%" stop-color="#23d5ff" />
+      </linearGradient>
+      <linearGradient id="fillGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(124,92,255,0.35)" />
+        <stop offset="100%" stop-color="rgba(35,213,255,0.02)" />
+      </linearGradient>
+    </defs>
+
+    <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" stroke="rgba(255,255,255,.12)" />
+    <polygon points="${areaPoints}" fill="url(#fillGrad)"></polygon>
+    <polyline points="${polylinePoints}" fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    ${circles}
+    ${xLabels}
+  `;
+}
       let found = null;
 
       function walk(node) {
@@ -282,7 +397,7 @@
 
         const history = [...(provider.epochData || [])]
           .sort((a, b) => Number(b.epoch) - Number(a.epoch));
-
+drawRewardChart(history);
         tbody.innerHTML = "";
 
         if (!history.length) {
