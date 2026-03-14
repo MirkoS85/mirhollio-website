@@ -313,13 +313,21 @@
   }
 
   function findProvider(data) {
-    const list = Array.isArray(data) ? data : [];
-    return list.find(item =>
-      String(item.voterAddress || "").toLowerCase() === TARGET_VOTER ||
-      String(item.delegationAddress || "").toLowerCase() === TARGET_DELEGATION ||
-      String(item.dataProviderName || "").toLowerCase() === "mirsflr"
-    );
+
+  if (!data) return null;
+
+  // če API vrne en objekt
+  if (!Array.isArray(data)) {
+    return data;
   }
+
+  // če vrne array
+  return data.find(item =>
+    String(item.voterAddress || "").toLowerCase() === TARGET_VOTER ||
+    String(item.delegationAddress || "").toLowerCase() === TARGET_DELEGATION ||
+    String(item.dataProviderName || "").toLowerCase() === "mirsflr"
+  );
+}
 
   function getLatestEpoch(provider) {
     if (!provider?.epochData?.length) return null;
