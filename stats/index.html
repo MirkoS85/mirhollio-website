@@ -309,25 +309,60 @@
 
   function shortAddr(addr) {
     if (!addr) return "-";
-    return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
+    const s = String(addr);
+    return `${s.slice(0, 8)}...${s.slice(-6)}`;
   }
 
-  function findProvider(data) {
+  function isProviderObject(obj) {
+    if (!obj || typeof obj !== "object") return false;
 
-  if (!data) return null;
+    const voter = String(obj.voterAddress || "").toLowerCase();
+    const delegation = String(obj.delegationAddress || "").toLowerCase();
+    const name = String(obj.dataProviderName || "").toLowerCase();
 
-  // če API vrne en objekt
-  if (!Array.isArray(data)) {
-    return data;
+    return (
+      voter === TARGET_VOTER ||
+      delegation === TARGET_DELEGATION ||
+      name === "mirsflr" ||
+      (obj.epochData && Array.isArray(obj.epochData))
+    );
   }
 
-  // če vrne array
-  return data.find(item =>
-    String(item.voterAddress || "").toLowerCase() === TARGET_VOTER ||
-    String(item.delegationAddress || "").toLowerCase() === TARGET_DELEGATION ||
-    String(item.dataProviderName || "").toLowerCase() === "mirsflr"
-  );
-}
+  function findProviderDeep(data) {
+    let found = null;
+
+    function walk(node) {
+      if (found || node == null) return;
+
+      if (Array.isArray(node)) {
+        for (const item of node) walk(item);
+        return;
+      }
+
+      if (typeof node === "object") {
+        const voter = String(node.voterAddress || "").toLowerCase();
+        const delegation = String(node.delegationAddress || "").toLowerCase();
+        const name = String(node.dataProviderName || "").toLowerCase();
+
+        if (
+          voter === TARGET_VOTER ||
+          delegation === TARGET_DELEGATION ||
+          name === "mirsflr"
+        ) {
+          found = node;
+          return;
+        }
+
+        for (const value of Object.values(node)) {
+          walk(value);
+          if (found) return;
+        }
+      }
+    }
+
+    walk(data);
+    return found;
+  }
 
   function getLatestEpoch(provider) {
     if (!provider?.epochData?.length) return null;
@@ -344,15 +379,17 @@
       if (!res.ok) throw new Error("API request failed");
 
       const data = await res.json();
-      const provider = findProvider(data);
+      const provider = findProviderDeep(data);
 
       if (!provider) {
+        console.log("RAW API DATA:", data);
         throw new Error("MirSFlr provider not found");
       }
 
+      console.log("MATCHED PROVIDER:", provider);
+
       const latest = getLatestEpoch(provider);
 
-      // top cards
       document.getElementById("aprValue").textContent =
         latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-";
 
@@ -365,7 +402,6 @@
       document.getElementById("providerNameText").textContent =
         provider.dataProviderName || "MirSFlr";
 
-      // performance bar = FTSO availability
       const ftsoAvailability = provider.ftsoPerformance?.availability;
       if (ftsoAvailability != null) {
         const pct = Number(ftsoAvailability) <= 1 ? Number(ftsoAvailability) * 100 : Number(ftsoAvailability);
@@ -375,7 +411,6 @@
         document.getElementById("performanceText").textContent = "-";
       }
 
-      // reward history table
       const tbody = document.getElementById("historyTableBody");
       tbody.innerHTML = "";
 
@@ -399,7 +434,6 @@
         });
       }
 
-      // extra stats block
       let extra = document.getElementById("extraStats");
       if (!extra) {
         extra = document.createElement("div");
@@ -484,7 +518,6 @@
         </div>
       `;
 
-      // detailed epoch table
       let detailSection = document.getElementById("detailEpochSection");
       if (!detailSection) {
         detailSection = document.createElement("div");
