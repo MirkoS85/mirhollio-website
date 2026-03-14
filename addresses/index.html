@@ -28,6 +28,33 @@ margin:auto;
 padding:40px 20px;
 }
 
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.btn{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+padding:10px 14px;
+border-radius:14px;
+background:var(--panel);
+border:1px solid var(--border);
+color:var(--text);
+font-weight:800;
+text-decoration:none;
+}
+
+.btn:hover{
+opacity:.85;
+}
+  
 h1{
 font-size:36px;
 margin-bottom:10px;
@@ -71,20 +98,6 @@ button:hover{
 opacity:.85;
 }
 
-.nav{
-margin-bottom:30px;
-}
-
-.nav a{
-margin-right:10px;
-text-decoration:none;
-background:var(--panel);
-border:1px solid var(--border);
-padding:8px 12px;
-border-radius:10px;
-color:white;
-}
-
 </style>
 </head>
 
@@ -93,15 +106,15 @@ color:white;
 <div class="container">
 
 <div class="topbar">
-<a class="btn" href="/">← Back to home</a>
+  <a class="btn" href="/">← Back to home</a>
 
-<div style="display:flex; gap:10px; flex-wrap:wrap;">
-<a class="btn" href="/stats/">Stats</a>
-<a class="btn" href="/epochs/">Epochs</a>
-<a class="btn" href="/addresses/" style="background:#7c5cff; border-color:#7c5cff; color:white;">Addresses</a>
-<a class="btn" href="/performance/">Performance</a>
-<a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
-</div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a class="btn" href="/stats/">Stats</a>
+    <a class="btn" href="/epochs/">Epochs</a>
+    <a class="btn" href="/addresses/" style="background:#7c5cff; border-color:#7c5cff; color:white;">Addresses</a>
+    <a class="btn" href="/performance/">Performance</a>
+    <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+  </div>
 </div>
 
 <h1>MirSFlr Addresses</h1>
