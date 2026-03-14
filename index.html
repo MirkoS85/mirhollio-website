@@ -48,11 +48,12 @@
       --chart-h: 320px;
       --chart-h-mobile: 240px;
     }
-    .addressGrid{
+   .addressGrid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:14px;
-margin-top:14px;
+gap:18px;
+margin-top:18px;
+width:100%;
 }
 
 @media (max-width:720px){
@@ -62,8 +63,10 @@ grid-template-columns:1fr;
 }
 
 .addressCard{
-padding:14px 16px;
-border-radius:16px;
+width:100%;
+min-width:0;
+padding:16px 18px;
+border-radius:18px;
 
 background:
 linear-gradient(
@@ -76,15 +79,16 @@ border:1px solid rgba(255,255,255,.10);
 
 box-shadow:
 inset 0 1px 0 rgba(255,255,255,.04),
-0 10px 24px rgba(0,0,0,.25);
+0 10px 24px rgba(0,0,0,.22);
 }
 
 .addrLabel{
-font-size:12px;
-color:rgba(255,255,255,.55);
-margin-bottom:6px;
-font-weight:600;
-letter-spacing:.02em;
+font-size:13px;
+color:rgba(255,255,255,.72);
+margin-bottom:10px;
+font-weight:800;
+letter-spacing:.06em;
+text-transform:uppercase;
 }
 
 .securityNote{
