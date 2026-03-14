@@ -259,8 +259,12 @@
       </div>
 
       <div class="note">
-        Scroll horizontally if needed on smaller screens.
-      </div>
+  Scroll horizontally if needed on smaller screens.
+  <br><br>
+  <span id="lastUpdated"></span>
+  <br>
+  Source: Oracle Daemon API
+</div>
     </div>
   </div>
 
@@ -425,7 +429,23 @@ function findProviderDeep(data) {
       }
     }
   }
+function updateLastUpdated() {
+  const el = document.getElementById("lastUpdated");
+  if (!el) return;
 
+  const now = new Date();
+
+  el.textContent =
+    "Last updated: " +
+    now.toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZoneName: "short"
+    });
+}
   walk(data);
   return found;
 }
@@ -475,6 +495,8 @@ drawRewardChart(history);
 
         loadingEl.style.display = "none";
         contentEl.style.display = "block";
+
+        updateLastUpdated();
       } catch (err) {
         loadingEl.style.display = "none";
         errorEl.style.display = "block";
