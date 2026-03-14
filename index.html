@@ -467,34 +467,7 @@ border:1px solid rgba(255,165,0,.18);
     }
 
     /* ===== FTSO EMBED PATCH ===== */
-    .ftsoEmbedWrap{
-      border-radius: 18px;
-      border:1px solid var(--border);
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-      height: var(--embed-height);
-      position: relative;
-      width: 100%;
-      max-width: 100%;
-      contain: paint;
-    }
-    .ftsoEmbedWrap iframe{
-      width: 100%;
-      height: 1100px; /* large, we crop the viewport */
-      border: 0;
-      display: block;
-      max-width: 100%;
-      transform: translateY(calc(-1 * var(--embed-shift)));
-      transform-origin: top center;
-    }
-    .ftsoEmbedWrap::after{
-      content:"";
-      position:absolute;
-      left:0; right:0; bottom:0;
-      height: 140px; /* hides Price Feeds section */
-      background: linear-gradient(to bottom, rgba(7,11,20,0), rgba(7,11,20,1));
-      pointer-events:none;
-    }
+  
     [data-theme="light"] .ftsoEmbedWrap::after{
       background: linear-gradient(to bottom, rgba(247,249,255,0), rgba(247,249,255,1));
     }
@@ -703,7 +676,6 @@ border:1px solid rgba(255,165,0,.18);
         </a>
 <nav class="navlinks" aria-label="Primary">
   <a href="#price">Price</a>
-  <a href="#ftso">FTSO</a>
   <a href="/stats/">Stats</a>
   <a href="/epochs/">Epochs</a>
   <a href="/performance/">Performance</a>
@@ -883,31 +855,6 @@ border:1px solid rgba(255,165,0,.18);
 
             <div class="tiny" style="margin-top:10px"></div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FTSO -->
-    <section id="ftso">
-      <div class="panel">
-        <div class="titleRow">
-          <h2>FTSO Provider metrics</h2>
-        </div>
-
-        <div class="ftsoEmbedWrap" aria-label="FTSO provider embed">
-          <iframe
-            title="Flare Systems Explorer — FTSO Provider"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-            src="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3">
-          </iframe>
-        </div>
-
-        <div class="row" style="margin-top:12px">
-          <a class="btn primary" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">
-            ↗ Open full page
-          </a>
-          <a class="btn" href="#delegation">⚡ Delegation guide</a>
         </div>
       </div>
     </section>
