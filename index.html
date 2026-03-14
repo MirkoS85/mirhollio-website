@@ -514,6 +514,22 @@
       position:relative;
       z-index:1;
     }
+    .heroFeatures{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-top:18px;
+}
+
+.feature{
+padding:10px 16px;
+border-radius:999px;
+background:rgba(255,255,255,.05);
+border:1px solid rgba(255,255,255,.12);
+color:rgba(255,255,255,.85);
+font-size:14px;
+font-weight:600;
+}
   </style>
 </head>
 
@@ -577,22 +593,21 @@
                </p>
           </div>
 
-         <div class="heroBtns">
-  <a class="btn" href="/stats/">📊 Stats</a>
-  <a class="btn" href="/epochs/">🕒 Epoch history</a>
-  <a class="btn" href="/performance/">📈 Performance</a>
-  <a class="btn" href="/addresses/">📍 Addresses</a>
-  <a class="btn" href="https://flaremetrics.io/" target="_blank" rel="noopener">↗ FlareMetrics</a>
+         <div class="heroFeatures">
+
+  <div class="feature">
+    🌐 Flare native infrastructure
+  </div>
+
+  <div class="feature">
+    🔐 Security-first operations
+  </div>
+
+  <div class="feature">
+    ⚙️ Continuous improvements
+  </div>
+
 </div>
-
-          <div class="heroChips">
-            <a class="chipBtn" href="https://flare.network/" target="_blank" rel="noopener">🌐 flare.network</a>
-            <button class="chipBtn" type="button" id="copyAllBtn">📋 Copy key addresses</button>
-
-            <div class="chipBtn chipMuted">🔒 Security-first ops</div>
-            <div class="chipBtn chipMuted">🛠 Continuous improvements</div>
-            <div class="chipBtn chipMuted">🧭 Clear delegation guidance</div>
-          </div>
 
           <div class="row" style="margin-top:14px">
             <a class="btn" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">𝕏 @mirsFlR_</a>
