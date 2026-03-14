@@ -288,253 +288,42 @@
   </div>
 <script>
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
+  const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+  const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
 
-  const TARGETS = {
-    providerName: "MirSFlr",
-    identityAddress: "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3".toLowerCase(),
-    delegationAddress: "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade".toLowerCase()
-  };
-
-  function formatNumber(value, decimals = 2) {
-    if (value === null || value === undefined || value === "") return "-";
-    const num = Number(value);
-    if (Number.isNaN(num)) return String(value);
-    return num.toLocaleString(undefined, {
+  function fmtNum(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return n.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: decimals
     });
   }
 
-  function formatPercent(value) {
-    if (value === null || value === undefined || value === "") return "-";
-    const num = Number(value);
-    if (Number.isNaN(num)) return String(value);
-    return `${num.toFixed(2)}%`;
+  function fmtPct(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    const pct = n <= 1 ? n * 100 : n;
+    return `${pct.toFixed(decimals)}%`;
   }
 
-  function normalizeAddress(value) {
-    if (!value) return "";
-    return String(value).trim().toLowerCase();
+  function shortAddr(addr) {
+    if (!addr) return "-";
+    return `${addr.slice(0, 8)}...${addr.slice(-6)}`;
   }
 
-  function flattenProviders(input) {
-    const results = [];
-
-    function walk(value) {
-      if (!value) return;
-
-      if (Array.isArray(value)) {
-        value.forEach(walk);
-        return;
-      }
-
-      if (typeof value === "object") {
-        const hasProviderSignals =
-          "providerName" in value ||
-          "voterAddress" in value ||
-          "delegationAddress" in value ||
-          "submitAddress" in value ||
-          "signingPolicyAddress" in value;
-
-        if (hasProviderSignals) {
-          results.push(value);
-        }
-
-        Object.values(value).forEach(walk);
-      }
-    }
-
-    walk(input);
-    return results;
-  }
-
-  function findProvider(list) {
-    return list.find((p) => {
-      const providerName = String(p.providerName || "").trim().toLowerCase();
-      const voterAddress = normalizeAddress(p.voterAddress);
-      const delegationAddress = normalizeAddress(p.delegationAddress);
-      const submitAddress = normalizeAddress(p.submitAddress);
-      const submitSignatureAddress = normalizeAddress(p.submitSignatureAddress);
-      const signingPolicyAddress = normalizeAddress(p.signingPolicyAddress);
-
-      return (
-        providerName === TARGETS.providerName.toLowerCase() ||
-        providerName.includes("mirsflr") ||
-        voterAddress === TARGETS.identityAddress ||
-        delegationAddress === TARGETS.delegationAddress ||
-        submitAddress === TARGETS.identityAddress ||
-        submitSignatureAddress === TARGETS.identityAddress ||
-        signingPolicyAddress === TARGETS.identityAddress
-      );
-    });
-  }
-
-  function findValueByKeyPatterns(obj, patterns) {
-    let found = null;
-
-    function walk(value) {
-      if (found !== null || value === null || value === undefined) return;
-
-      if (Array.isArray(value)) {
-        for (const item of value) walk(item);
-        return;
-      }
-
-      if (typeof value === "object") {
-        for (const [key, val] of Object.entries(value)) {
-          const keyNorm = key.toLowerCase();
-
-          if (patterns.some((rx) => rx.test(keyNorm))) {
-            if (typeof val === "number" || typeof val === "string") {
-              const n = Number(val);
-              if (!Number.isNaN(n)) {
-                found = n;
-                return;
-              }
-            }
-          }
-
-          walk(val);
-        }
-      }
-    }
-
-    walk(obj);
-    return found;
-  }
-
-  function getAPR(provider) {
-    return (
-      provider.m_dAvgRewardRate ??
-      provider.avgRewardRate ??
-      provider.apr ??
-      provider.rewardRate ??
-      findValueByKeyPatterns(provider, [
-        /avgrewardrate/,
-        /rewardrate/,
-        /^apr$/,
-        /annual/
-      ])
+  function findProvider(data) {
+    const list = Array.isArray(data) ? data : [];
+    return list.find(item =>
+      String(item.voterAddress || "").toLowerCase() === TARGET_VOTER ||
+      String(item.delegationAddress || "").toLowerCase() === TARGET_DELEGATION ||
+      String(item.dataProviderName || "").toLowerCase() === "mirsflr"
     );
   }
 
-  function getVotePower(provider) {
-    return (
-      provider.votePower ??
-      provider.votingPower ??
-      provider.totalVotePower ??
-      provider.totalWeight ??
-      provider.weight ??
-      provider.delegatedVotePower ??
-      provider.delegationAmount ??
-      provider.delegation ??
-      findValueByKeyPatterns(provider, [
-        /votepower/,
-        /votingpower/,
-        /delegatedvotepower/,
-        /delegationamount/,
-        /totalweight/,
-        /^weight$/,
-        /stake/
-      ])
-    );
-  }
-
-  function getTotalRewards(provider) {
-    return (
-      provider.totalRewards ??
-      provider.rewards ??
-      provider.cumulativeRewards ??
-      provider.totalReward ??
-      findValueByKeyPatterns(provider, [
-        /totalrewards/,
-        /cumulativerewards/,
-        /totalreward/,
-        /^rewards$/
-      ])
-    );
-  }
-
-  function normalizePercentMaybe(value) {
-    const num = Number(value);
-    if (Number.isNaN(num)) return null;
-    if (num <= 1) return num * 100;
-    return num;
-  }
-
-  function getPerformance(provider) {
-    const perf =
-      provider.ftsoPerformance ??
-      provider.performance ??
-      provider.metrics ??
-      provider.stats ??
-      {};
-
-    const raw =
-      (typeof perf === "number" ? perf : null) ??
-      perf.availability ??
-      perf.performance ??
-      perf.performance1 ??
-      perf.successRate ??
-      perf.success ??
-      provider.availability ??
-      provider.successRate ??
-      provider.success ??
-      findValueByKeyPatterns(provider, [
-        /availability/,
-        /performance1/,
-        /performance/,
-        /successrate/,
-        /^success$/
-      ]);
-
-    return normalizePercentMaybe(raw);
-  }
-
-  function getEpochHistory(provider) {
-    return (
-      provider.epochData ??
-      provider.rewardHistory ??
-      provider.history ??
-      provider.epochs ??
-      []
-    );
-  }
-
-  function getItemReward(item) {
-    const direct =
-      item.reward ??
-      item.amount ??
-      item.epochReward ??
-      item.rewardAmount ??
-      item.rewards ??
-      findValueByKeyPatterns(item, [
-        /^reward$/,
-        /rewardamount/,
-        /epochreward/,
-        /^amount$/,
-        /^rewards$/
-      ]);
-
-    return direct;
-  }
-
-  function getItemRate(item) {
-    const direct =
-      item.successRate ??
-      item.rate ??
-      item.performance ??
-      item.availability ??
-      item.success ??
-      findValueByKeyPatterns(item, [
-        /successrate/,
-        /^rate$/,
-        /performance/,
-        /availability/,
-        /^success$/
-      ]);
-
-    return normalizePercentMaybe(direct);
+  function getLatestEpoch(provider) {
+    if (!provider?.epochData?.length) return null;
+    return [...provider.epochData].sort((a, b) => Number(b.epoch) - Number(a.epoch))[0];
   }
 
   async function loadStats() {
@@ -547,72 +336,185 @@
       if (!res.ok) throw new Error("API request failed");
 
       const data = await res.json();
-      const providers = flattenProviders(data);
-      const provider = findProvider(providers);
+      const provider = findProvider(data);
 
       if (!provider) {
-        console.log("API response:", data);
-        console.log("Flattened providers:", providers);
-        throw new Error("MirSFlr provider not found in parsed API response");
+        throw new Error("MirSFlr provider not found");
       }
 
-      const apr = getAPR(provider);
-      const votePower = getVotePower(provider);
-      const totalRewards = getTotalRewards(provider);
-      const performance = getPerformance(provider);
+      const latest = getLatestEpoch(provider);
 
+      // top cards
       document.getElementById("aprValue").textContent =
-        apr !== null && apr !== undefined ? formatPercent(normalizePercentMaybe(apr)) : "-";
+        latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-";
 
       document.getElementById("votePowerValue").textContent =
-        votePower !== null && votePower !== undefined ? formatNumber(votePower, 0) : "-";
+        latest?.m_dTotalWeight != null ? fmtNum(latest.m_dTotalWeight, 0) : "-";
 
       document.getElementById("totalRewardsValue").textContent =
-        totalRewards !== null && totalRewards !== undefined ? formatNumber(totalRewards, 2) : "-";
+        provider.totalRewards != null ? fmtNum(provider.totalRewards, 2) : "-";
 
       document.getElementById("providerNameText").textContent =
-        provider.providerName || "MirSFlr";
+        provider.dataProviderName || "MirSFlr";
 
-      if (performance !== null && performance !== undefined && !Number.isNaN(performance)) {
-        const safePerformance = Math.max(0, Math.min(performance, 100));
-        document.getElementById("performanceBar").style.width = `${safePerformance}%`;
-        document.getElementById("performanceText").textContent = `${safePerformance.toFixed(2)}%`;
+      // performance bar = FTSO availability
+      const ftsoAvailability = provider.ftsoPerformance?.availability;
+      if (ftsoAvailability != null) {
+        const pct = Number(ftsoAvailability) <= 1 ? Number(ftsoAvailability) * 100 : Number(ftsoAvailability);
+        document.getElementById("performanceBar").style.width = `${pct}%`;
+        document.getElementById("performanceText").textContent = `FTSO availability: ${pct.toFixed(2)}%`;
       } else {
         document.getElementById("performanceText").textContent = "-";
       }
 
+      // reward history table
       const tbody = document.getElementById("historyTableBody");
       tbody.innerHTML = "";
 
-      const history = getEpochHistory(provider).slice(-10).reverse();
+      const history = [...(provider.epochData || [])]
+        .sort((a, b) => Number(b.epoch) - Number(a.epoch))
+        .slice(0, 12);
 
       if (!history.length) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="3">No reward history available yet.</td>`;
+        tr.innerHTML = `<td colspan="3">No epoch history available.</td>`;
         tbody.appendChild(tr);
       } else {
         history.forEach(item => {
-          const epoch =
-            item.epochId ??
-            item.epoch ??
-            item.votingEpochId ??
-            item.id ??
-            "-";
-
-          const reward = getItemReward(item);
-          const rate = getItemRate(item);
-
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${epoch}</td>
-            <td>${reward !== null && reward !== undefined && !Number.isNaN(Number(reward)) ? formatNumber(reward, 2) : "-"}</td>
-            <td>${rate !== null && rate !== undefined && !Number.isNaN(Number(rate)) ? formatPercent(rate) : "-"}</td>
+            <td>${item.epoch ?? "-"}</td>
+            <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
+            <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
           `;
           tbody.appendChild(tr);
         });
       }
 
-      console.log("Matched provider:", provider);
+      // extra stats block
+      let extra = document.getElementById("extraStats");
+      if (!extra) {
+        extra = document.createElement("div");
+        extra.id = "extraStats";
+        extra.style.marginTop = "24px";
+        contentEl.appendChild(extra);
+      }
+
+      extra.innerHTML = `
+        <div class="grid">
+          <div class="card">
+            <div class="label">Average Reward / Epoch</div>
+            <div class="value">${provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-"}</div>
+            <div class="small">Average across all tracked epochs</div>
+          </div>
+
+          <div class="card">
+            <div class="label">FTSO Performance</div>
+            <div class="value">${provider.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-"}</div>
+            <div class="small">Overall FTSO performance</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Performance 1</div>
+            <div class="value">${provider.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-"}</div>
+            <div class="small">Performance metric 1</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Performance 2</div>
+            <div class="value">${provider.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-"}</div>
+            <div class="small">Performance metric 2</div>
+          </div>
+
+          <div class="card">
+            <div class="label">FDC Availability</div>
+            <div class="value">${provider.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-"}</div>
+            <div class="small">FDC participation availability</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Epochs</div>
+            <div class="value">${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}</div>
+            <div class="small">Eligible / total epochs</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Passes / Strikes</div>
+            <div class="value">${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}</div>
+            <div class="small">Eligibility track record</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Delegation Fee</div>
+            <div class="value">${latest?.voterRegistration?.delegationFeeBIPS != null ? (Number(latest.voterRegistration.delegationFeeBIPS) / 100).toFixed(2) + "%" : "-"}</div>
+            <div class="small">Current delegation fee</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Delegation Address</div>
+            <div class="value" style="font-size:18px">${shortAddr(provider.delegationAddress)}</div>
+            <div class="small">${provider.delegationAddress || "-"}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Submit Address</div>
+            <div class="value" style="font-size:18px">${shortAddr(provider.submitAddress)}</div>
+            <div class="small">${provider.submitAddress || "-"}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Submit Signature</div>
+            <div class="value" style="font-size:18px">${shortAddr(provider.submitSignatureAddress)}</div>
+            <div class="small">${provider.submitSignatureAddress || "-"}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Signing Policy</div>
+            <div class="value" style="font-size:18px">${shortAddr(provider.signingPolicyAddress)}</div>
+            <div class="small">${provider.signingPolicyAddress || "-"}</div>
+          </div>
+        </div>
+      `;
+
+      // detailed epoch table
+      let detailSection = document.getElementById("detailEpochSection");
+      if (!detailSection) {
+        detailSection = document.createElement("div");
+        detailSection.id = "detailEpochSection";
+        detailSection.style.marginTop = "24px";
+        contentEl.appendChild(detailSection);
+      }
+
+      detailSection.innerHTML = `
+        <div class="tableWrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Epoch</th>
+                <th>Total Weight</th>
+                <th>Delegation Weight</th>
+                <th>Reward</th>
+                <th>Reward Rate</th>
+                <th>FTSO Hits</th>
+                <th>FDC Participation</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${history.map(item => `
+                <tr>
+                  <td>${item.epoch ?? "-"}</td>
+                  <td>${item.m_dTotalWeight != null ? fmtNum(item.m_dTotalWeight, 0) : "-"}</td>
+                  <td>${item.m_dDelegationWeight != null ? fmtNum(item.m_dDelegationWeight, 0) : "-"}</td>
+                  <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
+                  <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
+                  <td>${item.ftsoScaling?.hitPercentage != null ? fmtPct(item.ftsoScaling.hitPercentage) : "-"}</td>
+                  <td>${item.fdc?.participationPercentage != null ? fmtPct(item.fdc.participationPercentage) : "-"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
 
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
