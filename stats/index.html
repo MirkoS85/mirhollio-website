@@ -369,6 +369,55 @@
     });
   }
 
+  function findValueByKeyPatterns(obj, patterns) {
+    let found = null;
+
+    function walk(value) {
+      if (found !== null || value === null || value === undefined) return;
+
+      if (Array.isArray(value)) {
+        for (const item of value) walk(item);
+        return;
+      }
+
+      if (typeof value === "object") {
+        for (const [key, val] of Object.entries(value)) {
+          const keyNorm = key.toLowerCase();
+
+          if (patterns.some((rx) => rx.test(keyNorm))) {
+            if (typeof val === "number" || typeof val === "string") {
+              const n = Number(val);
+              if (!Number.isNaN(n)) {
+                found = n;
+                return;
+              }
+            }
+          }
+
+          walk(val);
+        }
+      }
+    }
+
+    walk(obj);
+    return found;
+  }
+
+  function getAPR(provider) {
+    return (
+      provider.m_dAvgRewardRate ??
+      provider.avgRewardRate ??
+      provider.apr ??
+      provider.rewardRate ??
+      findValueByKeyPatterns(provider, [
+        /avgrewardrate/,
+        /rewardrate/,
+        /^apr$/,
+        /annual/
+      ])
+    );
+  }
+
   function getVotePower(provider) {
     return (
       provider.votePower ??
@@ -379,17 +428,15 @@
       provider.delegatedVotePower ??
       provider.delegationAmount ??
       provider.delegation ??
-      null
-    );
-  }
-
-  function getAPR(provider) {
-    return (
-      provider.m_dAvgRewardRate ??
-      provider.avgRewardRate ??
-      provider.apr ??
-      provider.rewardRate ??
-      null
+      findValueByKeyPatterns(provider, [
+        /votepower/,
+        /votingpower/,
+        /delegatedvotepower/,
+        /delegationamount/,
+        /totalweight/,
+        /^weight$/,
+        /stake/
+      ])
     );
   }
 
@@ -399,20 +446,49 @@
       provider.rewards ??
       provider.cumulativeRewards ??
       provider.totalReward ??
-      null
+      findValueByKeyPatterns(provider, [
+        /totalrewards/,
+        /cumulativerewards/,
+        /totalreward/,
+        /^rewards$/
+      ])
     );
   }
 
+  function normalizePercentMaybe(value) {
+    const num = Number(value);
+    if (Number.isNaN(num)) return null;
+    if (num <= 1) return num * 100;
+    return num;
+  }
+
   function getPerformance(provider) {
-    const perf = provider.ftsoPerformance ?? {};
-    return (
+    const perf =
+      provider.ftsoPerformance ??
+      provider.performance ??
+      provider.metrics ??
+      provider.stats ??
+      {};
+
+    const raw =
+      (typeof perf === "number" ? perf : null) ??
       perf.availability ??
       perf.performance ??
       perf.performance1 ??
+      perf.successRate ??
+      perf.success ??
       provider.availability ??
-      provider.performance ??
-      null
-    );
+      provider.successRate ??
+      provider.success ??
+      findValueByKeyPatterns(provider, [
+        /availability/,
+        /performance1/,
+        /performance/,
+        /successrate/,
+        /^success$/
+      ]);
+
+    return normalizePercentMaybe(raw);
   }
 
   function getEpochHistory(provider) {
@@ -420,8 +496,45 @@
       provider.epochData ??
       provider.rewardHistory ??
       provider.history ??
+      provider.epochs ??
       []
     );
+  }
+
+  function getItemReward(item) {
+    const direct =
+      item.reward ??
+      item.amount ??
+      item.epochReward ??
+      item.rewardAmount ??
+      item.rewards ??
+      findValueByKeyPatterns(item, [
+        /^reward$/,
+        /rewardamount/,
+        /epochreward/,
+        /^amount$/,
+        /^rewards$/
+      ]);
+
+    return direct;
+  }
+
+  function getItemRate(item) {
+    const direct =
+      item.successRate ??
+      item.rate ??
+      item.performance ??
+      item.availability ??
+      item.success ??
+      findValueByKeyPatterns(item, [
+        /successrate/,
+        /^rate$/,
+        /performance/,
+        /availability/,
+        /^success$/
+      ]);
+
+    return normalizePercentMaybe(direct);
   }
 
   async function loadStats() {
@@ -443,13 +556,24 @@
         throw new Error("MirSFlr provider not found in parsed API response");
       }
 
-      document.getElementById("aprValue").textContent = formatPercent(getAPR(provider));
-      document.getElementById("votePowerValue").textContent = formatNumber(getVotePower(provider), 0);
-      document.getElementById("totalRewardsValue").textContent = formatNumber(getTotalRewards(provider), 2);
-      document.getElementById("providerNameText").textContent = provider.providerName || "MirSFlr";
+      const apr = getAPR(provider);
+      const votePower = getVotePower(provider);
+      const totalRewards = getTotalRewards(provider);
+      const performance = getPerformance(provider);
 
-      const performance = Number(getPerformance(provider));
-      if (!Number.isNaN(performance)) {
+      document.getElementById("aprValue").textContent =
+        apr !== null && apr !== undefined ? formatPercent(normalizePercentMaybe(apr)) : "-";
+
+      document.getElementById("votePowerValue").textContent =
+        votePower !== null && votePower !== undefined ? formatNumber(votePower, 0) : "-";
+
+      document.getElementById("totalRewardsValue").textContent =
+        totalRewards !== null && totalRewards !== undefined ? formatNumber(totalRewards, 2) : "-";
+
+      document.getElementById("providerNameText").textContent =
+        provider.providerName || "MirSFlr";
+
+      if (performance !== null && performance !== undefined && !Number.isNaN(performance)) {
         const safePerformance = Math.max(0, Math.min(performance, 100));
         document.getElementById("performanceBar").style.width = `${safePerformance}%`;
         document.getElementById("performanceText").textContent = `${safePerformance.toFixed(2)}%`;
@@ -472,29 +596,23 @@
             item.epochId ??
             item.epoch ??
             item.votingEpochId ??
+            item.id ??
             "-";
 
-          const reward =
-            item.reward ??
-            item.amount ??
-            item.epochReward ??
-            "-";
-
-          const rate =
-            item.successRate ??
-            item.rate ??
-            item.performance ??
-            "-";
+          const reward = getItemReward(item);
+          const rate = getItemRate(item);
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${epoch}</td>
-            <td>${typeof reward === "number" ? formatNumber(reward, 2) : reward}</td>
-            <td>${typeof rate === "number" ? formatPercent(rate) : rate}</td>
+            <td>${reward !== null && reward !== undefined && !Number.isNaN(Number(reward)) ? formatNumber(reward, 2) : "-"}</td>
+            <td>${rate !== null && rate !== undefined && !Number.isNaN(Number(rate)) ? formatPercent(rate) : "-"}</td>
           `;
           tbody.appendChild(tr);
         });
       }
+
+      console.log("Matched provider:", provider);
 
       loadingEl.style.display = "none";
       contentEl.style.display = "block";
