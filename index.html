@@ -1286,6 +1286,31 @@ transform:translateY(-1px);
     white-space:normal;
   }
 }
+    /* ===== QUICK SNAPSHOT META STRIP ===== */
+
+.snapshotMeta{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+
+  margin-top:2px;
+  margin-bottom:2px;
+
+  font-size:13px;
+  font-weight:700;
+  line-height:1.4;
+  color:rgba(255,255,255,.68);
+}
+
+.snapshotMeta .metaSep{
+  opacity:.38;
+  font-weight:600;
+}
+
+[data-theme="light"] .snapshotMeta{
+  color:rgba(10,14,25,.66);
+}
   </style>
 </head>
 
@@ -1395,22 +1420,15 @@ transform:translateY(-1px);
     <h2>Quick Snapshot</h2>
   </div>
 
-  <div class="snapshotList">
-    <div class="snapshotItem">
-      <div class="snapshotKey">Role</div>
-      <div class="snapshotVal">Validator + FTSO</div>
-    </div>
+ <div class="snapshotMeta">
+  <span>Validator + FTSO</span>
+  <span class="metaSep">•</span>
+  <span>24/7 Alerts</span>
+  <span class="metaSep">•</span>
+  <span>Stability</span>
+</div>
 
-    <div class="snapshotItem">
-      <div class="snapshotKey">Monitoring</div>
-      <div class="snapshotVal">24/7 Alerts</div>
-    </div>
-
-    <div class="snapshotItem">
-      <div class="snapshotKey">Focus</div>
-      <div class="snapshotVal">Stability</div>
-    </div>
-  </div>
+<div class="snapshotDivider"></div>
 
   <div class="snapshotDivider"></div>
 
