@@ -546,6 +546,74 @@ border:1px solid rgba(124,92,255,.25);
 }
     .divider{height:1px; background:var(--border); margin:12px 0}
 
+    /* ===== LIGHT THEME CONTRAST FIXES ===== */
+[data-theme="light"] .opsStatus{
+  background: rgba(18, 163, 101, .10);
+  border: 1px solid rgba(18, 163, 101, .22);
+  color: #157347;
+}
+
+[data-theme="light"] .opsStatus .dot{
+  background: #16a34a;
+  box-shadow: 0 0 8px rgba(22,163,74,.28);
+}
+
+[data-theme="light"] .featureCard{
+  background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
+  border: 1px solid rgba(10,14,25,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    0 10px 24px rgba(10,14,25,.08);
+}
+
+[data-theme="light"] .featureTitle{
+  color: rgba(10,14,25,.92);
+}
+
+[data-theme="light"] .featureDesc{
+  color: rgba(10,14,25,.64);
+}
+
+[data-theme="light"] .addressCard{
+  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.68));
+  border: 1px solid rgba(10,14,25,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    0 10px 24px rgba(10,14,25,.08);
+}
+
+[data-theme="light"] .addrLabel{
+  color: rgba(10,14,25,.58);
+}
+
+[data-theme="light"] .copyBtn{
+  background: rgba(10,14,25,.04);
+  border: 1px solid rgba(10,14,25,.10);
+  color: rgba(10,14,25,.82);
+}
+
+[data-theme="light"] .copyBtn:hover{
+  background: rgba(124,92,255,.10);
+  border-color: rgba(124,92,255,.30);
+}
+
+[data-theme="light"] .securityNote{
+  color: rgba(10,14,25,.72);
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(10,14,25,.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),
+    0 8px 20px rgba(10,14,25,.06);
+}
+
+[data-theme="light"] .kpi .label{
+  color: rgba(10,14,25,.58);
+}
+
+[data-theme="light"] .kpi .value{
+  color: rgba(10,14,25,.92);
+}
+    
     /* ===== PRICE CHART (normal) ===== */
     .splitWide{
   display:grid;
