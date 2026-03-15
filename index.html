@@ -509,9 +509,7 @@ border:1px solid rgba(124,92,255,.25);
     .kpi .value{font-weight:900; letter-spacing:-0.02em}
 
     .addr{
-
-      cursor:pointer;
-      
+  cursor:pointer;
   display:inline-block;
   font-size:16px;
   font-weight:700;
@@ -529,13 +527,15 @@ border:1px solid rgba(124,92,255,.25);
     inset 0 1px 0 rgba(255,255,255,.04),
     0 6px 16px rgba(0,0,0,.25);
 
-  white-space:nowrap;
-  width:auto;
+  width:100%;
   max-width:100%;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-
 [data-theme="light"] .addr{
   color: rgba(10,14,25,.90);
   background: rgba(10,14,25,.04);
@@ -910,35 +910,87 @@ border:1px solid rgba(255,255,255,.08);
     /* ADDRESS COPY BUTTON */
 
 .addrRow{
-display:flex;
-align-items:center;
-gap:10px;
-margin-top:6px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:6px;
+  width:100%;
+}
+
+.addrRow .addr{
+  flex:1;
+  min-width:0;
 }
 
 .copyBtn{
-display:flex;
-align-items:center;
-justify-content:center;
-
-width:36px;
-height:36px;
-
-border-radius:10px;
-
-background:rgba(255,255,255,.05);
-border:1px solid rgba(255,255,255,.10);
-
-cursor:pointer;
-font-size:16px;
-
-transition:all .15s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 36px;
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  cursor:pointer;
+  font-size:16px;
+  transition:all .15s ease;
 }
 
 .copyBtn:hover{
 background:rgba(255,255,255,.12);
 border-color:#7c5cff;
 transform:translateY(-1px);
+}
+    /* ===== MOBILE POLISH ===== */
+
+@media (max-width: 980px){
+
+  .nav{
+    height:auto;
+    min-height:74px;
+    padding:12px 0;
+  }
+
+  .hero{
+    padding:22px 18px 20px;
+  }
+
+  .panel,
+  .rightBox .body{
+    padding:16px;
+  }
+
+}
+
+@media (max-width: 520px){
+
+  .container{
+    padding:0 14px;
+  }
+
+  .heroTitle{
+    font-size:30px;
+    line-height:1.08;
+  }
+
+  .heroSub{
+    font-size:16px;
+    line-height:1.65;
+  }
+
+  .featureCard{
+    padding:14px;
+  }
+
+  .step{
+    padding:12px;
+  }
+
+  .titleRow h2{
+    font-size:17px;
+  }
+
 }
   </style>
 </head>
@@ -1076,11 +1128,11 @@ transform:translateY(-1px);
 
  <div class="addrRow">
 
-  <div class="addr"
-       onclick="copyDelegate()"
-       title="Tap to copy address">
-       0xAd91...0cade
-  </div>
+ <div class="addr"
+     id="delegateAddr"
+     onclick="copyDelegate()"
+     title="Tap to copy address">
+</div>
 
   <button class="copyBtn" onclick="copyDelegate()">📋</button>
 
@@ -1097,10 +1149,10 @@ transform:translateY(-1px);
   <div class="addrRow">
 
   <div class="addr"
-       onclick="copyFtso()"
-       title="Tap to copy address">
-       0xb5A0...Deac3
-  </div>
+     id="ftsoAddr"
+     onclick="copyFtso()"
+     title="Tap to copy address">
+</div>
 
   <button class="copyBtn" onclick="copyFtso()">📋</button>
 
@@ -1348,7 +1400,13 @@ function setTheme(theme){
         showToast("Copied ✅");
       }
     }
+    function copyDelegate(){
+  copyText(CONFIG.delegationAddress);
+}
 
+function copyFtso(){
+  copyText(CONFIG.ftsoProviderIdentity);
+}
     // Fill addresses
     const delegateAddr = document.getElementById("delegateAddr");
     const ftsoAddr = document.getElementById("ftsoAddr");
@@ -1707,6 +1765,25 @@ function setTheme(theme){
       el.innerHTML = `<span class="dot"></span> Online · Monitoring active · Last checked Recently`;
     }
     updateOpsStatus();
+        // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    if (menuBtn && mobileMenu){
+      menuBtn.addEventListener("click", () => {
+        const isOpen = mobileMenu.classList.toggle("open");
+        menuBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        menuBtn.textContent = isOpen ? "✕" : "☰";
+      });
+
+      mobileMenu.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+          mobileMenu.classList.remove("open");
+          menuBtn.setAttribute("aria-expanded", "false");
+          menuBtn.textContent = "☰";
+        });
+      });
+    }
   </script>
 </body>
 </html>
