@@ -61,7 +61,6 @@ align-items:start;
 grid-template-columns:1fr;
 }
 }
-
 .addressCard{
 display:inline-block;
 width:auto;
@@ -457,6 +456,9 @@ border:1px solid rgba(124,92,255,.25);
     .kpi .value{font-weight:900; letter-spacing:-0.02em}
 
     .addr{
+
+      cursor:pointer;
+      
   display:inline-block;
   font-size:16px;
   font-weight:700;
@@ -935,11 +937,18 @@ transform:translateY(-1px);
 
   <div class="addrLabel">Delegation address</div>
 
-  <div class="addrRow">
-    <div class="addr">00xAd91...0cade
-</div>
-    <button class="copyBtn" onclick="copyDelegate()">📋</button>
+ <div class="addrRow">
+
+  <div class="addr"
+       onclick="copyDelegate()"
+       title="Tap to copy address">
+       0xAd91...0cade
   </div>
+
+  <button class="copyBtn" onclick="copyDelegate()">📋</button>
+
+</div>
+
 
 </div>
 
@@ -949,10 +958,17 @@ transform:translateY(-1px);
   <div class="addrLabel">FTSO identity</div>
 
   <div class="addrRow">
-    <div class="addr">0xb5A0...Deac3
-</div>
-    <button class="copyBtn" onclick="copyFtso()">📋</button>
+
+  <div class="addr"
+       onclick="copyFtso()"
+       title="Tap to copy address">
+       0xb5A0...Deac3
   </div>
+
+  <button class="copyBtn" onclick="copyFtso()">📋</button>
+
+</div>
+
 
 </div>
 
