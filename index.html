@@ -48,12 +48,12 @@
       --chart-h: 320px;
       --chart-h-mobile: 240px;
     }
-   .addressGrid{
+  .addressGrid{
 display:grid;
-grid-template-columns:1fr 1fr;
-gap:18px;
+grid-template-columns:max-content max-content;
+gap:24px;
 margin-top:18px;
-width:100%;
+align-items:start;
 }
 
 @media (max-width:720px){
@@ -63,8 +63,9 @@ grid-template-columns:1fr;
 }
 
 .addressCard{
-width:100%;
-min-width:0;
+display:inline-block;
+width:auto;
+min-width:420px;
 padding:16px 18px;
 border-radius:18px;
 
@@ -92,27 +93,45 @@ text-transform:uppercase;
 }
 
 .securityNote{
-margin-top:16px;
-padding:12px 14px;
-border-radius:14px;
-
-display:flex;
+display:inline-flex;
 align-items:center;
+
+margin-top:18px;
+padding:12px 16px;
+
+border-radius:14px;
 
 font-size:14px;
 font-weight:600;
 line-height:1.5;
 
-color:rgba(255,255,255,.78);
+color:rgba(255,255,255,.72);
 
 background:rgba(255,255,255,.03);
 border:1px solid rgba(255,255,255,.08);
 
 box-shadow:
 inset 0 1px 0 rgba(255,255,255,.04),
-0 8px 18px rgba(0,0,0,.18);
+0 6px 16px rgba(0,0,0,.20);
 }
-    [data-theme="light"]{
+    @media (max-width: 980px){
+  .addressGrid{
+    grid-template-columns:1fr;
+  }
+
+  .addressCard{
+    display:block;
+    width:100%;
+    min-width:0;
+  }
+
+  .securityNote{
+    display:flex;
+    width:100%;
+  }
+}
+
+[data-theme="light"]{
       --bg:#f7f9ff;
       --text:rgba(10,14,25,.92);
       --muted:rgba(10,14,25,.72);
