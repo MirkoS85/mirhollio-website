@@ -150,50 +150,11 @@ text-transform:uppercase;
   }
 
   .securityNote{
-    display:flex;
-    width:100%;
+    display:inline-flex;
+    width:auto;
+    max-width:100%;
   }
-      .verifyLinks{
-  .verifyLinks{
-  margin-top:18px;
-  margin-bottom:6px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-
-  flex-wrap:nowrap;
-  white-space:nowrap;
-
-  font-size:12.5px;
-  line-height:1.4;
-  color:rgba(255,255,255,.58);
 }
-
-.verifyLinks a{
-  margin-left:8px;
-  color:rgba(195,179,255,.92);
-  font-weight:700;
-}
-
-.verifyLinks a:hover{
-  color:rgba(255,255,255,.98);
-}
-
-[data-theme="light"] .verifyLinks{
-  color:rgba(10,14,25,.58);
-}
-
-[data-theme="light"] .verifyLinks a{
-  color:#6d4aff;
-}
-
-[data-theme="light"] .verifyLinks a:hover{
-  color:#4f35d8;
-}
-}
-
 [data-theme="light"]{
       --bg:#f7f9ff;
       --text:rgba(10,14,25,.92);
@@ -1050,11 +1011,7 @@ border-color:#7c5cff;
 transform:translateY(-1px);
 }
 
-.copyBtn:hover{
-background:rgba(255,255,255,.12);
-border-color:#7c5cff;
-transform:translateY(-1px);
-}
+
     /* ===== MOBILE POLISH ===== */
 
 @media (max-width: 980px){
@@ -1119,6 +1076,40 @@ transform:translateY(-1px);
     .copyBtn:disabled{
   opacity:.88;
   cursor:default;
+}
+    .verifyLinks{
+  margin-top:18px;
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+  font-size:12.5px;
+  line-height:1.4;
+  color:rgba(255,255,255,.58);
+}
+
+.verifyLinks a{
+  color:rgba(195,179,255,.92);
+  font-weight:700;
+}
+
+.verifyLinks a:hover{
+  color:rgba(255,255,255,.98);
+}
+
+[data-theme="light"] .verifyLinks{
+  color:rgba(10,14,25,.58);
+}
+
+[data-theme="light"] .verifyLinks a{
+  color:#6d4aff;
+}
+
+[data-theme="light"] .verifyLinks a:hover{
+  color:#4f35d8;
 }
   </style>
 </head>
@@ -1289,11 +1280,11 @@ transform:translateY(-1px);
 </div>
 
 <div class="verifyLinks">
-  Verify on:
+  <span>Verify on:</span>
   <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
+  <span>·</span>
   <a href="https://flaremetrics.io/" target="_blank" rel="noopener">FlareMetrics</a>
 </div>
-          
         </aside>
       </div>
     </section>
