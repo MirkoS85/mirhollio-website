@@ -1020,6 +1020,10 @@ transform:translateY(-1px);
 [data-theme="light"] .addrHelp{
   color:rgba(10,14,25,.62);
 }
+    .copyBtn:disabled{
+  opacity:.88;
+  cursor:default;
+}
   </style>
 </head>
 
@@ -1162,7 +1166,7 @@ transform:translateY(-1px);
      title="Tap to copy address">
 </div>
 
-  <button class="copyBtn" onclick="copyDelegate()">COPY ADDRESS</button>
+  <button class="copyBtn" onclick="copyDelegate(this)">COPY</button>
 
 </div>
 
@@ -1182,7 +1186,7 @@ transform:translateY(-1px);
      title="Tap to copy address">
 </div>
 
-  <button class="copyBtn" onclick="copyFtso()">COPY ADDRESS</button>
+ <button class="copyBtn" onclick="copyFtso(this)">COPY</button>
 
 </div>
 
@@ -1428,12 +1432,26 @@ function setTheme(theme){
         showToast("Copied ✅");
       }
     }
-    function copyDelegate(){
-  copyText(CONFIG.delegationAddress);
+   function flashCopy(btn){
+  if (!btn) return;
+  const original = btn.textContent;
+  btn.textContent = "COPIED";
+  btn.disabled = true;
+
+  setTimeout(() => {
+    btn.textContent = original;
+    btn.disabled = false;
+  }, 1100);
 }
 
-function copyFtso(){
+function copyDelegate(btn){
+  copyText(CONFIG.delegationAddress);
+  flashCopy(btn);
+}
+
+function copyFtso(btn){
   copyText(CONFIG.ftsoProviderIdentity);
+  flashCopy(btn);
 }
     // Fill addresses
     const delegateAddr = document.getElementById("delegateAddr");
