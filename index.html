@@ -109,26 +109,34 @@ text-transform:uppercase;
   align-items:center;
   gap:8px;
 
+  width:auto;
+  max-width:100%;
   margin-top:14px;
   padding:10px 14px;
 
-  width:auto;
-  max-width:100%;
-
   border-radius:14px;
 
-  font-size:13px;
+  font-size:12.5px;
   font-weight:650;
   line-height:1.45;
 
-  color:rgba(255,255,255,.76);
+  color:rgba(255,255,255,.78);
 
-  background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,184,77,.08);
+  border:1px solid rgba(255,184,77,.18);
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.04),
     0 6px 16px rgba(0,0,0,.20);
+}
+
+[data-theme="light"] .securityNote{
+  color:rgba(10,14,25,.76);
+  background:rgba(255,184,77,.16);
+  border:1px solid rgba(255,184,77,.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.45),
+    0 6px 16px rgba(10,14,25,.06);
 }
     @media (max-width: 980px){
   .addressGrid{
@@ -145,6 +153,34 @@ text-transform:uppercase;
     display:flex;
     width:100%;
   }
+      .verifyLinks{
+  margin-top:10px;
+  font-size:12.5px;
+  line-height:1.5;
+  color:rgba(255,255,255,.58);
+}
+
+.verifyLinks a{
+  margin-left:8px;
+  color:rgba(195,179,255,.92);
+  font-weight:700;
+}
+
+.verifyLinks a:hover{
+  color:rgba(255,255,255,.98);
+}
+
+[data-theme="light"] .verifyLinks{
+  color:rgba(10,14,25,.58);
+}
+
+[data-theme="light"] .verifyLinks a{
+  color:#6d4aff;
+}
+
+[data-theme="light"] .verifyLinks a:hover{
+  color:#4f35d8;
+}
 }
 
 [data-theme="light"]{
@@ -1241,8 +1277,10 @@ transform:translateY(-1px);
 
 </div>
 
-<div class="securityNote">
-⚠ Verify provider identity on trusted sources before delegating.
+<div class="verifyLinks">
+  Verify on:
+  <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
+  <a href="https://flaremetrics.io/" target="_blank" rel="noopener">FlareMetrics</a>
 </div>
           
         </aside>
