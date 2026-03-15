@@ -165,7 +165,13 @@ text-transform:uppercase;
       --border:rgba(10,14,25,.12);
       --shadow:0 18px 60px rgba(10,14,25,.12);
     }
-
+[data-theme="light"] body{
+  background:
+    radial-gradient(1200px 800px at 18% 12%, rgba(124,92,255,.10), transparent 70%),
+    radial-gradient(1000px 700px at 88% 18%, rgba(35,213,255,.08), transparent 66%),
+    radial-gradient(1100px 800px at 50% 115%, rgba(51,214,159,.04), transparent 68%),
+    linear-gradient(180deg, #f7f9ff 0%, #eef3fb 100%);
+}
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -879,21 +885,21 @@ border:1px solid rgba(124,92,255,.25);
     [data-theme="light"] .toast{background: rgba(10,14,25,0.82)}
 
     /* ===== Glass edge fade ===== */
-    body::before{
+   body::before{
   content:"";
   position:fixed;
   inset:0;
   pointer-events:none;
   z-index:0;
   background:
-    radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.62), transparent 65%),
-    radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.62), transparent 65%);
+    radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.42), transparent 68%),
+    radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.42), transparent 68%);
 }
-    [data-theme="light"] body::before{
-      background:
-        radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.9), transparent 60%),
-        radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.9), transparent 60%);
-    }
+   [data-theme="light"] body::before{
+  background:
+    radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.96), transparent 72%),
+    radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.96), transparent 72%);
+}
     [data-theme="light"] body::after{
   opacity:.035;
   background-image:
