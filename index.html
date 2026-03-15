@@ -1122,6 +1122,170 @@ transform:translateY(-1px);
 [data-theme="light"] .verifyLinks a:hover{
   color:#4f35d8;
 }
+    /* ===== CLEAN QUICK SNAPSHOT ===== */
+
+.snapshotClean{
+  padding:20px 22px;
+}
+
+.snapshotList{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:12px;
+}
+
+.snapshotItem{
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+}
+
+.snapshotKey{
+  font-size:11px;
+  letter-spacing:.03em;
+  color:var(--muted2);
+  margin-bottom:4px;
+}
+
+.snapshotVal{
+  font-size:17px;
+  font-weight:800;
+  letter-spacing:-0.01em;
+  color:var(--text);
+}
+
+.snapshotDivider{
+  height:1px;
+  margin:18px 0 14px;
+  background:var(--border);
+}
+
+.copySection{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.copyRow{
+  display:grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap:18px;
+  align-items:center;
+  padding:14px 0;
+}
+
+.copyRow + .copyRow{
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.copyMeta{
+  min-width:0;
+}
+
+.copyTitle{
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.78);
+  margin-bottom:6px;
+}
+
+.copyHelp{
+  font-size:13px;
+  line-height:1.45;
+  color:rgba(255,255,255,.60);
+  max-width:32ch;
+}
+
+.copyAction{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.copyAction .addr{
+  flex:0 1 auto;
+  max-width:260px;
+  margin-top:0;
+}
+
+.verifyLinks{
+  margin-top:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:600;
+  color:rgba(255,255,255,.55);
+}
+
+.verifyLinks a{
+  padding:4px 10px;
+  border-radius:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  color:rgba(195,179,255,.95);
+  font-weight:700;
+}
+
+.verifyLinks a:hover{
+  color:rgba(255,255,255,.98);
+}
+
+.verifySep{
+  opacity:.45;
+}
+
+[data-theme="light"] .snapshotItem{
+  border:1px solid rgba(10,14,25,.08);
+  background:rgba(10,14,25,.03);
+}
+
+[data-theme="light"] .copyTitle{
+  color:rgba(10,14,25,.72);
+}
+
+[data-theme="light"] .copyHelp{
+  color:rgba(10,14,25,.62);
+}
+
+[data-theme="light"] .verifyLinks{
+  color:rgba(10,14,25,.58);
+}
+
+[data-theme="light"] .verifyLinks a{
+  background:rgba(10,14,25,.04);
+  border:1px solid rgba(10,14,25,.08);
+  color:#6d4aff;
+}
+
+[data-theme="light"] .verifyLinks a:hover{
+  color:#4f35d8;
+}
+
+@media (max-width: 980px){
+  .snapshotList{
+    grid-template-columns:1fr;
+  }
+
+  .copyRow{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .copyAction{
+    flex-wrap:wrap;
+  }
+
+  .verifyLinks{
+    flex-wrap:wrap;
+    white-space:normal;
+  }
+}
   </style>
 </head>
 
@@ -1226,77 +1390,63 @@ transform:translateY(-1px);
 </div>
 
         <!-- QUICK SNAPSHOT -->
-        <aside class="card side" aria-label="Quick snapshot">
-          <div class="titleRow">
-            <h2>Quick Snapshot</h2>
-          </div>
+        <aside class="card side snapshotClean" aria-label="Quick snapshot">
+  <div class="titleRow">
+    <h2>Quick Snapshot</h2>
+  </div>
 
-          <div class="kpis">
-            <div class="kpi">
-              <div class="label">Role</div>
-              <div class="value">Validator + FTSO</div>
-            </div>
-            
-            <div class="kpi">
-              <div class="label">Monitoring</div>
-              <div class="value">24/7 Alerts</div>
-            </div>
-            <div class="kpi">
-              <div class="label">Focus</div>
-              <div class="value">Stability</div>
-            </div>
-          </div>
-         <div class="subSectionTitle">Delegation & verification</div>
-         <div class="addressGrid">
+  <div class="snapshotList">
+    <div class="snapshotItem">
+      <div class="snapshotKey">Role</div>
+      <div class="snapshotVal">Validator + FTSO</div>
+    </div>
 
- <div class="addressCard primary">
-  <div class="addrLabel">Delegate here</div>
-  <div class="addrHelp">Use this address in your wallet when delegating to MirSFlr.</div>
- <div class="addrRow">
+    <div class="snapshotItem">
+      <div class="snapshotKey">Monitoring</div>
+      <div class="snapshotVal">24/7 Alerts</div>
+    </div>
 
- <div class="addr"
-     id="delegateAddr"
-     onclick="copyDelegate()"
-     title="Tap to copy address">
-</div>
+    <div class="snapshotItem">
+      <div class="snapshotKey">Focus</div>
+      <div class="snapshotVal">Stability</div>
+    </div>
+  </div>
 
-  <button class="copyBtn" onclick="copyDelegate(this)">COPY</button>
+  <div class="snapshotDivider"></div>
 
-</div>
+  <div class="copySection">
+    <div class="copyRow">
+      <div class="copyMeta">
+        <div class="copyTitle">Delegate address</div>
+        <div class="copyHelp">Use this in your wallet when delegating to MirSFlr.</div>
+      </div>
 
+      <div class="copyAction">
+        <div class="addr" id="delegateAddr" onclick="copyDelegate()" title="Tap to copy address"></div>
+        <button class="copyBtn" onclick="copyDelegate(this)">COPY</button>
+      </div>
+    </div>
 
-</div>
+    <div class="copyRow">
+      <div class="copyMeta">
+        <div class="copyTitle">Provider identity</div>
+        <div class="copyHelp">Use this to verify the provider on Explorer or FlareMetrics.</div>
+      </div>
 
+      <div class="copyAction">
+        <div class="addr" id="ftsoAddr" onclick="copyFtso()" title="Tap to copy address"></div>
+        <button class="copyBtn" onclick="copyFtso(this)">COPY</button>
+      </div>
+    </div>
+  </div>
 
- <div class="addressCard">
-
- <div class="addrLabel">Verify provider identity</div>
- <div class="addrHelp">Use this identity to confirm the provider on Explorer or FlareMetrics.</div>
-  <div class="addrRow">
-
-  <div class="addr"
-     id="ftsoAddr"
-     onclick="copyFtso()"
-     title="Tap to copy address">
-</div>
-
- <button class="copyBtn" onclick="copyFtso(this)">COPY</button>
-
-</div>
-
-
-</div>
-
-
-</div>
-
-<div class="verifyLinks">
-  <span>Verify on:</span>
-  <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
-  <span>·</span>
-  <a href="https://flaremetrics.io/" target="_blank" rel="noopener">FlareMetrics</a>
-</div>
-        </aside>
+  <div class="verifyLinks">
+    <span>Verify on:</span>
+    <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
+    <span class="verifySep">·</span>
+    <a href="https://flaremetrics.io/" target="_blank" rel="noopener">FlareMetrics</a>
+  </div>
+</aside>
       </div>
     </section>
 
