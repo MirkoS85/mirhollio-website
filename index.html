@@ -78,7 +78,23 @@ grid-template-columns:1fr;
     inset 0 1px 0 rgba(255,255,255,.04),
     0 10px 24px rgba(0,0,0,.22);
 }
+.addressCard.primary{
+  border:1px solid rgba(124,92,255,.26);
+  background:
+    linear-gradient(180deg, rgba(124,92,255,.10), rgba(124,92,255,.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 12px 28px rgba(124,92,255,.12);
+}
 
+[data-theme="light"] .addressCard.primary{
+  border:1px solid rgba(124,92,255,.22);
+  background:
+    linear-gradient(180deg, rgba(124,92,255,.08), rgba(124,92,255,.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.45),
+    0 10px 24px rgba(124,92,255,.08);
+}
 .addrLabel{
 font-size:13px;
 color:rgba(255,255,255,.72);
@@ -1184,8 +1200,7 @@ transform:translateY(-1px);
          <div class="subSectionTitle">Delegation & verification</div>
          <div class="addressGrid">
 
- <div class="addressCard">
-
+ <div class="addressCard primary">
   <div class="addrLabel">Delegate here</div>
   <div class="addrHelp">Use this address in your wallet when delegating to MirSFlr.</div>
  <div class="addrRow">
