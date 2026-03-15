@@ -510,14 +510,15 @@ border:1px solid rgba(124,92,255,.25);
 
     .addr{
   cursor:pointer;
+
   display:inline-block;
-  font-size:16px;
+  font-size:15px;
   font-weight:700;
-  letter-spacing:.02em;
+  letter-spacing:.04em;
+
   color: rgba(255,255,255,.92);
 
   padding:10px 14px;
-  margin-top:8px;
 
   border-radius:12px;
   border:1px solid rgba(255,255,255,.10);
@@ -527,12 +528,13 @@ border:1px solid rgba(124,92,255,.25);
     inset 0 1px 0 rgba(255,255,255,.04),
     0 6px 16px rgba(0,0,0,.25);
 
-  width:100%;
-  max-width:100%;
-  min-width:0;
+  white-space:nowrap;
+
+  width:auto;        /* ← pomembno */
+  max-width:260px;   /* ← to skrajša address box */
+
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
 
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
@@ -941,9 +943,11 @@ font-size:12px;
 font-weight:800;
 letter-spacing:.06em;
 
-transition:all .15s ease;
-}
+color:rgba(255,255,255,.85);   /* ← DODAJ */
 
+transition:all .15s ease;
+  text-transform:uppercase;
+}
 .copyBtn:hover{
 background:rgba(124,92,255,.18);
 border-color:#7c5cff;
@@ -1147,7 +1151,7 @@ transform:translateY(-1px);
      title="Tap to copy address">
 </div>
 
-  <button class="copyBtn" onclick="copyDelegate()">Copy address</button>
+  <button class="copyBtn" onclick="copyDelegate()">COPY ADDRESS</button>
 
 </div>
 
@@ -1167,7 +1171,7 @@ transform:translateY(-1px);
      title="Tap to copy address">
 </div>
 
-  <button class="copyBtn" onclick="copyFtso()">📋</button>
+  <button class="copyBtn" onclick="copyFtso()">COPY ADDRESS</button>
 
 </div>
 
