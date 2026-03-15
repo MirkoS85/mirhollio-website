@@ -1169,10 +1169,13 @@ transform:translateY(-1px);
 
 .copyRow{
   display:grid;
-  grid-template-columns: minmax(220px, 300px) 1fr;
-  gap:18px;
+  grid-template-columns: 1fr auto;
+  gap:24px;
   align-items:center;
-  padding:14px 0;
+  padding:16px 0;
+}
+  .copyMeta{
+  max-width:700px;
 }
 
 .copyRow + .copyRow{
