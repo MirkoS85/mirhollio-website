@@ -180,9 +180,62 @@ inset 0 1px 0 rgba(255,255,255,.04),
     [data-theme="light"] .logoImg{border:1px solid rgba(10,14,25,.12);}
 
     .navlinks{display:flex; align-items:center; gap:12px; color:var(--muted); font-weight:700;}
-    .navlinks a{padding:10px 10px; border-radius:12px}
-    .navlinks a:hover{background:var(--panel2); color:var(--text)}
-    @media (max-width: 980px){ .navlinks{display:none} }
+.navlinks a{padding:10px 10px; border-radius:12px}
+.navlinks a:hover{background:var(--panel2); color:var(--text)}
+
+.menuBtn{
+  display:none;
+  width:46px;
+  height:46px;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border-radius:14px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  color:var(--text);
+  cursor:pointer;
+  font-size:22px;
+  font-weight:900;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.menuBtn:hover{
+  transform:translateY(-1px);
+  background:linear-gradient(135deg, rgba(124,92,255,.18), rgba(35,213,255,.08));
+  border-color:rgba(124,92,255,.22);
+  box-shadow:0 14px 28px rgba(124,92,255,.12);
+}
+
+.mobileMenu{
+  display:none;
+  padding:0 20px 16px;
+}
+
+.mobileMenu.open{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.mobileMenu a{
+  display:block;
+  padding:14px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  color:var(--text);
+  font-weight:800;
+}
+
+.mobileMenu a:hover{
+  background:rgba(255,255,255,.07);
+}
+
+@media (max-width: 980px){
+  .navlinks{display:none}
+  .menuBtn{display:inline-flex}
+}
 
     .actions{display:flex; align-items:center; gap:10px}
     .themeIconBtn{
@@ -825,30 +878,46 @@ transform:translateY(-1px);
 <body>
   <header>
     <div class="container">
-      <div class="nav">
-        <a class="brand" href="#top" aria-label="MirSFlr Home">
-          <img src="logo.png" alt="MirSFlr logo" class="logoImg">
-          <span>MirSFlr</span>
-        </a>
-<nav class="navlinks" aria-label="Primary">
+<div class="nav">
+  <a class="brand" href="#top" aria-label="MirSFlr Home">
+    <img src="logo.png" alt="MirSFlr logo" class="logoImg">
+    <span>MirSFlr</span>
+  </a>
+
+  <nav class="navlinks" aria-label="Primary">
+    <a href="#price">Price</a>
+    <a href="/stats/">Stats</a>
+    <a href="/epochs/">Epochs</a>
+    <a href="/performance/">Performance</a>
+    <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3"
+       target="_blank"
+       rel="noopener">↗FLR Explorer</a>
+    <a href="/addresses/">Addresses</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <div class="actions">
+    <button class="themeIconBtn" id="themeBtn" type="button" aria-label="Toggle theme">
+      <span id="themeGlyph">☾</span>
+    </button>
+
+    <button class="menuBtn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      ☰
+    </button>
+  </div>
+</div>
+
+<nav class="mobileMenu" id="mobileMenu" aria-label="Mobile navigation">
   <a href="#price">Price</a>
   <a href="/stats/">Stats</a>
   <a href="/epochs/">Epochs</a>
   <a href="/performance/">Performance</a>
   <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3"
-   target="_blank"
-   rel="noopener">
-   ↗FLR Explorer
-</a>
+     target="_blank"
+     rel="noopener">↗ FLR Explorer</a>
   <a href="/addresses/">Addresses</a>
   <a href="#contact">Contact</a>
 </nav>
-       <div class="actions">
-  <button class="themeIconBtn" id="themeBtn" type="button" aria-label="Toggle theme">
-    <span id="themeGlyph">☾</span>
-  </button>
-       </div>
-      </div>
     </div>
   </header>
 
