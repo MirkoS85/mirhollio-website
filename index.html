@@ -923,18 +923,31 @@ border:1px solid rgba(255,255,255,.08);
 }
 
 .copyBtn{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 36px;
-  width:36px;
-  height:36px;
-  border-radius:10px;
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.10);
-  cursor:pointer;
-  font-size:16px;
-  transition:all .15s ease;
+display:flex;
+align-items:center;
+justify-content:center;
+
+height:36px;
+padding:0 14px;
+
+border-radius:10px;
+
+background:rgba(255,255,255,.06);
+border:1px solid rgba(255,255,255,.12);
+
+cursor:pointer;
+
+font-size:12px;
+font-weight:800;
+letter-spacing:.06em;
+
+transition:all .15s ease;
+}
+
+.copyBtn:hover{
+background:rgba(124,92,255,.18);
+border-color:#7c5cff;
+transform:translateY(-1px);
 }
 
 .copyBtn:hover{
@@ -1134,7 +1147,7 @@ transform:translateY(-1px);
      title="Tap to copy address">
 </div>
 
-  <button class="copyBtn" onclick="copyDelegate()">📋</button>
+  <button class="copyBtn" onclick="copyDelegate()">Copy address</button>
 
 </div>
 
@@ -1410,8 +1423,12 @@ function copyFtso(){
     // Fill addresses
     const delegateAddr = document.getElementById("delegateAddr");
     const ftsoAddr = document.getElementById("ftsoAddr");
-    if (delegateAddr) delegateAddr.textContent = CONFIG.delegationAddress;
-    if (ftsoAddr) ftsoAddr.textContent = CONFIG.ftsoProviderIdentity;
+    function shorten(addr){
+  return addr.slice(0,6) + "..." + addr.slice(-4);
+}
+
+if (delegateAddr) delegateAddr.textContent = shorten(CONFIG.delegationAddress);
+if (ftsoAddr) ftsoAddr.textContent = shorten(CONFIG.ftsoProviderIdentity);
 
     // Copy buttons
     const copyDelegateBtn = document.getElementById("copyDelegateBtn");
