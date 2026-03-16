@@ -957,6 +957,21 @@ border:1px solid rgba(124,92,255,.25);
     radial-gradient(1200px 800px at -10% 50%, rgba(247,249,255,.96), transparent 72%),
     radial-gradient(1200px 800px at 110% 50%, rgba(247,249,255,.96), transparent 72%);
 }
+    /* ===== background glow layer ===== */
+
+.bgGlow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+
+  background:
+    radial-gradient(500px 300px at 20% 30%, rgba(124,92,255,.08), transparent 60%),
+    radial-gradient(600px 340px at 80% 25%, rgba(35,213,255,.06), transparent 60%),
+    radial-gradient(480px 280px at 55% 75%, rgba(124,92,255,.06), transparent 65%);
+
+  filter: blur(40px);
+}
     [data-theme="light"] body::after{
   opacity:.035;
   background-image:
@@ -1422,6 +1437,7 @@ transform:translateY(-1px);
 </head>
 
 <body>
+  <div class="bgGlow"></div>
   <header>
     <div class="container">
 <div class="nav">
