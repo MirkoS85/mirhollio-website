@@ -2,85 +2,386 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mirhollio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MirSFlr</title>
+
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
 
     body {
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020204;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
       background:
-        radial-gradient(circle at 78% 28%, rgba(255,45,149,0.35), transparent 18%),
-        radial-gradient(circle at 18% 82%, rgba(255,45,149,0.18), transparent 16%),
-        #000;
-      color:white;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      text-align:center;
+        radial-gradient(720px 420px at 79% 19%, rgba(255, 51, 153, 0.34), transparent 40%),
+        radial-gradient(520px 320px at 15% 77%, rgba(255, 51, 153, 0.20), transparent 34%),
+        radial-gradient(500px 280px at 54% 40%, rgba(123, 49, 255, 0.12), transparent 42%),
+        #020204;
+      overflow: hidden;
     }
 
-    .wrap {
-      max-width:900px;
-      padding:20px;
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(680px 380px at 79% 18%, rgba(255, 51, 153, 0.24), transparent 38%),
+        radial-gradient(500px 300px at 15% 77%, rgba(255, 51, 153, 0.14), transparent 34%),
+        radial-gradient(460px 260px at 54% 40%, rgba(123, 49, 255, 0.10), transparent 40%);
+      filter: blur(46px);
+      opacity: 1;
     }
 
-    .logo {
-      font-size:22px;
-      margin-bottom:28px;
-      opacity:0.9;
+    .grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image:
+        radial-gradient(rgba(255,255,255,.12) 0.6px, transparent 0.6px);
+      background-size: 7px 7px;
+      mix-blend-mode: soft-light;
     }
 
-    h1 {
-      font-size:clamp(40px, 8vw, 90px);
-      line-height:1;
-      margin-bottom:20px;
-      font-weight:800;
+    .topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 5;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 30px 42px 0;
     }
 
-    p {
-      font-size:20px;
-      opacity:0.8;
-      margin-bottom:40px;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: #fff;
     }
 
-    .btn {
-      display:inline-block;
-      padding:16px 32px;
-      border-radius:12px;
-      font-size:18px;
-      font-weight:600;
-      color:white;
-      text-decoration:none;
-      background:linear-gradient(90deg,#7c3aed,#ec4899);
-      box-shadow:0 10px 30px rgba(236,72,153,0.3);
-      transition:0.2s;
+    .brand img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      display: block;
     }
 
-    .btn:hover {
-      transform:translateY(-2px);
-      box-shadow:0 15px 40px rgba(236,72,153,0.4);
+    .brand span {
+      font-size: 25px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .menuBtn {
+      width: 46px;
+      height: 46px;
+      border: 0;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: default;
+      padding: 0;
+      margin-top: 1px;
+    }
+
+    .menuLines {
+      width: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .menuLines span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,.96);
+      border-radius: 999px;
+    }
+
+    .hero {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 170px;
+    }
+
+    .heroInner {
+      width: min(100%, 980px);
+      transform: translateY(-14px);
+    }
+
+    .title {
+      font-size: clamp(48px, 5.6vw, 76px);
+      line-height: 1.06;
+      letter-spacing: -0.055em;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .title strong {
+      font-weight: 800;
+    }
+
+    .title .line2 {
+      display: block;
+      margin-top: 8px;
+      font-weight: 400;
+    }
+
+    .desc {
+      max-width: 780px;
+      margin: 0 auto 38px;
+      font-size: 18px;
+      line-height: 1.6;
+      letter-spacing: -0.02em;
+      color: rgba(210, 210, 225, 0.62);
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 245px;
+      height: 54px;
+      padding: 0 30px;
+      text-decoration: none;
+      color: #fff;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #5b2eff 0%, #ff2f92 100%);
+      box-shadow: 0 10px 28px rgba(255, 47, 146, 0.22);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 36px rgba(255, 47, 146, 0.28);
+    }
+
+    .features {
+      position: absolute;
+      left: 50%;
+      bottom: 56px;
+      transform: translateX(-50%);
+      z-index: 3;
+      width: min(100%, 980px);
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .feature {
+      text-align: center;
+      color: rgba(196, 189, 231, 0.90);
+    }
+
+    .featureIcon {
+      height: 52px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+    }
+
+    .featureIcon svg {
+      width: 36px;
+      height: 36px;
+      stroke: rgba(183, 174, 228, 0.88);
+      stroke-width: 1.8;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .featureLabel {
+      font-size: 15px;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: rgba(194, 187, 228, 0.82);
+    }
+
+    @media (max-width: 920px) {
+      .topbar {
+        padding: 24px 18px 0;
+      }
+
+      .brand span {
+        font-size: 22px;
+      }
+
+      .hero {
+        padding: 110px 18px 190px;
+      }
+
+      .heroInner {
+        transform: none;
+      }
+
+      .title {
+        font-size: clamp(40px, 9vw, 62px);
+      }
+
+      .desc {
+        font-size: 16px;
+        max-width: 650px;
+      }
+
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px 10px;
+        bottom: 28px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .page {
+        min-height: 100dvh;
+      }
+
+      .brand img {
+        width: 30px;
+        height: 30px;
+      }
+
+      .brand span {
+        font-size: 20px;
+      }
+
+      .title {
+        font-size: 38px;
+      }
+
+      .desc {
+        font-size: 15px;
+      }
+
+      .cta {
+        min-width: 220px;
+        height: 52px;
+        font-size: 17px;
+      }
+
+      .featureLabel {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="logo">mirhollio</div>
+  <div class="page">
+    <div class="grain"></div>
 
-    <h1>Trustworthy Flare Validator</h1>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MirSFlr">
+        <img src="/logo.png" alt="MirSFlr logo">
+        <span>MirSFlr</span>
+      </a>
 
-    <p>
-      Production-grade systems. Zero noise.
-    </p>
+      <button class="menuBtn" type="button" aria-label="Menu">
+        <span class="menuLines">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </header>
 
-    <a href="/home/" class="btn">
-      Enter
-    </a>
+    <main class="hero">
+      <div class="heroInner">
+        <h1 class="title">
+          Trustworthy <strong>Flare Validator</strong>
+          <span class="line2">&amp; FTSO Provider</span>
+        </h1>
+
+        <p class="desc">
+          Monitoring and describing production-grade systems. Stay reliably
+          connected to the Flare Network without the marketing noise.
+        </p>
+
+        <a class="cta" href="/home/">Visit the Dashboard</a>
+      </div>
+    </main>
+
+    <section class="features" aria-label="Highlights">
+      <div class="feature">
+        <div class="featureIcon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 7v5l3 3"></path>
+            <circle cx="12" cy="13" r="8"></circle>
+            <path d="M5.6 19.4 4 21"></path>
+            <path d="M18.4 19.4 20 21"></path>
+          </svg>
+        </div>
+        <div class="featureLabel">High uptime</div>
+      </div>
+
+      <div class="feature">
+        <div class="featureIcon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 5 6v5c0 5 3.5 8 7 10 3.5-2 7-5 7-10V6l-7-3z"></path>
+            <path d="m9.5 12 1.8 1.8 3.7-3.8"></path>
+          </svg>
+        </div>
+        <div class="featureLabel">Secure systems</div>
+      </div>
+
+      <div class="feature">
+        <div class="featureIcon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </div>
+        <div class="featureLabel">Transparent</div>
+      </div>
+
+      <div class="feature">
+        <div class="featureIcon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 4 7 3.5-7 3.5-7-3.5L12 4z"></path>
+            <path d="m5 12 7 3.5 7-3.5"></path>
+            <path d="m5 16.5 7 3.5 7-3.5"></path>
+          </svg>
+        </div>
+        <div class="featureLabel">No shortcuts</div>
+      </div>
+    </section>
   </div>
 </body>
 </html>
