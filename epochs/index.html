@@ -88,12 +88,24 @@ a{
 }
 
 .topbar{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:center;
+  gap:16px;
+  margin-bottom:24px;
+}
+   .navGroup{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:24px;
+  justify-content:flex-end;
+  gap:10px;
   flex-wrap:wrap;
+  min-width:0;
+}
+
+.backBtn{
+  justify-self:start;
+  white-space:nowrap;
 }
 
 .btn{
@@ -109,6 +121,8 @@ a{
   font-weight:800;
   box-shadow:0 8px 22px rgba(0,0,0,.18);
   transition:transform .14s ease, background .14s ease, border-color .14s ease;
+  white-space:nowrap;
+  min-height:44px;
 }
 
 .btn:hover{
@@ -292,16 +306,16 @@ tr:last-child td{
 </head>
 <body>
   <div class="container">
-    <div class="topbar">
-     <a class="btn" href="/home/">← Back to home</a>
-<div style="display:flex; gap:10px; flex-wrap:wrap;">
-  <a class="btn" href="/stats/">Stats</a>
-  <a class="btn active" href="/epochs/">Epochs</a>
-  <a class="btn" href="/addresses/">Addresses</a>
-  <a class="btn" href="/performance/">Performance</a>
-  <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+   <div class="topbar">
+  <a class="btn backBtn" href="/home/">← Back to home</a>
+
+  <div class="navGroup">
+    <a class="btn" href="/stats/">Stats</a>
+    <a class="btn active" href="/epochs/">Epochs</a>
+    <a class="btn" href="/addresses/">Addresses</a>
+    <a class="btn" href="/performance/">Performance</a>
+  </div>
 </div>
-    </div>
 
     <div class="title">MirSFlr Epoch History</div>
     <div class="subtitle">
