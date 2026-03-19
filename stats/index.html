@@ -116,7 +116,11 @@ a{
   background:linear-gradient(135deg, rgba(124,92,255,.18), rgba(255,47,146,.08));
   border-color:rgba(124,92,255,.22);
 }
-
+.btn.active{
+  background:#4f46e5;
+  border-color:#4f46e5;
+  color:white;
+}
 .title{
   position:relative;
   z-index:1;
@@ -309,11 +313,10 @@ tr:last-child td{
   <a class="btn" href="/home/">← Back to home</a>
 
   <div style="display:flex; gap:10px; flex-wrap:wrap;">
-    <a class="btn" href="/stats/" style="background:#7c5cff; border-color:#7c5cff; color:white;">Stats</a>
-    <a class="btn" href="/epochs/">Epochs</a>
-    <a class="btn" href="/addresses/">Addresses</a>
-    <a class="btn" href="/performance/">Performance</a>
-    <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+   <a class="btn active" href="/stats/">Stats</a>
+<a class="btn" href="/epochs/">Epochs</a>
+<a class="btn" href="/addresses/">Addresses</a>
+<a class="btn" href="/performance/">Performance</a>
   </div>
 </div>
 
