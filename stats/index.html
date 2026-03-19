@@ -589,29 +589,6 @@ tr:last-child td{
             <div class="small">Current delegation fee</div>
           </div>
 
-          <div class="card">
-            <div class="label">Delegation Address</div>
-            <div class="value" style="font-size:18px">${shortAddr(provider.delegationAddress)}</div>
-            <div class="small">${provider.delegationAddress || "-"}</div>
-          </div>
-
-          <div class="card">
-            <div class="label">Submit Address</div>
-            <div class="value" style="font-size:18px">${shortAddr(provider.submitAddress)}</div>
-            <div class="small">${provider.submitAddress || "-"}</div>
-          </div>
-
-          <div class="card">
-            <div class="label">Submit Signature</div>
-            <div class="value" style="font-size:18px">${shortAddr(provider.submitSignatureAddress)}</div>
-            <div class="small">${provider.submitSignatureAddress || "-"}</div>
-          </div>
-
-          <div class="card">
-            <div class="label">Signing Policy</div>
-            <div class="value" style="font-size:18px">${shortAddr(provider.signingPolicyAddress)}</div>
-            <div class="small">${provider.signingPolicyAddress || "-"}</div>
-          </div>
         </div>
       `;
       let epochsLink = document.getElementById("epochsLinkBox");
