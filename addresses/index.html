@@ -112,6 +112,13 @@ body::after{
   border-color:rgba(124,92,255,.22);
 }
 
+  .btn.active{
+  background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
+  border-color:transparent;
+  color:white;
+  box-shadow:0 10px 24px rgba(109,74,255,.22);
+}
+  
 h1{
   position:relative;
   z-index:1;
@@ -198,13 +205,13 @@ button:hover{
 <div class="topbar">
  <a class="btn" href="/home/">← Back to home</a>
 
-  <div style="display:flex; gap:10px; flex-wrap:wrap;">
-    <a class="btn" href="/stats/">Stats</a>
-    <a class="btn" href="/epochs/">Epochs</a>
-    <a class="btn" href="/addresses/" style="background:#7c5cff; border-color:#7c5cff; color:white;">Addresses</a>
-    <a class="btn" href="/performance/">Performance</a>
-    <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
-  </div>
+ <div style="display:flex; gap:10px; flex-wrap:wrap;">
+  <a class="btn" href="/stats/">Stats</a>
+  <a class="btn" href="/epochs/">Epochs</a>
+  <a class="btn active" href="/addresses/">Addresses</a>
+  <a class="btn" href="/performance/">Performance</a>
+  <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+</div>
 </div>
 
 <h1>MirSFlr Addresses</h1>
