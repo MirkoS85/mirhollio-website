@@ -84,18 +84,40 @@ a{
   z-index:1;
   max-width:var(--max);
   margin:0 auto;
-  padding:24px 20px 60px;
+  padding:0 20px 60px;
 }
 
 .topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:24px;
+  justify-content:center;
+
+  padding:14px 0 18px;
+  margin:0 0 24px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7,11,20,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.topnav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
   flex-wrap:wrap;
+  width:100%;
 }
 
+@media (max-width: 640px){
+  .topnav{
+    justify-content:center;
+  }
+}
 .btn{
   display:inline-flex;
   align-items:center;
@@ -311,13 +333,12 @@ tr:last-child td{
 <body>
   <div class="container">
 <div class="topbar">
-  <a class="btn" href="/home/">← Back to home</a>
-
-  <div style="display:flex; gap:10px; flex-wrap:wrap;">
-   <a class="btn active" href="/stats/">Stats</a>
-<a class="btn" href="/epochs/">Epochs</a>
-<a class="btn" href="/addresses/">Addresses</a>
-<a class="btn" href="/performance/">Performance</a>
+  <div class="topnav">
+    <a class="btn active" href="/stats/">Stats</a>
+    <a class="btn" href="/epochs/">Epochs</a>
+    <a class="btn" href="/addresses/">Addresses</a>
+    <a class="btn" href="/performance/">Performance</a>
+    <a class="btn" href="/">Home</a>
   </div>
 </div>
 
