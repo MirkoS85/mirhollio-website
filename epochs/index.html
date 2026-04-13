@@ -84,29 +84,36 @@ a{
   z-index:1;
   max-width:var(--max);
   margin:0 auto;
-  padding:24px 20px 60px;
+  padding:0 20px 60px;
 }
 
 .topbar{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  align-items:center;
-  gap:16px;
-  margin-bottom:24px;
-}
-   .navGroup{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
   display:flex;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:center;
+
+  padding:14px 0 18px;
+  margin:0 0 24px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7,11,20,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+  .navGroup{
+  display:flex;
+  align-items:center;
+  justify-content:center;
   gap:10px;
   flex-wrap:wrap;
-  min-width:0;
+  width:100%;
 }
 
-.backBtn{
-  justify-self:start;
-  white-space:nowrap;
-}
+
 
 .btn{
   display:inline-flex;
@@ -144,7 +151,7 @@ a{
   font-size:clamp(30px, 4vw, 42px);
   font-weight:900;
   letter-spacing:-0.03em;
-  margin:10px 0 8px;
+  margin:18px 0 8px;
 }
 
 .subtitle{
@@ -299,7 +306,12 @@ tr:last-child td{
 
 @media (max-width: 700px){
   .container{
-    padding:24px 14px 40px;
+    padding:0 14px 40px;
+  }
+}
+   @media (max-width: 640px){
+  .navGroup{
+    justify-content:center;
   }
 }
 </style>
@@ -307,13 +319,12 @@ tr:last-child td{
 <body>
   <div class="container">
    <div class="topbar">
-  <a class="btn backBtn" href="/home/">← Back to home</a>
-
   <div class="navGroup">
     <a class="btn" href="/stats/">Stats</a>
     <a class="btn active" href="/epochs/">Epochs</a>
     <a class="btn" href="/addresses/">Addresses</a>
     <a class="btn" href="/performance/">Performance</a>
+    <a class="btn" href="/">Home</a>
   </div>
 </div>
 
