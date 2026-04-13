@@ -707,14 +707,39 @@
       el.textContent = value ?? "-";
     }
 
-    function loadExtraMetrics(provider, latest) {
-      const apr = pickFirstDefined(
-        provider?.apr,
-        provider?.currentApr,
-        provider?.estimatedApr,
-        latest?.apr,
-        latest?.currentApr
-      );
+   function loadExtraMetrics(provider, latest) {
+  if (!latest) return;
+
+  // APR (reward rate)
+  document.getElementById("aprValue").textContent =
+    latest.m_dRewardRate != null
+      ? Number(latest.m_dRewardRate).toFixed(2) + "%"
+      : "-";
+
+  // Self stake
+  document.getElementById("selfBondValue").textContent =
+    latest.m_stakeWeight != null
+      ? fmtNum(latest.m_stakeWeight, 0)
+      : "-";
+
+  // Delegated
+  document.getElementById("delegatedValue").textContent =
+    latest.m_delegationWeight != null
+      ? fmtNum(latest.m_delegationWeight, 0)
+      : "-";
+
+  // Total weight
+  document.getElementById("totalWeightValue").textContent =
+    latest.m_totalWeight != null
+      ? fmtNum(latest.m_totalWeight, 0)
+      : "-";
+const total = latest.m_totalWeight;
+const self = latest.m_stakeWeight;
+
+if (total && self) {
+  const pct = (self / total) * 100;
+  document.getElementById("selfBondValue").textContent += ` (${pct.toFixed(1)}%)`;
+}
 
       const selfBond = pickFirstDefined(
         provider?.selfBond,
