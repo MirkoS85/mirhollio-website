@@ -227,14 +227,14 @@ body::after{
   padding-right: clamp(16px, 2.2vw, 36px);
 }
 
-  header{
+ header{
   position:sticky;
   top:0;
-  z-index:50;
+  z-index:1000;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom:1px solid rgba(255,255,255,.08);
-  background: rgba(7,11,20,.62);
+  background: rgba(7,11,20,.78);
 }
 
 [data-theme="light"] header{
@@ -243,13 +243,13 @@ body::after{
 }
 
 .nav{
-  height:72px;
-  display:flex;
+  min-height:72px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  justify-content:space-between;
   gap:16px;
+  padding:12px 0;
 }
-
 .brand{
   display:flex;
   align-items:center;
@@ -283,11 +283,7 @@ body::after{
 }
 
 .navlinks{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  color:var(--muted);
-  font-weight:700;
+  display:none;
 }
 
 .navlinks a{
@@ -303,6 +299,68 @@ body::after{
   background:rgba(255,255,255,.05);
   color:var(--text);
   transform:translateY(-1px);
+}
+
+.primaryNav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  flex:1;
+}
+
+.utilityNav{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.subBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--border);
+  color:var(--text);
+  font-weight:800;
+  box-shadow:0 8px 22px rgba(0,0,0,.18);
+  transition:transform .14s ease, background .14s ease, border-color .14s ease;
+  white-space:nowrap;
+  min-height:44px;
+}
+
+.subBtn:hover{
+  transform:translateY(-1px);
+  background:linear-gradient(135deg, rgba(124,92,255,.18), rgba(255,47,146,.08));
+  border-color:rgba(124,92,255,.22);
+}
+
+.utilityBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
+  color:var(--muted);
+  font-weight:700;
+  transition:transform .14s ease, background .14s ease, border-color .14s ease, color .14s ease;
+  white-space:nowrap;
+  min-height:42px;
+}
+
+.utilityBtn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.07);
+  border-color:rgba(124,92,255,.18);
+  color:var(--text);
 }
 
 [data-theme="light"] .navlinks a:hover{
@@ -359,10 +417,20 @@ body::after{
 }
 
 @media (max-width: 980px){
-  .navlinks{display:none}
-  .menuBtn{display:inline-flex}
-}
+  .primaryNav,
+  .utilityNav{
+    display:none;
+  }
 
+  .menuBtn{
+    display:inline-flex;
+  }
+
+  .nav{
+    grid-template-columns:auto auto;
+    justify-content:space-between;
+  }
+}
     .actions{display:flex; align-items:center; gap:10px}
     .themeIconBtn{
   width:46px;
@@ -1169,6 +1237,8 @@ transform:translateY(-1px);
     height:auto;
     min-height:74px;
     padding:12px 0;
+    grid-template-columns:auto auto;
+    justify-content:space-between;
   }
 
   .hero{
@@ -1472,22 +1542,19 @@ transform:translateY(-1px);
     <span>MirSFlr</span>
   </a>
 
-  <nav class="navlinks" aria-label="Primary">
-    <a href="#price">Price</a>
-    <a href="/stats/">Stats</a>
-    <a href="/epochs/">Epochs</a>
-    <a href="/performance/">Performance</a>
-    <a href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3"
-       target="_blank"
-       rel="noopener">↗FLR Explorer</a>
-    <a href="/addresses/">Addresses</a>
-    <a href="#contact">Contact</a>
+  <nav class="primaryNav" aria-label="Primary">
+    <a class="subBtn" href="/stats/">Stats</a>
+    <a class="subBtn" href="/epochs/">Epochs</a>
+    <a class="subBtn" href="/addresses/">Addresses</a>
+    <a class="subBtn" href="/performance/">Performance</a>
   </nav>
 
   <div class="actions">
-    <button class="themeIconBtn" id="themeBtn" type="button" aria-label="Toggle theme">
-      <span id="themeGlyph">☾</span>
-    </button>
+    <nav class="utilityNav" aria-label="Utility">
+      <a class="utilityBtn" href="#price">Price</a>
+      <a class="utilityBtn" href="#contact">Contact</a>
+      <a class="utilityBtn" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Explorer</a>
+    </nav>
 
     <button class="menuBtn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
       ☰
