@@ -769,7 +769,9 @@
 
         const data = await res.json();
         const provider = findProviderDeep(data);
-
+          console.log("FULL API DATA:", data);
+console.log("MIRSFLR PROVIDER:", provider);
+console.log("LATEST EPOCH:", getLatestEpoch(provider));
         if (!provider) {
           throw new Error("MirSFlr provider not found");
         }
