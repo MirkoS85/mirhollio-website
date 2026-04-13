@@ -352,6 +352,133 @@
   .navGroup{
     justify-content:center;
   }
+
+  .currencyToggle{
+    width:100%;
+    justify-content:center;
+  }
+
+  .currencyBtn{
+    flex:1 1 auto;
+  }
+}
+    .currencyToggle{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  box-shadow:0 8px 22px rgba(0,0,0,.18);
+}
+
+.currencyBtn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-weight:800;
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:background .14s ease, color .14s ease, transform .14s ease;
+}
+
+.currencyBtn:hover{
+  color:var(--text);
+  transform:translateY(-1px);
+}
+
+.currencyBtn.active{
+  background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(109,74,255,.22);
+}
+
+.inlineStatusRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.statusBadgeSmall{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+}
+
+.statusBadgeSmall.ok{
+  color:#9ff0cc;
+  background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
+  border-color:rgba(51,214,159,.26);
+}
+
+.statusBadgeSmall.no{
+  color:#ffb7c4;
+  background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
+  border-color:rgba(255,97,125,.26);
+}
+
+.statusBadgeSmall.unknown{
+  color:#ffd89a;
+  background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
+  border-color:rgba(255,180,84,.26);
+}
+
+.ratioCard{
+  position:relative;
+  z-index:1;
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:18px;
+  backdrop-filter:blur(10px);
+}
+
+.ratioLegend{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+  flex-wrap:wrap;
+}
+
+.ratioStack{
+  width:100%;
+  height:18px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
+  display:flex;
+}
+
+.ratioSelf{
+  height:100%;
+  background:linear-gradient(90deg, #7c5cff, #9a78ff);
+  width:0%;
+}
+
+.ratioDelegated{
+  height:100%;
+  background:linear-gradient(90deg, #23d5ff, #7be7ff);
+  width:0%;
+}
+
+.miniNote{
+  color:var(--muted2);
+  font-size:12px;
+  margin-top:8px;
 }
   </style>
 </head>
@@ -376,12 +503,22 @@
       </div>
 
       <div class="statusWrap">
-        <div class="badge unknown" id="preRegBadge">
-          <span class="badgeDot"></span>
-          <span id="preRegBadgeText">Pre-registration: checking…</span>
-        </div>
-      </div>
+  <div class="inlineStatusRow">
+    <div class="badge unknown" id="preRegBadge">
+      <span class="badgeDot"></span>
+      <span id="preRegBadgeText">Pre-registration: checking…</span>
     </div>
+
+    <div class="statusBadgeSmall unknown" id="minConditionsBadge">
+      Minimal Conditions: checking…
+    </div>
+
+    <div class="currencyToggle" aria-label="Currency toggle">
+      <button class="currencyBtn active" id="usdBtn" type="button">USD</button>
+      <button class="currencyBtn" id="eurBtn" type="button">EUR</button>
+    </div>
+  </div>
+</div>
 
     <div id="loading" class="loading">Loading performance…</div>
     <div id="error" class="error" style="display:none;"></div>
@@ -393,7 +530,19 @@
           <div class="value" id="avgRewardValue">-</div>
           <div class="small">Average across all tracked epochs</div>
         </div>
+<div class="grid">
+  <div class="card">
+    <div class="label">Monthly Earnings</div>
+    <div class="value" id="monthlyEarningsValue">-</div>
+    <div class="small">Estimated based on APR</div>
+  </div>
 
+  <div class="card">
+    <div class="label">Stake Composition</div>
+<div class="value" id="networkShareValue">-</div>
+<div class="small">Derived from provider weight</div>
+  </div>
+</div>
         <div class="card">
           <div class="label">Epochs</div>
           <div class="value" id="epochsValue">-</div>
@@ -414,7 +563,23 @@
       </div>
 
       <div class="sectionTitle">Additional metrics</div>
+<div class="ratioCard">
+  <div class="sectionTitle">Stake composition</div>
 
+  <div class="ratioStack">
+    <div class="ratioSelf" id="ratioSelf"></div>
+    <div class="ratioDelegated" id="ratioDelegated"></div>
+  </div>
+
+  <div class="ratioLegend">
+    <div id="ratioSelfText">Self: -</div>
+    <div id="ratioDelegatedText">Delegated: -</div>
+  </div>
+
+  <div class="miniNote">
+    Shows how much stake is provider-owned vs delegated.
+  </div>
+</div>
       <div class="grid">
         <div class="card">
           <div class="label">APR</div>
@@ -470,15 +635,58 @@
         <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
         <div class="barMeta" id="fdcAvailabilityText">-</div>
       </div>
+<div class="sectionTitle">Validator Monitoring</div>
 
-      <div class="note">
-        Source: Oracle Daemon API
-        <br>
-        <span id="lastUpdated"></span>
-        <br>
-        <span id="debugHint"></span>
-      </div>
-      <div class="note">
+<div class="grid">
+  <div class="card">
+    <div class="label">Validator APR</div>
+    <div class="value" id="validatorAprValue">-</div>
+    <div class="small">Validator-side APR</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Uptime</div>
+    <div class="value" id="validatorUptimeValue">-</div>
+    <div class="small">Current node uptime</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Connected</div>
+    <div class="value" id="validatorConnectedValue">-</div>
+    <div class="small">Live node status</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Delegators</div>
+    <div class="value" id="delegatorsCountValue">-</div>
+    <div class="small">Current delegator count</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Total Stake</div>
+    <div class="value" id="validatorTotalStakeValue">-</div>
+    <div class="small">Validator total stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Self Bond</div>
+    <div class="value" id="validatorSelfStakeValue">-</div>
+    <div class="small">Provider-owned validator stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Delegated</div>
+    <div class="value" id="validatorDelegatedStakeValue">-</div>
+    <div class="small">Delegated validator stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Staking Expiry</div>
+    <div class="value" id="stakingExpiryValue">-</div>
+    <div class="small">Validator staking end time</div>
+  </div>
+</div>
+     <div class="note">
   Source: Oracle Daemon API
   <br>
   <a href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">Open raw API</a>
@@ -735,7 +943,306 @@
       if (!el) return;
       el.textContent = value ?? "-";
     }
+let selectedCurrency = "USD";
+let usdToEurRate = 0.92; // fallback
 
+function fmtMoney(value, currency = "USD", decimals = 2) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-";
+
+  if (currency === "EUR") {
+    return "€" + n.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
+  }
+
+  return "$" + n.toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+async function loadFxRate() {
+  try {
+    const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");
+    if (!res.ok) return;
+    const data = await res.json();
+    const rate = Number(data?.rates?.EUR);
+    if (Number.isFinite(rate) && rate > 0) {
+      usdToEurRate = rate;
+    }
+  } catch (_) {}
+}
+
+function updateCurrencyButtons() {
+  const usdBtn = document.getElementById("usdBtn");
+  const eurBtn = document.getElementById("eurBtn");
+
+  if (usdBtn) usdBtn.classList.toggle("active", selectedCurrency === "USD");
+  if (eurBtn) eurBtn.classList.toggle("active", selectedCurrency === "EUR");
+}
+
+function setMinimalConditionsBadge(provider) {
+  const badge = document.getElementById("minConditionsBadge");
+  if (!badge) return;
+
+  badge.classList.remove("ok", "no", "unknown");
+
+  const strikes = Number(provider?.totalStrikes);
+  const passes = Number(provider?.totalPasses);
+
+  if (Number.isFinite(strikes) && Number.isFinite(passes)) {
+    if (strikes === 0 && passes > 0) {
+      badge.classList.add("ok");
+      badge.textContent = "Minimal Conditions: PASS";
+      return;
+    }
+
+    if (strikes > 0) {
+      badge.classList.add("no");
+      badge.textContent = "Minimal Conditions: REVIEW";
+      return;
+    }
+  }
+
+  badge.classList.add("unknown");
+  badge.textContent = "Minimal Conditions: UNKNOWN";
+}
+
+function estimateMonthlyEarnings(provider, latest) {
+  const totalWeight =
+    Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
+
+  const aprPct =
+    Number(latest?.m_dRewardRate ?? 0);
+
+  if (!Number.isFinite(totalWeight) || totalWeight <= 0) return null;
+  if (!Number.isFinite(aprPct) || aprPct <= 0) return null;
+
+  // APR is yearly, monthly estimate = stake * (apr / 100) / 12
+  return totalWeight * (aprPct / 100) / 12;
+}
+
+function updateMonthlyEarnings(provider, latest) {
+  const el = document.getElementById("monthlyEarningsValue");
+  if (!el) return;
+
+  const monthlyFlr = estimateMonthlyEarnings(provider, latest);
+  if (!Number.isFinite(monthlyFlr)) {
+    el.textContent = "-";
+    return;
+  }
+
+  const usdSpotText = document.getElementById("spotUsd")?.textContent || "";
+  const eurSpotText = document.getElementById("spotEur")?.textContent || "";
+
+  const usdSpot = Number(usdSpotText.replace(/[^\d.]/g, ""));
+  const eurSpot = Number(eurSpotText.replace(/[^\d.]/g, ""));
+
+  if (selectedCurrency === "EUR") {
+    if (Number.isFinite(eurSpot) && eurSpot > 0) {
+      const eurValue = monthlyFlr * eurSpot;
+      el.textContent = fmtMoney(eurValue, "EUR", 0);
+    } else if (Number.isFinite(usdSpot) && usdSpot > 0 && Number.isFinite(usdToEurRate) && usdToEurRate > 0) {
+      const eurValue = monthlyFlr * usdSpot * usdToEurRate;
+      el.textContent = fmtMoney(eurValue, "EUR", 0);
+    } else {
+      el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
+    }
+    return;
+  }
+
+  if (Number.isFinite(usdSpot) && usdSpot > 0) {
+    const usdValue = monthlyFlr * usdSpot;
+    el.textContent = fmtMoney(usdValue, "USD", 0);
+  } else {
+    el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
+  }
+}
+
+  if (selectedCurrency === "EUR") {
+    const eurValue = monthlyFlr * Number(document.getElementById("spotEur")?.textContent?.replace(/[^\d.]/g, "") || 0);
+    el.textContent = Number.isFinite(eurValue) && eurValue > 0
+      ? fmtMoney(eurValue, "EUR", 0)
+      : fmtNum(monthlyFlr, 0) + " FLR";
+    return;
+  }
+
+  const usdValue = monthlyFlr * Number(document.getElementById("spotUsd")?.textContent?.replace(/[^\d.]/g, "") || 0);
+  el.textContent = Number.isFinite(usdValue) && usdValue > 0
+    ? fmtMoney(usdValue, "USD", 0)
+    : fmtNum(monthlyFlr, 0) + " FLR";
+}
+
+function updateNetworkShare(latest) {
+  const el = document.getElementById("networkShareValue");
+  if (!el) return;
+
+  const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
+  const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
+  const totalWeight = Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
+
+  if (!Number.isFinite(selfStake) || !Number.isFinite(delegated) || !Number.isFinite(totalWeight) || totalWeight <= 0) {
+    el.textContent = "-";
+    return;
+  }
+
+  const share = ((selfStake + delegated) / totalWeight) * 100;
+  el.textContent = share.toFixed(2) + "%";
+}
+
+function updateRatioBar(latest) {
+  function fmtDateShort(value) {
+  if (!value) return "-";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return String(value);
+
+  return d.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+}
+
+function setValidatorMonitoring(provider, latest) {
+  const validatorApr =
+    pickFirstDefined(
+      provider?.validatorApr,
+      provider?.validatorAPR,
+      provider?.validator?.apr,
+      provider?.validator?.APR,
+      latest?.validatorApr,
+      latest?.validatorAPR
+    );
+
+  const validatorUptime =
+    pickFirstDefined(
+      provider?.validatorUptime,
+      provider?.validator?.uptime,
+      latest?.validatorUptime,
+      latest?.uptime
+    );
+
+  const validatorConnected =
+    pickFirstDefined(
+      provider?.validatorConnected,
+      provider?.connected,
+      provider?.validator?.connected,
+      latest?.validatorConnected
+    );
+
+  const delegatorsCount =
+    pickFirstDefined(
+      provider?.delegatorsCount,
+      provider?.validator?.delegatorsCount,
+      latest?.delegatorsCount
+    );
+
+  const validatorTotalStake =
+    pickFirstDefined(
+      provider?.validatorTotalStake,
+      provider?.validator?.totalStake,
+      provider?.totalStake,
+      latest?.validatorTotalStake
+    );
+
+  const validatorSelfStake =
+    pickFirstDefined(
+      provider?.validatorSelfStake,
+      provider?.validatorSelfBond,
+      provider?.validator?.selfStake,
+      provider?.validator?.selfBond,
+      provider?.selfBond,
+      latest?.validatorSelfStake
+    );
+
+  const validatorDelegatedStake =
+    pickFirstDefined(
+      provider?.validatorDelegatedStake,
+      provider?.validator?.delegatedStake,
+      provider?.delegatedStake,
+      latest?.validatorDelegatedStake
+    );
+
+  const stakingExpiry =
+    pickFirstDefined(
+      provider?.stakingExpiry,
+      provider?.validator?.stakingExpiry,
+      provider?.stakingEnd,
+      provider?.validator?.stakingEnd,
+      latest?.stakingExpiry
+    );
+
+  setText(
+    "validatorAprValue",
+    validatorApr != null ? fmtPct(validatorApr) : "-"
+  );
+
+  setText(
+    "validatorUptimeValue",
+    validatorUptime != null ? fmtPct(validatorUptime) : "-"
+  );
+
+  setText(
+    "validatorConnectedValue",
+    validatorConnected === true || String(validatorConnected).toLowerCase() === "true"
+      ? "YES"
+      : validatorConnected === false || String(validatorConnected).toLowerCase() === "false"
+      ? "NO"
+      : "-"
+  );
+
+  setText(
+    "delegatorsCountValue",
+    delegatorsCount != null ? fmtNum(delegatorsCount, 0) : "-"
+  );
+
+  setText(
+    "validatorTotalStakeValue",
+    validatorTotalStake != null ? fmtNum(validatorTotalStake, 0) : "-"
+  );
+
+  setText(
+    "validatorSelfStakeValue",
+    validatorSelfStake != null ? fmtNum(validatorSelfStake, 0) : "-"
+  );
+
+  setText(
+    "validatorDelegatedStakeValue",
+    validatorDelegatedStake != null ? fmtNum(validatorDelegatedStake, 0) : "-"
+  );
+
+  setText(
+    "stakingExpiryValue",
+    stakingExpiry != null ? fmtDateShort(stakingExpiry) : "-"
+  );
+}
+  const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
+  const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
+
+  const total = selfStake + delegated;
+
+  const selfEl = document.getElementById("ratioSelf");
+  const delegatedEl = document.getElementById("ratioDelegated");
+  const selfText = document.getElementById("ratioSelfText");
+  const delegatedText = document.getElementById("ratioDelegatedText");
+
+  if (!Number.isFinite(total) || total <= 0) {
+    if (selfText) selfText.textContent = "Self: -";
+    if (delegatedText) delegatedText.textContent = "Delegated: -";
+    return;
+  }
+
+  const selfPct = (selfStake / total) * 100;
+  const delegatedPct = (delegated / total) * 100;
+
+  if (selfEl) selfEl.style.width = `${selfPct}%`;
+  if (delegatedEl) delegatedEl.style.width = `${delegatedPct}%`;
+
+  if (selfText) selfText.textContent = `Self: ${fmtNum(selfStake, 0)} (${selfPct.toFixed(1)}%)`;
+  if (delegatedText) delegatedText.textContent = `Delegated: ${fmtNum(delegated, 0)} (${delegatedPct.toFixed(1)}%)`;
+}
   function loadExtraMetrics(provider, latest) {
   if (!latest) {
     document.getElementById("aprValue").textContent = "-";
@@ -815,7 +1322,8 @@
         }
 
         const latest = getLatestEpoch(provider);
-
+window.__providerData = provider;
+window.__latestEpochData = latest;
         setText(
           "avgRewardValue",
           provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-"
@@ -848,7 +1356,11 @@
         setPreRegBadge(preRegResult);
 
         loadExtraMetrics(provider, latest);
-
+setMinimalConditionsBadge(provider);
+updateMonthlyEarnings(provider, latest);
+updateNetworkShare(latest);
+updateRatioBar(latest);
+        setValidatorMonitoring(provider, latest);
         loadingEl.style.display = "none";
         contentEl.style.display = "block";
         updateLastUpdated();
@@ -862,7 +1374,22 @@
       }
     }
 
-    loadPerformance();
+   document.getElementById("usdBtn")?.addEventListener("click", () => {
+  selectedCurrency = "USD";
+  updateCurrencyButtons();
+  updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
+});
+
+document.getElementById("eurBtn")?.addEventListener("click", () => {
+  selectedCurrency = "EUR";
+  updateCurrencyButtons();
+  updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
+});
+
+updateCurrencyButtons();
+loadFxRate().finally(() => {
+  loadPerformance();
+});
   </script>
 </body>
 </html>
