@@ -524,13 +524,13 @@
     <div id="error" class="error" style="display:none;"></div>
 
     <div id="content" style="display:none;">
-      <div class="grid">
-        <div class="card">
-          <div class="label">Average Reward / Epoch</div>
-          <div class="value" id="avgRewardValue">-</div>
-          <div class="small">Average across all tracked epochs</div>
-        </div>
-<div class="grid">
+     <div class="grid">
+  <div class="card">
+    <div class="label">Average Reward / Epoch</div>
+    <div class="value" id="avgRewardValue">-</div>
+    <div class="small">Average across all tracked epochs</div>
+  </div>
+
   <div class="card">
     <div class="label">Monthly Earnings</div>
     <div class="value" id="monthlyEarningsValue">-</div>
@@ -539,12 +539,12 @@
 
   <div class="card">
     <div class="label">Stake Composition</div>
-<div class="value" id="networkShareValue">-</div>
-<div class="small">Derived from provider weight</div>
+    <div class="value" id="networkShareValue">-</div>
+    <div class="small">Derived from provider weight</div>
   </div>
-</div>
-        <div class="card">
-          <div class="label">Epochs</div>
+
+  <div class="card">
+    <div class="label">Epochs</div>
           <div class="value" id="epochsValue">-</div>
           <div class="small">Eligible / total epochs</div>
         </div>
@@ -1103,29 +1103,6 @@ async function loadFlrSpotPrices() {
   el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
 }
 
-    const usdSpotText = document.getElementById("spotUsd")?.textContent || "";
-    const eurSpotText = document.getElementById("spotEur")?.textContent || "";
-
-    const usdSpot = Number(usdSpotText.replace(/[^\d.]/g, ""));
-    const eurSpot = Number(eurSpotText.replace(/[^\d.]/g, ""));
-
-    if (selectedCurrency === "EUR") {
-      if (Number.isFinite(eurSpot) && eurSpot > 0) {
-        el.textContent = fmtMoney(monthlyFlr * eurSpot, "EUR", 0);
-      } else if (Number.isFinite(usdSpot) && usdSpot > 0 && Number.isFinite(usdToEurRate) && usdToEurRate > 0) {
-        el.textContent = fmtMoney(monthlyFlr * usdSpot * usdToEurRate, "EUR", 0);
-      } else {
-        el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
-      }
-      return;
-    }
-
-    if (Number.isFinite(usdSpot) && usdSpot > 0) {
-      el.textContent = fmtMoney(monthlyFlr * usdSpot, "USD", 0);
-    } else {
-      el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
-    }
-  }
 
   function updateNetworkShare(latest) {
     const el = document.getElementById("networkShareValue");
