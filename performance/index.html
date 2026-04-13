@@ -720,24 +720,39 @@
     ? Number(latest.m_dRewardRate).toFixed(2) + "%"
     : "-";
 
-  let selfBondValue = latest.m_stakeWeight != null
-    ? fmtNum(latest.m_stakeWeight, 0)
+  const selfBondRaw =
+    latest.m_dStakeWeight ??
+    latest.m_stakeWeight ??
+    null;
+
+  const delegatedRaw =
+    latest.m_dDelegationWeight ??
+    latest.m_delegationWeight ??
+    null;
+
+  const totalWeightRaw =
+    latest.m_dTotalWeight ??
+    latest.m_totalWeight ??
+    null;
+
+  let selfBondValue = selfBondRaw != null
+    ? fmtNum(selfBondRaw, 0)
     : "-";
 
-  const delegatedValue = latest.m_delegationWeight != null
-    ? fmtNum(latest.m_delegationWeight, 0)
+  const delegatedValue = delegatedRaw != null
+    ? fmtNum(delegatedRaw, 0)
     : "-";
 
-  const totalWeightValue = latest.m_totalWeight != null
-    ? fmtNum(latest.m_totalWeight, 0)
+  const totalWeightValue = totalWeightRaw != null
+    ? fmtNum(totalWeightRaw, 0)
     : "-";
 
   if (
-    latest.m_stakeWeight != null &&
-    latest.m_totalWeight != null &&
-    Number(latest.m_totalWeight) > 0
+    selfBondRaw != null &&
+    totalWeightRaw != null &&
+    Number(totalWeightRaw) > 0
   ) {
-    const selfPct = (Number(latest.m_stakeWeight) / Number(latest.m_totalWeight)) * 100;
+    const selfPct = (Number(selfBondRaw) / Number(totalWeightRaw)) * 100;
     selfBondValue += ` (${selfPct.toFixed(1)}%)`;
   }
 
