@@ -371,9 +371,9 @@ tr:last-child td{
         </div>
 
        <div class="card">
-  <div class="label">Provider</div>
-  <div class="value" id="providerNameText">MirSFlr</div>
-  <div class="small">Oracle Daemon provider record</div>
+  <div class="label">Provider Status</div>
+  <div class="value"><span class="status" id="statusValue">ONLINE</span></div>
+  <div class="small" id="providerNameText">MirSFlr</div>
 </div>
       </div>
 
@@ -521,8 +521,10 @@ tr:last-child td{
       document.getElementById("totalRewardsValue").textContent =
         provider.totalRewards != null ? fmtNum(provider.totalRewards, 2) : "-";
 
-      document.getElementById("providerNameText").textContent =
-        provider.dataProviderName || "MirSFlr";
+      const name = provider.dataProviderName;
+
+document.getElementById("providerNameText").textContent =
+  name && name !== "Unknown" ? name : "MirSFlr";
 
       const ftsoAvailability = provider.ftsoPerformance?.availability;
       if (ftsoAvailability != null) {
