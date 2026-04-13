@@ -80,22 +80,39 @@
       text-decoration:none;
     }
 
-    .container{
-      position:relative;
-      z-index:1;
-      max-width:var(--max);
-      margin:0 auto;
-      padding:24px 20px 60px;
-    }
+   .container{
+  position:relative;
+  z-index:1;
+  max-width:var(--max);
+  margin:0 auto;
+  padding:0 20px 60px;
+}
 
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:24px;
-      flex-wrap:wrap;
-    }
+   .topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px 0 18px;
+  margin:0 0 24px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7,11,20,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+    .navGroup{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+}
 
     .btn{
       display:inline-flex;
@@ -135,13 +152,13 @@
     }
 
     .title{
-      position:relative;
-      z-index:1;
-      font-size:clamp(30px, 4vw, 42px);
-      font-weight:900;
-      letter-spacing:-0.03em;
-      margin:10px 0 0;
-    }
+  position:relative;
+  z-index:1;
+  font-size:clamp(30px, 4vw, 42px);
+  font-weight:900;
+  letter-spacing:-0.03em;
+  margin:18px 0 0;
+}
 
     .subtitle{
       position:relative;
@@ -320,32 +337,36 @@
     }
 
     @media (max-width: 640px){
-      .container{
-        padding:24px 14px 40px;
-      }
+  .container{
+    padding:0 14px 40px;
+  }
 
-      .grid{
-        grid-template-columns:1fr;
-      }
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-      .value{
-        font-size:24px;
-      }
-    }
+  .value{
+    font-size:24px;
+  }
+
+  .navGroup{
+    justify-content:center;
+  }
+}
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="topbar">
-      <a class="btn" href="/home/">← Back to home</a>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <a class="btn" href="/stats/">Stats</a>
-        <a class="btn" href="/epochs/">Epochs</a>
-        <a class="btn" href="/addresses/">Addresses</a>
-        <a class="btn active" href="/performance/">Performance</a>
-        <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
-      </div>
-    </div>
+   <div class="topbar">
+  <div class="navGroup">
+    <a class="btn" href="/stats/">Stats</a>
+    <a class="btn" href="/epochs/">Epochs</a>
+    <a class="btn" href="/addresses/">Addresses</a>
+    <a class="btn active" href="/performance/">Performance</a>
+    <a class="btn" href="/">Home</a>
+    <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+  </div>
+</div>
 
     <div class="titleRow">
       <div>
@@ -450,7 +471,7 @@
         <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
         <div class="barMeta" id="fdcAvailabilityText">-</div>
       </div>
-<pre id="debugData" style="display:none; white-space:pre-wrap; word-break:break-word; color:rgba(255,255,255,.78); font-size:12px; line-height:1.5; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:16px; margin-top:18px;"></pre>
+
       <div class="note">
         Source: Oracle Daemon API
         <br>
@@ -780,9 +801,7 @@
 
         const data = await res.json();
         const provider = findProviderDeep(data);
-          console.log("FULL API DATA:", data);
-console.log("MIRSFLR PROVIDER:", provider);
-console.log("LATEST EPOCH:", getLatestEpoch(provider));
+         
         if (!provider) {
           throw new Error("MirSFlr provider not found");
         }
