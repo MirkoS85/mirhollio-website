@@ -1,1113 +1,410 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MirSFlr Performance</title>
+<script>
+  const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
+  const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+  const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  let selectedCurrency = "USD";
+  let usdToEurRate = 0.92;
 
-  <style>
-    :root{
-      --bg:#070b14;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.52);
-      --panel:rgba(255,255,255,.06);
-      --panel2:rgba(255,255,255,.04);
-      --border:rgba(255,255,255,.10);
-      --shadow:0 18px 60px rgba(0,0,0,.45);
-      --r2:28px;
-      --max:1200px;
-      --ok:#33d69f;
-      --brand:#7c5cff;
-      --brandPink:#ff2f92;
-      --danger:#ff617d;
-      --warn:#ffb454;
-    }
-
-    *,
-    *::before,
-    *::after{
-      box-sizing:border-box;
-    }
-
-    html,body{
-      min-height:100%;
-    }
-
-    body{
-      margin:0;
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(720px 420px at 79% 19%, rgba(255, 51, 153, 0.34), transparent 40%),
-        radial-gradient(520px 320px at 15% 77%, rgba(255, 51, 153, 0.20), transparent 34%),
-        radial-gradient(500px 280px at 54% 40%, rgba(123, 49, 255, 0.12), transparent 42%),
-        #020204;
-      overflow-x:hidden;
-      position:relative;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      background:
-        radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.42), transparent 68%),
-        radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.42), transparent 68%);
-    }
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      background:
-        radial-gradient(680px 380px at 79% 18%, rgba(255, 51, 153, 0.24), transparent 38%),
-        radial-gradient(500px 300px at 15% 77%, rgba(255, 51, 153, 0.14), transparent 34%),
-        radial-gradient(460px 260px at 54% 40%, rgba(123, 49, 255, 0.10), transparent 40%);
-      filter: blur(46px);
-    }
-
-    a{
-      color:inherit;
-      text-decoration:none;
-    }
-
-   .container{
-  position:relative;
-  z-index:1;
-  max-width:var(--max);
-  margin:0 auto;
-  padding:0 20px 60px;
-}
-
-   .topbar{
-  position:sticky;
-  top:0;
-  z-index:1000;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  padding:14px 0 18px;
-  margin:0 0 24px;
-
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background: rgba(7,11,20,.62);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-    .navGroup{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  width:100%;
-}
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:14px;
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border:1px solid var(--border);
-      color:var(--text);
-      font-weight:800;
-      box-shadow:0 8px 22px rgba(0,0,0,.18);
-      transition:transform .14s ease, background .14s ease, border-color .14s ease;
-    }
-
-    .btn:hover{
-      transform:translateY(-1px);
-      background:linear-gradient(135deg, rgba(109,74,255,.18), rgba(255,47,146,.10));
-      border-color:rgba(109,74,255,.24);
-    }
-
-    .btn.active{
-      background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
-      border-color:transparent;
-      color:white;
-      box-shadow:0 10px 24px rgba(109,74,255,.22);
-    }
-
-    .titleRow{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-      margin-bottom:8px;
-    }
-
-    .title{
-  position:relative;
-  z-index:1;
-  font-size:clamp(30px, 4vw, 42px);
-  font-weight:900;
-  letter-spacing:-0.03em;
-  margin:18px 0 0;
-}
-
-    .subtitle{
-      position:relative;
-      z-index:1;
-      color:var(--muted);
-      line-height:1.6;
-      margin-bottom:24px;
-    }
-
-    .statusWrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow:0 8px 22px rgba(0,0,0,.18);
-      font-weight:800;
-      backdrop-filter:blur(10px);
-    }
-
-    .badgeDot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--muted2);
-      box-shadow:0 0 0 6px rgba(255,255,255,.04);
-      flex:0 0 auto;
-    }
-
-    .badge.ok{
-      border-color:rgba(51,214,159,.26);
-      background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
-    }
-
-    .badge.ok .badgeDot{
-      background:var(--ok);
-      box-shadow:0 0 0 6px rgba(51,214,159,.10);
-    }
-
-    .badge.no{
-      border-color:rgba(255,97,125,.26);
-      background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
-    }
-
-    .badge.no .badgeDot{
-      background:var(--danger);
-      box-shadow:0 0 0 6px rgba(255,97,125,.10);
-    }
-
-    .badge.unknown{
-      border-color:rgba(255,180,84,.26);
-      background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
-    }
-
-    .badge.unknown .badgeDot{
-      background:var(--warn);
-      box-shadow:0 0 0 6px rgba(255,180,84,.10);
-    }
-
-    .loading,.error{
-      position:relative;
-      z-index:1;
-      padding:16px;
-      border-radius:18px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      margin-bottom:20px;
-      box-shadow:var(--shadow);
-    }
-
-    .grid{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
-      margin-bottom:24px;
-    }
-
-    .card{
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border:1px solid var(--border);
-      border-radius:var(--r2);
-      box-shadow:var(--shadow);
-      padding:18px;
-      backdrop-filter:blur(10px);
-    }
-
-    .label{
-      color:var(--muted2);
-      font-size:13px;
-      margin-bottom:8px;
-    }
-
-    .value{
-      font-size:30px;
-      font-weight:900;
-      letter-spacing:-0.02em;
-    }
-
-    .small{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .sectionTitle{
-      margin:8px 0 14px;
-      font-size:16px;
-      font-weight:800;
-      color:var(--text);
-    }
-
-    .barCard{
-      position:relative;
-      z-index:1;
-      background:linear-gradient(180deg, var(--panel), var(--panel2));
-      border:1px solid var(--border);
-      border-radius:var(--r2);
-      box-shadow:var(--shadow);
-      padding:18px;
-      margin-bottom:18px;
-      backdrop-filter:blur(10px);
-    }
-
-    .barTitle{
-      color:var(--muted2);
-      font-size:13px;
-      margin-bottom:10px;
-    }
-
-    .barBg{
-      width:100%;
-      height:16px;
-      border-radius:999px;
-      overflow:hidden;
-      background:rgba(255,255,255,.08);
-    }
-
-    .barFill{
-      height:100%;
-      width:0%;
-      background:linear-gradient(90deg, var(--ok), #69e58f);
-      transition:width .4s ease;
-    }
-
-    .barMeta{
-      margin-top:8px;
-      color:var(--muted);
-      font-size:13px;
-    }
-
-    .note{
-      position:relative;
-      z-index:1;
-      margin-top:12px;
-      color:var(--muted2);
-      font-size:13px;
-      line-height:1.6;
-    }
-
-    @media (max-width: 980px){
-      .grid{
-        grid-template-columns:repeat(2,1fr);
-      }
-    }
-
-    @media (max-width: 640px){
-  .container{
-    padding:0 14px 40px;
+  function fmtNum(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return n.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: decimals
+    });
   }
 
-  .grid{
-    grid-template-columns:1fr;
+  function fmtPct(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    const pct = n <= 1 ? n * 100 : n;
+    return `${pct.toFixed(decimals)}%`;
   }
 
-  .value{
-    font-size:24px;
-  }
+  function fmtMoney(value, currency = "USD", decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
 
-  .navGroup{
-    justify-content:center;
-  }
-
-  .currencyToggle{
-    width:100%;
-    justify-content:center;
-  }
-
-  .currencyBtn{
-    flex:1 1 auto;
-  }
-}
-    .currencyToggle{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:6px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  box-shadow:0 8px 22px rgba(0,0,0,.18);
-}
-
-.currencyBtn{
-  border:0;
-  background:transparent;
-  color:var(--muted);
-  font-weight:800;
-  padding:8px 12px;
-  border-radius:999px;
-  cursor:pointer;
-  transition:background .14s ease, color .14s ease, transform .14s ease;
-}
-
-.currencyBtn:hover{
-  color:var(--text);
-  transform:translateY(-1px);
-}
-
-.currencyBtn.active{
-  background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
-  color:#fff;
-  box-shadow:0 10px 24px rgba(109,74,255,.22);
-}
-
-.inlineStatusRow{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.statusBadgeSmall{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 14px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:800;
-  border:1px solid var(--border);
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-}
-
-.statusBadgeSmall.ok{
-  color:#9ff0cc;
-  background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
-  border-color:rgba(51,214,159,.26);
-}
-
-.statusBadgeSmall.no{
-  color:#ffb7c4;
-  background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
-  border-color:rgba(255,97,125,.26);
-}
-
-.statusBadgeSmall.unknown{
-  color:#ffd89a;
-  background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
-  border-color:rgba(255,180,84,.26);
-}
-
-.ratioCard{
-  position:relative;
-  z-index:1;
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  border:1px solid var(--border);
-  border-radius:var(--r2);
-  box-shadow:var(--shadow);
-  padding:18px;
-  margin-bottom:18px;
-  backdrop-filter:blur(10px);
-}
-
-.ratioLegend{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:10px;
-  color:var(--muted);
-  font-size:13px;
-  flex-wrap:wrap;
-}
-
-.ratioStack{
-  width:100%;
-  height:18px;
-  border-radius:999px;
-  overflow:hidden;
-  background:rgba(255,255,255,.08);
-  display:flex;
-}
-
-.ratioSelf{
-  height:100%;
-  background:linear-gradient(90deg, #7c5cff, #9a78ff);
-  width:0%;
-}
-
-.ratioDelegated{
-  height:100%;
-  background:linear-gradient(90deg, #23d5ff, #7be7ff);
-  width:0%;
-}
-
-.miniNote{
-  color:var(--muted2);
-  font-size:12px;
-  margin-top:8px;
-}
-  </style>
-</head>
-<body>
-  <div class="container">
-  <div class="topbar">
-  <div class="navGroup">
-    <a class="btn" href="/stats/">Stats</a>
-    <a class="btn" href="/epochs/">Epochs</a>
-    <a class="btn" href="/addresses/">Addresses</a>
-    <a class="btn active" href="/performance/">Performance</a>
-    <a class="btn" href="/">Home</a>
-  </div>
-</div>
-
-    <div class="titleRow">
-      <div>
-        <div class="title">MirSFlr Performance</div>
-        <div class="subtitle">
-          Technical performance overview from Oracle Daemon API.
-        </div>
-      </div>
-
-      <div class="statusWrap">
-  <div class="inlineStatusRow">
-    <div class="badge unknown" id="preRegBadge">
-      <span class="badgeDot"></span>
-      <span id="preRegBadgeText">Pre-registration: checking…</span>
-    </div>
-
-    <div class="statusBadgeSmall unknown" id="minConditionsBadge">
-      Minimal Conditions: checking…
-    </div>
-
-    <div class="currencyToggle" aria-label="Currency toggle">
-      <button class="currencyBtn active" id="usdBtn" type="button">USD</button>
-      <button class="currencyBtn" id="eurBtn" type="button">EUR</button>
-    </div>
-  </div>
-</div>
-
-    <div id="loading" class="loading">Loading performance…</div>
-    <div id="error" class="error" style="display:none;"></div>
-
-    <div id="content" style="display:none;">
-      <div class="grid">
-        <div class="card">
-          <div class="label">Average Reward / Epoch</div>
-          <div class="value" id="avgRewardValue">-</div>
-          <div class="small">Average across all tracked epochs</div>
-        </div>
-<div class="grid">
-  <div class="card">
-    <div class="label">Monthly Earnings</div>
-    <div class="value" id="monthlyEarningsValue">-</div>
-    <div class="small">Estimated based on APR</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Stake Composition</div>
-<div class="value" id="networkShareValue">-</div>
-<div class="small">Derived from provider weight</div>
-  </div>
-</div>
-        <div class="card">
-          <div class="label">Epochs</div>
-          <div class="value" id="epochsValue">-</div>
-          <div class="small">Eligible / total epochs</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Passes / Strikes</div>
-          <div class="value" id="passStrikeValue">-</div>
-          <div class="small">Eligibility track record</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Delegation Fee</div>
-          <div class="value" id="feeValue">-</div>
-          <div class="small">Current fee</div>
-        </div>
-      </div>
-
-      <div class="sectionTitle">Additional metrics</div>
-<div class="ratioCard">
-  <div class="sectionTitle">Stake composition</div>
-
-  <div class="ratioStack">
-    <div class="ratioSelf" id="ratioSelf"></div>
-    <div class="ratioDelegated" id="ratioDelegated"></div>
-  </div>
-
-  <div class="ratioLegend">
-    <div id="ratioSelfText">Self: -</div>
-    <div id="ratioDelegatedText">Delegated: -</div>
-  </div>
-
-  <div class="miniNote">
-    Shows how much stake is provider-owned vs delegated.
-  </div>
-</div>
-      <div class="grid">
-        <div class="card">
-          <div class="label">APR</div>
-          <div class="value" id="aprValue">-</div>
-          <div class="small">If available from API</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Self Bond / Stake</div>
-          <div class="value" id="selfBondValue">-</div>
-          <div class="small">Provider-owned weight</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Delegated</div>
-          <div class="value" id="delegatedValue">-</div>
-          <div class="small">External delegation</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Total Weight</div>
-          <div class="value" id="totalWeightValue">-</div>
-          <div class="small">Combined effective weight</div>
-        </div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FTSO Availability</div>
-        <div class="barBg"><div class="barFill" id="ftsoAvailabilityBar"></div></div>
-        <div class="barMeta" id="ftsoAvailabilityText">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FTSO Performance</div>
-        <div class="barBg"><div class="barFill" id="ftsoPerformanceBar"></div></div>
-        <div class="barMeta" id="ftsoPerformanceText">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">Performance 1</div>
-        <div class="barBg"><div class="barFill" id="performance1Bar"></div></div>
-        <div class="barMeta" id="performance1Text">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">Performance 2</div>
-        <div class="barBg"><div class="barFill" id="performance2Bar"></div></div>
-        <div class="barMeta" id="performance2Text">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FDC Availability</div>
-        <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
-        <div class="barMeta" id="fdcAvailabilityText">-</div>
-      </div>
-<div class="sectionTitle">Validator Monitoring</div>
-
-<div class="grid">
-  <div class="card">
-    <div class="label">Validator APR</div>
-    <div class="value" id="validatorAprValue">-</div>
-    <div class="small">Validator-side APR</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Uptime</div>
-    <div class="value" id="validatorUptimeValue">-</div>
-    <div class="small">Current node uptime</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Connected</div>
-    <div class="value" id="validatorConnectedValue">-</div>
-    <div class="small">Live node status</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Delegators</div>
-    <div class="value" id="delegatorsCountValue">-</div>
-    <div class="small">Current delegator count</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Total Stake</div>
-    <div class="value" id="validatorTotalStakeValue">-</div>
-    <div class="small">Validator total stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Self Bond</div>
-    <div class="value" id="validatorSelfStakeValue">-</div>
-    <div class="small">Provider-owned validator stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Delegated</div>
-    <div class="value" id="validatorDelegatedStakeValue">-</div>
-    <div class="small">Delegated validator stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Staking Expiry</div>
-    <div class="value" id="stakingExpiryValue">-</div>
-    <div class="small">Validator staking end time</div>
-  </div>
-</div>
-     <div class="note">
-  Source: Oracle Daemon API
-  <br>
-  <a href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">Open raw API</a>
-  <br>
-  <span id="lastUpdated"></span>
-  <br>
-  <span id="debugHint"></span>
-</div>
-    </div>
-  </div>
-
-  <script>
-    const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
-    const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
-    const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
-
-    function fmtNum(value, decimals = 2) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return "-";
-      return n.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
+    if (currency === "EUR") {
+      return "€" + n.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       });
     }
 
-    function fmtPct(value, decimals = 2) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return "-";
-      const pct = n <= 1 ? n * 100 : n;
-      return `${pct.toFixed(decimals)}%`;
-    }
-
-    function toPercentNumber(value) {
-      const n = Number(value);
-      if (!Number.isFinite(n)) return null;
-      return n <= 1 ? n * 100 : n;
-    }
-
-    function setBar(barId, textId, value) {
-      const pct = toPercentNumber(value);
-      const bar = document.getElementById(barId);
-      const text = document.getElementById(textId);
-
-      if (pct === null) {
-        if (bar) bar.style.width = "0%";
-        if (text) text.textContent = "-";
-        return;
-      }
-
-      const safe = Math.max(0, Math.min(pct, 100));
-      if (bar) bar.style.width = `${safe}%`;
-      if (text) text.textContent = `${safe.toFixed(2)}%`;
-    }
-
-    function updateLastUpdated() {
-      const el = document.getElementById("lastUpdated");
-      if (!el) return;
-
-      el.textContent =
-        "Last updated: " +
-        new Date().toLocaleString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          timeZoneName: "short"
-        });
-    }
-
-    function findProviderDeep(data) {
-      let found = null;
-
-      function walk(node) {
-        if (found || node == null) return;
-
-        if (Array.isArray(node)) {
-          for (const item of node) walk(item);
-          return;
-        }
-
-        if (typeof node === "object") {
-          const voter = String(node.voterAddress || "").toLowerCase();
-          const delegation = String(node.delegationAddress || "").toLowerCase();
-          const name = String(node.dataProviderName || "").toLowerCase();
-
-          if (
-            voter === TARGET_VOTER ||
-            delegation === TARGET_DELEGATION ||
-            name === "mirsflr"
-          ) {
-            found = node;
-            return;
-          }
-
-          for (const value of Object.values(node)) {
-            walk(value);
-            if (found) return;
-          }
-        }
-      }
-
-      walk(data);
-      return found;
-    }
-
-    function getLatestEpoch(provider) {
-      if (!provider?.epochData?.length) return null;
-      return [...provider.epochData].sort((a, b) => Number(b.epoch) - Number(a.epoch))[0];
-    }
-
-    function getNextEpoch(provider) {
-      if (!provider?.epochData?.length) return null;
-      return [...provider.epochData].sort((a, b) => Number(a.epoch) - Number(b.epoch)).slice(-1)[0] || null;
-    }
-
-    function pickFirstDefined(...values) {
-      for (const value of values) {
-        if (value !== undefined && value !== null && value !== "") {
-          return value;
-        }
-      }
-      return null;
-    }
-
-    function parseBooleanLike(value) {
-      if (typeof value === "boolean") return value;
-      if (typeof value === "number") {
-        if (value === 1) return true;
-        if (value === 0) return false;
-      }
-      if (typeof value === "string") {
-        const v = value.trim().toLowerCase();
-        if (["true", "yes", "y", "1", "registered", "pre-registered", "preregistered", "ready", "active"].includes(v)) {
-          return true;
-        }
-        if (["false", "no", "n", "0", "not registered", "not pre-registered", "unregistered", "inactive"].includes(v)) {
-          return false;
-        }
-      }
-      return null;
-    }
-
-    function findValueByKeyDeep(node, candidateKeys) {
-      if (!node || typeof node !== "object") return null;
-
-      const lowered = candidateKeys.map(k => k.toLowerCase());
-      let match = null;
-
-      function walk(obj) {
-        if (match !== null || obj == null) return;
-
-        if (Array.isArray(obj)) {
-          for (const item of obj) {
-            walk(item);
-            if (match !== null) return;
-          }
-          return;
-        }
-
-        if (typeof obj === "object") {
-          for (const [key, value] of Object.entries(obj)) {
-            const keyLc = key.toLowerCase();
-            if (lowered.includes(keyLc)) {
-              match = value;
-              return;
-            }
-          }
-
-          for (const value of Object.values(obj)) {
-            walk(value);
-            if (match !== null) return;
-          }
-        }
-      }
-
-      walk(node);
-      return match;
-    }
-
-    function detectPreRegistration(provider, latestEpoch) {
-      const keyCandidates = [
-        "preRegistered",
-        "preregistered",
-        "preRegistration",
-        "preRegistrationStatus",
-        "isPreRegistered",
-        "isPreregistered",
-        "preRegisteredForNextEpoch",
-        "preregisteredForNextEpoch",
-        "isPreRegisteredForNextEpoch",
-        "nextEpochPreRegistered",
-        "nextEpochPreregistered",
-        "registeredForNextEpoch",
-        "nextEpochRegistered",
-        "registrationStatus",
-        "p"
-      ];
-
-      const rawValue = pickFirstDefined(
-        findValueByKeyDeep(latestEpoch, keyCandidates),
-        findValueByKeyDeep(provider, keyCandidates),
-        latestEpoch?.voterRegistration?.preRegistered,
-        latestEpoch?.voterRegistration?.isPreRegistered,
-        latestEpoch?.voterRegistration?.preRegisteredForNextEpoch,
-        latestEpoch?.voterRegistration?.registeredForNextEpoch,
-        latestEpoch?.preRegistered,
-        latestEpoch?.preregistered,
-        provider?.preRegistered,
-        provider?.preregistered
-      );
-
-      const parsed = parseBooleanLike(rawValue);
-
-      return {
-        value: parsed,
-        raw: rawValue
-      };
-    }
-
-    function setPreRegBadge(result) {
-      const badge = document.getElementById("preRegBadge");
-      const text = document.getElementById("preRegBadgeText");
-      const hint = document.getElementById("debugHint");
-
-      if (!badge || !text || !hint) return;
-
-      badge.classList.remove("ok", "no", "unknown");
-
-      if (result.value === true) {
-        badge.classList.add("ok");
-        text.textContent = "Pre-registration: YES";
-        hint.textContent = "Next epoch registration detected.";
-        return;
-      }
-
-      if (result.value === false) {
-        badge.classList.add("no");
-        text.textContent = "Pre-registration: NO";
-        hint.textContent = "Next epoch registration not detected.";
-        return;
-      }
-
-      badge.classList.add("unknown");
-      text.textContent = "Pre-registration: UNKNOWN";
-      hint.textContent = result.raw != null
-        ? `Raw prereg value found but not recognized: ${String(result.raw)}`
-        : "No explicit prereg field detected in current API response.";
-    }
-
-    function setText(id, value) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.textContent = value ?? "-";
-    }
-let selectedCurrency = "USD";
-let usdToEurRate = 0.92; // fallback
-
-function fmtMoney(value, currency = "USD", decimals = 2) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "-";
-
-  if (currency === "EUR") {
-    return "€" + n.toLocaleString(undefined, {
+    return "$" + n.toLocaleString(undefined, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
     });
   }
 
-  return "$" + n.toLocaleString(undefined, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-}
+  function toPercentNumber(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return n <= 1 ? n * 100 : n;
+  }
 
-async function loadFxRate() {
-  try {
-    const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");
-    if (!res.ok) return;
-    const data = await res.json();
-    const rate = Number(data?.rates?.EUR);
-    if (Number.isFinite(rate) && rate > 0) {
-      usdToEurRate = rate;
+  function setBar(barId, textId, value) {
+    const pct = toPercentNumber(value);
+    const bar = document.getElementById(barId);
+    const text = document.getElementById(textId);
+
+    if (pct === null) {
+      if (bar) bar.style.width = "0%";
+      if (text) text.textContent = "-";
+      return;
     }
-  } catch (_) {}
-}
 
-function updateCurrencyButtons() {
-  const usdBtn = document.getElementById("usdBtn");
-  const eurBtn = document.getElementById("eurBtn");
+    const safe = Math.max(0, Math.min(pct, 100));
+    if (bar) bar.style.width = `${safe}%`;
+    if (text) text.textContent = `${safe.toFixed(2)}%`;
+  }
 
-  if (usdBtn) usdBtn.classList.toggle("active", selectedCurrency === "USD");
-  if (eurBtn) eurBtn.classList.toggle("active", selectedCurrency === "EUR");
-}
+  function setText(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value ?? "-";
+  }
 
-function setMinimalConditionsBadge(provider) {
-  const badge = document.getElementById("minConditionsBadge");
-  if (!badge) return;
+  function updateLastUpdated() {
+    const el = document.getElementById("lastUpdated");
+    if (!el) return;
 
-  badge.classList.remove("ok", "no", "unknown");
+    el.textContent =
+      "Last updated: " +
+      new Date().toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZoneName: "short"
+      });
+  }
 
-  const strikes = Number(provider?.totalStrikes);
-  const passes = Number(provider?.totalPasses);
+  function findProviderDeep(data) {
+    let found = null;
 
-  if (Number.isFinite(strikes) && Number.isFinite(passes)) {
-    if (strikes === 0 && passes > 0) {
+    function walk(node) {
+      if (found || node == null) return;
+
+      if (Array.isArray(node)) {
+        for (const item of node) walk(item);
+        return;
+      }
+
+      if (typeof node === "object") {
+        const voter = String(node.voterAddress || "").toLowerCase();
+        const delegation = String(node.delegationAddress || "").toLowerCase();
+        const name = String(node.dataProviderName || "").toLowerCase();
+
+        if (
+          voter === TARGET_VOTER ||
+          delegation === TARGET_DELEGATION ||
+          name === "mirsflr"
+        ) {
+          found = node;
+          return;
+        }
+
+        for (const value of Object.values(node)) {
+          walk(value);
+          if (found) return;
+        }
+      }
+    }
+
+    walk(data);
+    return found;
+  }
+
+  function getLatestEpoch(provider) {
+    if (!provider?.epochData?.length) return null;
+    return [...provider.epochData].sort((a, b) => Number(b.epoch) - Number(a.epoch))[0];
+  }
+
+  function pickFirstDefined(...values) {
+    for (const value of values) {
+      if (value !== undefined && value !== null && value !== "") {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  function parseBooleanLike(value) {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") {
+      if (value === 1) return true;
+      if (value === 0) return false;
+    }
+    if (typeof value === "string") {
+      const v = value.trim().toLowerCase();
+      if (["true", "yes", "y", "1", "registered", "pre-registered", "preregistered", "ready", "active"].includes(v)) {
+        return true;
+      }
+      if (["false", "no", "n", "0", "not registered", "not pre-registered", "unregistered", "inactive"].includes(v)) {
+        return false;
+      }
+    }
+    return null;
+  }
+
+  function findValueByKeyDeep(node, candidateKeys) {
+    if (!node || typeof node !== "object") return null;
+
+    const lowered = candidateKeys.map(k => k.toLowerCase());
+    let match = null;
+
+    function walk(obj) {
+      if (match !== null || obj == null) return;
+
+      if (Array.isArray(obj)) {
+        for (const item of obj) {
+          walk(item);
+          if (match !== null) return;
+        }
+        return;
+      }
+
+      if (typeof obj === "object") {
+        for (const [key, value] of Object.entries(obj)) {
+          const keyLc = key.toLowerCase();
+          if (lowered.includes(keyLc)) {
+            match = value;
+            return;
+          }
+        }
+
+        for (const value of Object.values(obj)) {
+          walk(value);
+          if (match !== null) return;
+        }
+      }
+    }
+
+    walk(node);
+    return match;
+  }
+
+  function detectPreRegistration(provider, latestEpoch) {
+    const keyCandidates = [
+      "preRegistered",
+      "preregistered",
+      "preRegistration",
+      "preRegistrationStatus",
+      "isPreRegistered",
+      "isPreregistered",
+      "preRegisteredForNextEpoch",
+      "preregisteredForNextEpoch",
+      "isPreRegisteredForNextEpoch",
+      "nextEpochPreRegistered",
+      "nextEpochPreregistered",
+      "registeredForNextEpoch",
+      "nextEpochRegistered",
+      "registrationStatus",
+      "p"
+    ];
+
+    const rawValue = pickFirstDefined(
+      findValueByKeyDeep(latestEpoch, keyCandidates),
+      findValueByKeyDeep(provider, keyCandidates),
+      latestEpoch?.voterRegistration?.preRegistered,
+      latestEpoch?.voterRegistration?.isPreRegistered,
+      latestEpoch?.voterRegistration?.preRegisteredForNextEpoch,
+      latestEpoch?.voterRegistration?.registeredForNextEpoch,
+      latestEpoch?.preRegistered,
+      latestEpoch?.preregistered,
+      provider?.preRegistered,
+      provider?.preregistered
+    );
+
+    return {
+      value: parseBooleanLike(rawValue),
+      raw: rawValue
+    };
+  }
+
+  function setPreRegBadge(result) {
+    const badge = document.getElementById("preRegBadge");
+    const text = document.getElementById("preRegBadgeText");
+    const hint = document.getElementById("debugHint");
+
+    if (!badge || !text || !hint) return;
+
+    badge.classList.remove("ok", "no", "unknown");
+
+    if (result.value === true) {
       badge.classList.add("ok");
-      badge.textContent = "Minimal Conditions: PASS";
+      text.textContent = "Pre-registration: YES";
+      hint.textContent = "Next epoch registration detected.";
       return;
     }
 
-    if (strikes > 0) {
+    if (result.value === false) {
       badge.classList.add("no");
-      badge.textContent = "Minimal Conditions: REVIEW";
+      text.textContent = "Pre-registration: NO";
+      hint.textContent = "Next epoch registration not detected.";
       return;
     }
+
+    badge.classList.add("unknown");
+    text.textContent = "Pre-registration: UNKNOWN";
+    hint.textContent = result.raw != null
+      ? `Raw prereg value found but not recognized: ${String(result.raw)}`
+      : "No explicit prereg field detected in current API response.";
   }
 
-  badge.classList.add("unknown");
-  badge.textContent = "Minimal Conditions: UNKNOWN";
-}
+  function updateCurrencyButtons() {
+    const usdBtn = document.getElementById("usdBtn");
+    const eurBtn = document.getElementById("eurBtn");
 
-function estimateMonthlyEarnings(provider, latest) {
-  const totalWeight =
-    Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
-
-  const aprPct =
-    Number(latest?.m_dRewardRate ?? 0);
-
-  if (!Number.isFinite(totalWeight) || totalWeight <= 0) return null;
-  if (!Number.isFinite(aprPct) || aprPct <= 0) return null;
-
-  // APR is yearly, monthly estimate = stake * (apr / 100) / 12
-  return totalWeight * (aprPct / 100) / 12;
-}
-
-function updateMonthlyEarnings(provider, latest) {
-  const el = document.getElementById("monthlyEarningsValue");
-  if (!el) return;
-
-  const monthlyFlr = estimateMonthlyEarnings(provider, latest);
-  if (!Number.isFinite(monthlyFlr)) {
-    el.textContent = "-";
-    return;
+    if (usdBtn) usdBtn.classList.toggle("active", selectedCurrency === "USD");
+    if (eurBtn) eurBtn.classList.toggle("active", selectedCurrency === "EUR");
   }
 
-  const usdSpotText = document.getElementById("spotUsd")?.textContent || "";
-  const eurSpotText = document.getElementById("spotEur")?.textContent || "";
+  async function loadFxRate() {
+    try {
+      const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");
+      if (!res.ok) return;
+      const data = await res.json();
+      const rate = Number(data?.rates?.EUR);
+      if (Number.isFinite(rate) && rate > 0) {
+        usdToEurRate = rate;
+      }
+    } catch (_) {}
+  }
 
-  const usdSpot = Number(usdSpotText.replace(/[^\d.]/g, ""));
-  const eurSpot = Number(eurSpotText.replace(/[^\d.]/g, ""));
+  function setMinimalConditionsBadge(provider) {
+    const badge = document.getElementById("minConditionsBadge");
+    if (!badge) return;
 
-  if (selectedCurrency === "EUR") {
-    if (Number.isFinite(eurSpot) && eurSpot > 0) {
-      const eurValue = monthlyFlr * eurSpot;
-      el.textContent = fmtMoney(eurValue, "EUR", 0);
-    } else if (Number.isFinite(usdSpot) && usdSpot > 0 && Number.isFinite(usdToEurRate) && usdToEurRate > 0) {
-      const eurValue = monthlyFlr * usdSpot * usdToEurRate;
-      el.textContent = fmtMoney(eurValue, "EUR", 0);
+    badge.classList.remove("ok", "no", "unknown");
+
+    const strikes = Number(provider?.totalStrikes);
+    const passes = Number(provider?.totalPasses);
+
+    if (Number.isFinite(strikes) && Number.isFinite(passes)) {
+      if (strikes === 0 && passes > 0) {
+        badge.classList.add("ok");
+        badge.textContent = "Minimal Conditions: PASS";
+        return;
+      }
+
+      if (strikes > 0) {
+        badge.classList.add("no");
+        badge.textContent = "Minimal Conditions: REVIEW";
+        return;
+      }
+    }
+
+    badge.classList.add("unknown");
+    badge.textContent = "Minimal Conditions: UNKNOWN";
+  }
+
+  function estimateMonthlyEarnings(provider, latest) {
+    const totalWeight = Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
+    const aprPct = Number(latest?.m_dRewardRate ?? 0);
+
+    if (!Number.isFinite(totalWeight) || totalWeight <= 0) return null;
+    if (!Number.isFinite(aprPct) || aprPct <= 0) return null;
+
+    return totalWeight * (aprPct / 100) / 12;
+  }
+
+  function updateMonthlyEarnings(provider, latest) {
+    const el = document.getElementById("monthlyEarningsValue");
+    if (!el) return;
+
+    const monthlyFlr = estimateMonthlyEarnings(provider, latest);
+    if (!Number.isFinite(monthlyFlr)) {
+      el.textContent = "-";
+      return;
+    }
+
+    const usdSpotText = document.getElementById("spotUsd")?.textContent || "";
+    const eurSpotText = document.getElementById("spotEur")?.textContent || "";
+
+    const usdSpot = Number(usdSpotText.replace(/[^\d.]/g, ""));
+    const eurSpot = Number(eurSpotText.replace(/[^\d.]/g, ""));
+
+    if (selectedCurrency === "EUR") {
+      if (Number.isFinite(eurSpot) && eurSpot > 0) {
+        el.textContent = fmtMoney(monthlyFlr * eurSpot, "EUR", 0);
+      } else if (Number.isFinite(usdSpot) && usdSpot > 0 && Number.isFinite(usdToEurRate) && usdToEurRate > 0) {
+        el.textContent = fmtMoney(monthlyFlr * usdSpot * usdToEurRate, "EUR", 0);
+      } else {
+        el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
+      }
+      return;
+    }
+
+    if (Number.isFinite(usdSpot) && usdSpot > 0) {
+      el.textContent = fmtMoney(monthlyFlr * usdSpot, "USD", 0);
     } else {
       el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
     }
-    return;
   }
 
-  if (Number.isFinite(usdSpot) && usdSpot > 0) {
-    const usdValue = monthlyFlr * usdSpot;
-    el.textContent = fmtMoney(usdValue, "USD", 0);
-  } else {
-    el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
-  }
-}
+  function updateNetworkShare(latest) {
+    const el = document.getElementById("networkShareValue");
+    if (!el) return;
 
-  if (selectedCurrency === "EUR") {
-    const eurValue = monthlyFlr * Number(document.getElementById("spotEur")?.textContent?.replace(/[^\d.]/g, "") || 0);
-    el.textContent = Number.isFinite(eurValue) && eurValue > 0
-      ? fmtMoney(eurValue, "EUR", 0)
-      : fmtNum(monthlyFlr, 0) + " FLR";
-    return;
-  }
+    const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
+    const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
+    const totalWeight = Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
 
-  const usdValue = monthlyFlr * Number(document.getElementById("spotUsd")?.textContent?.replace(/[^\d.]/g, "") || 0);
-  el.textContent = Number.isFinite(usdValue) && usdValue > 0
-    ? fmtMoney(usdValue, "USD", 0)
-    : fmtNum(monthlyFlr, 0) + " FLR";
-}
+    if (!Number.isFinite(selfStake) || !Number.isFinite(delegated) || !Number.isFinite(totalWeight) || totalWeight <= 0) {
+      el.textContent = "-";
+      return;
+    }
 
-function updateNetworkShare(latest) {
-  const el = document.getElementById("networkShareValue");
-  if (!el) return;
-
-  const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
-  const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
-  const totalWeight = Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
-
-  if (!Number.isFinite(selfStake) || !Number.isFinite(delegated) || !Number.isFinite(totalWeight) || totalWeight <= 0) {
-    el.textContent = "-";
-    return;
+    const share = ((selfStake + delegated) / totalWeight) * 100;
+    el.textContent = share.toFixed(2) + "%";
   }
 
-  const share = ((selfStake + delegated) / totalWeight) * 100;
-  el.textContent = share.toFixed(2) + "%";
-}
+  function updateRatioBar(latest) {
+    const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
+    const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
+    const total = selfStake + delegated;
 
-function updateRatioBar(latest) {
+    const selfEl = document.getElementById("ratioSelf");
+    const delegatedEl = document.getElementById("ratioDelegated");
+    const selfText = document.getElementById("ratioSelfText");
+    const delegatedText = document.getElementById("ratioDelegatedText");
+
+    if (!Number.isFinite(total) || total <= 0) {
+      if (selfText) selfText.textContent = "Self: -";
+      if (delegatedText) delegatedText.textContent = "Delegated: -";
+      return;
+    }
+
+    const selfPct = (selfStake / total) * 100;
+    const delegatedPct = (delegated / total) * 100;
+
+    if (selfEl) selfEl.style.width = `${selfPct}%`;
+    if (delegatedEl) delegatedEl.style.width = `${delegatedPct}%`;
+
+    if (selfText) selfText.textContent = `Self: ${fmtNum(selfStake, 0)} (${selfPct.toFixed(1)}%)`;
+    if (delegatedText) delegatedText.textContent = `Delegated: ${fmtNum(delegated, 0)} (${delegatedPct.toFixed(1)}%)`;
+  }
+
   function fmtDateShort(value) {
-  if (!value) return "-";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return String(value);
+    if (!value) return "-";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
 
-  return d.toLocaleString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  });
-}
+    return d.toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric"
+    });
+  }
 
-function setValidatorMonitoring(provider, latest) {
-  const validatorApr =
-    pickFirstDefined(
+  function setValidatorMonitoring(provider, latest) {
+    const validatorApr = pickFirstDefined(
       provider?.validatorApr,
       provider?.validatorAPR,
       provider?.validator?.apr,
@@ -1116,39 +413,34 @@ function setValidatorMonitoring(provider, latest) {
       latest?.validatorAPR
     );
 
-  const validatorUptime =
-    pickFirstDefined(
+    const validatorUptime = pickFirstDefined(
       provider?.validatorUptime,
       provider?.validator?.uptime,
       latest?.validatorUptime,
       latest?.uptime
     );
 
-  const validatorConnected =
-    pickFirstDefined(
+    const validatorConnected = pickFirstDefined(
       provider?.validatorConnected,
       provider?.connected,
       provider?.validator?.connected,
       latest?.validatorConnected
     );
 
-  const delegatorsCount =
-    pickFirstDefined(
+    const delegatorsCount = pickFirstDefined(
       provider?.delegatorsCount,
       provider?.validator?.delegatorsCount,
       latest?.delegatorsCount
     );
 
-  const validatorTotalStake =
-    pickFirstDefined(
+    const validatorTotalStake = pickFirstDefined(
       provider?.validatorTotalStake,
       provider?.validator?.totalStake,
       provider?.totalStake,
       latest?.validatorTotalStake
     );
 
-  const validatorSelfStake =
-    pickFirstDefined(
+    const validatorSelfStake = pickFirstDefined(
       provider?.validatorSelfStake,
       provider?.validatorSelfBond,
       provider?.validator?.selfStake,
@@ -1157,16 +449,14 @@ function setValidatorMonitoring(provider, latest) {
       latest?.validatorSelfStake
     );
 
-  const validatorDelegatedStake =
-    pickFirstDefined(
+    const validatorDelegatedStake = pickFirstDefined(
       provider?.validatorDelegatedStake,
       provider?.validator?.delegatedStake,
       provider?.delegatedStake,
       latest?.validatorDelegatedStake
     );
 
-  const stakingExpiry =
-    pickFirstDefined(
+    const stakingExpiry = pickFirstDefined(
       provider?.stakingExpiry,
       provider?.validator?.stakingExpiry,
       provider?.stakingEnd,
@@ -1174,222 +464,152 @@ function setValidatorMonitoring(provider, latest) {
       latest?.stakingExpiry
     );
 
-  setText(
-    "validatorAprValue",
-    validatorApr != null ? fmtPct(validatorApr) : "-"
-  );
+    setText("validatorAprValue", validatorApr != null ? fmtPct(validatorApr) : "-");
+    setText("validatorUptimeValue", validatorUptime != null ? fmtPct(validatorUptime) : "-");
 
-  setText(
-    "validatorUptimeValue",
-    validatorUptime != null ? fmtPct(validatorUptime) : "-"
-  );
+    setText(
+      "validatorConnectedValue",
+      validatorConnected === true || String(validatorConnected).toLowerCase() === "true"
+        ? "YES"
+        : validatorConnected === false || String(validatorConnected).toLowerCase() === "false"
+        ? "NO"
+        : "-"
+    );
 
-  setText(
-    "validatorConnectedValue",
-    validatorConnected === true || String(validatorConnected).toLowerCase() === "true"
-      ? "YES"
-      : validatorConnected === false || String(validatorConnected).toLowerCase() === "false"
-      ? "NO"
-      : "-"
-  );
-
-  setText(
-    "delegatorsCountValue",
-    delegatorsCount != null ? fmtNum(delegatorsCount, 0) : "-"
-  );
-
-  setText(
-    "validatorTotalStakeValue",
-    validatorTotalStake != null ? fmtNum(validatorTotalStake, 0) : "-"
-  );
-
-  setText(
-    "validatorSelfStakeValue",
-    validatorSelfStake != null ? fmtNum(validatorSelfStake, 0) : "-"
-  );
-
-  setText(
-    "validatorDelegatedStakeValue",
-    validatorDelegatedStake != null ? fmtNum(validatorDelegatedStake, 0) : "-"
-  );
-
-  setText(
-    "stakingExpiryValue",
-    stakingExpiry != null ? fmtDateShort(stakingExpiry) : "-"
-  );
-}
-  const selfStake = Number(latest?.m_dStakeWeight ?? latest?.m_stakeWeight ?? 0);
-  const delegated = Number(latest?.m_dDelegationWeight ?? latest?.m_delegationWeight ?? 0);
-
-  const total = selfStake + delegated;
-
-  const selfEl = document.getElementById("ratioSelf");
-  const delegatedEl = document.getElementById("ratioDelegated");
-  const selfText = document.getElementById("ratioSelfText");
-  const delegatedText = document.getElementById("ratioDelegatedText");
-
-  if (!Number.isFinite(total) || total <= 0) {
-    if (selfText) selfText.textContent = "Self: -";
-    if (delegatedText) delegatedText.textContent = "Delegated: -";
-    return;
+    setText("delegatorsCountValue", delegatorsCount != null ? fmtNum(delegatorsCount, 0) : "-");
+    setText("validatorTotalStakeValue", validatorTotalStake != null ? fmtNum(validatorTotalStake, 0) : "-");
+    setText("validatorSelfStakeValue", validatorSelfStake != null ? fmtNum(validatorSelfStake, 0) : "-");
+    setText("validatorDelegatedStakeValue", validatorDelegatedStake != null ? fmtNum(validatorDelegatedStake, 0) : "-");
+    setText("stakingExpiryValue", stakingExpiry != null ? fmtDateShort(stakingExpiry) : "-");
   }
 
-  const selfPct = (selfStake / total) * 100;
-  const delegatedPct = (delegated / total) * 100;
-
-  if (selfEl) selfEl.style.width = `${selfPct}%`;
-  if (delegatedEl) delegatedEl.style.width = `${delegatedPct}%`;
-
-  if (selfText) selfText.textContent = `Self: ${fmtNum(selfStake, 0)} (${selfPct.toFixed(1)}%)`;
-  if (delegatedText) delegatedText.textContent = `Delegated: ${fmtNum(delegated, 0)} (${delegatedPct.toFixed(1)}%)`;
-}
   function loadExtraMetrics(provider, latest) {
-  if (!latest) {
-    document.getElementById("aprValue").textContent = "-";
-    document.getElementById("selfBondValue").textContent = "-";
-    document.getElementById("delegatedValue").textContent = "-";
-    document.getElementById("totalWeightValue").textContent = "-";
-    return;
-  }
-
-  const aprValue = latest.m_dRewardRate != null
-    ? Number(latest.m_dRewardRate).toFixed(2) + "%"
-    : "-";
-
-  const selfBondRaw =
-    latest.m_dStakeWeight ??
-    latest.m_stakeWeight ??
-    null;
-
-  const delegatedRaw =
-    latest.m_dDelegationWeight ??
-    latest.m_delegationWeight ??
-    null;
-
-  const totalWeightRaw =
-    latest.m_dTotalWeight ??
-    latest.m_totalWeight ??
-    null;
-
-  let selfBondValue = selfBondRaw != null
-    ? fmtNum(selfBondRaw, 0)
-    : "-";
-
-  const delegatedValue = delegatedRaw != null
-    ? fmtNum(delegatedRaw, 0)
-    : "-";
-
-  const totalWeightValue = totalWeightRaw != null
-    ? fmtNum(totalWeightRaw, 0)
-    : "-";
-
-  if (
-    selfBondRaw != null &&
-    totalWeightRaw != null &&
-    Number(totalWeightRaw) > 0
-  ) {
-    const selfPct = (Number(selfBondRaw) / Number(totalWeightRaw)) * 100;
-    selfBondValue += ` (${selfPct.toFixed(1)}%)`;
-  }
-
-  document.getElementById("aprValue").textContent = aprValue;
-  document.getElementById("selfBondValue").textContent = selfBondValue;
-  document.getElementById("delegatedValue").textContent = delegatedValue;
-  document.getElementById("totalWeightValue").textContent = totalWeightValue;
-}
-    async function loadPerformance() {
-      const loadingEl = document.getElementById("loading");
-      const errorEl = document.getElementById("error");
-      const contentEl = document.getElementById("content");
-
-      try {
-        const res = await fetch(API_URL, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json"
-          }
-        });
-
-        if (!res.ok) {
-          throw new Error(`API request failed (${res.status})`);
-        }
-
-        const data = await res.json();
-        const provider = findProviderDeep(data);
-         
-        if (!provider) {
-          throw new Error("MirSFlr provider not found");
-        }
-
-        const latest = getLatestEpoch(provider);
-window.__providerData = provider;
-window.__latestEpochData = latest;
-        setText(
-          "avgRewardValue",
-          provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-"
-        );
-
-        setText(
-          "epochsValue",
-          `${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}`
-        );
-
-        setText(
-          "passStrikeValue",
-          `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`
-        );
-
-        setText(
-          "feeValue",
-          latest?.voterRegistration?.delegationFeeBIPS != null
-            ? (Number(latest.voterRegistration.delegationFeeBIPS) / 100).toFixed(2) + "%"
-            : "-"
-        );
-
-        setBar("ftsoAvailabilityBar", "ftsoAvailabilityText", provider.ftsoPerformance?.availability);
-        setBar("ftsoPerformanceBar", "ftsoPerformanceText", provider.ftsoPerformance?.performance);
-        setBar("performance1Bar", "performance1Text", provider.ftsoPerformance?.performance1);
-        setBar("performance2Bar", "performance2Text", provider.ftsoPerformance?.performance2);
-        setBar("fdcAvailabilityBar", "fdcAvailabilityText", provider.fdcPerformance?.availability);
-
-        const preRegResult = detectPreRegistration(provider, latest);
-        setPreRegBadge(preRegResult);
-
-        loadExtraMetrics(provider, latest);
-setMinimalConditionsBadge(provider);
-updateMonthlyEarnings(provider, latest);
-updateNetworkShare(latest);
-updateRatioBar(latest);
-        setValidatorMonitoring(provider, latest);
-        loadingEl.style.display = "none";
-        contentEl.style.display = "block";
-        updateLastUpdated();
-      } catch (err) {
-        loadingEl.style.display = "none";
-        errorEl.style.display = "block";
-        errorEl.textContent = "Could not load performance: " + err.message;
-        console.error(err);
-
-        setPreRegBadge({ value: null, raw: null });
-      }
+    if (!latest) {
+      document.getElementById("aprValue").textContent = "-";
+      document.getElementById("selfBondValue").textContent = "-";
+      document.getElementById("delegatedValue").textContent = "-";
+      document.getElementById("totalWeightValue").textContent = "-";
+      return;
     }
 
-   document.getElementById("usdBtn")?.addEventListener("click", () => {
-  selectedCurrency = "USD";
-  updateCurrencyButtons();
-  updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
-});
+    const aprValue = latest.m_dRewardRate != null
+      ? Number(latest.m_dRewardRate).toFixed(2) + "%"
+      : "-";
 
-document.getElementById("eurBtn")?.addEventListener("click", () => {
-  selectedCurrency = "EUR";
-  updateCurrencyButtons();
-  updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
-});
+    const selfBondRaw = latest.m_dStakeWeight ?? latest.m_stakeWeight ?? null;
+    const delegatedRaw = latest.m_dDelegationWeight ?? latest.m_delegationWeight ?? null;
+    const totalWeightRaw = latest.m_dTotalWeight ?? latest.m_totalWeight ?? null;
 
-updateCurrencyButtons();
-loadFxRate().finally(() => {
+    let selfBondValue = selfBondRaw != null ? fmtNum(selfBondRaw, 0) : "-";
+    const delegatedValue = delegatedRaw != null ? fmtNum(delegatedRaw, 0) : "-";
+    const totalWeightValue = totalWeightRaw != null ? fmtNum(totalWeightRaw, 0) : "-";
+
+    if (selfBondRaw != null && totalWeightRaw != null && Number(totalWeightRaw) > 0) {
+      const selfPct = (Number(selfBondRaw) / Number(totalWeightRaw)) * 100;
+      selfBondValue += ` (${selfPct.toFixed(1)}%)`;
+    }
+
+    document.getElementById("aprValue").textContent = aprValue;
+    document.getElementById("selfBondValue").textContent = selfBondValue;
+    document.getElementById("delegatedValue").textContent = delegatedValue;
+    document.getElementById("totalWeightValue").textContent = totalWeightValue;
+  }
+
+  async function loadPerformance() {
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const contentEl = document.getElementById("content");
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error(`API request failed (${res.status})`);
+      }
+
+      const data = await res.json();
+      const provider = findProviderDeep(data);
+
+      if (!provider) {
+        throw new Error("MirSFlr provider not found");
+      }
+
+      const latest = getLatestEpoch(provider);
+      window.__providerData = provider;
+      window.__latestEpochData = latest;
+
+      setText(
+        "avgRewardValue",
+        provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-"
+      );
+
+      setText(
+        "epochsValue",
+        `${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}`
+      );
+
+      setText(
+        "passStrikeValue",
+        `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`
+      );
+
+      setText(
+        "feeValue",
+        latest?.voterRegistration?.delegationFeeBIPS != null
+          ? (Number(latest.voterRegistration.delegationFeeBIPS) / 100).toFixed(2) + "%"
+          : "-"
+      );
+
+      setBar("ftsoAvailabilityBar", "ftsoAvailabilityText", provider.ftsoPerformance?.availability);
+      setBar("ftsoPerformanceBar", "ftsoPerformanceText", provider.ftsoPerformance?.performance);
+      setBar("performance1Bar", "performance1Text", provider.ftsoPerformance?.performance1);
+      setBar("performance2Bar", "performance2Text", provider.ftsoPerformance?.performance2);
+      setBar("fdcAvailabilityBar", "fdcAvailabilityText", provider.fdcPerformance?.availability);
+
+      const preRegResult = detectPreRegistration(provider, latest);
+      setPreRegBadge(preRegResult);
+
+      loadExtraMetrics(provider, latest);
+      setMinimalConditionsBadge(provider);
+      updateMonthlyEarnings(provider, latest);
+      updateNetworkShare(latest);
+      updateRatioBar(latest);
+      setValidatorMonitoring(provider, latest);
+
+      loadingEl.style.display = "none";
+      contentEl.style.display = "block";
+      updateLastUpdated();
+    } catch (err) {
+      loadingEl.style.display = "none";
+      errorEl.style.display = "block";
+      errorEl.textContent = "Could not load performance: " + err.message;
+      console.error(err);
+      setPreRegBadge({ value: null, raw: null });
+    }
+  }
+
+  document.getElementById("usdBtn")?.addEventListener("click", () => {
+    selectedCurrency = "USD";
+    updateCurrencyButtons();
+    if (window.__providerData && window.__latestEpochData) {
+      updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
+    }
+  });
+
+  document.getElementById("eurBtn")?.addEventListener("click", () => {
+    selectedCurrency = "EUR";
+    updateCurrencyButtons();
+    if (window.__providerData && window.__latestEpochData) {
+      updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
+    }
+  });
+
+  updateCurrencyButtons();
   loadPerformance();
-});
-  </script>
-</body>
-</html>
+  loadFxRate();
+</script>
