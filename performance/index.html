@@ -1,3 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Performance</title>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+
+  <style>
+    :root{
+      --bg:#070b14;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.52);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --r2:28px;
+      --max:1200px;
+      --ok:#33d69f;
+      --brand:#7c5cff;
+      --brandPink:#ff2f92;
+      --danger:#ff617d;
+      --warn:#ffb454;
+    }
+
+    *,
+    *::before,
+    *::after{
+      box-sizing:border-box;
+    }
+
+    html,body{
+      min-height:100%;
+    }
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(720px 420px at 79% 19%, rgba(255, 51, 153, 0.34), transparent 40%),
+        radial-gradient(520px 320px at 15% 77%, rgba(255, 51, 153, 0.20), transparent 34%),
+        radial-gradient(500px 280px at 54% 40%, rgba(123, 49, 255, 0.12), transparent 42%),
+        #020204;
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.42), transparent 68%),
+        radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.42), transparent 68%);
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(680px 380px at 79% 18%, rgba(255, 51, 153, 0.24), transparent 38%),
+        radial-gradient(500px 300px at 15% 77%, rgba(255, 51, 153, 0.14), transparent 34%),
+        radial-gradient(460px 260px at 54% 40%, rgba(123, 49, 255, 0.10), transparent 40%);
+      filter: blur(46px);
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+   .container{
+  position:relative;
+  z-index:1;
+  max-width:var(--max);
+  margin:0 auto;
+  padding:0 20px 60px;
+}
+
+   .topbar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:14px 0 18px;
+  margin:0 0 24px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7,11,20,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+    .navGroup{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:800;
+      box-shadow:0 8px 22px rgba(0,0,0,.18);
+      transition:transform .14s ease, background .14s ease, border-color .14s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+      background:linear-gradient(135deg, rgba(109,74,255,.18), rgba(255,47,146,.10));
+      border-color:rgba(109,74,255,.24);
+    }
+
+    .btn.active{
+      background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
+      border-color:transparent;
+      color:white;
+      box-shadow:0 10px 24px rgba(109,74,255,.22);
+    }
+
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+
+    .title{
+  position:relative;
+  z-index:1;
+  font-size:clamp(30px, 4vw, 42px);
+  font-weight:900;
+  letter-spacing:-0.03em;
+  margin:18px 0 0;
+}
+
+    .subtitle{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:24px;
+    }
+
+    .statusWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow:0 8px 22px rgba(0,0,0,.18);
+      font-weight:800;
+      backdrop-filter:blur(10px);
+    }
+
+    .badgeDot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--muted2);
+      box-shadow:0 0 0 6px rgba(255,255,255,.04);
+      flex:0 0 auto;
+    }
+
+    .badge.ok{
+      border-color:rgba(51,214,159,.26);
+      background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
+    }
+
+    .badge.ok .badgeDot{
+      background:var(--ok);
+      box-shadow:0 0 0 6px rgba(51,214,159,.10);
+    }
+
+    .badge.no{
+      border-color:rgba(255,97,125,.26);
+      background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
+    }
+
+    .badge.no .badgeDot{
+      background:var(--danger);
+      box-shadow:0 0 0 6px rgba(255,97,125,.10);
+    }
+
+    .badge.unknown{
+      border-color:rgba(255,180,84,.26);
+      background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
+    }
+
+    .badge.unknown .badgeDot{
+      background:var(--warn);
+      box-shadow:0 0 0 6px rgba(255,180,84,.10);
+    }
+
+    .loading,.error{
+      position:relative;
+      z-index:1;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      margin-bottom:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+      margin-bottom:24px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--r2);
+      box-shadow:var(--shadow);
+      padding:18px;
+      backdrop-filter:blur(10px);
+    }
+
+    .label{
+      color:var(--muted2);
+      font-size:13px;
+      margin-bottom:8px;
+    }
+
+    .value{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-0.02em;
+    }
+
+    .small{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .sectionTitle{
+      margin:8px 0 14px;
+      font-size:16px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .barCard{
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--r2);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:18px;
+      backdrop-filter:blur(10px);
+    }
+
+    .barTitle{
+      color:var(--muted2);
+      font-size:13px;
+      margin-bottom:10px;
+    }
+
+    .barBg{
+      width:100%;
+      height:16px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(255,255,255,.08);
+    }
+
+    .barFill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--ok), #69e58f);
+      transition:width .4s ease;
+    }
+
+    .barMeta{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .note{
+      position:relative;
+      z-index:1;
+      margin-top:12px;
+      color:var(--muted2);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 980px){
+      .grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width: 640px){
+  .container{
+    padding:0 14px 40px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .value{
+    font-size:24px;
+  }
+
+  .navGroup{
+    justify-content:center;
+  }
+
+  .currencyToggle{
+    width:100%;
+    justify-content:center;
+  }
+
+  .currencyBtn{
+    flex:1 1 auto;
+  }
+}
+    .currencyToggle{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  box-shadow:0 8px 22px rgba(0,0,0,.18);
+}
+
+.currencyBtn{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-weight:800;
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  transition:background .14s ease, color .14s ease, transform .14s ease;
+}
+
+.currencyBtn:hover{
+  color:var(--text);
+  transform:translateY(-1px);
+}
+
+.currencyBtn.active{
+  background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(109,74,255,.22);
+}
+
+.inlineStatusRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.statusBadgeSmall{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius:999px;
+  font-size:13px;
+  font-weight:800;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+}
+
+.statusBadgeSmall.ok{
+  color:#9ff0cc;
+  background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
+  border-color:rgba(51,214,159,.26);
+}
+
+.statusBadgeSmall.no{
+  color:#ffb7c4;
+  background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
+  border-color:rgba(255,97,125,.26);
+}
+
+.statusBadgeSmall.unknown{
+  color:#ffd89a;
+  background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
+  border-color:rgba(255,180,84,.26);
+}
+
+.ratioCard{
+  position:relative;
+  z-index:1;
+  background:linear-gradient(180deg, var(--panel), var(--panel2));
+  border:1px solid var(--border);
+  border-radius:var(--r2);
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:18px;
+  backdrop-filter:blur(10px);
+}
+
+.ratioLegend{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  color:var(--muted);
+  font-size:13px;
+  flex-wrap:wrap;
+}
+
+.ratioStack{
+  width:100%;
+  height:18px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.08);
+  display:flex;
+}
+
+.ratioSelf{
+  height:100%;
+  background:linear-gradient(90deg, #7c5cff, #9a78ff);
+  width:0%;
+}
+
+.ratioDelegated{
+  height:100%;
+  background:linear-gradient(90deg, #23d5ff, #7be7ff);
+  width:0%;
+}
+
+.miniNote{
+  color:var(--muted2);
+  font-size:12px;
+  margin-top:8px;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+  <div class="topbar">
+  <div class="navGroup">
+    <a class="btn" href="/stats/">Stats</a>
+    <a class="btn" href="/epochs/">Epochs</a>
+    <a class="btn" href="/addresses/">Addresses</a>
+    <a class="btn active" href="/performance/">Performance</a>
+    <a class="btn" href="/">Home</a>
+  </div>
+</div>
+
+    <div class="titleRow">
+      <div>
+        <div class="title">MirSFlr Performance</div>
+        <div class="subtitle">
+          Technical performance overview from Oracle Daemon API.
+        </div>
+      </div>
+
+      <div class="statusWrap">
+  <div class="inlineStatusRow">
+    <div class="badge unknown" id="preRegBadge">
+      <span class="badgeDot"></span>
+      <span id="preRegBadgeText">Pre-registration: checking…</span>
+    </div>
+
+    <div class="statusBadgeSmall unknown" id="minConditionsBadge">
+      Minimal Conditions: checking…
+    </div>
+
+    <div class="currencyToggle" aria-label="Currency toggle">
+      <button class="currencyBtn active" id="usdBtn" type="button">USD</button>
+      <button class="currencyBtn" id="eurBtn" type="button">EUR</button>
+    </div>
+  </div>
+</div>
+
+    <div id="loading" class="loading">Loading performance…</div>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <div id="content" style="display:none;">
+      <div class="grid">
+        <div class="card">
+          <div class="label">Average Reward / Epoch</div>
+          <div class="value" id="avgRewardValue">-</div>
+          <div class="small">Average across all tracked epochs</div>
+        </div>
+<div class="grid">
+  <div class="card">
+    <div class="label">Monthly Earnings</div>
+    <div class="value" id="monthlyEarningsValue">-</div>
+    <div class="small">Estimated based on APR</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Stake Composition</div>
+<div class="value" id="networkShareValue">-</div>
+<div class="small">Derived from provider weight</div>
+  </div>
+</div>
+        <div class="card">
+          <div class="label">Epochs</div>
+          <div class="value" id="epochsValue">-</div>
+          <div class="small">Eligible / total epochs</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Passes / Strikes</div>
+          <div class="value" id="passStrikeValue">-</div>
+          <div class="small">Eligibility track record</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Delegation Fee</div>
+          <div class="value" id="feeValue">-</div>
+          <div class="small">Current fee</div>
+        </div>
+      </div>
+
+      <div class="sectionTitle">Additional metrics</div>
+<div class="ratioCard">
+  <div class="sectionTitle">Stake composition</div>
+
+  <div class="ratioStack">
+    <div class="ratioSelf" id="ratioSelf"></div>
+    <div class="ratioDelegated" id="ratioDelegated"></div>
+  </div>
+
+  <div class="ratioLegend">
+    <div id="ratioSelfText">Self: -</div>
+    <div id="ratioDelegatedText">Delegated: -</div>
+  </div>
+
+  <div class="miniNote">
+    Shows how much stake is provider-owned vs delegated.
+  </div>
+</div>
+      <div class="grid">
+        <div class="card">
+          <div class="label">APR</div>
+          <div class="value" id="aprValue">-</div>
+          <div class="small">If available from API</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Self Bond / Stake</div>
+          <div class="value" id="selfBondValue">-</div>
+          <div class="small">Provider-owned weight</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Delegated</div>
+          <div class="value" id="delegatedValue">-</div>
+          <div class="small">External delegation</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Total Weight</div>
+          <div class="value" id="totalWeightValue">-</div>
+          <div class="small">Combined effective weight</div>
+        </div>
+      </div>
+
+      <div class="barCard">
+        <div class="barTitle">FTSO Availability</div>
+        <div class="barBg"><div class="barFill" id="ftsoAvailabilityBar"></div></div>
+        <div class="barMeta" id="ftsoAvailabilityText">-</div>
+      </div>
+
+      <div class="barCard">
+        <div class="barTitle">FTSO Performance</div>
+        <div class="barBg"><div class="barFill" id="ftsoPerformanceBar"></div></div>
+        <div class="barMeta" id="ftsoPerformanceText">-</div>
+      </div>
+
+      <div class="barCard">
+        <div class="barTitle">Performance 1</div>
+        <div class="barBg"><div class="barFill" id="performance1Bar"></div></div>
+        <div class="barMeta" id="performance1Text">-</div>
+      </div>
+
+      <div class="barCard">
+        <div class="barTitle">Performance 2</div>
+        <div class="barBg"><div class="barFill" id="performance2Bar"></div></div>
+        <div class="barMeta" id="performance2Text">-</div>
+      </div>
+
+      <div class="barCard">
+        <div class="barTitle">FDC Availability</div>
+        <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
+        <div class="barMeta" id="fdcAvailabilityText">-</div>
+      </div>
+<div class="sectionTitle">Validator Monitoring</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="label">Validator APR</div>
+    <div class="value" id="validatorAprValue">-</div>
+    <div class="small">Validator-side APR</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Uptime</div>
+    <div class="value" id="validatorUptimeValue">-</div>
+    <div class="small">Current node uptime</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Connected</div>
+    <div class="value" id="validatorConnectedValue">-</div>
+    <div class="small">Live node status</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Delegators</div>
+    <div class="value" id="delegatorsCountValue">-</div>
+    <div class="small">Current delegator count</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Total Stake</div>
+    <div class="value" id="validatorTotalStakeValue">-</div>
+    <div class="small">Validator total stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Self Bond</div>
+    <div class="value" id="validatorSelfStakeValue">-</div>
+    <div class="small">Provider-owned validator stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Validator Delegated</div>
+    <div class="value" id="validatorDelegatedStakeValue">-</div>
+    <div class="small">Delegated validator stake</div>
+  </div>
+
+  <div class="card">
+    <div class="label">Staking Expiry</div>
+    <div class="value" id="stakingExpiryValue">-</div>
+    <div class="small">Validator staking end time</div>
+  </div>
+</div>
+     <div class="note">
+  Source: Oracle Daemon API
+  <br>
+  <a href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">Open raw API</a>
+  <br>
+  <span id="lastUpdated"></span>
+  <br>
+  <span id="debugHint"></span>
+</div>
+    </div>
+  </div>
+
 <script>
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
@@ -613,3 +1313,5 @@
   loadPerformance();
   loadFxRate();
 </script>
+</body>
+</html>
