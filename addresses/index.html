@@ -78,29 +78,33 @@ body::after{
   z-index:1;
   max-width:1100px;
   margin:auto;
-  padding:40px 20px 56px;
+  padding:0 20px 56px;
 }
 
 .topbar{
-  display:grid;
-  grid-template-columns:auto 1fr;
-  align-items:center;
-  gap:16px;
-  margin-bottom:30px;
-}
+  position:sticky;
+  top:0;
+  z-index:1000;
 
-  .navGroup{
   display:flex;
   align-items:center;
-  justify-content:flex-end;
+  justify-content:center;
+
+  padding:14px 0 18px;
+  margin:0 0 30px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(7,11,20,.62);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+ .navGroup{
+  display:flex;
+  align-items:center;
+  justify-content:center;
   gap:10px;
   flex-wrap:wrap;
-  min-width:0;
-}
-
-.backBtn{
-  justify-self:start;
-  white-space:nowrap;
+  width:100%;
 }
 
 .btn{
@@ -140,9 +144,8 @@ h1{
   font-size:36px;
   line-height:1.06;
   letter-spacing:-0.03em;
-  margin:0 0 10px;
+  margin:18px 0 10px;
 }
-
 .subtitle{
   position:relative;
   z-index:1;
@@ -194,31 +197,24 @@ button:hover{
   opacity:.92;
 }
 
+@media (max-width: 900px){
+  .navGroup{
+    justify-content:center;
+    width:100%;
+  }
+}
+
 @media (max-width: 700px){
   .container{
-    padding:24px 14px 40px;
+    padding:0 14px 40px;
   }
 
   h1{
     font-size:30px;
   }
 
-  .topbar{
-    align-items:flex-start;
-  }
-
-  .topbar > div{
-    width:100%;
-  }
-  @media (max-width: 900px){
-  .topbar{
-    grid-template-columns:1fr;
-    align-items:flex-start;
-  }
-
   .navGroup{
-    justify-content:flex-start;
-    width:100%;
+    justify-content:center;
   }
 }
 }
@@ -229,16 +225,14 @@ button:hover{
 <div class="container">
 
 <div class="topbar">
-  <a class="btn backBtn" href="/home/">← Back to home</a>
-
   <div class="navGroup">
     <a class="btn" href="/stats/">Stats</a>
     <a class="btn" href="/epochs/">Epochs</a>
     <a class="btn active" href="/addresses/">Addresses</a>
     <a class="btn" href="/performance/">Performance</a>
+    <a class="btn" href="/">Home</a>
   </div>
 </div>
-
 <h1>MirSFlr Addresses</h1>
 <div class="subtitle">Provider identity and operational addresses</div>
 
