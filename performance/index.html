@@ -534,7 +534,7 @@
   <div class="card">
     <div class="label">Monthly Earnings</div>
     <div class="value" id="monthlyEarningsValue">-</div>
-    <div class="small">Estimated based on APR</div>
+    <div class="small">Estimated from average reward per epoch</div>
   </div>
 
   <div class="card">
@@ -698,6 +698,7 @@
   </div>
 
 <script>
+  const EPOCHS_PER_MONTH = 8,7;
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
   const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
@@ -980,42 +981,62 @@
   }
 }
 
-  function setMinimalConditionsBadge(provider) {
-    const badge = document.getElementById("minConditionsBadge");
-    if (!badge) return;
+  function setMinimalConditionsBadge(provider, latest) {
+  const badge = document.getElementById("minConditionsBadge");
+  if (!badge) return;
 
-    badge.classList.remove("ok", "no", "unknown");
+  badge.classList.remove("ok", "no", "unknown");
 
-    const strikes = Number(provider?.totalStrikes);
-    const passes = Number(provider?.totalPasses);
+  const eligibleEpochs = Number(provider?.eligibleEpochs);
+  const totalEpochs = Number(provider?.totalEpochs);
+  const latestEligible =
+    latest?.eligibleForReward ??
+    latest?.eligible ??
+    latest?.isEligible ??
+    null;
 
-    if (Number.isFinite(strikes) && Number.isFinite(passes)) {
-      if (strikes === 0 && passes > 0) {
-        badge.classList.add("ok");
-        badge.textContent = "Minimal Conditions: PASS";
-        return;
-      }
-
-      if (strikes > 0) {
-        badge.classList.add("no");
-        badge.textContent = "Minimal Conditions: REVIEW";
-        return;
-      }
+  if (
+    Number.isFinite(eligibleEpochs) &&
+    Number.isFinite(totalEpochs) &&
+    totalEpochs > 0
+  ) {
+    if (eligibleEpochs === totalEpochs) {
+      badge.classList.add("ok");
+      badge.textContent = "Minimal Conditions: PASS";
+      return;
     }
 
-    badge.classList.add("unknown");
-    badge.textContent = "Minimal Conditions: UNKNOWN";
+    if (eligibleEpochs < totalEpochs) {
+      badge.classList.add("no");
+      badge.textContent = "Minimal Conditions: REVIEW";
+      return;
+    }
   }
 
+  if (latestEligible === true) {
+    badge.classList.add("ok");
+    badge.textContent = "Minimal Conditions: PASS";
+    return;
+  }
+
+  if (latestEligible === false) {
+    badge.classList.add("no");
+    badge.textContent = "Minimal Conditions: REVIEW";
+    return;
+  }
+
+  badge.classList.add("unknown");
+  badge.textContent = "Minimal Conditions: UNKNOWN";
+}
   function estimateMonthlyEarnings(provider, latest) {
-    const totalWeight = Number(latest?.m_dTotalWeight ?? latest?.m_totalWeight ?? 0);
-    const aprPct = Number(latest?.m_dRewardRate ?? 0);
+  const avgRewardPerEpoch = Number(provider?.averageRewardPerEpoch);
 
-    if (!Number.isFinite(totalWeight) || totalWeight <= 0) return null;
-    if (!Number.isFinite(aprPct) || aprPct <= 0) return null;
-
-    return totalWeight * (aprPct / 100) / 12;
+  if (!Number.isFinite(avgRewardPerEpoch) || avgRewardPerEpoch <= 0) {
+    return null;
   }
+
+  return avgRewardPerEpoch * EPOCHS_PER_MONTH;
+}
 
   function updateMonthlyEarnings(provider, latest) {
     const el = document.getElementById("monthlyEarningsValue");
@@ -1280,7 +1301,7 @@ console.log("LATEST EPOCH FULL:", latest);
       setPreRegBadge(preRegResult);
 
       loadExtraMetrics(provider, latest);
-      setMinimalConditionsBadge(provider);
+      setMinimalConditionsBadge(provider, latest);
       updateMonthlyEarnings(provider, latest);
       updateNetworkShare(latest);
       updateRatioBar(latest);
