@@ -3,275 +3,364 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
   <title>MirSFlr Performance</title>
 
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
 
   <style>
-:root{
-  --bg:#070b14;
-  --text:rgba(255,255,255,.92);
-  --muted:rgba(255,255,255,.70);
-  --muted2:rgba(255,255,255,.52);
-  --panel:rgba(255,255,255,.06);
-  --panel2:rgba(255,255,255,.04);
-  --border:rgba(255,255,255,.10);
-  --shadow:0 18px 60px rgba(0,0,0,.45);
-  --r2:28px;
-  --max:1200px;
-  --ok:#33d69f;
-  --brand:#7c5cff;
-  --brandPink:#ff2f92;
-}
+    :root{
+      --bg:#070b14;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.52);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.10);
+      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --r2:28px;
+      --max:1200px;
+      --ok:#33d69f;
+      --brand:#7c5cff;
+      --brandPink:#ff2f92;
+      --danger:#ff617d;
+      --warn:#ffb454;
+    }
 
-*,
-*::before,
-*::after{
-  box-sizing:border-box;
-}
+    *,
+    *::before,
+    *::after{
+      box-sizing:border-box;
+    }
 
-html,body{
-  min-height:100%;
-}
+    html,body{
+      min-height:100%;
+    }
 
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(720px 420px at 79% 19%, rgba(255, 51, 153, 0.34), transparent 40%),
-    radial-gradient(520px 320px at 15% 77%, rgba(255, 51, 153, 0.20), transparent 34%),
-    radial-gradient(500px 280px at 54% 40%, rgba(123, 49, 255, 0.12), transparent 42%),
-    #020204;
-  overflow-x:hidden;
-  position:relative;
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(720px 420px at 79% 19%, rgba(255, 51, 153, 0.34), transparent 40%),
+        radial-gradient(520px 320px at 15% 77%, rgba(255, 51, 153, 0.20), transparent 34%),
+        radial-gradient(500px 280px at 54% 40%, rgba(123, 49, 255, 0.12), transparent 42%),
+        #020204;
+      overflow-x:hidden;
+      position:relative;
+    }
 
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  background:
-    radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.42), transparent 68%),
-    radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.42), transparent 68%);
-}
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(1200px 800px at -10% 50%, rgba(7,11,20,.42), transparent 68%),
+        radial-gradient(1200px 800px at 110% 50%, rgba(7,11,20,.42), transparent 68%);
+    }
 
-body::after{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:0;
-  background:
-    radial-gradient(680px 380px at 79% 18%, rgba(255, 51, 153, 0.24), transparent 38%),
-    radial-gradient(500px 300px at 15% 77%, rgba(255, 51, 153, 0.14), transparent 34%),
-    radial-gradient(460px 260px at 54% 40%, rgba(123, 49, 255, 0.10), transparent 40%);
-  filter: blur(46px);
-}
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:
+        radial-gradient(680px 380px at 79% 18%, rgba(255, 51, 153, 0.24), transparent 38%),
+        radial-gradient(500px 300px at 15% 77%, rgba(255, 51, 153, 0.14), transparent 34%),
+        radial-gradient(460px 260px at 54% 40%, rgba(123, 49, 255, 0.10), transparent 40%);
+      filter: blur(46px);
+    }
 
-a{
-  color:inherit;
-  text-decoration:none;
-}
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
 
-.container{
-  position:relative;
-  z-index:1;
-  max-width:var(--max);
-  margin:0 auto;
-  padding:24px 20px 60px;
-}
+    .container{
+      position:relative;
+      z-index:1;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:24px 20px 60px;
+    }
 
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:24px;
-  flex-wrap:wrap;
-}
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:24px;
+      flex-wrap:wrap;
+    }
 
-.btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding:10px 14px;
-  border-radius:14px;
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  border:1px solid var(--border);
-  color:var(--text);
-  font-weight:800;
-  box-shadow:0 8px 22px rgba(0,0,0,.18);
-  transition:transform .14s ease, background .14s ease, border-color .14s ease;
-}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:800;
+      box-shadow:0 8px 22px rgba(0,0,0,.18);
+      transition:transform .14s ease, background .14s ease, border-color .14s ease;
+    }
 
-.btn:hover{
-  transform:translateY(-1px);
-  background:linear-gradient(135deg, rgba(109,74,255,.18), rgba(255,47,146,.10));
-  border-color:rgba(109,74,255,.24);
-}
+    .btn:hover{
+      transform:translateY(-1px);
+      background:linear-gradient(135deg, rgba(109,74,255,.18), rgba(255,47,146,.10));
+      border-color:rgba(109,74,255,.24);
+    }
 
-.btn.active{
-  background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
-  border-color:transparent;
-  color:white;
-  box-shadow:0 10px 24px rgba(109,74,255,.22);
-}
+    .btn.active{
+      background:linear-gradient(135deg, #6d4aff 0%, #ff2f92 100%);
+      border-color:transparent;
+      color:white;
+      box-shadow:0 10px 24px rgba(109,74,255,.22);
+    }
 
-.title{
-  position:relative;
-  z-index:1;
-  font-size:clamp(30px, 4vw, 42px);
-  font-weight:900;
-  letter-spacing:-0.03em;
-  margin:10px 0 8px;
-}
+    .titleRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
 
-.subtitle{
-  position:relative;
-  z-index:1;
-  color:var(--muted);
-  line-height:1.6;
-  margin-bottom:24px;
-}
+    .title{
+      position:relative;
+      z-index:1;
+      font-size:clamp(30px, 4vw, 42px);
+      font-weight:900;
+      letter-spacing:-0.03em;
+      margin:10px 0 0;
+    }
 
-.loading,.error{
-  position:relative;
-  z-index:1;
-  padding:16px;
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  margin-bottom:20px;
-  box-shadow:var(--shadow);
-}
+    .subtitle{
+      position:relative;
+      z-index:1;
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:24px;
+    }
 
-.grid{
-  position:relative;
-  z-index:1;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:16px;
-  margin-bottom:24px;
-}
+    .statusWrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
 
-.card{
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  border:1px solid var(--border);
-  border-radius:var(--r2);
-  box-shadow:var(--shadow);
-  padding:18px;
-  backdrop-filter:blur(10px);
-}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      box-shadow:0 8px 22px rgba(0,0,0,.18);
+      font-weight:800;
+      backdrop-filter:blur(10px);
+    }
 
-.label{
-  color:var(--muted2);
-  font-size:13px;
-  margin-bottom:8px;
-}
+    .badgeDot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--muted2);
+      box-shadow:0 0 0 6px rgba(255,255,255,.04);
+      flex:0 0 auto;
+    }
 
-.value{
-  font-size:30px;
-  font-weight:900;
-  letter-spacing:-0.02em;
-}
+    .badge.ok{
+      border-color:rgba(51,214,159,.26);
+      background:linear-gradient(180deg, rgba(51,214,159,.14), rgba(51,214,159,.06));
+    }
 
-.small{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:13px;
-}
+    .badge.ok .badgeDot{
+      background:var(--ok);
+      box-shadow:0 0 0 6px rgba(51,214,159,.10);
+    }
 
-.barCard{
-  position:relative;
-  z-index:1;
-  background:linear-gradient(180deg, var(--panel), var(--panel2));
-  border:1px solid var(--border);
-  border-radius:var(--r2);
-  box-shadow:var(--shadow);
-  padding:18px;
-  margin-bottom:18px;
-  backdrop-filter:blur(10px);
-}
+    .badge.no{
+      border-color:rgba(255,97,125,.26);
+      background:linear-gradient(180deg, rgba(255,97,125,.14), rgba(255,97,125,.06));
+    }
 
-.barTitle{
-  color:var(--muted2);
-  font-size:13px;
-  margin-bottom:10px;
-}
+    .badge.no .badgeDot{
+      background:var(--danger);
+      box-shadow:0 0 0 6px rgba(255,97,125,.10);
+    }
 
-.barBg{
-  width:100%;
-  height:16px;
-  border-radius:999px;
-  overflow:hidden;
-  background:rgba(255,255,255,.08);
-}
+    .badge.unknown{
+      border-color:rgba(255,180,84,.26);
+      background:linear-gradient(180deg, rgba(255,180,84,.14), rgba(255,180,84,.06));
+    }
 
-.barFill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg, var(--ok), #69e58f);
-  transition:width .4s ease;
-}
+    .badge.unknown .badgeDot{
+      background:var(--warn);
+      box-shadow:0 0 0 6px rgba(255,180,84,.10);
+    }
 
-.barMeta{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:13px;
-}
+    .loading,.error{
+      position:relative;
+      z-index:1;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      margin-bottom:20px;
+      box-shadow:var(--shadow);
+    }
 
-.note{
-  position:relative;
-  z-index:1;
-  margin-top:12px;
-  color:var(--muted2);
-  font-size:13px;
-}
+    .grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+      margin-bottom:24px;
+    }
 
-@media (max-width: 980px){
-  .grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
+    .card{
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--r2);
+      box-shadow:var(--shadow);
+      padding:18px;
+      backdrop-filter:blur(10px);
+    }
 
-@media (max-width: 640px){
-  .container{
-    padding:24px 14px 40px;
-  }
+    .label{
+      color:var(--muted2);
+      font-size:13px;
+      margin-bottom:8px;
+    }
 
-  .grid{
-    grid-template-columns:1fr;
-  }
+    .value{
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:-0.02em;
+    }
 
-  .value{
-    font-size:24px;
-  }
-}
-</style>
+    .small{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .sectionTitle{
+      margin:8px 0 14px;
+      font-size:16px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .barCard{
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      border:1px solid var(--border);
+      border-radius:var(--r2);
+      box-shadow:var(--shadow);
+      padding:18px;
+      margin-bottom:18px;
+      backdrop-filter:blur(10px);
+    }
+
+    .barTitle{
+      color:var(--muted2);
+      font-size:13px;
+      margin-bottom:10px;
+    }
+
+    .barBg{
+      width:100%;
+      height:16px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(255,255,255,.08);
+    }
+
+    .barFill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--ok), #69e58f);
+      transition:width .4s ease;
+    }
+
+    .barMeta{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .note{
+      position:relative;
+      z-index:1;
+      margin-top:12px;
+      color:var(--muted2);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 980px){
+      .grid{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    @media (max-width: 640px){
+      .container{
+        padding:24px 14px 40px;
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .value{
+        font-size:24px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <div class="topbar">
       <a class="btn" href="/home/">← Back to home</a>
-     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-  <a class="btn" href="/stats/">Stats</a>
-  <a class="btn" href="/epochs/">Epochs</a>
-  <a class="btn" href="/addresses/">Addresses</a>
-  <a class="btn active" href="/performance/">Performance</a>
-  <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
-</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn" href="/stats/">Stats</a>
+        <a class="btn" href="/epochs/">Epochs</a>
+        <a class="btn" href="/addresses/">Addresses</a>
+        <a class="btn active" href="/performance/">Performance</a>
+        <a class="btn" href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">API</a>
+      </div>
     </div>
 
-    <div class="title">MirSFlr Performance</div>
-    <div class="subtitle">
-      Technical performance overview from Oracle Daemon API.
+    <div class="titleRow">
+      <div>
+        <div class="title">MirSFlr Performance</div>
+        <div class="subtitle">
+          Technical performance overview from Oracle Daemon API.
+        </div>
+      </div>
+
+      <div class="statusWrap">
+        <div class="badge unknown" id="preRegBadge">
+          <span class="badgeDot"></span>
+          <span id="preRegBadgeText">Pre-registration: checking…</span>
+        </div>
+      </div>
     </div>
 
     <div id="loading" class="loading">Loading performance…</div>
@@ -301,6 +390,34 @@ a{
           <div class="label">Delegation Fee</div>
           <div class="value" id="feeValue">-</div>
           <div class="small">Current fee</div>
+        </div>
+      </div>
+
+      <div class="sectionTitle">Additional metrics</div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="label">APR</div>
+          <div class="value" id="aprValue">-</div>
+          <div class="small">If available from API</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Self Bond / Stake</div>
+          <div class="value" id="selfBondValue">-</div>
+          <div class="small">Provider-owned weight</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Delegated</div>
+          <div class="value" id="delegatedValue">-</div>
+          <div class="small">External delegation</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Total Weight</div>
+          <div class="value" id="totalWeightValue">-</div>
+          <div class="small">Combined effective weight</div>
         </div>
       </div>
 
@@ -338,6 +455,8 @@ a{
         Source: Oracle Daemon API
         <br>
         <span id="lastUpdated"></span>
+        <br>
+        <span id="debugHint"></span>
       </div>
     </div>
   </div>
@@ -375,6 +494,7 @@ a{
       const text = document.getElementById(textId);
 
       if (pct === null) {
+        if (bar) bar.style.width = "0%";
         if (text) text.textContent = "-";
         return;
       }
@@ -396,6 +516,7 @@ a{
           day: "numeric",
           hour: "2-digit",
           minute: "2-digit",
+          second: "2-digit",
           timeZoneName: "short"
         });
     }
@@ -441,40 +562,252 @@ a{
       return [...provider.epochData].sort((a, b) => Number(b.epoch) - Number(a.epoch))[0];
     }
 
+    function getNextEpoch(provider) {
+      if (!provider?.epochData?.length) return null;
+      return [...provider.epochData].sort((a, b) => Number(a.epoch) - Number(b.epoch)).slice(-1)[0] || null;
+    }
+
+    function pickFirstDefined(...values) {
+      for (const value of values) {
+        if (value !== undefined && value !== null && value !== "") {
+          return value;
+        }
+      }
+      return null;
+    }
+
+    function parseBooleanLike(value) {
+      if (typeof value === "boolean") return value;
+      if (typeof value === "number") {
+        if (value === 1) return true;
+        if (value === 0) return false;
+      }
+      if (typeof value === "string") {
+        const v = value.trim().toLowerCase();
+        if (["true", "yes", "y", "1", "registered", "pre-registered", "preregistered", "ready", "active"].includes(v)) {
+          return true;
+        }
+        if (["false", "no", "n", "0", "not registered", "not pre-registered", "unregistered", "inactive"].includes(v)) {
+          return false;
+        }
+      }
+      return null;
+    }
+
+    function findValueByKeyDeep(node, candidateKeys) {
+      if (!node || typeof node !== "object") return null;
+
+      const lowered = candidateKeys.map(k => k.toLowerCase());
+      let match = null;
+
+      function walk(obj) {
+        if (match !== null || obj == null) return;
+
+        if (Array.isArray(obj)) {
+          for (const item of obj) {
+            walk(item);
+            if (match !== null) return;
+          }
+          return;
+        }
+
+        if (typeof obj === "object") {
+          for (const [key, value] of Object.entries(obj)) {
+            const keyLc = key.toLowerCase();
+            if (lowered.includes(keyLc)) {
+              match = value;
+              return;
+            }
+          }
+
+          for (const value of Object.values(obj)) {
+            walk(value);
+            if (match !== null) return;
+          }
+        }
+      }
+
+      walk(node);
+      return match;
+    }
+
+    function detectPreRegistration(provider, latestEpoch) {
+      const keyCandidates = [
+        "preRegistered",
+        "preregistered",
+        "preRegistration",
+        "preRegistrationStatus",
+        "isPreRegistered",
+        "isPreregistered",
+        "preRegisteredForNextEpoch",
+        "preregisteredForNextEpoch",
+        "isPreRegisteredForNextEpoch",
+        "nextEpochPreRegistered",
+        "nextEpochPreregistered",
+        "registeredForNextEpoch",
+        "nextEpochRegistered",
+        "registrationStatus",
+        "p"
+      ];
+
+      const rawValue = pickFirstDefined(
+        findValueByKeyDeep(latestEpoch, keyCandidates),
+        findValueByKeyDeep(provider, keyCandidates),
+        latestEpoch?.voterRegistration?.preRegistered,
+        latestEpoch?.voterRegistration?.isPreRegistered,
+        latestEpoch?.voterRegistration?.preRegisteredForNextEpoch,
+        latestEpoch?.voterRegistration?.registeredForNextEpoch,
+        latestEpoch?.preRegistered,
+        latestEpoch?.preregistered,
+        provider?.preRegistered,
+        provider?.preregistered
+      );
+
+      const parsed = parseBooleanLike(rawValue);
+
+      return {
+        value: parsed,
+        raw: rawValue
+      };
+    }
+
+    function setPreRegBadge(result) {
+      const badge = document.getElementById("preRegBadge");
+      const text = document.getElementById("preRegBadgeText");
+      const hint = document.getElementById("debugHint");
+
+      if (!badge || !text || !hint) return;
+
+      badge.classList.remove("ok", "no", "unknown");
+
+      if (result.value === true) {
+        badge.classList.add("ok");
+        text.textContent = "Pre-registration: YES";
+        hint.textContent = "Next epoch registration detected.";
+        return;
+      }
+
+      if (result.value === false) {
+        badge.classList.add("no");
+        text.textContent = "Pre-registration: NO";
+        hint.textContent = "Next epoch registration not detected.";
+        return;
+      }
+
+      badge.classList.add("unknown");
+      text.textContent = "Pre-registration: UNKNOWN";
+      hint.textContent = result.raw != null
+        ? `Raw prereg value found but not recognized: ${String(result.raw)}`
+        : "No explicit prereg field detected in current API response.";
+    }
+
+    function setText(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = value ?? "-";
+    }
+
+    function loadExtraMetrics(provider, latest) {
+      const apr = pickFirstDefined(
+        provider?.apr,
+        provider?.currentApr,
+        provider?.estimatedApr,
+        latest?.apr,
+        latest?.currentApr
+      );
+
+      const selfBond = pickFirstDefined(
+        provider?.selfBond,
+        provider?.selfStake,
+        provider?.stake,
+        provider?.ownStake,
+        latest?.selfBond,
+        latest?.selfStake,
+        latest?.stake
+      );
+
+      const delegated = pickFirstDefined(
+        provider?.delegated,
+        provider?.delegatedAmount,
+        provider?.delegation,
+        provider?.totalDelegation,
+        latest?.delegated,
+        latest?.delegatedAmount
+      );
+
+      const totalWeight = pickFirstDefined(
+        provider?.totalWeight,
+        provider?.votePower,
+        provider?.wNatVotePower,
+        provider?.totalVotePower,
+        latest?.totalWeight,
+        latest?.votePower
+      );
+
+      setText("aprValue", apr != null ? fmtPct(apr, 2) : "-");
+      setText("selfBondValue", selfBond != null ? fmtNum(selfBond, 2) : "-");
+      setText("delegatedValue", delegated != null ? fmtNum(delegated, 2) : "-");
+      setText("totalWeightValue", totalWeight != null ? fmtNum(totalWeight, 2) : "-");
+    }
+
     async function loadPerformance() {
       const loadingEl = document.getElementById("loading");
       const errorEl = document.getElementById("error");
       const contentEl = document.getElementById("content");
 
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("API request failed");
+        const res = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(`API request failed (${res.status})`);
+        }
 
         const data = await res.json();
         const provider = findProviderDeep(data);
-        if (!provider) throw new Error("MirSFlr provider not found");
+
+        if (!provider) {
+          throw new Error("MirSFlr provider not found");
+        }
 
         const latest = getLatestEpoch(provider);
 
-        document.getElementById("avgRewardValue").textContent =
-          provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-";
+        setText(
+          "avgRewardValue",
+          provider.averageRewardPerEpoch != null ? fmtNum(provider.averageRewardPerEpoch, 2) : "-"
+        );
 
-        document.getElementById("epochsValue").textContent =
-          `${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}`;
+        setText(
+          "epochsValue",
+          `${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}`
+        );
 
-        document.getElementById("passStrikeValue").textContent =
-          `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`;
+        setText(
+          "passStrikeValue",
+          `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`
+        );
 
-        document.getElementById("feeValue").textContent =
+        setText(
+          "feeValue",
           latest?.voterRegistration?.delegationFeeBIPS != null
             ? (Number(latest.voterRegistration.delegationFeeBIPS) / 100).toFixed(2) + "%"
-            : "-";
+            : "-"
+        );
 
         setBar("ftsoAvailabilityBar", "ftsoAvailabilityText", provider.ftsoPerformance?.availability);
         setBar("ftsoPerformanceBar", "ftsoPerformanceText", provider.ftsoPerformance?.performance);
         setBar("performance1Bar", "performance1Text", provider.ftsoPerformance?.performance1);
         setBar("performance2Bar", "performance2Text", provider.ftsoPerformance?.performance2);
         setBar("fdcAvailabilityBar", "fdcAvailabilityText", provider.fdcPerformance?.availability);
+
+        const preRegResult = detectPreRegistration(provider, latest);
+        setPreRegBadge(preRegResult);
+
+        loadExtraMetrics(provider, latest);
 
         loadingEl.style.display = "none";
         contentEl.style.display = "block";
@@ -484,6 +817,8 @@ a{
         errorEl.style.display = "block";
         errorEl.textContent = "Could not load performance: " + err.message;
         console.error(err);
+
+        setPreRegBadge({ value: null, raw: null });
       }
     }
 
