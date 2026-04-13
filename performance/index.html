@@ -20,7 +20,7 @@
       --border:rgba(255,255,255,.10);
       --shadow:0 18px 60px rgba(0,0,0,.45);
       --r2:28px;
-      --max:1200px;
+      --max:1520px;
       --ok:#33d69f;
       --brand:#7c5cff;
       --brandPink:#ff2f92;
@@ -88,22 +88,19 @@
   padding:0 20px 60px;
 }
 
-   .topbar{
+  .topbar{
   position:sticky;
   top:0;
   z-index:1000;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
-  padding:14px 0 18px;
-  margin:0 0 24px;
-
+  padding:10px 0 14px;
+  margin:0 0 18px;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  background: rgba(7,11,20,.62);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  background: rgba(7,11,20,.48);
+  border-bottom:1px solid rgba(255,255,255,.06);
 }
     .navGroup{
   display:flex;
@@ -480,6 +477,139 @@
   font-size:12px;
   margin-top:8px;
 }
+    .mainLayout{
+  display:grid;
+  grid-template-columns:minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap:24px;
+  align-items:start;
+}
+
+.leftCol,
+.rightCol{
+  min-width:0;
+}
+
+@media (max-width: 1100px){
+  .mainLayout{
+    grid-template-columns:1fr;
+  }
+}
+    .titleRow{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) auto;
+  gap:18px;
+  align-items:end;
+  margin:24px 0 22px;
+}
+
+@media (max-width: 900px){
+  .titleRow{
+    grid-template-columns:1fr;
+    align-items:start;
+  }
+}
+
+.kpiGrid{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
+
+@media (max-width: 1100px){
+  .kpiGrid{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .kpiGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+.kpiCard{
+  min-height:140px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.sectionCard{
+  padding:22px;
+}
+
+.sectionTitle{
+  margin:0 0 18px;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:-0.02em;
+}
+
+.barGroup{
+  display:grid;
+  gap:16px;
+}
+
+.barItem{
+  padding:14px 0;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+.barItem:first-child{
+  border-top:0;
+  padding-top:0;
+}
+
+.miniGrid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:14px;
+}
+
+.miniGrid.oneCol{
+  grid-template-columns:1fr;
+}
+
+@media (max-width: 640px){
+  .miniGrid{
+    grid-template-columns:1fr;
+  }
+}
+
+.miniStat{
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.miniValue{
+  font-size:20px;
+  font-weight:800;
+  line-height:1.25;
+}
+
+.stickyCard{
+  position:sticky;
+  top:92px;
+}
+
+@media (max-width: 1100px){
+  .stickyCard{
+    position:static;
+  }
+}
+
+.validatorMuted{
+  opacity:.72;
+}
+
+.note{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.7;
+}
   </style>
 </head>
 <body>
@@ -519,184 +649,197 @@
     </div>
   </div>
 </div>
-
+</div>
     <div id="loading" class="loading">Loading performance…</div>
     <div id="error" class="error" style="display:none;"></div>
 
-    <div id="content" style="display:none;">
-     <div class="grid">
-  <div class="card">
-    <div class="label">Average Reward / Epoch</div>
-    <div class="value" id="avgRewardValue">-</div>
-    <div class="small">Average across all tracked epochs</div>
-  </div>
+ <div id="content" style="display:none;">
+  <div class="kpiGrid">
+    <div class="card kpiCard">
+      <div class="label">Average Reward / Epoch</div>
+      <div class="value" id="avgRewardValue">-</div>
+      <div class="small">Average across all tracked epochs</div>
+    </div>
 
-  <div class="card">
-    <div class="label">Monthly Earnings</div>
-    <div class="value" id="monthlyEarningsValue">-</div>
-    <div class="small">Estimated from average reward per epoch and current selected currency</div>
-  </div>
+    <div class="card kpiCard">
+      <div class="label">Monthly Earnings</div>
+      <div class="value" id="monthlyEarningsValue">-</div>
+      <div class="small">Estimated from average reward per epoch</div>
+    </div>
 
-  <div class="card">
-    <div class="label">Stake Composition</div>
-    <div class="value" id="networkShareValue">-</div>
-    <div class="small">Derived from provider weight</div>
-  </div>
+    <div class="card kpiCard">
+      <div class="label">Epochs</div>
+      <div class="value" id="epochsValue">-</div>
+      <div class="small">Eligible / total epochs</div>
+    </div>
 
-  <div class="card">
-    <div class="label">Epochs</div>
-          <div class="value" id="epochsValue">-</div>
-          <div class="small">Eligible / total epochs</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Passes / Strikes</div>
-          <div class="value" id="passStrikeValue">-</div>
-          <div class="small">Eligibility track record</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Delegation Fee</div>
-          <div class="value" id="feeValue">-</div>
-          <div class="small">Current fee</div>
-        </div>
-      </div>
-
-      <div class="sectionTitle">Additional metrics</div>
-<div class="ratioCard">
-  <div class="sectionTitle">Stake composition</div>
-
-  <div class="ratioStack">
-    <div class="ratioSelf" id="ratioSelf"></div>
-    <div class="ratioDelegated" id="ratioDelegated"></div>
-  </div>
-
-  <div class="ratioLegend">
-    <div id="ratioSelfText">Self: -</div>
-    <div id="ratioDelegatedText">Delegated: -</div>
-  </div>
-
-  <div class="miniNote">
-    Shows how much stake is provider-owned vs delegated.
-  </div>
-</div>
-      <div class="grid">
-        <div class="card">
-          <div class="label">APR</div>
-          <div class="value" id="aprValue">-</div>
-          <div class="small">If available from API</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Self Bond / Stake</div>
-          <div class="value" id="selfBondValue">-</div>
-          <div class="small">Provider-owned weight</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Delegated</div>
-          <div class="value" id="delegatedValue">-</div>
-          <div class="small">External delegation</div>
-        </div>
-
-        <div class="card">
-          <div class="label">Total Weight</div>
-          <div class="value" id="totalWeightValue">-</div>
-          <div class="small">Combined effective weight</div>
-        </div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FTSO Availability</div>
-        <div class="barBg"><div class="barFill" id="ftsoAvailabilityBar"></div></div>
-        <div class="barMeta" id="ftsoAvailabilityText">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FTSO Performance</div>
-        <div class="barBg"><div class="barFill" id="ftsoPerformanceBar"></div></div>
-        <div class="barMeta" id="ftsoPerformanceText">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">Performance 1</div>
-        <div class="barBg"><div class="barFill" id="performance1Bar"></div></div>
-        <div class="barMeta" id="performance1Text">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">Performance 2</div>
-        <div class="barBg"><div class="barFill" id="performance2Bar"></div></div>
-        <div class="barMeta" id="performance2Text">-</div>
-      </div>
-
-      <div class="barCard">
-        <div class="barTitle">FDC Availability</div>
-        <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
-        <div class="barMeta" id="fdcAvailabilityText">-</div>
-      </div>
-<div class="sectionTitle">Validator Monitoring (coming soon)</div>
-<div class="grid">
-  <div class="card">
-    <div class="label">Validator APR</div>
-    <div class="value" id="validatorAprValue">-</div>
-    <div class="small">Validator-side APR</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Uptime</div>
-    <div class="value" id="validatorUptimeValue">-</div>
-    <div class="small">Current node uptime</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Connected</div>
-    <div class="value" id="validatorConnectedValue">-</div>
-    <div class="small">Live node status</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Delegators</div>
-    <div class="value" id="delegatorsCountValue">-</div>
-    <div class="small">Current delegator count</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Total Stake</div>
-    <div class="value" id="validatorTotalStakeValue">-</div>
-    <div class="small">Validator total stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Self Bond</div>
-    <div class="value" id="validatorSelfStakeValue">-</div>
-    <div class="small">Provider-owned validator stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Validator Delegated</div>
-    <div class="value" id="validatorDelegatedStakeValue">-</div>
-    <div class="small">Delegated validator stake</div>
-  </div>
-
-  <div class="card">
-    <div class="label">Staking Expiry</div>
-    <div class="value" id="stakingExpiryValue">-</div>
-    <div class="small">Validator staking end time</div>
-  </div>
-</div>
-     <div class="note">
-  Source: Oracle Daemon API
-  <br>
-  <a href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">Open raw API</a>
-  <br>
-  <span id="lastUpdated"></span>
-  <br>
-  <span id="debugHint"></span>
-</div>
+    <div class="card kpiCard">
+      <div class="label">Delegation Fee</div>
+      <div class="value" id="feeValue">-</div>
+      <div class="small">Current fee</div>
     </div>
   </div>
 
+  <div class="mainLayout">
+    <div class="leftCol">
+      <div class="card sectionCard">
+        <div class="sectionTitle">Performance Health</div>
+
+        <div class="barGroup">
+          <div class="barItem">
+            <div class="barTitle">FTSO Availability</div>
+            <div class="barBg"><div class="barFill" id="ftsoAvailabilityBar"></div></div>
+            <div class="barMeta" id="ftsoAvailabilityText">-</div>
+          </div>
+
+          <div class="barItem">
+            <div class="barTitle">FTSO Performance</div>
+            <div class="barBg"><div class="barFill" id="ftsoPerformanceBar"></div></div>
+            <div class="barMeta" id="ftsoPerformanceText">-</div>
+          </div>
+
+          <div class="barItem">
+            <div class="barTitle">Performance 1</div>
+            <div class="barBg"><div class="barFill" id="performance1Bar"></div></div>
+            <div class="barMeta" id="performance1Text">-</div>
+          </div>
+
+          <div class="barItem">
+            <div class="barTitle">Performance 2</div>
+            <div class="barBg"><div class="barFill" id="performance2Bar"></div></div>
+            <div class="barMeta" id="performance2Text">-</div>
+          </div>
+
+          <div class="barItem">
+            <div class="barTitle">FDC Availability</div>
+            <div class="barBg"><div class="barFill" id="fdcAvailabilityBar"></div></div>
+            <div class="barMeta" id="fdcAvailabilityText">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sectionCard">
+        <div class="sectionTitle">Additional Metrics</div>
+
+        <div class="miniGrid">
+          <div class="miniStat">
+            <div class="label">APR</div>
+            <div class="miniValue" id="aprValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Passes / Strikes</div>
+            <div class="miniValue" id="passStrikeValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Self Bond / Stake</div>
+            <div class="miniValue" id="selfBondValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Delegated</div>
+            <div class="miniValue" id="delegatedValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Total Weight</div>
+            <div class="miniValue" id="totalWeightValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Stake Composition</div>
+            <div class="miniValue" id="networkShareValue">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sectionCard validatorMuted">
+        <div class="sectionTitle">Validator Monitoring</div>
+        <div class="small">Coming soon</div>
+      </div>
+    </div>
+
+    <div class="rightCol">
+      <div class="card sectionCard stickyCard">
+        <div class="sectionTitle">Stake Composition</div>
+
+        <div class="ratioStack">
+          <div class="ratioSelf" id="ratioSelf"></div>
+          <div class="ratioDelegated" id="ratioDelegated"></div>
+        </div>
+
+        <div class="ratioLegend">
+          <div id="ratioSelfText">Self: -</div>
+          <div id="ratioDelegatedText">Delegated: -</div>
+        </div>
+
+        <div class="miniNote">
+          Shows how much stake is provider-owned vs delegated.
+        </div>
+      </div>
+
+      <div class="card sectionCard">
+        <div class="sectionTitle">Validator Preview</div>
+
+        <div class="miniGrid oneCol">
+          <div class="miniStat">
+            <div class="label">Validator APR</div>
+            <div class="miniValue" id="validatorAprValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Validator Uptime</div>
+            <div class="miniValue" id="validatorUptimeValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Connected</div>
+            <div class="miniValue" id="validatorConnectedValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Delegators</div>
+            <div class="miniValue" id="delegatorsCountValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Validator Total Stake</div>
+            <div class="miniValue" id="validatorTotalStakeValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Validator Self Bond</div>
+            <div class="miniValue" id="validatorSelfStakeValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Validator Delegated</div>
+            <div class="miniValue" id="validatorDelegatedStakeValue">-</div>
+          </div>
+
+          <div class="miniStat">
+            <div class="label">Staking Expiry</div>
+            <div class="miniValue" id="stakingExpiryValue">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card sectionCard">
+        <div class="sectionTitle">Source</div>
+        <div class="note" style="margin-top:0;">
+          Source: Oracle Daemon API
+          <br>
+          <a href="https://api.oracle-daemon.com/v1/flare/providers" target="_blank" rel="noopener">Open raw API</a>
+          <br>
+          <span id="lastUpdated"></span>
+          <br>
+          <span id="debugHint"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
   const EPOCHS_PER_MONTH = 8.7;
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
