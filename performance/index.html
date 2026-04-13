@@ -965,17 +965,21 @@
     if (eurBtn) eurBtn.classList.toggle("active", selectedCurrency === "EUR");
   }
 
-  async function loadFxRate() {
-    try {
-      const res = await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");
-      if (!res.ok) return;
-      const data = await res.json();
-      const rate = Number(data?.rates?.EUR);
-      if (Number.isFinite(rate) && rate > 0) {
-        usdToEurRate = rate;
-      }
-    } catch (_) {}
+ async function loadFxRate() {
+  try {
+    const res = await fetch("https://open.er-api.com/v6/latest/USD");
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const rate = Number(data?.rates?.EUR);
+
+    if (Number.isFinite(rate) && rate > 0) {
+      usdToEurRate = rate;
+    }
+  } catch (e) {
+    console.warn("FX fetch failed, using fallback");
   }
+}
 
   function setMinimalConditionsBadge(provider) {
     const badge = document.getElementById("minConditionsBadge");
@@ -1311,6 +1315,11 @@
 
   updateCurrencyButtons();
   loadPerformance();
+  updateCurrencyButtons();
+
+loadFxRate().finally(() => {
+  loadPerformance();
+});
 </script>
 </body>
 </html>
