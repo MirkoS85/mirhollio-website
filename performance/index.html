@@ -707,74 +707,45 @@
       el.textContent = value ?? "-";
     }
 
-   function loadExtraMetrics(provider, latest) {
-  if (!latest) return;
+  function loadExtraMetrics(provider, latest) {
+  if (!latest) {
+    document.getElementById("aprValue").textContent = "-";
+    document.getElementById("selfBondValue").textContent = "-";
+    document.getElementById("delegatedValue").textContent = "-";
+    document.getElementById("totalWeightValue").textContent = "-";
+    return;
+  }
 
-  // APR (reward rate)
-  document.getElementById("aprValue").textContent =
-    latest.m_dRewardRate != null
-      ? Number(latest.m_dRewardRate).toFixed(2) + "%"
-      : "-";
+  const aprValue = latest.m_dRewardRate != null
+    ? Number(latest.m_dRewardRate).toFixed(2) + "%"
+    : "-";
 
-  // Self stake
-  document.getElementById("selfBondValue").textContent =
-    latest.m_stakeWeight != null
-      ? fmtNum(latest.m_stakeWeight, 0)
-      : "-";
+  let selfBondValue = latest.m_stakeWeight != null
+    ? fmtNum(latest.m_stakeWeight, 0)
+    : "-";
 
-  // Delegated
-  document.getElementById("delegatedValue").textContent =
-    latest.m_delegationWeight != null
-      ? fmtNum(latest.m_delegationWeight, 0)
-      : "-";
+  const delegatedValue = latest.m_delegationWeight != null
+    ? fmtNum(latest.m_delegationWeight, 0)
+    : "-";
 
-  // Total weight
-  document.getElementById("totalWeightValue").textContent =
-    latest.m_totalWeight != null
-      ? fmtNum(latest.m_totalWeight, 0)
-      : "-";
-const total = latest.m_totalWeight;
-const self = latest.m_stakeWeight;
+  const totalWeightValue = latest.m_totalWeight != null
+    ? fmtNum(latest.m_totalWeight, 0)
+    : "-";
 
-if (total && self) {
-  const pct = (self / total) * 100;
-  document.getElementById("selfBondValue").textContent += ` (${pct.toFixed(1)}%)`;
+  if (
+    latest.m_stakeWeight != null &&
+    latest.m_totalWeight != null &&
+    Number(latest.m_totalWeight) > 0
+  ) {
+    const selfPct = (Number(latest.m_stakeWeight) / Number(latest.m_totalWeight)) * 100;
+    selfBondValue += ` (${selfPct.toFixed(1)}%)`;
+  }
+
+  document.getElementById("aprValue").textContent = aprValue;
+  document.getElementById("selfBondValue").textContent = selfBondValue;
+  document.getElementById("delegatedValue").textContent = delegatedValue;
+  document.getElementById("totalWeightValue").textContent = totalWeightValue;
 }
-
-      const selfBond = pickFirstDefined(
-        provider?.selfBond,
-        provider?.selfStake,
-        provider?.stake,
-        provider?.ownStake,
-        latest?.selfBond,
-        latest?.selfStake,
-        latest?.stake
-      );
-
-      const delegated = pickFirstDefined(
-        provider?.delegated,
-        provider?.delegatedAmount,
-        provider?.delegation,
-        provider?.totalDelegation,
-        latest?.delegated,
-        latest?.delegatedAmount
-      );
-
-      const totalWeight = pickFirstDefined(
-        provider?.totalWeight,
-        provider?.votePower,
-        provider?.wNatVotePower,
-        provider?.totalVotePower,
-        latest?.totalWeight,
-        latest?.votePower
-      );
-
-      setText("aprValue", apr != null ? fmtPct(apr, 2) : "-");
-      setText("selfBondValue", selfBond != null ? fmtNum(selfBond, 2) : "-");
-      setText("delegatedValue", delegated != null ? fmtNum(delegated, 2) : "-");
-      setText("totalWeightValue", totalWeight != null ? fmtNum(totalWeight, 2) : "-");
-    }
-
     async function loadPerformance() {
       const loadingEl = document.getElementById("loading");
       const errorEl = document.getElementById("error");
