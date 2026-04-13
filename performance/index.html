@@ -240,13 +240,13 @@
     }
 
     .grid{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:16px;
-      margin-bottom:24px;
-    }
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
+  margin-bottom:24px;
+}
 
     .card{
       background:linear-gradient(180deg, var(--panel), var(--panel2));
@@ -534,7 +534,7 @@
   <div class="card">
     <div class="label">Monthly Earnings</div>
     <div class="value" id="monthlyEarningsValue">-</div>
-    <div class="small">Estimated from average reward per epoch</div>
+    <div class="small">Estimated from average reward per epoch and current selected currency</div>
   </div>
 
   <div class="card">
@@ -705,7 +705,8 @@
 
   let selectedCurrency = "USD";
   let usdToEurRate = 0.92;
-
+  let flrUsdPrice = null;
+  let flrEurPrice = null;
   function fmtNum(value, decimals = 2) {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -980,7 +981,33 @@
     console.warn("FX fetch failed, using fallback");
   }
 }
+async function loadFlrSpotPrices() {
+  try {
+    const usdRes = await fetch("https://api.coinbase.com/v2/prices/FLR-USD/spot");
+    if (usdRes.ok) {
+      const usdData = await usdRes.json();
+      const usd = Number(usdData?.data?.amount);
+      if (Number.isFinite(usd) && usd > 0) {
+        flrUsdPrice = usd;
+      }
+    }
+  } catch (e) {
+    console.warn("FLR USD spot fetch failed");
+  }
 
+  try {
+    const eurRes = await fetch("https://api.coinbase.com/v2/prices/FLR-EUR/spot");
+    if (eurRes.ok) {
+      const eurData = await eurRes.json();
+      const eur = Number(eurData?.data?.amount);
+      if (Number.isFinite(eur) && eur > 0) {
+        flrEurPrice = eur;
+      }
+    }
+  } catch (e) {
+    console.warn("FLR EUR spot fetch failed");
+  }
+}
   function setMinimalConditionsBadge(provider, latest) {
   const badge = document.getElementById("minConditionsBadge");
   if (!badge) return;
@@ -1039,14 +1066,42 @@
 }
 
   function updateMonthlyEarnings(provider, latest) {
-    const el = document.getElementById("monthlyEarningsValue");
-    if (!el) return;
+  const el = document.getElementById("monthlyEarningsValue");
+  if (!el) return;
 
-    const monthlyFlr = estimateMonthlyEarnings(provider, latest);
-    if (!Number.isFinite(monthlyFlr)) {
-      el.textContent = "-";
+  const monthlyFlr = estimateMonthlyEarnings(provider, latest);
+  if (!Number.isFinite(monthlyFlr)) {
+    el.textContent = "-";
+    return;
+  }
+
+  if (selectedCurrency === "EUR") {
+    if (Number.isFinite(flrEurPrice) && flrEurPrice > 0) {
+      el.textContent = fmtMoney(monthlyFlr * flrEurPrice, "EUR", 0);
       return;
     }
+
+    if (
+      Number.isFinite(flrUsdPrice) &&
+      flrUsdPrice > 0 &&
+      Number.isFinite(usdToEurRate) &&
+      usdToEurRate > 0
+    ) {
+      el.textContent = fmtMoney(monthlyFlr * flrUsdPrice * usdToEurRate, "EUR", 0);
+      return;
+    }
+
+    el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
+    return;
+  }
+
+  if (Number.isFinite(flrUsdPrice) && flrUsdPrice > 0) {
+    el.textContent = fmtMoney(monthlyFlr * flrUsdPrice, "USD", 0);
+    return;
+  }
+
+  el.textContent = fmtNum(monthlyFlr, 0) + " FLR";
+}
 
     const usdSpotText = document.getElementById("spotUsd")?.textContent || "";
     const eurSpotText = document.getElementById("spotEur")?.textContent || "";
@@ -1334,12 +1389,12 @@ console.log("LATEST EPOCH FULL:", latest);
       updateMonthlyEarnings(window.__providerData, window.__latestEpochData);
     }
   });
-
-  updateCurrencyButtons();
-  loadPerformance();
   updateCurrencyButtons();
 
-loadFxRate().finally(() => {
+Promise.allSettled([
+  loadFxRate(),
+  loadFlrSpotPrices()
+]).finally(() => {
   loadPerformance();
 });
 </script>
