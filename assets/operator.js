@@ -117,6 +117,7 @@ const MirSFlr = (() => {
     const raw = pickFirstDefined(
       provider.preRegistered,
       provider.preregistered,
+      provider.isPreRegistered,
       provider.preRegistration,
       provider.pre_registration,
       provider.nextEpochRegistered,
@@ -125,6 +126,7 @@ const MirSFlr = (() => {
       findValueByKeyDeep(provider, [
         "preRegistered",
         "preregistered",
+        "isPreRegistered",
         "preRegistration",
         "registeredForNextEpoch",
         "nextEpochRegistered",
@@ -137,6 +139,7 @@ const MirSFlr = (() => {
       parsed = parseBooleanLike(pickFirstDefined(
         latest?.preRegistered,
         latest?.preregistered,
+        latest?.isPreRegistered,
         latest?.preRegistration,
         latest?.registeredForNextEpoch,
         latest?.nextEpochRegistered,
@@ -149,12 +152,17 @@ const MirSFlr = (() => {
   }
 
   function minimalConditions(provider, latest) {
+    const latestConditions = [
+      latest?.ftsoScaling?.conditionMet,
+      latest?.fastUpdates?.conditionMet,
+      latest?.staking?.conditionMet,
+      latest?.fdc?.conditionMet
+    ].filter(value => typeof value === "boolean");
     const eligibleEpochs = Number(provider?.eligibleEpochs);
     const totalEpochs = Number(provider?.totalEpochs);
-    const strikes = Number(provider?.totalStrikes);
     const latestEligible = latest?.eligibleForReward;
+    if (latestConditions.length > 0) return latestConditions.every(Boolean) ? "Pass" : "Watch";
     if (latestEligible === false) return "Watch";
-    if (Number.isFinite(strikes) && strikes > 0) return "Watch";
     if (Number.isFinite(eligibleEpochs) && Number.isFinite(totalEpochs) && totalEpochs > 0) {
       return eligibleEpochs >= totalEpochs ? "Pass" : "Watch";
     }
