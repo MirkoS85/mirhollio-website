@@ -36,6 +36,13 @@ const MirSFlr = (() => {
     return `${fmtNum(n, 0)}${suffix}`;
   }
 
+  function fmtChainAmount(value, suffix = " FLR") {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    const normalized = Math.abs(n) > 1_000_000_000_000 ? n / 1_000_000_000 : n;
+    return fmtCompact(normalized, suffix);
+  }
+
   function shortAddr(addr) {
     if (!addr) return "-";
     const s = String(addr);
@@ -152,12 +159,7 @@ const MirSFlr = (() => {
   }
 
   function minimalConditions(provider, latest) {
-    const latestConditions = [
-      latest?.ftsoScaling?.conditionMet,
-      latest?.fastUpdates?.conditionMet,
-      latest?.staking?.conditionMet,
-      latest?.fdc?.conditionMet
-    ].filter(value => typeof value === "boolean");
+    const latestConditions = getLatestConditions(latest).map(item => item.met).filter(value => typeof value === "boolean");
     const eligibleEpochs = Number(provider?.eligibleEpochs);
     const totalEpochs = Number(provider?.totalEpochs);
     const latestEligible = latest?.eligibleForReward;
@@ -167,6 +169,40 @@ const MirSFlr = (() => {
       return eligibleEpochs >= totalEpochs ? "Pass" : "Watch";
     }
     return latestEligible === true ? "Pass" : "Not exposed";
+  }
+
+  function getLatestConditions(latest) {
+    return [
+      ["FTSO", latest?.ftsoScaling?.conditionMet],
+      ["Fast", latest?.fastUpdates?.conditionMet],
+      ["FDC", latest?.fdc?.conditionMet],
+      ["Stake", latest?.staking?.conditionMet]
+    ];
+  }
+
+  function renderConditions(latest) {
+    const conditions = getLatestConditions(latest);
+    document.querySelectorAll("[data-render='conditions']").forEach(mount => {
+      mount.innerHTML = conditions.map(([label, met]) => {
+        const state = met === true ? "ok" : met === false ? "bad" : "unknown";
+        const title = `${label}: ${met === true ? "OK" : met === false ? "Needs attention" : "Not exposed"}`;
+        return `<span class="${state}" title="${title}" aria-label="${title}">${met === true ? "✓" : met === false ? "!" : "?"}</span>`;
+      }).join("");
+    });
+  }
+
+  function renderUptime(values) {
+    document.querySelectorAll("[data-render='validator-uptime']").forEach(mount => {
+      if (!Array.isArray(values) || !values.length) {
+        mount.innerHTML = "<span>-</span>";
+        return;
+      }
+      mount.innerHTML = values.map((value, index) => {
+        const pct = Math.round(Number(value));
+        const title = `Recent checkpoint ${index + 1}: ${pct}% uptime`;
+        return `<span title="${title}"><em>E-${values.length - index}</em>${pct}%</span>`;
+      }).join("");
+    });
   }
 
   function findProviderDeep(data) {
@@ -385,6 +421,8 @@ const MirSFlr = (() => {
     setText("passes", `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`);
     setText("preRegistered", detectPreRegistration(provider));
     setText("minimalConditions", minimalConditions(provider, latest));
+    setText("selfBond", latest?.staking?.totalSelfBond != null ? fmtChainAmount(latest.staking.totalSelfBond) : "-");
+    setText("stakedFlr", latest?.staking?.stakeWithUptime != null ? fmtChainAmount(latest.staking.stakeWithUptime) : latest?.staking?.stake != null ? fmtChainAmount(latest.staking.stake) : "-");
     setText("latestEpoch", latest?.epoch ?? "-");
     setText("latestReward", latest?.totalRewardAmount != null ? `${fmtNum(latest.totalRewardAmount, 2)} FLR` : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "Yes" : latest?.eligibleForReward === false ? "No" : "-");
@@ -398,6 +436,7 @@ const MirSFlr = (() => {
     setBar("performance1", provider.ftsoPerformance?.performance1);
     setBar("performance2", provider.ftsoPerformance?.performance2);
     setBar("fdcAvailability", provider.fdcPerformance?.availability);
+    renderConditions(latest);
     renderEpochTable(provider);
     renderAddresses(provider);
     renderRewardChart(provider);
@@ -411,7 +450,8 @@ const MirSFlr = (() => {
     const node = Array.isArray(validator.m_axNode) ? validator.m_axNode[0] : null;
     const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
     const connected = node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "Not exposed";
-    const uptime = Array.isArray(node?.m_adUptime) && node.m_adUptime.length ? node.m_adUptime.map(v => `${Math.round(Number(v))}%`).join(" / ") : "-";
+    const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
+    const uptime = uptimeValues.length ? uptimeValues.map(v => `${Math.round(Number(v))}%`).join(" / ") : "-";
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM)
       ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h ${stake.m_aiTimeLeftDHM[2]}m left`
       : "-";
@@ -427,8 +467,10 @@ const MirSFlr = (() => {
     setText("validatorDelegation", validator.m_dTotalDelegation != null ? fmtCompact(validator.m_dTotalDelegation, " FLR") : "-");
     setText("freeDelegationSpace", validator.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
     setText("stakeDelegation", `${fmtCompact(validator.m_dTotalStake, "")} / ${fmtCompact(validator.m_dTotalDelegation, "")}`);
+    if (!latestData?.staking?.stakeWithUptime && validator.m_dTotalStake != null) setText("stakedFlr", fmtCompact(validator.m_dTotalStake, " FLR"));
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
+    renderUptime(uptimeValues);
   }
 
   function applyProviderV2Data(data) {

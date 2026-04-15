@@ -176,7 +176,7 @@ main{min-width:0}
 }
 
 .hero{
-  min-height:640px;
+  min-height:560px;
   display:grid;
   grid-template-columns:minmax(0,1fr) minmax(330px,430px);
   gap:28px;
@@ -193,7 +193,7 @@ main{min-width:0}
   display:inline-flex;
   align-items:center;
   gap:9px;
-  margin-bottom:18px;
+  margin-bottom:12px;
   color:var(--pink);
   font-size:12px;
   font-weight:950;
@@ -394,6 +394,8 @@ h1{
 .card{
   min-height:190px;
   padding:16px;
+  position:relative;
+  overflow:visible;
 }
 
 .card strong{
@@ -408,6 +410,117 @@ h1{
   color:var(--muted);
   font-size:14px;
   line-height:1.5;
+}
+
+.info-tip{
+  position:absolute;
+  top:12px;
+  right:12px;
+  z-index:3;
+  width:22px;
+  height:22px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--line);
+  border-radius:50%;
+  background:rgba(255,255,255,.04);
+  color:var(--muted);
+  font-size:12px;
+  font-weight:950;
+  cursor:help;
+}
+
+.light .info-tip{
+  border-color:var(--dark-line);
+  background:#f6f7f3;
+  color:#66706d;
+}
+
+.info-tip span{
+  position:absolute;
+  right:-1px;
+  top:30px;
+  width:min(290px, calc(100vw - 40px));
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#151817;
+  color:var(--text);
+  box-shadow:0 18px 45px rgba(0,0,0,.28);
+  font-size:13px;
+  font-weight:760;
+  line-height:1.45;
+  text-align:left;
+  text-transform:none;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(-4px);
+  transition:opacity .16s ease, transform .16s ease;
+}
+
+.light .info-tip span{
+  background:#151817;
+  color:#f4f6f2;
+  border-color:rgba(255,255,255,.10);
+}
+
+.info-tip:hover span,
+.info-tip:focus-visible span{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.condition-dots,
+.uptime-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:18px;
+}
+
+.condition-dots span{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#7b817f;
+  color:#fff;
+  font-size:17px;
+  font-weight:950;
+}
+
+.condition-dots span.ok{background:var(--green)}
+.condition-dots span.bad{background:#e23d3d}
+.condition-dots span.unknown{background:#7b817f}
+
+.uptime-pills span{
+  min-width:64px;
+  padding:8px 9px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:rgba(255,255,255,.04);
+  color:var(--text);
+  font-size:14px;
+  font-weight:950;
+}
+
+.light .uptime-pills span{
+  border-color:var(--dark-line);
+  background:#f6f7f3;
+  color:var(--ink);
+}
+
+.uptime-pills em{
+  display:block;
+  margin-bottom:2px;
+  color:var(--muted);
+  font-size:10px;
+  font-style:normal;
+  font-weight:950;
+  text-transform:uppercase;
 }
 
 .toggle{
