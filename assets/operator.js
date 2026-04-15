@@ -468,9 +468,22 @@ const MirSFlr = (() => {
 
   async function load() {
     try {
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error("API request failed");
-      const provider = findProviderDeep(await res.json());
+      let provider = null;
+      try {
+        const v2Res = await fetch(PROVIDERS_V2_URL, { mode: "cors" });
+        if (v2Res.ok) {
+          const v2Data = await v2Res.json();
+          applyProviderV2Data(v2Data);
+          provider = findProviderDeep(v2Data);
+        }
+      } catch (_) {}
+
+      if (!provider) {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("API request failed");
+        provider = findProviderDeep(await res.json());
+      }
+
       if (!provider) throw new Error("MirSFlr provider not found");
       providerData = provider;
       latestData = latestEpoch(provider);
@@ -526,7 +539,6 @@ const MirSFlr = (() => {
     bindCopy();
     load();
     loadValidator();
-    loadProviderV2();
     loadPrice();
     window.addEventListener("resize", () => {
       if (providerData) renderRewardChart(providerData);
