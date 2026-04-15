@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page not found - MirSFlr</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <style>
+    :root{
+      --bg:#070b14;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --panel:rgba(255,255,255,.06);
+      --border:rgba(255,255,255,.12);
+      --brand:#7c5cff;
+      --brand2:#23d5ff;
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{margin:0; min-height:100%; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif}
+
+    body{
+      display:grid;
+      place-items:center;
+      padding:28px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(124,92,255,.22), transparent 32%),
+        radial-gradient(circle at 80% 0%, rgba(35,213,255,.16), transparent 28%),
+        var(--bg);
+    }
+
+    main{
+      width:min(720px, 100%);
+      padding:30px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
+      box-shadow:0 18px 60px rgba(0,0,0,.38);
+    }
+
+    .brand{display:flex; align-items:center; gap:12px; color:var(--text); text-decoration:none; font-weight:900}
+    .brand img{width:42px; height:42px; border-radius:10px}
+    h1{margin:28px 0 12px; font-size:clamp(34px, 7vw, 60px); line-height:1; letter-spacing:-.04em}
+    p{margin:0; color:var(--muted); line-height:1.7; font-size:17px}
+    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:10px 14px;
+      border:1px solid var(--border);
+      border-radius:10px;
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      text-decoration:none;
+      font-weight:800;
+    }
+    .btn.primary{border-color:rgba(124,92,255,.5); background:linear-gradient(135deg, rgba(124,92,255,.25), rgba(35,213,255,.14))}
+  </style>
+</head>
+<body>
+  <main>
+    <a class="brand" href="/" aria-label="MirSFlr Home">
+      <img src="/logo.png" alt="MirSFlr logo">
+      <span>MirSFlr</span>
+    </a>
+    <h1>Page not found.</h1>
+    <p>The address may have moved, or the link may be outdated. Use the verified MirSFlr pages below.</p>
+    <div class="actions">
+      <a class="btn primary" href="/">Home</a>
+      <a class="btn" href="/stats/">Stats</a>
+      <a class="btn" href="/addresses/">Addresses</a>
+      <a class="btn" href="/performance/">Performance</a>
+    </div>
+  </main>
+</body>
+</html>

@@ -7,6 +7,16 @@
 
   <meta name="description" content="MirSFlr — Flare validator and FTSO provider. Transparent metrics, delegation guide, live embeds." />
   <meta name="theme-color" content="#0b1220" />
+  <link rel="canonical" href="https://www.mirhollio.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta property="og:description" content="MirSFlr runs Flare validator and FTSO infrastructure with public metrics, delegation guidance, and verifiable provider identity." />
+  <meta property="og:url" content="https://www.mirhollio.com/" />
+  <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta name="twitter:description" content="Flare validator and FTSO infrastructure with public metrics, delegation guidance, and verifiable provider identity." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
 
   <!-- Favicons -->
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -1583,10 +1593,10 @@ transform:translateY(-1px);
       <div class="gridHero">
         <div class="card hero">
 
-<div class="heroTitle">
+<h1 class="heroTitle">
   Validator + FTSO Provider built for uptime, signal quality, and
   <span class="flarePink">trust.</span>
-</div>
+</h1>
 
 <div class="opsStatus" id="opsStatus">
   <span class="dot"></span>
@@ -2208,7 +2218,7 @@ if (ftsoAddr) ftsoAddr.textContent = shorten(CONFIG.ftsoProviderIdentity);
     }
 
     async function fetchCoinGecko24h(vs){
-      const url = `https://api.coingecko.com/api/v3/coins/flare/market_chart?vs_currency=${vs}&days=1&interval=hourly`;
+      const url = `https://api.coingecko.com/api/v3/coins/flare-networks/market_chart?vs_currency=${vs}&days=1&interval=hourly`;
       const res = await fetch(url, { mode:"cors" });
       if (!res.ok) throw new Error("CG blocked");
       const j = await res.json();
