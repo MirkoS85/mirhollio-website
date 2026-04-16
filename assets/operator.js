@@ -67,6 +67,8 @@ const MirSFlr = (() => {
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
       btn.classList.toggle("active", btn.getAttribute("data-price-currency") === currency);
     });
+    if (providerData) renderRewardChart(providerData);
+    if (validatorData) renderValidatorRewardChart(Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null);
   }
 
   function fmtFiat(flrAmount, currency = activePriceCurrency) {
@@ -346,7 +348,15 @@ const MirSFlr = (() => {
     `).join("");
   }
 
-  function renderRewardSeries({ svg, tooltip, series, emptyMessage, gradientId }) {
+  function rewardWithFiat(value) {
+    return `${fmtNum(value, 2)} FLR<br><small>${fmtFiat(value)}</small>`;
+  }
+
+  function rewardRangeWithFiat(minReward, maxReward) {
+    return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR<br><small>${fmtFiat(minReward)} - ${fmtFiat(maxReward)}</small>`;
+  }
+
+  function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId }) {
     if (!svg) return;
 
     if (!series.length) {
@@ -415,7 +425,7 @@ const MirSFlr = (() => {
         const svgRect = svg.getBoundingClientRect();
         const left = (point.x / width) * svgRect.width;
         const top = (point.y / height) * svgRect.height;
-        tooltip.innerHTML = `Epoch ${point.epoch}<br>${fmtNum(point.reward, 2)} FLR`;
+        tooltip.innerHTML = `Epoch ${point.epoch}<br>${rewardWithFiat(point.reward)}`;
         tooltip.style.display = "block";
         tooltip.style.left = `${Math.max(8, Math.min(left - 48, wrapRect.width - 160))}px`;
         tooltip.style.top = `${Math.max(8, top - 52)}px`;
@@ -425,9 +435,8 @@ const MirSFlr = (() => {
       });
     });
 
-    const summary = svg.parentElement?.parentElement?.querySelector("[data-render='reward-summary']");
     if (summary && last) {
-      summary.innerHTML = `<span>Latest <strong>${fmtNum(last.reward, 2)} FLR</strong></span><span>Average <strong>${fmtNum(avgReward, 2)} FLR</strong></span><span>Range <strong>${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)}</strong></span>`;
+      summary.innerHTML = `<span>Latest <strong>${rewardWithFiat(last.reward)}</strong></span><span>Average <strong>${rewardWithFiat(avgReward)}</strong></span><span>Range <strong>${rewardRangeWithFiat(minReward, maxReward)}</strong></span>`;
     }
   }
 
@@ -443,6 +452,7 @@ const MirSFlr = (() => {
     renderRewardSeries({
       svg: document.querySelector("[data-render='reward-chart']"),
       tooltip: document.querySelector("[data-render='reward-tooltip']"),
+      summary: document.querySelector("[data-render='reward-summary']"),
       series,
       emptyMessage: "FTSO reward history unavailable",
       gradientId: "ftsoReward"
@@ -461,6 +471,7 @@ const MirSFlr = (() => {
     renderRewardSeries({
       svg: document.querySelector("[data-render='validator-reward-chart']"),
       tooltip: document.querySelector("[data-render='validator-reward-tooltip']"),
+      summary: document.querySelector("[data-render='validator-reward-summary']"),
       series,
       emptyMessage: "Validator reward history unavailable",
       gradientId: "validatorReward"

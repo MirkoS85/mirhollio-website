@@ -242,6 +242,20 @@ h1{
   margin-top:26px;
 }
 
+.currency-control{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:14px;
+}
+
+.currency-control span{
+  color:var(--muted);
+  font-size:12px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+
 .btn.primary{
   border-color:var(--pink);
   background:var(--pink);
@@ -268,6 +282,12 @@ h1{
   border-radius:8px;
   background:var(--surface);
   overflow:hidden;
+}
+
+.status-panel,
+.card,
+.chart-panel{
+  overflow:visible;
 }
 
 .light .status-panel,
@@ -506,6 +526,10 @@ h1{
   grid-column:span 2;
 }
 
+.monthly-rewards-panel{
+  width:min(780px,100%);
+}
+
 .card{
   min-height:190px;
   padding:16px;
@@ -705,11 +729,15 @@ h1{
 .toggle{
   display:inline-flex;
   gap:4px;
-  margin-top:12px;
   padding:3px;
   border:1px solid var(--line);
   border-radius:8px;
   background:rgba(238,242,237,.05);
+}
+
+.card .toggle,
+.metric .toggle{
+  margin-top:12px;
 }
 
 .light .toggle{
@@ -893,6 +921,14 @@ tr:last-child td{border-bottom:0}
 
 .chart-summary strong{
   color:var(--text);
+}
+
+.chart-summary small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:850;
 }
 
 .bars{
