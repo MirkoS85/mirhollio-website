@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=validator-rewards" />
+  <link rel="stylesheet" href="/assets/operator.css?v=stacked-proof" />
 </head>
 <body>
   <div class="mobile-top">
@@ -63,7 +63,6 @@
               <a class="btn ghost" href="/performance/">Performance</a>
               <a class="btn ghost" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
             </div>
-            <div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div>
           </div>
           <aside class="status-panel">
             <div class="panel-head">
@@ -84,9 +83,10 @@
         <div class="inner">
           <div class="section-title">
             <h2>Proof first.</h2>
-            <p>Start with current validator capacity, uptime, fee, stake timing, and protocol participation before you stake or delegate.</p>
+            <div class="section-side"><p>Start with current earnings, validator capacity, uptime, fee, stake timing, and reward history before you stake or delegate.</p><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div></div>
           </div>
           <div class="proof-stack">
+            <article class="card rewards-card monthly-rewards-panel"><button class="info-tip" type="button" aria-label="Monthly rewards info">i<span>Estimated monthly rewards for the operator side. FTSO uses recent provider rewards. Validator uses recent validator rewards when a monthly estimate is not published.</span></button><b>Monthly Rewards (est.)</b><div class="reward-lines"><div><em>FTSO</em><strong data-field="ftsoMonthlyRewards">-</strong><small data-field="ftsoMonthlyFiat">-</small></div><div><em>Validator</em><strong data-field="validatorMonthlyRewards">-</strong><small data-field="validatorMonthlyFiat">-</small></div></div><p>Estimated monthly FTSO and validator rewards, shown in FLR with the selected fiat value below.</p></article>
             <div class="validator-panel">
               <div class="validator-head">
                 <h3>Validator</h3>
@@ -104,7 +104,6 @@
                 <span>Free space <strong data-field="freeDelegationSpace">-</strong></span>
               </div>
             </div>
-            <article class="card rewards-card monthly-rewards-panel"><button class="info-tip" type="button" aria-label="Monthly rewards info">i<span>Estimated monthly rewards for the operator side. FTSO uses recent provider rewards. Validator uses recent validator rewards when a monthly estimate is not published.</span></button><b>Monthly Rewards (est.)</b><div class="reward-lines"><div><em>FTSO</em><strong data-field="ftsoMonthlyRewards">-</strong><small data-field="ftsoMonthlyFiat">-</small></div><div><em>Validator</em><strong data-field="validatorMonthlyRewards">-</strong><small data-field="validatorMonthlyFiat">-</small></div></div><p>Estimated monthly FTSO and validator rewards, shown in FLR with the selected fiat value below.</p></article>
             <div class="chart-panel">
               <div class="panel-head">
                 <strong>Validator Rewards per epoch</strong>
@@ -205,6 +204,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=validator-rewards"></script>
+  <script src="/assets/operator.js?v=stacked-proof"></script>
 </body>
 </html>

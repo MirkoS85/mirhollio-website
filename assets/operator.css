@@ -245,8 +245,8 @@ h1{
 .currency-control{
   display:flex;
   align-items:center;
+  justify-content:flex-end;
   gap:10px;
-  margin-top:14px;
 }
 
 .currency-control span{
@@ -399,6 +399,18 @@ h1{
   line-height:1.55;
 }
 
+.section-side{
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-end;
+  gap:18px;
+  min-width:0;
+}
+
+.section-side p{
+  max-width:620px;
+}
+
 .cards{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
@@ -410,7 +422,13 @@ h1{
 
 .proof-stack{
   display:grid;
+  grid-template-columns:1fr;
   gap:14px;
+}
+
+.proof-stack > *{
+  width:100%;
+  min-width:0;
 }
 
 .validator-panel{
@@ -527,7 +545,8 @@ h1{
 }
 
 .monthly-rewards-panel{
-  width:min(780px,100%);
+  width:100%;
+  min-height:auto;
 }
 
 .card{
@@ -1042,6 +1061,15 @@ tr:last-child td{border-bottom:0}
   .section-title{
     align-items:flex-start;
     flex-direction:column;
+  }
+  .section-side{
+    width:100%;
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .currency-control{
+    width:100%;
+    justify-content:space-between;
   }
   .section-title h2{font-size:29px}
   .copy-row{
