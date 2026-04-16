@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=mobile-nav-fix" />
+  <link rel="stylesheet" href="/assets/operator.css?v=monthly-uptime-fix" />
 </head>
 <body>
   <div class="mobile-top">
@@ -139,7 +139,7 @@
             <p>Validator stake and validator performance deserve the same visibility as FTSO rewards.</p>
           </div>
           <div class="cards">
-            <article class="card"><button class="info-tip" type="button" aria-label="Uptime average info">i<span>Recent validator uptime checkpoints. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Uptime (avg)</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent validator uptime checkpoints.</p></article>
+            <article class="card uptime-wide"><button class="info-tip" type="button" aria-label="Uptime average info">i<span>Recent validator uptime checkpoints. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Uptime (avg)</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent validator uptime checkpoints.</p></article>
             <article class="card"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. All four should be green.</span></button><b>Minimal Conditions</b><div class="condition-dots" data-render="conditions"><span></span><span></span><span></span><span></span></div><p>Green means OK. Red means the check failed.</p></article>
             <article class="card"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><b>Pre-registered</b><strong data-field="preRegistered">-</strong><p>Ready for the next reward epoch.</p></article>
           </div>
@@ -204,6 +204,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=mobile-nav-fix"></script>
+  <script src="/assets/operator.js?v=monthly-uptime-fix"></script>
 </body>
 </html>

@@ -219,6 +219,8 @@ const MirSFlr = (() => {
   }
 
   function estimateFtsoMonthlyReward(provider) {
+    const direct = Number(provider?.m_dMonthlyReward ?? provider?.monthlyReward ?? provider?.monthlyRewards ?? provider?.estimatedMonthlyReward);
+    if (Number.isFinite(direct)) return direct;
     const history = Array.isArray(provider?.epochData) ? provider.epochData : [];
     const recent = history
       .filter(item => Number.isFinite(Number(item.totalRewardAmount)))
@@ -230,13 +232,15 @@ const MirSFlr = (() => {
   }
 
   function estimateValidatorMonthlyReward(node) {
+    const direct = Number(node?.m_dMonthlyReward ?? node?.monthlyReward ?? node?.monthlyRewards ?? node?.estimatedMonthlyReward);
+    if (Number.isFinite(direct)) return direct;
     const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
     const recent = history
-      .filter(item => Number.isFinite(Number(item.m_dValidatorReward ?? item.m_dNodeReward)))
+      .filter(item => Number.isFinite(Number(item.m_dNodeReward ?? item.m_dValidatorReward)))
       .sort((a, b) => Number(b.m_dRewardEpoch) - Number(a.m_dRewardEpoch))
       .slice(0, 8);
     if (!recent.length) return null;
-    const total = recent.reduce((sum, item) => sum + Number(item.m_dValidatorReward ?? item.m_dNodeReward ?? 0), 0);
+    const total = recent.reduce((sum, item) => sum + Number(item.m_dNodeReward ?? item.m_dValidatorReward ?? 0), 0);
     return total * (30.5 / 28);
   }
 
