@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css" />
+  <link rel="stylesheet" href="/assets/operator.css?v=reward-ui" />
 </head>
 <body>
   <div class="mobile-top">
@@ -70,10 +70,10 @@
               <span class="status-dot" data-field="status">Loading</span>
             </div>
             <div class="metric-grid">
-              <div class="metric"><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
-              <div class="metric"><span>FTSO availability</span><strong data-field="availability">-</strong></div>
-              <div class="metric"><span>Minimal conditions</span><strong data-field="minimalConditions">Checking</strong></div>
-              <div class="metric"><span>Pre-registered</span><strong data-field="preRegistered">Checking</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. Green means the check passed. Red means that part did not pass.</span></button><span>Minimal Conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
+              <div class="metric rewards-metric"><button class="info-tip" type="button" aria-label="Monthly rewards info">i<span>Estimated monthly rewards for the operator side. FTSO uses recent provider rewards. Validator uses recent validator rewards when a monthly estimate is not published.</span></button><span>Monthly Rewards (est.)</span><div class="toggle mini-toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div><div class="reward-lines"><div><em>FTSO</em><strong data-field="ftsoMonthlyRewards">-</strong><small data-field="ftsoMonthlyFiat">-</small></div><div><em>Validator</em><strong data-field="validatorMonthlyRewards">-</strong><small data-field="validatorMonthlyFiat">-</small></div></div></div>
             </div>
           </aside>
         </div>
@@ -83,24 +83,24 @@
         <div class="inner">
           <div class="section-title">
             <h2>Proof first.</h2>
-            <p>FIP.16 moves the conversation toward validator weight. Start with current validator capacity, uptime, fee, stake timing, and protocol participation.</p>
+            <p>Start with current validator capacity, uptime, fee, stake timing, and protocol participation before you stake or delegate.</p>
           </div>
           <div class="proof-stack">
             <div class="cards proof-cards">
-              <article class="card"><button class="info-tip" type="button" aria-label="Free delegation space info">i<span>How much additional FLR delegation the validator can currently accept.</span></button><b>Free delegation space</b><strong data-field="freeDelegationSpace">-</strong><p>Available validator delegation room from Oracle Daemon.</p></article>
-              <article class="card"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>Provider performance score from Oracle Daemon. It helps separate uptime from data quality.</span></button><b>FTSO performance</b><strong data-field="performance">-</strong><p>Provider performance score.</p></article>
-              <article class="card"><button class="info-tip" type="button" aria-label="Self bond and staked FLR info">i<span>Self bond comes from the latest epoch staking condition. Staked FLR is the stake counted with uptime.</span></button><b>Self bond / staked</b><strong><span data-field="selfBond">-</span> / <span data-field="stakedFlr">-</span></strong><p>Latest epoch self bond and active stake.</p></article>
-              <article class="card"><button class="info-tip" type="button" aria-label="Stake and delegation info">i<span>Validator self-stake compared with delegated validator stake from Oracle Daemon validator data.</span></button><b>Stake / delegation</b><strong data-field="stakeDelegation">-</strong><p>Current validator self-stake and delegated stake.</p></article>
-              <article class="card"><button class="info-tip" type="button" aria-label="Validator fee info">i<span>Reported validator fee. FIP.16 proposes a minimum total entity fee across staking and delegation rewards.</span></button><b>Validator fee</b><strong data-field="validatorFee">-</strong><p>Reported fee from validator data.</p></article>
-              <article class="card"><button class="info-tip" type="button" aria-label="Stake active until info">i<span>When the current validator staking period ends. Re-staking keeps validator weight active.</span></button><b>Stake active until</b><strong data-field="stakeEnd">-</strong><p data-field="stakeTimeLeft">Validator staking time left.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="Free Space info">i<span>How much more FLR can still be added before the validator reaches its current capacity. If this number is high, there is still room to add weight.</span></button><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Room still available for more validator weight.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="FTSO Performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><b>FTSO Performance</b><strong data-field="performance">-</strong><p>Quality signal for price submissions.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="Self Stake and Current Stake info">i<span>Self stake is the operator's own FLR. Current stake is the validator stake currently counted by the network.</span></button><b>Self stake / current stake</b><strong><span data-field="selfBond">-</span> / <span data-field="stakedFlr">-</span></strong><p>Shows how much validator weight is active.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="Delegated Stake info">i<span>Delegation is FLR assigned to this validator by other holders. Together with self stake, it helps define validator weight.</span></button><b>Stake / delegation</b><strong data-field="stakeDelegation">-</strong><p>Validator stake compared with delegated weight.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="Delegation Fee info">i<span>The validator fee taken from validator rewards before the remaining rewards are distributed.</span></button><b>Delegation Fee</b><strong data-field="validatorFee">-</strong><p>Validator reward fee.</p></article>
+              <article class="card"><button class="info-tip" type="button" aria-label="Staking Period info">i<span>Staking Period shows when the current validator stake ends. A validator needs active stake to keep validator weight.</span></button><b>Staking Period</b><strong data-field="stakeEnd">-</strong><p data-field="stakeTimeLeft">Time left in the current staking period.</p></article>
             </div>
             <div class="chart-panel">
               <div class="panel-head">
-                <strong>Rewards per epoch</strong>
+                <strong>FTSO Rewards per epoch</strong>
                 <span class="mini-label">Latest 20</span>
               </div>
               <div class="reward-chart-wrap">
-                <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Rewards per epoch chart"></svg>
+                <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg>
                 <div class="chart-tooltip" data-render="reward-tooltip"></div>
               </div>
               <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
@@ -114,18 +114,17 @@
         <div class="inner">
           <div class="section-title">
             <h2>Validator-first.</h2>
-            <p>FIP.16 is a draft proposal, but its direction is clear: validator stake and validator performance become harder to ignore.</p>
+            <p>Validator stake and validator performance deserve the same visibility as FTSO rewards.</p>
           </div>
           <div class="cards">
-            <article class="card"><button class="info-tip" type="button" aria-label="Validator uptime info">i<span>Recent validator uptime values. Each pill represents one recent validator uptime checkpoint.</span></button><b>Validator uptime</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime checkpoints from validator data.</p></article>
-            <article class="card"><button class="info-tip" type="button" aria-label="Minimum conditions info">i<span>Latest epoch checks: FTSO scaling, fast updates, FDC, and staking. Green means condition met, red means attention needed.</span></button><b>Minimum conditions</b><div class="condition-dots" data-render="conditions"><span></span><span></span><span></span><span></span></div><p>Anchor feeds, fast updates, FDC, and staking.</p></article>
-            <article class="card"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>Whether the provider is pre-registered for the next reward epoch in Oracle Daemon v2 data.</span></button><b>Pre-registered</b><strong data-field="preRegistered">-</strong><p>Provider registration signal from Oracle Daemon v2.</p></article>
-            <article class="card"><button class="info-tip" type="button" aria-label="FIP.16 info">i<span>FIP.16 is a draft proposal. The site presents it as context, not as an active rule.</span></button><b>FIP.16 context</b><strong>5x P-chain weight</strong><p>If accepted, staked FLR carries five times the signing weight of WFLR delegation. <a href="https://proposals.flare.network/FIP/FIP_16.html" target="_blank" rel="noopener">Read FIP.16</a></p></article>
+            <article class="card"><button class="info-tip" type="button" aria-label="Uptime average info">i<span>Recent validator uptime checkpoints. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Uptime (avg)</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent validator uptime checkpoints.</p></article>
+            <article class="card"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. All four should be green.</span></button><b>Minimal Conditions</b><div class="condition-dots" data-render="conditions"><span></span><span></span><span></span><span></span></div><p>Green means OK. Red means the check failed.</p></article>
+            <article class="card"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><b>Pre-registered</b><strong data-field="preRegistered">-</strong><p>Ready for the next reward epoch.</p></article>
           </div>
           <div class="flow">
-            <div class="step"><em>1</em><strong>Validator stake matters</strong><p>More reward weight shifts toward active P-chain stake, so validator capacity and uptime deserve front-page visibility.</p></div>
+            <div class="step"><em>1</em><strong>Validator stake matters</strong><p>Active validator stake helps show how much weight the operator is currently carrying.</p></div>
             <div class="step"><em>2</em><strong>Data work still matters</strong><p>FTSO, fast updates, staking, and FDC conditions remain part of reward eligibility.</p></div>
-            <div class="step"><em>3</em><strong>Fees become clearer</strong><p>FIP.16 proposes a 20% minimum total entity fee across staking and WFLR delegation rewards.</p></div>
+            <div class="step"><em>3</em><strong>Fees matter</strong><p>Check the validator fee before comparing estimated rewards.</p></div>
             <div class="step"><em>4</em><strong>Verify before weight</strong><p>Check node status, free space, stake end, and provider addresses before staking or delegating.</p></div>
           </div>
         </div>
@@ -183,6 +182,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=provider-v2"></script>
+  <script src="/assets/operator.js?v=reward-ui"></script>
 </body>
 </html>

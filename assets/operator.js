@@ -12,6 +12,7 @@ const MirSFlr = (() => {
   let latestData = null;
   let prices = { USD: null, EUR: null };
   let activePriceCurrency = "USD";
+  let monthlyRewards = { ftso: null, validator: null };
 
   function fmtNum(value, decimals = 2) {
     const n = Number(value);
@@ -61,9 +62,19 @@ const MirSFlr = (() => {
     const prefix = currency === "EUR" ? "€" : "$";
     setText("flrPrice", Number.isFinite(value) ? `${prefix}${value.toFixed(6)}` : "-");
     setText("flrUsd", Number.isFinite(prices.USD) ? `$${prices.USD.toFixed(6)}` : "-");
+    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso, currency));
+    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator, currency));
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
       btn.classList.toggle("active", btn.getAttribute("data-price-currency") === currency);
     });
+  }
+
+  function fmtFiat(flrAmount, currency = activePriceCurrency) {
+    const amount = Number(flrAmount);
+    const price = prices[currency];
+    if (!Number.isFinite(amount) || !Number.isFinite(price)) return "-";
+    const prefix = currency === "EUR" ? "€" : "$";
+    return `${prefix}${fmtNum(amount * price, 0)}`;
   }
 
   function setBar(key, value) {
@@ -173,10 +184,10 @@ const MirSFlr = (() => {
 
   function getLatestConditions(latest) {
     return [
-      ["FTSO", latest?.ftsoScaling?.conditionMet],
-      ["Fast", latest?.fastUpdates?.conditionMet],
+      ["FTSO Anchor Feeds", latest?.ftsoScaling?.conditionMet],
+      ["FTSO Block-Latency Feeds", latest?.fastUpdates?.conditionMet],
       ["FDC", latest?.fdc?.conditionMet],
-      ["Stake", latest?.staking?.conditionMet]
+      ["Staking", latest?.staking?.conditionMet]
     ];
   }
 
@@ -186,7 +197,7 @@ const MirSFlr = (() => {
       mount.innerHTML = conditions.map(([label, met]) => {
         const state = met === true ? "ok" : met === false ? "bad" : "unknown";
         const title = `${label}: ${met === true ? "OK" : met === false ? "Needs attention" : "Not exposed"}`;
-        return `<span class="${state}" title="${title}" aria-label="${title}">${met === true ? "✓" : met === false ? "!" : "?"}</span>`;
+        return `<span class="${state}" title="${title}" aria-label="${title}">${met === true ? "✓" : met === false ? "×" : "?"}</span>`;
       }).join("");
     });
   }
@@ -203,6 +214,35 @@ const MirSFlr = (() => {
         return `<span title="${title}"><em>E-${values.length - index}</em>${pct}%</span>`;
       }).join("");
     });
+  }
+
+  function estimateFtsoMonthlyReward(provider) {
+    const history = Array.isArray(provider?.epochData) ? provider.epochData : [];
+    const recent = history
+      .filter(item => Number.isFinite(Number(item.totalRewardAmount)))
+      .sort((a, b) => Number(b.epoch) - Number(a.epoch))
+      .slice(0, 8);
+    if (!recent.length) return null;
+    const total = recent.reduce((sum, item) => sum + Number(item.totalRewardAmount || 0), 0);
+    return total * (30.5 / 28);
+  }
+
+  function estimateValidatorMonthlyReward(node) {
+    const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
+    const recent = history
+      .filter(item => Number.isFinite(Number(item.m_dValidatorReward ?? item.m_dNodeReward)))
+      .sort((a, b) => Number(b.m_dRewardEpoch) - Number(a.m_dRewardEpoch))
+      .slice(0, 8);
+    if (!recent.length) return null;
+    const total = recent.reduce((sum, item) => sum + Number(item.m_dValidatorReward ?? item.m_dNodeReward ?? 0), 0);
+    return total * (30.5 / 28);
+  }
+
+  function renderMonthlyRewards() {
+    setText("ftsoMonthlyRewards", Number.isFinite(monthlyRewards.ftso) ? `${fmtNum(monthlyRewards.ftso, 0)} FLR` : "-");
+    setText("validatorMonthlyRewards", Number.isFinite(monthlyRewards.validator) ? `${fmtNum(monthlyRewards.validator, 0)} FLR` : "-");
+    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso));
+    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator));
   }
 
   function findProviderDeep(data) {
@@ -421,6 +461,8 @@ const MirSFlr = (() => {
     setText("passes", `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`);
     setText("preRegistered", detectPreRegistration(provider));
     setText("minimalConditions", minimalConditions(provider, latest));
+    monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
+    renderMonthlyRewards();
     setText("selfBond", latest?.staking?.totalSelfBond != null ? fmtChainAmount(latest.staking.totalSelfBond) : "-");
     setText("stakedFlr", latest?.staking?.stakeWithUptime != null ? fmtChainAmount(latest.staking.stakeWithUptime) : latest?.staking?.stake != null ? fmtChainAmount(latest.staking.stake) : "-");
     setText("latestEpoch", latest?.epoch ?? "-");
@@ -461,6 +503,8 @@ const MirSFlr = (() => {
     setText("validatorLastSeen", node?.m_sLastSeen || "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
+    monthlyRewards.validator = Number.isFinite(Number(node?.m_dMonthlyReward)) ? Number(node.m_dMonthlyReward) : estimateValidatorMonthlyReward(node);
+    renderMonthlyRewards();
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
     setText("validatorTotal", validator.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
     setText("validatorStake", validator.m_dTotalStake != null ? fmtCompact(validator.m_dTotalStake, " FLR") : "-");
