@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=mobile-chart-touch" />
+  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
 </head>
 <body>
   <div class="mobile-top">
@@ -48,7 +48,7 @@
           <a href="/performance/">Performance</a>
         </nav>
       </div>
-      <p class="side-note">Validator-led Flare infrastructure with public metrics, verified provider identity, and clear staking or delegation flow.</p>
+      <p class="side-note">Verified Flare infrastructure. Live proof.</p>
     </aside>
 
     <main>
@@ -67,7 +67,10 @@
           <aside class="status-panel">
             <div class="panel-head">
               <strong>FTSO status</strong>
-              <span class="status-dot" data-field="status">Loading</span>
+              <div class="panel-statuses">
+                <span class="status-dot" data-field="status">Loading</span>
+                <span class="status-dot" data-field="preRegisteredStatus">Pre-reg</span>
+              </div>
             </div>
             <div class="metric-grid">
               <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
@@ -171,7 +174,6 @@
         <div class="inner">
           <div class="section-title">
             <h2>Verification addresses.</h2>
-            <p>Critical values wrap cleanly on mobile. Copy buttons use the live provider data when available.</p>
           </div>
           <div class="address-grid">
             <article class="address">
@@ -204,6 +206,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=mobile-chart-touch"></script>
+  <script src="/assets/operator.js?v=status-copy-mobile"></script>
 </body>
 </html>

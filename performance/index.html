@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=mobile-chart-touch" />
+  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
 </head>
 <body>
   <div class="mobile-top">
@@ -53,13 +53,13 @@
       <section class="section light">
         <div class="inner">
           <div class="section-title"><h2>Validator details.</h2><p>Validator stake, uptime, fee, and connection status matter more as Flare moves toward stronger validator weighting.</p></div>
-          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="Connected info">i<span>Whether the validator node is currently reachable. A connected validator is a basic health signal, but uptime history is more important than one moment.</span></button><b>Connected</b><strong data-field="validatorConnected">-</strong><p>Last seen <span data-field="validatorLastSeen">-</span>.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Node uptime info">i<span>Recent validator uptime checkpoints. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Node uptime</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime checkpoints.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Fee info">i<span>The validator fee taken from validator rewards before the remaining rewards are distributed.</span></button><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator reward fee.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Boost info">i<span>Boost is additional validator weight when available. Higher boost can improve validator weight, but it should be read together with uptime and stake.</span></button><b>Boost</b><strong data-field="validatorBoost">-</strong><p>Additional validator weight signal.</p></article></div>
+          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="Validator status info">i<span>Whether the validator node is currently reachable. A connected validator is a basic health signal, but uptime history is more important than one moment.</span></button><b>Validator</b><strong data-field="validatorConnected">-</strong><p>Node connection status.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Node uptime info">i<span>Recent validator uptime checkpoints. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Node uptime</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime checkpoints.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Fee info">i<span>The validator fee taken from validator rewards before the remaining rewards are distributed.</span></button><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator reward fee.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Boost info">i<span>Boost is additional validator weight when available. Higher boost can improve validator weight, but it should be read together with uptime and stake.</span></button><b>Boost</b><strong data-field="validatorBoost">-</strong><p>Additional validator weight signal.</p></article></div>
           <div class="cards three" style="margin-top:10px"><article class="card"><button class="info-tip" type="button" aria-label="Total stake info">i<span>Total validator weight currently visible here: operator stake plus delegated validator stake.</span></button><b>Total stake</b><strong data-field="validatorTotal">-</strong><p>Self stake plus delegated validator stake.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Self stake info">i<span>FLR put up by the operator. This is the operator's own validator stake.</span></button><b>Self stake</b><strong data-field="validatorStake">-</strong><p>FLR put up by the operator.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Delegation info">i<span>FLR assigned to this validator by other holders.</span></button><b>Delegation</b><strong data-field="validatorDelegation">-</strong><p>FLR assigned to this validator by others.</p></article></div>
         </div>
       </section>
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=mobile-chart-touch"></script>
+  <script src="/assets/operator.js?v=status-copy-mobile"></script>
 </body>
 </html>

@@ -309,6 +309,14 @@ h1{
   border-bottom:1px solid var(--line);
 }
 
+.panel-statuses{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
 .light .panel-head{border-bottom-color:var(--dark-line)}
 
 .status-dot{
@@ -1092,10 +1100,16 @@ tr:last-child td{border-bottom:0}
   .validator-head h3{font-size:32px}
   .validator-row{padding:14px; gap:14px}
   .validator-id{grid-column:auto}
-  .reward-chart{height:220px}
+  .reward-chart{height:170px}
   .chart-panel{padding:14px}
   .chart-panel .panel-head{margin:-14px -14px 12px}
-  .chart-summary{flex-direction:column}
+  .chart-summary{
+    flex-direction:column;
+    gap:8px;
+    font-size:12px;
+  }
+  .chart-summary small{font-size:11px}
+  .table-note{font-size:12px}
   .section-title{
     align-items:flex-start;
     flex-direction:column;
@@ -1119,7 +1133,7 @@ tr:last-child td{border-bottom:0}
 }
 
 @media (max-width:370px){
-  .reward-chart{height:190px}
+  .reward-chart{height:150px}
   .mobile-links a{
     padding-inline:5px;
     font-size:11px;

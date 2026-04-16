@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=mobile-chart-touch" />
+  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
 </head>
 <body>
   <div class="mobile-top">
@@ -35,13 +35,13 @@
       <section class="section">
         <div class="inner hero compact">
           <div><div class="kicker">Epoch history</div><h1>Reward history with context.</h1><p class="lead">Track the latest epoch, reward rate, eligibility, and recent reward outcomes in a clean table.</p></div>
-          <aside class="status-panel"><div class="panel-head"><strong>Latest epoch</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Epoch info">i<span>The latest reward epoch shown in the provider history.</span></button><span>Epoch</span><strong data-field="latestEpoch">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Latest reward info">i<span>FLR reward from the latest visible epoch.</span></button><span>Latest reward</span><strong data-field="latestReward">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with actual epoch rewards.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Eligible info">i<span>Whether the latest visible epoch was eligible for rewards.</span></button><span>Eligible</span><strong data-field="latestEligibility">-</strong></div></div></aside>
+          <aside class="status-panel"><div class="panel-head"><strong>Latest epoch</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Epoch info">i<span>The latest reward epoch shown in the provider history.</span></button><span>Epoch</span><strong data-field="latestEpoch">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Latest reward info">i<span>FLR reward from the latest visible epoch.</span></button><span>Latest reward</span><strong data-field="latestReward">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with actual epoch rewards.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>Whether the latest visible epoch was eligible for rewards.</span></button><span>Eligible for reward</span><strong data-field="latestEligibility">-</strong></div></div></aside>
         </div>
       </section>
       <section class="section light">
         <div class="inner">
           <div class="section-title"><h2>Recent epochs.</h2><p data-error>Newest epochs first. On mobile, the table can scroll horizontally without breaking the page.</p></div>
-          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
         </div>
       </section>
       <section class="section">
@@ -53,6 +53,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=mobile-chart-touch"></script>
+  <script src="/assets/operator.js?v=status-copy-mobile"></script>
 </body>
 </html>

@@ -541,7 +541,9 @@ const MirSFlr = (() => {
     setText("fdcAvailability", provider.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("eligible", `${provider.eligibleEpochs ?? "-"} / ${provider.totalEpochs ?? "-"}`);
     setText("passes", `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`);
-    setText("preRegistered", detectPreRegistration(provider));
+    const preReg = detectPreRegistration(provider);
+    setText("preRegistered", preReg);
+    setText("preRegisteredStatus", preReg === "Yes" ? "Pre-reg" : preReg === "No" ? "No pre-reg" : "Pre-reg unknown");
     setText("minimalConditions", minimalConditions(provider, latest));
     monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
     renderMonthlyRewards();
@@ -591,7 +593,6 @@ const MirSFlr = (() => {
     setText("validatorNodeId", shortAddr(node?.m_sNodeID));
     setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
     setText("validatorUptimeAvg", Number.isFinite(uptimeAvg) ? `${fmtNum(uptimeAvg, 2)}%` : "-");
-    setText("validatorLastSeen", node?.m_sLastSeen || "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
     monthlyRewards.validator = Number.isFinite(Number(node?.m_dMonthlyReward)) ? Number(node.m_dMonthlyReward) : estimateValidatorMonthlyReward(node);

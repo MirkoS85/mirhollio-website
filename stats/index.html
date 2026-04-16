@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=mobile-chart-touch" />
+  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
 </head>
 <body>
   <div class="mobile-top">
@@ -41,18 +41,18 @@
       <section class="section light">
         <div class="inner">
           <div class="section-title"><h2>Performance summary.</h2><p>These values explain the provider's health before you open the detailed performance page.</p></div>
-          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting data when expected. Higher is better.</span></button><b>FTSO availability</b><strong data-field="availability">-</strong><p>Availability for FTSO work.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><b>FTSO performance</b><strong data-field="performance">-</strong><p>Quality signal for price submissions.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><b>FDC availability</b><strong data-field="fdcAvailability">-</strong><p>Availability for FDC work.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>How many reward epochs were eligible for rewards compared with the total history shown here.</span></button><b>Eligible for reward</b><strong data-field="eligible">-</strong><p>Reward eligibility across recent history.</p></article></div>
+          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting data when expected. Higher is better.</span></button><b>FTSO availability</b><strong data-field="availability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><b>FTSO performance</b><strong data-field="performance">-</strong><p>Quality signal for price submissions.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><b>FDC availability</b><strong data-field="fdcAvailability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>How many reward epochs were eligible for rewards compared with the total history shown here.</span></button><b>Eligible for reward</b><strong data-field="eligible">-</strong><p>Reward eligibility across recent history.</p></article></div>
         </div>
       </section>
       <section class="section">
         <div class="inner">
           <div class="section-title"><h2>Recent epochs.</h2><p class="table-note" data-error></p></div>
-          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="8"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="8"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
         </div>
       </section>
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=mobile-chart-touch"></script>
+  <script src="/assets/operator.js?v=status-copy-mobile"></script>
 </body>
 </html>
