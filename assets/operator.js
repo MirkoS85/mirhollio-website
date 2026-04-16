@@ -238,6 +238,26 @@ const MirSFlr = (() => {
     return total * (30.5 / 28);
   }
 
+  function estimateValidatorApr(node) {
+    const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
+    const recent = history
+      .filter(item => Number.isFinite(Number(item.m_dValidatorReward)) && Number(item.m_dRewardWeight) > 0)
+      .sort((a, b) => Number(b.m_dRewardEpoch) - Number(a.m_dRewardEpoch))
+      .slice(0, 8);
+    if (!recent.length) return null;
+    const avgRate = recent.reduce((sum, item) => sum + (Number(item.m_dValidatorReward) / Number(item.m_dRewardWeight)), 0) / recent.length;
+    return avgRate * (365 / 3.5) * 100;
+  }
+
+  function timeLeftPct(stake) {
+    if (!stake?.m_xTimeStart || !stake?.m_xTimeEnd) return null;
+    const start = new Date(stake.m_xTimeStart).getTime();
+    const end = new Date(stake.m_xTimeEnd).getTime();
+    const now = Date.now();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+    return Math.max(0, Math.min(100, ((end - now) / (end - start)) * 100));
+  }
+
   function renderMonthlyRewards() {
     setText("ftsoMonthlyRewards", Number.isFinite(monthlyRewards.ftso) ? `${fmtNum(monthlyRewards.ftso, 0)} FLR` : "-");
     setText("validatorMonthlyRewards", Number.isFinite(monthlyRewards.validator) ? `${fmtNum(monthlyRewards.validator, 0)} FLR` : "-");
@@ -326,20 +346,11 @@ const MirSFlr = (() => {
     `).join("");
   }
 
-  function renderRewardChart(provider) {
-    const svg = document.querySelector("[data-render='reward-chart']");
+  function renderRewardSeries({ svg, tooltip, series, emptyMessage, gradientId }) {
     if (!svg) return;
-    const tooltip = document.querySelector("[data-render='reward-tooltip']");
-    const series = [...(provider.epochData || [])]
-      .sort((a, b) => Number(a.epoch) - Number(b.epoch))
-      .slice(-20)
-      .map(item => ({
-        epoch: item.epoch,
-        reward: Number(item.totalRewardAmount || 0)
-      }));
 
     if (!series.length) {
-      svg.innerHTML = `<text x="40" y="40" fill="#b8c1bd" font-size="16" font-weight="700">Reward history unavailable</text>`;
+      svg.innerHTML = `<text x="40" y="40" fill="#b8c1bd" font-size="16" font-weight="700">${emptyMessage}</text>`;
       return;
     }
 
@@ -377,11 +388,11 @@ const MirSFlr = (() => {
 
     svg.innerHTML = `
       <defs>
-        <linearGradient id="rewardLineGrad" x1="0" x2="1" y1="0" y2="0">
+        <linearGradient id="${gradientId}LineGrad" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stop-color="rgba(233,22,124,.58)" />
           <stop offset="100%" stop-color="#e9167c" />
         </linearGradient>
-        <linearGradient id="rewardFillGrad" x1="0" x2="0" y1="0" y2="1">
+        <linearGradient id="${gradientId}FillGrad" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stop-color="rgba(233,22,124,.28)" />
           <stop offset="100%" stop-color="rgba(233,22,124,.02)" />
         </linearGradient>
@@ -390,8 +401,8 @@ const MirSFlr = (() => {
       <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(maxReward, 0)}</text>
       <text x="8" y="${height - padBottom}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(minReward, 0)}</text>
       <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(233,22,124,.48)" stroke-dasharray="6 6" />
-      <polygon points="${area}" fill="url(#rewardFillGrad)"></polygon>
-      <polyline points="${line}" fill="none" stroke="url(#rewardLineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <polygon points="${area}" fill="url(#${gradientId}FillGrad)"></polygon>
+      <polyline points="${line}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
       ${circles}
       ${labels}
     `;
@@ -418,6 +429,42 @@ const MirSFlr = (() => {
     if (summary && last) {
       summary.innerHTML = `<span>Latest <strong>${fmtNum(last.reward, 2)} FLR</strong></span><span>Average <strong>${fmtNum(avgReward, 2)} FLR</strong></span><span>Range <strong>${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)}</strong></span>`;
     }
+  }
+
+  function renderRewardChart(provider) {
+    const series = [...(provider.epochData || [])]
+      .sort((a, b) => Number(a.epoch) - Number(b.epoch))
+      .slice(-20)
+      .map(item => ({
+        epoch: item.epoch,
+        reward: Number(item.totalRewardAmount || 0)
+      }));
+
+    renderRewardSeries({
+      svg: document.querySelector("[data-render='reward-chart']"),
+      tooltip: document.querySelector("[data-render='reward-tooltip']"),
+      series,
+      emptyMessage: "FTSO reward history unavailable",
+      gradientId: "ftsoReward"
+    });
+  }
+
+  function renderValidatorRewardChart(node) {
+    const series = [...(node?.m_axReward || [])]
+      .sort((a, b) => Number(a.m_dRewardEpoch) - Number(b.m_dRewardEpoch))
+      .slice(-20)
+      .map(item => ({
+        epoch: item.m_dRewardEpoch,
+        reward: Number(item.m_dValidatorReward ?? item.m_dNodeReward ?? 0)
+      }));
+
+    renderRewardSeries({
+      svg: document.querySelector("[data-render='validator-reward-chart']"),
+      tooltip: document.querySelector("[data-render='validator-reward-tooltip']"),
+      series,
+      emptyMessage: "Validator reward history unavailable",
+      gradientId: "validatorReward"
+    });
   }
 
   function renderAddresses(provider) {
@@ -494,12 +541,21 @@ const MirSFlr = (() => {
     const connected = node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "Not exposed";
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
     const uptime = uptimeValues.length ? uptimeValues.map(v => `${Math.round(Number(v))}%`).join(" / ") : "-";
+    const uptimeAvg = uptimeValues.length ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length : null;
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM)
       ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h ${stake.m_aiTimeLeftDHM[2]}m left`
       : "-";
     const stakeEnd = stake?.m_xTimeEnd ? new Date(stake.m_xTimeEnd).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "-";
+    const capacity = Number(validator.m_dTotal);
+    const freeSpace = Number(validator.m_dFreeDelegationSpace);
+    const capacityMax = capacity + freeSpace;
+    const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : null;
+    const leftPct = timeLeftPct(stake);
 
     setText("validatorConnected", connected);
+    setText("validatorNodeId", shortAddr(node?.m_sNodeID));
+    setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
+    setText("validatorUptimeAvg", Number.isFinite(uptimeAvg) ? `${fmtNum(uptimeAvg, 2)}%` : "-");
     setText("validatorLastSeen", node?.m_sLastSeen || "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
@@ -511,10 +567,16 @@ const MirSFlr = (() => {
     setText("validatorDelegation", validator.m_dTotalDelegation != null ? fmtCompact(validator.m_dTotalDelegation, " FLR") : "-");
     setText("freeDelegationSpace", validator.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
     setText("stakeDelegation", `${fmtCompact(validator.m_dTotalStake, "")} / ${fmtCompact(validator.m_dTotalDelegation, "")}`);
+    setText("validatorCapacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
+    setText("validatorCapacityPct", Number.isFinite(capacityPct) ? `${fmtNum(capacityPct, 1)}% full` : "-");
+    setText("validatorTimeLeftPct", Number.isFinite(leftPct) ? `${fmtNum(leftPct, 1)}% of staking period left` : "-");
+    setBar("validatorStakeCapacity", capacityPct);
+    setBar("validatorTimeLeft", leftPct);
     if (!latestData?.staking?.stakeWithUptime && validator.m_dTotalStake != null) setText("stakedFlr", fmtCompact(validator.m_dTotalStake, " FLR"));
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
     renderUptime(uptimeValues);
+    renderValidatorRewardChart(node);
   }
 
   function applyProviderV2Data(data) {
