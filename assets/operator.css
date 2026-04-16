@@ -1092,6 +1092,9 @@ tr:last-child td{border-bottom:0}
   .validator-head h3{font-size:32px}
   .validator-row{padding:14px; gap:14px}
   .validator-id{grid-column:auto}
+  .reward-chart{height:220px}
+  .chart-panel{padding:14px}
+  .chart-panel .panel-head{margin:-14px -14px 12px}
   .chart-summary{flex-direction:column}
   .section-title{
     align-items:flex-start;
@@ -1116,6 +1119,7 @@ tr:last-child td{border-bottom:0}
 }
 
 @media (max-width:370px){
+  .reward-chart{height:190px}
   .mobile-links a{
     padding-inline:5px;
     font-size:11px;

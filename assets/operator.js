@@ -421,8 +421,7 @@ const MirSFlr = (() => {
       ${labels}
     `;
 
-    svg.querySelectorAll("[data-chart-index]").forEach(target => {
-      target.addEventListener("mouseenter", () => {
+    const showTooltip = target => {
         const point = points[Number(target.getAttribute("data-chart-index"))];
         if (!tooltip || !point) return;
         const wrapRect = svg.parentElement.getBoundingClientRect();
@@ -433,9 +432,30 @@ const MirSFlr = (() => {
         tooltip.style.display = "block";
         tooltip.style.left = `${Math.max(8, Math.min(left - 48, wrapRect.width - 160))}px`;
         tooltip.style.top = `${Math.max(8, top - 52)}px`;
+    };
+    const hideTooltip = () => {
+      if (tooltip) tooltip.style.display = "none";
+    };
+
+    svg.querySelectorAll("[data-chart-index]").forEach(target => {
+      target.addEventListener("mouseenter", () => {
+        showTooltip(target);
       });
-      target.addEventListener("mouseleave", () => {
-        if (tooltip) tooltip.style.display = "none";
+      target.addEventListener("focus", () => {
+        showTooltip(target);
+      });
+      target.addEventListener("click", event => {
+        event.preventDefault();
+        showTooltip(target);
+      });
+      target.addEventListener("touchstart", event => {
+        event.preventDefault();
+        showTooltip(target);
+      }, { passive: false });
+      target.addEventListener("mouseleave", hideTooltip);
+      target.addEventListener("blur", hideTooltip);
+      document.addEventListener("click", event => {
+        if (!svg.contains(event.target)) hideTooltip();
       });
     });
 
