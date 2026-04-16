@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
+  <link rel="stylesheet" href="/assets/operator.css?v=copy-cleanup" />
 </head>
 <body>
   <div class="mobile-top">
@@ -34,13 +34,13 @@
     <main>
       <section class="section">
         <div class="inner hero compact">
-          <div><div class="kicker">Live metrics</div><h1>Provider stats without the noise.</h1><p class="lead">Reward, eligibility, availability, and recent epoch data in one operator dashboard.</p></div>
+          <div><div class="kicker">Live metrics</div><h1>Provider stats without the noise.</h1><p class="lead">Rewards, eligibility, availability, and recent epochs for MirSFlr.</p></div>
           <aside class="status-panel"><div class="panel-head"><strong>Data status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Vote power info">i<span>Provider vote power currently visible for this operator. More vote power can influence reward size, but performance still matters.</span></button><span>Vote power</span><strong data-field="votePower">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Total rewards info">i<span>Total FLR rewards over the available provider history.</span></button><span>Total rewards</span><strong data-field="totalRewards">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Average reward info">i<span>Average FLR reward per epoch over the available reward history.</span></button><span>Average reward</span><strong data-field="averageReward">-</strong></div></div></aside>
         </div>
       </section>
       <section class="section light">
         <div class="inner">
-          <div class="section-title"><h2>Performance summary.</h2><p>These values explain the provider's health before you open the detailed performance page.</p></div>
+          <div class="section-title"><h2>Performance summary.</h2><p>Current FTSO, FDC, eligibility, and rewards.</p></div>
           <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting data when expected. Higher is better.</span></button><b>FTSO availability</b><strong data-field="availability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><b>FTSO performance</b><strong data-field="performance">-</strong><p>Quality signal for price submissions.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><b>FDC availability</b><strong data-field="fdcAvailability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>How many reward epochs were eligible for rewards compared with the total history shown here.</span></button><b>Eligible for reward</b><strong data-field="eligible">-</strong><p>Reward eligibility across recent history.</p></article></div>
         </div>
       </section>
@@ -53,6 +53,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=status-copy-mobile"></script>
+  <script src="/assets/operator.js?v=copy-cleanup"></script>
 </body>
 </html>

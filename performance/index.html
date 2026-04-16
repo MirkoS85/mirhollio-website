@@ -4,12 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MirSFlr Performance</title>
-  <meta name="description" content="MirSFlr performance dashboard for Flare FTSO availability, performance, rewards, and provider health." />
+  <meta name="description" content="MirSFlr performance data for Flare FTSO availability, rewards, validator stake, and provider health." />
   <meta name="theme-color" content="#0f1212" />
   <link rel="canonical" href="https://www.mirhollio.com/performance/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="MirSFlr Performance" />
-  <meta property="og:description" content="MirSFlr performance dashboard for Flare FTSO availability, performance, rewards, and provider health." />
+  <meta property="og:description" content="MirSFlr performance data for Flare FTSO availability, rewards, validator stake, and provider health." />
   <meta property="og:url" content="https://www.mirhollio.com/performance/" />
   <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
   <meta name="twitter:card" content="summary" />
@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=status-copy-mobile" />
+  <link rel="stylesheet" href="/assets/operator.css?v=copy-cleanup" />
 </head>
 <body>
   <div class="mobile-top">
@@ -34,13 +34,13 @@
     <main>
       <section class="section">
         <div class="inner hero compact">
-          <div><div class="kicker">Validator health</div><h1>Performance signals in one place.</h1><p class="lead">Validator uptime, active stake, FTSO availability, FDC availability, passes, and strikes share the same mobile-friendly layout.</p></div>
+          <div><div class="kicker">Validator health</div><h1>Performance signals.</h1><p class="lead">Validator uptime, active stake, FTSO availability, FDC availability, passes, and strikes.</p></div>
           <aside class="status-panel"><div class="panel-head"><strong>Health status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Validator info">i<span>Whether the validator node is currently reachable. This is a basic live health signal.</span></button><span>Validator</span><strong data-field="validatorConnected">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Free delegation info">i<span>How much more FLR can still be added before this validator reaches its current capacity.</span></button><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Passes and strikes info">i<span>Passes and strikes summarize how often the provider met reward requirements across the available history.</span></button><span>Passes / strikes</span><strong data-field="passes">-</strong></div></div></aside>
         </div>
       </section>
       <section class="section light">
         <div class="inner">
-          <div class="section-title"><h2>Availability bars.</h2><p data-error>Recent percentages are shown as simple health bars, so weak spots are easy to notice without reading raw data.</p></div>
+          <div class="section-title"><h2>Availability bars.</h2><p data-error></p></div>
           <div class="chart-panel"><div class="bars"><div><div class="bar-label"><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="availability"></div></div></div><div><div class="bar-label"><span>FTSO performance</span><strong data-field="performance">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance"></div></div></div><div><div class="bar-label"><span>Performance 1</span><strong data-field="performance1">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance1"></div></div></div><div><div class="bar-label"><span>Performance 2</span><strong data-field="performance2">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance2"></div></div></div><div><div class="bar-label"><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="fdcAvailability"></div></div></div></div></div>
         </div>
       </section>
@@ -60,6 +60,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=status-copy-mobile"></script>
+  <script src="/assets/operator.js?v=copy-cleanup"></script>
 </body>
 </html>
