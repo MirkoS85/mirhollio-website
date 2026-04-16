@@ -427,6 +427,7 @@ h1{
 }
 
 .proof-stack > *{
+  grid-column:1 / -1;
   width:100%;
   min-width:0;
 }
@@ -454,12 +455,20 @@ h1{
 
 .validator-row{
   display:grid;
-  grid-template-columns:1.25fr .55fr .65fr 1.45fr 1.45fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:22px;
   align-items:center;
   padding:20px;
   border-radius:8px;
   background:var(--surface-2);
+}
+
+.validator-id{
+  grid-column:1 / -1;
+}
+
+.validator-progress{
+  min-width:0;
 }
 
 .validator-id span,
@@ -895,6 +904,7 @@ tr:last-child td{border-bottom:0}
 
 .chart-panel{
   padding:16px;
+  overflow:hidden;
 }
 
 .chart-panel .panel-head{
@@ -1025,6 +1035,26 @@ tr:last-child td{border-bottom:0}
 
 @media (max-width:620px){
   .section{padding:24px 14px}
+  .mobile-top{padding:10px}
+  .mobile-row .btn{
+    min-height:38px;
+    padding:9px 12px;
+    font-size:13px;
+  }
+  .mobile-links{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+    overflow:visible;
+    padding-bottom:0;
+  }
+  .mobile-links a{
+    min-width:0;
+    justify-content:center;
+    padding:9px 7px;
+    font-size:12px;
+    text-align:center;
+  }
   h1{
     font-size:38px;
     line-height:1;
@@ -1078,4 +1108,11 @@ tr:last-child td{border-bottom:0}
   }
   .btn{width:100%}
   .mobile-row .btn{width:auto}
+}
+
+@media (max-width:370px){
+  .mobile-links a{
+    padding-inline:5px;
+    font-size:11px;
+  }
 }
