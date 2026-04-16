@@ -397,6 +397,10 @@ h1{
   grid-template-columns:repeat(3,minmax(0,1fr));
 }
 
+.rewards-card{
+  grid-column:span 2;
+}
+
 .card{
   min-height:190px;
   padding:16px;
@@ -550,15 +554,25 @@ h1{
 
 .reward-lines{
   display:grid;
-  gap:8px;
-  margin-top:10px;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:14px;
 }
 
 .reward-lines div{
   display:grid;
-  grid-template-columns:56px minmax(0,1fr);
-  column-gap:8px;
+  grid-template-columns:76px minmax(0,1fr);
+  column-gap:10px;
   align-items:baseline;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:rgba(238,242,237,.05);
+}
+
+.light .reward-lines div{
+  border-color:var(--dark-line);
+  background:#eef1ec;
 }
 
 .reward-lines em{
@@ -571,7 +585,7 @@ h1{
 
 .reward-lines strong{
   margin:0;
-  font-size:18px;
+  font-size:24px;
   line-height:1.1;
 }
 
@@ -873,6 +887,8 @@ tr:last-child td{border-bottom:0}
     border-bottom-color:var(--dark-line);
   }
   .metric:last-child{border-bottom:0}
+  .rewards-card{grid-column:auto}
+  .reward-lines{grid-template-columns:1fr}
   .section-title{
     align-items:flex-start;
     flex-direction:column;
