@@ -204,6 +204,12 @@ const MirSFlr = (() => {
     });
   }
 
+  function uptimeEpochLabel(index, total) {
+    const latestEpochNumber = Number(latestData?.epoch);
+    if (!Number.isFinite(latestEpochNumber)) return `E ${index + 1}`;
+    return `E ${latestEpochNumber - total + index}`;
+  }
+
   function renderUptime(values) {
     document.querySelectorAll("[data-render='validator-uptime']").forEach(mount => {
       if (!Array.isArray(values) || !values.length) {
@@ -212,8 +218,9 @@ const MirSFlr = (() => {
       }
       mount.innerHTML = values.map((value, index) => {
         const pct = Math.round(Number(value));
-        const title = `Recent checkpoint ${index + 1}: ${pct}% uptime`;
-        return `<span title="${title}"><em>E-${values.length - index}</em>${pct}%</span>`;
+        const epoch = uptimeEpochLabel(index, values.length);
+        const title = `${epoch}: ${pct}% uptime`;
+        return `<span title="${title}"><em>${epoch}</em>${pct}%</span>`;
       }).join("");
     });
   }
@@ -566,6 +573,10 @@ const MirSFlr = (() => {
     renderEpochTable(provider);
     renderAddresses(provider);
     renderRewardChart(provider);
+    if (validatorData) {
+      const node = Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null;
+      renderUptime(Array.isArray(node?.m_adUptime) ? node.m_adUptime : []);
+    }
   }
 
   function applyValidatorData(validator) {
