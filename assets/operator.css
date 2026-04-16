@@ -650,6 +650,10 @@ h1{
   margin-top:18px;
 }
 
+.uptime-wide .uptime-pills{
+  justify-content:center;
+}
+
 .condition-dots.compact{
   margin-top:16px;
   gap:8px;
