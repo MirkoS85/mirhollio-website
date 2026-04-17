@@ -189,6 +189,19 @@ main{min-width:0}
   padding-bottom:18px;
 }
 
+.home-hero-section{
+  padding-top:0;
+}
+
+.home-hero{
+  min-height:auto;
+  align-items:start;
+}
+
+.home-hero .metric{
+  min-height:104px;
+}
+
 .kicker{
   display:inline-flex;
   align-items:center;
