@@ -206,22 +206,6 @@ main{min-width:0}
   color:var(--green);
 }
 
-.pre-reg-value{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:27px;
-  line-height:1.1;
-}
-
-.pre-reg-value span{
-  display:inline;
-  color:var(--text);
-  font-size:inherit;
-  font-weight:950;
-  text-transform:none;
-}
-
 .state-dot{
   width:14px;
   height:14px;
@@ -423,6 +407,22 @@ h1{
   font-size:27px;
   line-height:1.1;
   overflow-wrap:anywhere;
+}
+
+.metric strong.pre-reg-value{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:31px;
+  line-height:1.1;
+}
+
+.metric strong.pre-reg-value span{
+  display:inline;
+  color:var(--text);
+  font-size:inherit;
+  font-weight:950;
+  text-transform:none;
 }
 
 .metric .info-tip{
