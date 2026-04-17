@@ -204,6 +204,32 @@ const MirSFlr = (() => {
     });
   }
 
+  function renderConditionPasses(provider, latest) {
+    const passes = Number(latest?.passes ?? latest?.newNumberOfPasses);
+    const maxPasses = 3;
+    const history = Array.isArray(provider?.epochData) ? provider.epochData : [];
+    const recent = [...history]
+      .sort((a, b) => Number(b.epoch ?? 0) - Number(a.epoch ?? 0))
+      .slice(0, 10);
+    const successCount = recent.filter(epoch => epoch.passEarned === true || Number(epoch.passes ?? epoch.newNumberOfPasses) >= maxPasses).length;
+    const successRate = recent.length ? (successCount / recent.length) * 100 : null;
+    const value = Number.isFinite(passes)
+      ? `${passes}/${maxPasses}${Number.isFinite(successRate) ? ` ${successRate.toFixed(1)}%` : ""}`
+      : "-";
+    document.querySelectorAll("[data-render='condition-passes']").forEach(el => {
+      el.textContent = value;
+    });
+  }
+
+  function renderPreRegisteredState(value) {
+    document.querySelectorAll("[data-state='preRegistered']").forEach(el => {
+      el.classList.toggle("ok", value === "Yes");
+      el.classList.toggle("bad", value === "No");
+      el.setAttribute("aria-label", `Pre-registered: ${value}`);
+      el.removeAttribute("aria-hidden");
+    });
+  }
+
   function uptimeEpochLabel(index, total) {
     const latestEpochNumber = Number(latestData?.epoch);
     if (!Number.isFinite(latestEpochNumber)) return `E ${index + 1}`;
@@ -551,6 +577,7 @@ const MirSFlr = (() => {
     const preReg = detectPreRegistration(provider);
     setText("preRegistered", preReg);
     setText("preRegisteredStatus", preReg === "Yes" ? "Pre-reg" : preReg === "No" ? "No pre-reg" : "Pre-reg unknown");
+    renderPreRegisteredState(preReg);
     setText("minimalConditions", minimalConditions(provider, latest));
     monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
     renderMonthlyRewards();
@@ -570,6 +597,7 @@ const MirSFlr = (() => {
     setBar("performance2", provider.ftsoPerformance?.performance2);
     setBar("fdcAvailability", provider.fdcPerformance?.availability);
     renderConditions(latest);
+    renderConditionPasses(provider, latest);
     renderEpochTable(provider);
     renderAddresses(provider);
     renderRewardChart(provider);

@@ -190,7 +190,7 @@ main{min-width:0}
 }
 
 .home-hero-section{
-  padding-top:0;
+  padding-top:18px;
 }
 
 .home-hero{
@@ -201,6 +201,27 @@ main{min-width:0}
 .home-hero .metric{
   min-height:104px;
 }
+
+.condition-pass-value{
+  color:var(--green);
+}
+
+.pre-reg-value{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.state-dot{
+  width:14px;
+  height:14px;
+  border-radius:999px;
+  background:#7a8580;
+  flex:0 0 auto;
+}
+
+.state-dot.ok{background:var(--green)}
+.state-dot.bad{background:#ff5d6c}
 
 .kicker{
   display:inline-flex;

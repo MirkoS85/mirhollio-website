@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="stylesheet" href="/assets/operator.css?v=home-status-grid" />
+  <link rel="stylesheet" href="/assets/operator.css?v=condition-passes-home" />
 </head>
 <body>
   <div class="mobile-top">
@@ -76,8 +76,8 @@
               <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
               <div class="metric"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. Green means the check passed. Red means that part did not pass.</span></button><span>Minimal Conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
               <div class="metric"><button class="info-tip" type="button" aria-label="FTSO Performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><span>FTSO Performance</span><strong data-field="performance">-</strong></div>
-              <div class="metric"><button class="info-tip" type="button" aria-label="Condition Passes info">i<span>How many reward conditions passed compared with failed checks across the available provider history.</span></button><span>Condition Passes</span><strong data-field="passes">-</strong></div>
-              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong data-field="preRegistered">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Condition Passes info">i<span>Number of condition passes in the latest epoch (out of 3). Percentage shows success rate over last 10 epochs. 3 passes needed to be eligible for rewards.</span></button><span>Condition Passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
             </div>
           </aside>
         </div>
@@ -207,6 +207,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=home-status-grid"></script>
+  <script src="/assets/operator.js?v=condition-passes-home"></script>
 </body>
 </html>
