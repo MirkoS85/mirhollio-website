@@ -214,6 +214,14 @@ main{min-width:0}
   line-height:1.1;
 }
 
+.pre-reg-value span{
+  display:inline;
+  color:var(--text);
+  font-size:inherit;
+  font-weight:950;
+  text-transform:none;
+}
+
 .state-dot{
   width:14px;
   height:14px;
