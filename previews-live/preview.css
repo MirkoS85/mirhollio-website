@@ -417,6 +417,16 @@ h1{
   letter-spacing:-.04em;
 }
 
+.metric-unit{
+  display:block;
+  margin-top:4px;
+  font-size:.5em;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+  opacity:.92;
+}
+
 .metric strong.pre-reg-value{
   font-size:34px;
 }
@@ -526,7 +536,42 @@ h1{
 .condition-dots span{
   width:38px;
   height:38px;
+  position:relative;
+  display:grid;
+  place-items:center;
+  font-size:0;
+  line-height:1;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.condition-dots span::before{
+  display:block;
+  font-size:17px;
+  line-height:1;
+  font-weight:950;
+  color:#fff;
+  transform:translateY(-1px);
+}
+
+.condition-dots span.ok::before{
+  content:"\2713";
+}
+
+.condition-dots span.bad::before{
+  content:"\00d7";
+}
+
+.condition-dots span.unknown::before{
+  content:"?";
+}
+
+.condition-dots.compact span{
+  width:34px;
+  height:34px;
+}
+
+.condition-dots.compact span::before{
+  font-size:15px;
 }
 
 .uptime-pills span{
