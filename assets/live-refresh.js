@@ -34,7 +34,7 @@
       const items = [...mount.children];
       if (!items.length) return;
 
-      const alreadySimplified = mount.dataset.previewDots === "true"
+      const alreadySimplified = mount.dataset.refreshDots === "true"
         && items.length === 3
         && items.every(el => !(el.textContent || "").trim());
 
@@ -61,7 +61,7 @@
       }
 
       mount.innerHTML = summary.map(state => `<span class="${state}" aria-hidden="true"></span>`).join("");
-      mount.dataset.previewDots = "true";
+      mount.dataset.refreshDots = "true";
     });
   }
 
