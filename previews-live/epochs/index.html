@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Epoch History</title>
+  <meta name="description" content="MirSFlr epoch history with reward amounts, reward rates, eligibility, and registration timing for Flare delegation." />
+  <meta name="theme-color" content="#0f1212" />
+  <link rel="canonical" href="https://www.mirhollio.com/epochs/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr Epoch History" />
+  <meta property="og:description" content="MirSFlr epoch history with reward amounts, reward rates, eligibility, and registration timing." />
+  <meta property="og:url" content="https://www.mirhollio.com/epochs/" />
+  <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MirSFlr Epoch History" />
+  <meta name="twitter:description" content="Reward and eligibility history for MirSFlr on Flare." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="stylesheet" href="/previews-live/preview.css?v=soft-live" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="/previews-live/addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/">Stats</a><a href="/previews-live/epochs/" aria-current="page">Epochs</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/">Performance</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/">Live stats</a><a href="/previews-live/epochs/" aria-current="page">Epoch history</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/">Performance</a></nav></div>
+      <p class="side-note">Epoch changes are not instant. Recheck after the next epoch before evaluating results.</p>
+    </aside>
+    <main>
+      <section class="section">
+        <div class="inner hero compact">
+          <div><div class="kicker">Epoch history</div><h1>Reward history with context.</h1><p class="lead">Track rewards, rates, and eligibility across recent epochs.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Latest epoch</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Epoch info">i<span>The latest reward epoch shown in the provider history.</span></button><span>Epoch</span><strong data-field="latestEpoch">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Latest reward info">i<span>FLR reward from the latest visible epoch.</span></button><span>Latest reward</span><strong data-field="latestReward">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with actual epoch rewards.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>Whether the latest visible epoch was eligible for rewards.</span></button><span>Eligible for reward</span><strong data-field="latestEligibility">-</strong></div></div></aside>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Recent epochs.</h2><p data-error></p></div>
+          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title"><h2>Epoch reminders.</h2><p>Delegation changes normally take effect from the next epoch. Do not judge a provider before the change has actually applied.</p></div>
+          <div class="flow"><div class="step"><em>1</em><strong>Delegate</strong><p>Copy the verified delegation address.</p></div><div class="step"><em>2</em><strong>Wait</strong><p>Allow the next epoch to begin.</p></div><div class="step"><em>3</em><strong>Check</strong><p>Refresh Stats and Epochs.</p></div><div class="step"><em>4</em><strong>Evaluate</strong><p>Use multiple epochs for a fair view.</p></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/operator.js?v=validator-copy"></script>
+</body>
+</html>

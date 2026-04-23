@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Performance</title>
+  <meta name="description" content="MirSFlr performance data for Flare FTSO availability, rewards, validator stake, and provider health." />
+  <meta name="theme-color" content="#0f1212" />
+  <link rel="canonical" href="https://www.mirhollio.com/performance/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr Performance" />
+  <meta property="og:description" content="MirSFlr performance data for Flare FTSO availability, rewards, validator stake, and provider health." />
+  <meta property="og:url" content="https://www.mirhollio.com/performance/" />
+  <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MirSFlr Performance" />
+  <meta name="twitter:description" content="FTSO availability, performance, rewards, and provider health for MirSFlr." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="stylesheet" href="/previews-live/preview.css?v=soft-live" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="/previews-live/addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/">Stats</a><a href="/previews-live/epochs/">Epochs</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/" aria-current="page">Performance</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/">Live stats</a><a href="/previews-live/epochs/">Epoch history</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/" aria-current="page">Performance</a></nav></div>
+      <p class="side-note">Performance is treated like validator health: uptime, stake, protocol participation, and recent outcomes.</p>
+    </aside>
+    <main>
+      <section class="section">
+        <div class="inner hero compact">
+          <div><div class="kicker">Validator health</div><h1>Performance signals.</h1><p class="lead">Validator uptime, active stake, FTSO availability, FDC availability, passes, and strikes.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Health status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Validator info">i<span>Whether the validator node is currently reachable. This is a basic live health signal.</span></button><span>Validator</span><strong data-field="validatorConnected">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Free delegation info">i<span>How much more FLR can still be added before this validator reaches its current capacity.</span></button><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Condition Passes info">i<span>How many reward conditions passed compared with failed checks across the available provider history.</span></button><span>Condition Passes</span><strong data-field="passes">-</strong></div></div></aside>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Availability bars.</h2><p data-error></p></div>
+          <div class="chart-panel"><div class="bars"><div><div class="bar-label"><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="availability"></div></div></div><div><div class="bar-label"><span>FTSO performance</span><strong data-field="performance">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance"></div></div></div><div><div class="bar-label"><span>Performance 1</span><strong data-field="performance1">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance1"></div></div></div><div><div class="bar-label"><span>Performance 2</span><strong data-field="performance2">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance2"></div></div></div><div><div class="bar-label"><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="fdcAvailability"></div></div></div></div></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title"><h2>Operational context.</h2><p>These values help stakers and delegators read performance without overreacting to a single data point.</p></div>
+          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>How many reward epochs were eligible for rewards compared with the total history shown here.</span></button><b>Eligible for reward</b><strong data-field="eligible">-</strong><p>Reward eligibility across recent history.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Four checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. All four should be green.</span></button><b>Minimal Conditions</b><div class="condition-dots" data-render="conditions"><span></span><span></span><span></span><span></span></div><p>Green means OK. Red means the check failed.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><b>Pre-registered</b><strong data-field="preRegistered">-</strong><p>Ready for the next reward epoch.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Average reward info">i<span>Average FLR reward per epoch over the available reward history.</span></button><b>Average reward</b><strong data-field="averageReward">-</strong><p>Average reward per epoch.</p></article></div>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Validator details.</h2><p>Stake, uptime, fee, and node status before you choose where to put weight.</p></div>
+          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="Validator status info">i<span>Whether the validator node is currently reachable. A connected validator is a basic health signal, but uptime history is more important than one moment.</span></button><b>Validator</b><strong data-field="validatorConnected">-</strong><p>Node connection status.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Node uptime info">i<span>Recent validator uptime by epoch. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Node uptime</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div></article><article class="card"><button class="info-tip" type="button" aria-label="Fee info">i<span>The validator fee taken from validator rewards before the remaining rewards are distributed.</span></button><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator reward fee.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Boost info">i<span>Boost is additional validator weight when available. Higher boost can improve validator weight, but it should be read together with uptime and stake.</span></button><b>Boost</b><strong data-field="validatorBoost">-</strong><p>Additional validator weight signal.</p></article></div>
+          <div class="cards three" style="margin-top:10px"><article class="card"><button class="info-tip" type="button" aria-label="Total stake info">i<span>Total validator weight currently visible here: operator stake plus delegated validator stake.</span></button><b>Total stake</b><strong data-field="validatorTotal">-</strong><p>Self stake plus delegated validator stake.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Self stake info">i<span>FLR put up by the operator. This is the operator's own validator stake.</span></button><b>Self stake</b><strong data-field="validatorStake">-</strong><p>FLR put up by the operator.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Delegation info">i<span>FLR assigned to this validator by other holders.</span></button><b>Delegation</b><strong data-field="validatorDelegation">-</strong><p>FLR assigned to this validator by others.</p></article></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/operator.js?v=validator-copy"></script>
+</body>
+</html>

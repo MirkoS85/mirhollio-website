@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr — Flare Validator & FTSO Provider</title>
+  <meta name="description" content="MirSFlr runs Flare validator and FTSO infrastructure with live metrics, verified addresses, and delegation guidance." />
+  <meta name="theme-color" content="#0f1212" />
+  <link rel="canonical" href="https://www.mirhollio.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta property="og:description" content="Live Flare provider metrics, verified addresses, and safe delegation guidance." />
+  <meta property="og:url" content="https://www.mirhollio.com/" />
+  <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta name="twitter:description" content="Live Flare provider metrics, verified addresses, and safe delegation guidance." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="stylesheet" href="/previews-live/preview.css?v=soft-live" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row">
+      <a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+      <a class="btn primary" href="/previews-live/addresses/">Delegate</a>
+    </div>
+    <nav class="mobile-links" aria-label="Mobile navigation">
+      <a href="/previews-live/" aria-current="page">Home</a>
+      <a href="/previews-live/stats/">Stats</a>
+      <a href="/previews-live/epochs/">Epochs</a>
+      <a href="/previews-live/addresses/">Addresses</a>
+      <a href="/previews-live/performance/">Performance</a>
+    </nav>
+  </div>
+
+  <div class="site-shell">
+    <aside class="side">
+      <div>
+        <a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+        <nav class="nav" aria-label="Primary navigation">
+          <a href="/previews-live/" aria-current="page">Home</a>
+          <a href="/previews-live/stats/">Live stats</a>
+          <a href="/previews-live/epochs/">Epoch history</a>
+          <a href="/previews-live/addresses/">Addresses</a>
+          <a href="/previews-live/performance/">Performance</a>
+        </nav>
+      </div>
+      <p class="side-note">Verified Flare infrastructure. Live proof.</p>
+    </aside>
+
+    <main>
+      <section class="section home-hero-section">
+        <div class="inner hero home-hero">
+          <div>
+            <div class="kicker">Flare validator + FTSO provider</div>
+            <h1>Stake with proof. Delegate with confidence.</h1>
+            <p class="lead">Live Flare validator and FTSO metrics: uptime, rewards, stake, and verified addresses.</p>
+            <div class="actions">
+              <a class="btn primary" href="/previews-live/addresses/">Verify addresses</a>
+              <a class="btn ghost" href="/previews-live/performance/">Performance</a>
+              <a class="btn ghost" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
+            </div>
+          </div>
+          <aside class="status-panel">
+            <div class="panel-head">
+              <strong>FTSO status</strong>
+              <div class="panel-statuses">
+                <span class="status-dot" data-field="status">Loading</span>
+              </div>
+            </div>
+            <div class="metric-grid">
+              <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. Green means the check passed. Red means that part did not pass.</span></button><span>Minimal Conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FTSO Performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><span>FTSO Performance</span><strong data-field="performance">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Condition Passes info">i<span>Number of condition passes in the latest epoch (out of 3). Percentage shows success rate over last 10 epochs. 3 passes needed to be eligible for rewards.</span></button><span>Condition Passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="inner">
+          <div class="section-title">
+            <h2>Proof first.</h2>
+            <div class="section-side"><p>Start with current earnings, validator capacity, uptime, fee, stake timing, and reward history before you stake or delegate.</p><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div></div>
+          </div>
+          <div class="proof-stack">
+            <article class="card rewards-card monthly-rewards-panel"><button class="info-tip" type="button" aria-label="Monthly rewards info">i<span>Estimated monthly rewards for the operator side. FTSO uses recent provider rewards. Validator uses recent validator rewards when a monthly estimate is not published.</span></button><b>Monthly Rewards (est.)</b><div class="reward-lines"><div><em>FTSO</em><strong data-field="ftsoMonthlyRewards">-</strong><small data-field="ftsoMonthlyFiat">-</small></div><div><em>Validator</em><strong data-field="validatorMonthlyRewards">-</strong><small data-field="validatorMonthlyFiat">-</small></div></div><p>Estimated monthly FTSO and validator rewards.</p></article>
+            <div class="validator-panel">
+              <div class="validator-head">
+                <h3>Validator</h3>
+                <span class="status-dot" data-field="validatorConnected">Loading</span>
+              </div>
+              <div class="validator-row">
+                <div class="validator-id"><span>Node</span><strong data-field="validatorNodeId">-</strong></div>
+                <div class="validator-stat"><span>APR</span><strong data-field="validatorApr">-</strong></div>
+                <div class="validator-stat"><span>Uptime</span><strong data-field="validatorUptimeAvg">-</strong></div>
+                <div class="validator-progress"><span>Stake <b data-field="validatorCapacityText">-</b></span><div class="bar-track"><div class="bar-fill" data-bar="validatorStakeCapacity"></div></div><em data-field="validatorCapacityPct">-</em></div>
+                <div class="validator-progress"><span>Time left <b data-field="stakeTimeLeft">-</b></span><div class="bar-track green"><div class="bar-fill" data-bar="validatorTimeLeft"></div></div><em data-field="validatorTimeLeftPct">-</em></div>
+              </div>
+              <div class="validator-foot">
+                <span>Fee <strong data-field="validatorFee">-</strong></span>
+                <span>Free space <strong data-field="freeDelegationSpace">-</strong></span>
+              </div>
+            </div>
+            <div class="chart-panel">
+              <div class="panel-head">
+                <strong>Validator Rewards per epoch</strong>
+                <span class="mini-label">Latest 20</span>
+              </div>
+              <div class="reward-chart-wrap">
+                <svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg>
+                <div class="chart-tooltip" data-render="validator-reward-tooltip"></div>
+              </div>
+              <div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
+              <p class="table-note">Loaded from validator reward history. Data updated <span data-field="lastUpdated">-</span>.</p>
+            </div>
+            <div class="chart-panel">
+              <div class="panel-head">
+                <strong>FTSO Rewards per epoch</strong>
+                <span class="mini-label">Latest 20</span>
+              </div>
+              <div class="reward-chart-wrap">
+                <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg>
+                <div class="chart-tooltip" data-render="reward-tooltip"></div>
+              </div>
+              <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
+              <p class="table-note">Loaded from provider epoch history. Data updated <span data-field="lastUpdated">-</span>.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title">
+            <h2>Validator-first.</h2>
+            <p>Validator stake and validator performance deserve the same visibility as FTSO rewards.</p>
+          </div>
+          <div class="cards">
+            <article class="card uptime-wide"><button class="info-tip" type="button" aria-label="Uptime average info">i<span>Recent validator uptime by epoch. Values close to 100% mean the node has been reachable when the network expected it.</span></button><b>Uptime (avg)</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div></article>
+            <article class="card"><button class="info-tip" type="button" aria-label="Minimal Conditions info">i<span>Four reward checks for the latest epoch: FTSO Anchor Feeds, FTSO Block-Latency Feeds, FDC, and Staking. All four should be green.</span></button><b>Minimal Conditions</b><div class="condition-dots" data-render="conditions"><span></span><span></span><span></span><span></span></div><p>Green means OK. Red means the check failed.</p></article>
+            <article class="card"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><b>Pre-registered</b><strong data-field="preRegistered">-</strong><p>Ready for the next reward epoch.</p></article>
+          </div>
+          <div class="flow">
+            <div class="step"><em>1</em><strong>Validator stake matters</strong><p>Active validator stake helps show how much weight the operator is currently carrying.</p></div>
+            <div class="step"><em>2</em><strong>Data work still matters</strong><p>FTSO, fast updates, staking, and FDC conditions remain part of reward eligibility.</p></div>
+            <div class="step"><em>3</em><strong>Fees matter</strong><p>Check the validator fee before comparing estimated rewards.</p></div>
+            <div class="step"><em>4</em><strong>Verify before weight</strong><p>Check node status, free space, stake end, and provider addresses before staking or delegating.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title">
+            <h2>Stake or delegate.</h2>
+            <p>Both routes support Flare, but they do not signal the same thing. Staking points weight at validator security; WFLR delegation points weight at data-provider rewards.</p>
+          </div>
+          <div class="flow">
+            <div class="step"><em>1</em><strong>Verify identity</strong><p>Compare this site with Explorer and FlareMetrics.</p></div>
+            <div class="step"><em>2</em><strong>Check capacity</strong><p>Use free delegation space and stake timing before choosing a validator.</p></div>
+            <div class="step"><em>3</em><strong>Choose route</strong><p>Stake FLR for validator weight or delegate WFLR for data-provider reward participation.</p></div>
+            <div class="step"><em>4</em><strong>Track results</strong><p>Return to stats and performance after one epoch.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="addresses">
+        <div class="inner">
+          <div class="section-title">
+            <h2>Verification addresses.</h2>
+          </div>
+          <div class="address-grid">
+            <article class="address">
+              <span>Delegation address</span>
+              <code data-field="delegationAddress">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</code>
+              <div class="copy-row"><div class="copy-help">Use this in your wallet when delegating.</div><button class="btn ghost" type="button" data-copy="delegation">Copy</button></div>
+            </article>
+            <article class="address">
+              <span>Provider identity</span>
+              <code data-field="providerIdentity">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</code>
+              <div class="copy-row"><div class="copy-help">Use this to verify the provider.</div><button class="btn ghost" type="button" data-copy="identity">Copy</button></div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title">
+            <h2>Contact.</h2>
+            <p>Use official links only. MirSFlr will never ask for your seed phrase.</p>
+          </div>
+          <div class="cards three">
+            <article class="card"><b>Email</b><strong data-field="contactEmail">mirsven@icloud.com</strong><p><button class="btn ghost" type="button" data-copy="email">Copy email</button></p></article>
+            <article class="card"><b>X</b><strong>@mirsFlR_</strong><p><a class="btn ghost" href="https://x.com/mirsFlR_" target="_blank" rel="noopener">Open X</a></p></article>
+            <article class="card"><b>Telegram</b><strong>@Mirhollio</strong><p><a class="btn ghost" href="https://t.me/Mirhollio" target="_blank" rel="noopener">Open Telegram</a></p></article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/operator.js?v=pre-reg-value-fix"></script>
+</body>
+</html>

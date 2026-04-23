@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Live Stats</title>
+  <meta name="description" content="Live MirSFlr validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
+  <meta name="theme-color" content="#0f1212" />
+  <link rel="canonical" href="https://www.mirhollio.com/stats/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr Live Stats" />
+  <meta property="og:description" content="Live MirSFlr validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
+  <meta property="og:url" content="https://www.mirhollio.com/stats/" />
+  <meta property="og:image" content="https://www.mirhollio.com/logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="MirSFlr Live Stats" />
+  <meta name="twitter:description" content="Live validator and FTSO provider statistics for MirSFlr." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="stylesheet" href="/previews-live/preview.css?v=soft-live" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="/previews-live/addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/" aria-current="page">Stats</a><a href="/previews-live/epochs/">Epochs</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/">Performance</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div><a class="brand" href="/previews-live/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="/previews-live/">Home</a><a href="/previews-live/stats/" aria-current="page">Live stats</a><a href="/previews-live/epochs/">Epoch history</a><a href="/previews-live/addresses/">Addresses</a><a href="/previews-live/performance/">Performance</a></nav></div>
+      <p class="side-note">Live reward, eligibility, and performance signals for a quick provider check.</p>
+    </aside>
+    <main>
+      <section class="section">
+        <div class="inner hero compact">
+          <div><div class="kicker">Live metrics</div><h1>Provider stats without the noise.</h1><p class="lead">Rewards, eligibility, availability, and recent epochs for MirSFlr.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Data status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Vote power info">i<span>Provider vote power currently visible for this operator. More vote power can influence reward size, but performance still matters.</span></button><span>Vote power</span><strong data-field="votePower">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Total rewards info">i<span>Total FLR rewards over the available provider history.</span></button><span>Total rewards</span><strong data-field="totalRewards">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Average reward info">i<span>Average FLR reward per epoch over the available reward history.</span></button><span>Average reward</span><strong data-field="averageReward">-</strong></div></div></aside>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Performance summary.</h2><p>Current FTSO, FDC, eligibility, and rewards.</p></div>
+          <div class="cards"><article class="card"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting data when expected. Higher is better.</span></button><b>FTSO availability</b><strong data-field="availability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><b>FTSO performance</b><strong data-field="performance">-</strong><p>Quality signal for price submissions.</p></article><article class="card"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><b>FDC availability</b><strong data-field="fdcAvailability">-</strong><p>Availability.</p></article><article class="card"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>How many reward epochs were eligible for rewards compared with the total history shown here.</span></button><b>Eligible for reward</b><strong data-field="eligible">-</strong><p>Reward eligibility across recent history.</p></article></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title"><h2>Recent epochs.</h2><p class="table-note" data-error></p></div>
+          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="8"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/operator.js?v=validator-copy"></script>
+</body>
+</html>
