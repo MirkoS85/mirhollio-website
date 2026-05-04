@@ -34,7 +34,7 @@
       const items = [...mount.children];
       if (!items.length) return;
 
-      const alreadySimplified = mount.dataset.refreshDots === "true"
+      const alreadySimplified = mount.dataset.previewDots === "true"
         && items.length === 3
         && items.every(el => !(el.textContent || "").trim());
 
@@ -61,7 +61,22 @@
       }
 
       mount.innerHTML = summary.map(state => `<span class="${state}" aria-hidden="true"></span>`).join("");
-      mount.dataset.refreshDots = "true";
+      mount.dataset.previewDots = "true";
+    });
+  }
+
+  function formatPassStrikeValues(root = document) {
+    root.querySelectorAll("[data-field='passes']").forEach(el => {
+      if (el.dataset.previewPasses === "true") return;
+      const raw = (el.textContent || "").trim();
+      const match = raw.match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (!match) return;
+      const passes = Number(match[1]);
+      const strikes = Number(match[2]);
+      const passLabel = passes === 1 ? "pass" : "passes";
+      const strikeLabel = strikes === 1 ? "strike" : "strikes";
+      el.textContent = `${passes} ${passLabel} / ${strikes} ${strikeLabel}`;
+      el.dataset.previewPasses = "true";
     });
   }
 
@@ -69,6 +84,7 @@
     formatFlrUnits();
     simplifyConditionDots();
     tightenLongValues();
+    formatPassStrikeValues();
 
     const observer = new MutationObserver(mutations => {
       for (const mutation of mutations) {
@@ -76,6 +92,7 @@
           formatFlrUnits();
           simplifyConditionDots();
           tightenLongValues();
+          formatPassStrikeValues();
           break;
         }
       }

@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
   <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-rollout" />
+  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v6" />
 </head>
 <body>
   <div class="mobile-top">
@@ -33,19 +33,19 @@
   <div class="site-shell">
     <aside class="side">
       <div><a class="brand" href="/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="/">Home</a><a href="/stats/">Live stats</a><a href="/epochs/">Epoch history</a><a href="/addresses/">Addresses</a><a href="/performance/" aria-current="page">Performance</a></nav></div>
-      <p class="side-note">Performance is treated like validator health: uptime, stake, protocol participation, and recent outcomes.</p>
+      <p class="side-note">Mixed operator view: provider execution, validator uptime, capacity, and readiness in one place.</p>
     </aside>
     <main>
       <section class="section">
         <div class="inner hero compact">
-          <div><div class="kicker">Validator health</div><h1>Performance signals.</h1><p class="lead">Validator uptime, active stake, FTSO availability, FDC availability, passes, and strikes.</p></div>
-          <aside class="status-panel"><div class="panel-head"><strong>Health status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Validator info">i<span>Whether the validator node is currently reachable. This is a basic live health signal.</span></button><span>Validator</span><strong data-field="validatorConnected">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Free delegation info">i<span>How much more FLR can still be added before this validator reaches its current capacity.</span></button><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Condition Passes info">i<span>How many reward conditions passed compared with failed checks across the available provider history.</span></button><span>Condition Passes</span><strong data-field="passes">-</strong></div></div></aside>
+          <div><div class="kicker">Operator health</div><h1>Provider + validator health.</h1><p class="lead">One operator view across provider execution, validator uptime, free capacity, and readiness.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Operator snapshot</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Validator info">i<span>Whether the validator node is currently reachable. This is a basic live health signal.</span></button><span>Validator</span><strong data-field="validatorConnected">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Free delegation info">i<span>How much more FLR can still be added before this validator reaches its current capacity.</span></button><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Passes and strikes info">i<span>Total passed checks compared with total strikes across the available provider history.</span></button><span>Passes / strikes</span><strong data-field="passes">-</strong></div></div></aside>
         </div>
       </section>
       <section class="section light">
         <div class="inner">
-          <div class="section-title"><h2>Availability bars.</h2><p data-error></p></div>
-          <div class="chart-panel"><div class="bars"><div><div class="bar-label"><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="availability"></div></div></div><div><div class="bar-label"><span>FTSO performance</span><strong data-field="performance">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance"></div></div></div><div><div class="bar-label"><span>Performance 1</span><strong data-field="performance1">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance1"></div></div></div><div><div class="bar-label"><span>Performance 2</span><strong data-field="performance2">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance2"></div></div></div><div><div class="bar-label"><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="fdcAvailability"></div></div></div></div></div>
+          <div class="section-title"><h2>Provider execution.</h2><p data-error>FTSO and FDC delivery metrics in one place.</p></div>
+          <div class="chart-panel"><div class="bars"><div><div class="bar-label"><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="availability"></div></div></div><div><div class="bar-label"><span>FTSO performance</span><strong data-field="performance">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="performance"></div></div></div><div><div class="bar-label"><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div><div class="bar-track"><div class="bar-fill" data-bar="fdcAvailability"></div></div></div></div></div>
         </div>
       </section>
       <section class="section">
@@ -65,7 +65,7 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/assets/operator.js?v=validator-copy"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-rollout"></script>
+  <script src="/assets/live-refresh.js?v=soft-live-v6"></script>
   <script src="/assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
