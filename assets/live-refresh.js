@@ -80,11 +80,65 @@
     });
   }
 
+  function bindPanelAccordion() {
+    const buttons = [...document.querySelectorAll("[data-panel-toggle]")];
+    const panels = new Map(
+      [...document.querySelectorAll("[data-accordion-panel]")].map(panel => [panel.id, panel])
+    );
+    if (!buttons.length || !panels.size) return;
+
+    function syncButtons(openId) {
+      buttons.forEach(button => {
+        const targetId = button.getAttribute("data-panel-toggle");
+        const expanded = targetId === openId;
+        button.setAttribute("aria-expanded", expanded ? "true" : "false");
+        button.textContent = expanded
+          ? (button.getAttribute("data-close-label") || "Hide panel")
+          : (button.getAttribute("data-open-label") || "Open panel");
+      });
+    }
+
+    function setOpenPanel(openId, { scroll = false } = {}) {
+      panels.forEach((panel, id) => {
+        panel.hidden = id !== openId;
+      });
+      syncButtons(openId);
+
+      if (scroll && openId) {
+        const panel = panels.get(openId);
+        panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const targetId = button.getAttribute("data-panel-toggle");
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        const nextId = isOpen ? "" : targetId;
+        setOpenPanel(nextId, { scroll: !isOpen });
+
+        if (nextId) {
+          history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${nextId}`);
+        } else {
+          history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+        }
+      });
+    });
+
+    const hashId = window.location.hash.replace("#", "");
+    if (hashId && panels.has(hashId)) {
+      setOpenPanel(hashId);
+    } else {
+      setOpenPanel("");
+    }
+  }
+
   function boot() {
     formatFlrUnits();
     simplifyConditionDots();
     tightenLongValues();
     formatPassStrikeValues();
+    bindPanelAccordion();
 
     const observer = new MutationObserver(mutations => {
       for (const mutation of mutations) {

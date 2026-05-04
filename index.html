@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
   <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v6" />
+  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v7" />
 </head>
 <body>
   <div class="mobile-top">
@@ -57,25 +57,10 @@
 
     <main>
       <section class="section home-hero-section">
-        <div class="inner home-role-split">
+        <div class="inner">
           <div class="hero home-hero">
             <div class="kicker">Flare validator + FTSO provider</div>
             <h1>Stake with proof. Delegate with confidence.</h1>
-            <p class="lead">Delegate WFLR through provider metrics. Stake FLR through validator metrics.</p>
-          </div>
-          <div class="role-choice-grid">
-            <article class="card role-choice role-choice-ftso">
-              <b>Delegate WFLR</b>
-              <strong>FTSO provider</strong>
-              <p>Judge the operator through reward rate, availability, performance, conditions, and pre-registration.</p>
-              <a class="btn decision-btn" href="#ftso-panel">Open provider metrics</a>
-            </article>
-            <article class="card role-choice role-choice-validator">
-              <b>Stake FLR</b>
-              <strong>Validator node</strong>
-              <p>Judge the node through APR, uptime, fee, free capacity, and how much staking time remains.</p>
-              <a class="btn decision-btn" href="#validator-panel">Open validator metrics</a>
-            </article>
           </div>
         </div>
       </section>
@@ -84,10 +69,24 @@
         <div class="inner">
           <div class="section-title">
             <h2>Live panels.</h2>
-            <div class="section-side"><p>Use provider data for delegation. Use validator data for staking.</p><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div></div>
+            <div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div></div>
+          </div>
+          <div class="role-choice-grid">
+            <article class="card role-choice role-choice-ftso">
+              <b>Delegate WFLR</b>
+              <strong>FTSO provider</strong>
+              <p>Check reward rate, availability, performance, conditions, and registration before you delegate.</p>
+              <button class="btn decision-btn" type="button" data-panel-toggle="ftso-panel" data-open-label="Open provider metrics" data-close-label="Hide provider metrics" aria-controls="ftso-panel" aria-expanded="false">Open provider metrics</button>
+            </article>
+            <article class="card role-choice role-choice-validator">
+              <b>Stake FLR</b>
+              <strong>Validator node</strong>
+              <p>Check APR, uptime, fee, free capacity, and remaining stake time before you stake.</p>
+              <button class="btn decision-btn" type="button" data-panel-toggle="validator-panel" data-open-label="Open validator metrics" data-close-label="Hide validator metrics" aria-controls="validator-panel" aria-expanded="false">Open validator metrics</button>
+            </article>
           </div>
           <div class="command-grid">
-            <div class="validator-panel split-panel" id="ftso-panel">
+            <div class="validator-panel split-panel" id="ftso-panel" data-accordion-panel hidden>
               <div class="validator-head">
                 <div>
                   <div class="panel-eyebrow">Delegate path</div>
@@ -108,8 +107,20 @@
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
                 <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
               </div>
+              <div class="chart-panel">
+                <div class="panel-head">
+                  <strong>FTSO Rewards per epoch</strong>
+                  <span class="mini-label">Latest 20</span>
+                </div>
+                <div class="reward-chart-wrap">
+                  <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg>
+                  <div class="chart-tooltip" data-render="reward-tooltip"></div>
+                </div>
+                <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
+                <p class="table-note">Loaded from provider epoch history. Data updated <span data-field="lastUpdated">-</span>.</p>
+              </div>
             </div>
-            <div class="validator-panel split-panel" id="validator-panel">
+            <div class="validator-panel split-panel" id="validator-panel" data-accordion-panel hidden>
               <div class="validator-head">
                 <div>
                   <div class="panel-eyebrow">Stake path</div>
@@ -130,66 +141,19 @@
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
               </div>
               <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent validator uptime snapshots should stay close to 100%.</p></article>
+              <div class="chart-panel">
+                <div class="panel-head">
+                  <strong>Validator Rewards per epoch</strong>
+                  <span class="mini-label">Latest 20</span>
+                </div>
+                <div class="reward-chart-wrap">
+                  <svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg>
+                  <div class="chart-tooltip" data-render="validator-reward-tooltip"></div>
+                </div>
+                <div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
+                <p class="table-note">Loaded from validator reward history. Data updated <span data-field="lastUpdated">-</span>.</p>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="inner">
-          <div class="section-title">
-            <h2>History by role.</h2>
-            <p data-error>Keep provider history and validator history separate when you compare outcomes.</p>
-          </div>
-          <div class="operator-history-grid">
-            <div class="chart-panel">
-              <div class="panel-head">
-                <strong>FTSO Rewards per epoch</strong>
-                <span class="mini-label">Latest 20</span>
-              </div>
-              <div class="reward-chart-wrap">
-                <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg>
-                <div class="chart-tooltip" data-render="reward-tooltip"></div>
-              </div>
-              <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
-              <p class="table-note">Loaded from provider epoch history. Data updated <span data-field="lastUpdated">-</span>.</p>
-            </div>
-            <div class="chart-panel">
-              <div class="panel-head">
-                <strong>Validator Rewards per epoch</strong>
-                <span class="mini-label">Latest 20</span>
-              </div>
-              <div class="reward-chart-wrap">
-                <svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg>
-                <div class="chart-tooltip" data-render="validator-reward-tooltip"></div>
-              </div>
-              <div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
-              <p class="table-note">Loaded from validator reward history. Data updated <span data-field="lastUpdated">-</span>.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="addresses">
-        <div class="inner">
-          <div class="section-title">
-            <h2>Verification addresses.</h2>
-            <p>Match these with Explorer before you copy, stake, or delegate.</p>
-          </div>
-          <div class="secondary-actions">
-            <a class="btn ghost" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Open Flare Explorer</a>
-          </div>
-          <div class="address-grid">
-            <article class="address">
-              <span>Delegation address</span>
-              <code data-field="delegationAddress">0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</code>
-              <div class="copy-row"><div class="copy-help">Use this in your wallet when delegating.</div><button class="btn ghost" type="button" data-copy="delegation">Copy</button></div>
-            </article>
-            <article class="address">
-              <span>Provider identity</span>
-              <code data-field="providerIdentity">0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</code>
-              <div class="copy-row"><div class="copy-help">Use this to verify the provider.</div><button class="btn ghost" type="button" data-copy="identity">Copy</button></div>
-            </article>
           </div>
         </div>
       </section>
@@ -211,7 +175,7 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/assets/operator.js?v=pre-reg-value-fix"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-v6"></script>
+  <script src="/assets/live-refresh.js?v=soft-live-v7"></script>
   <script src="/assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

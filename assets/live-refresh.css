@@ -70,19 +70,76 @@ body::after{
   border-bottom-color:var(--line);
   box-shadow:0 12px 28px rgba(121,68,94,.08);
   backdrop-filter:blur(18px);
+  overflow-x:hidden;
+}
+
+.mobile-row{
+  gap:12px;
+  align-items:center;
+}
+
+.mobile-top .brand span{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.mobile-row .btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:nowrap;
+  flex:0 0 auto;
+  min-width:96px;
+  padding-inline:15px;
+  font-size:13px;
+}
+
+.mobile-links{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:8px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  margin-top:12px;
+  padding:6px;
+  border:1px solid rgba(137,96,116,.12);
+  border-radius:20px;
+  background:rgba(255,255,255,.46);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+  scrollbar-width:none;
+  -ms-overflow-style:none;
 }
 
 .mobile-links a{
-  color:var(--ink);
-  background:rgba(255,255,255,.74);
-  border-color:rgba(137,96,116,.14);
-  border-radius:14px;
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+  color:#675a63;
+  background:transparent;
+  border-color:transparent;
+  border-radius:12px;
+  padding:10px 16px;
+  font-size:13px;
+  font-weight:850;
+  letter-spacing:-.01em;
+  box-shadow:none;
+  transition:color .18s ease, background .18s ease, border-color .18s ease;
 }
 
 .mobile-links a:hover{
-  transform:translateY(-1px);
-  box-shadow:0 12px 24px rgba(121,68,94,.08);
+  color:var(--ink);
+  background:rgba(255,255,255,.72);
+  border-color:rgba(137,96,116,.12);
+  transform:none;
+  box-shadow:none;
+}
+
+.mobile-links a[aria-current="page"]{
+  color:#fff8fb;
+  border-color:#cf5f93;
+  background:linear-gradient(180deg, #dc6f9e 0%, #d24d88 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 10px 22px rgba(217,63,132,.18);
 }
 
 .site-shell{
@@ -160,8 +217,7 @@ body::after{
 
 .nav a:hover,
 .btn.ghost:hover,
-.copy-row .btn:hover,
-.mobile-links a:hover{
+.copy-row .btn:hover{
   transform:translateY(-1px);
   border-color:rgba(137,96,116,.24);
   box-shadow:0 14px 26px rgba(121,68,94,.08);
@@ -169,8 +225,7 @@ body::after{
 
 .nav a[aria-current="page"],
 .btn.primary,
-.toggle-btn.active,
-.mobile-links a[aria-current="page"]{
+.toggle-btn.active{
   color:#fff;
   border-color:#cd3377;
   background:linear-gradient(180deg, #df4c8b, #cf3679);
@@ -186,8 +241,7 @@ body::after{
 
 .btn.ghost,
 .toggle-btn,
-.copy-row .btn,
-.mobile-links a{
+.copy-row .btn{
   border-color:rgba(137,96,116,.14);
   background:rgba(255,255,255,.76);
 }
@@ -385,7 +439,7 @@ h1{
 .command-grid,
 .operator-history-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:1fr;
   gap:14px;
 }
 
@@ -559,14 +613,20 @@ h1{
 }
 
 .info-tip span{
-  top:34px;
-  right:0;
+  top:32px;
+  right:-2px;
+  width:min(240px, calc(100vw - 72px));
+  max-width:240px;
+  padding:11px 12px;
   border-color:rgba(42,34,38,.14);
   border-radius:14px;
   background:rgba(42,34,38,.95);
   color:#fff6fa;
   box-shadow:0 22px 44px rgba(39,23,31,.26);
   backdrop-filter:blur(14px);
+  font-size:12px;
+  line-height:1.45;
+  text-wrap:pretty;
 }
 
 .validator-panel{
@@ -577,6 +637,10 @@ h1{
   display:flex;
   flex-direction:column;
   gap:14px;
+}
+
+.split-panel[hidden]{
+  display:none !important;
 }
 
 .panel-eyebrow{
@@ -959,18 +1023,24 @@ tbody tr:hover td{
 
   .mobile-row .btn{
     min-height:40px;
-    padding:8px 12px;
-    font-size:12px;
+    padding:8px 10px;
+    font-size:11px;
     border-radius:14px;
+    min-width:78px;
   }
 
   .mobile-links{
     display:flex;
     flex-wrap:nowrap;
-    gap:8px;
+    gap:6px;
     overflow-x:auto;
     overflow-y:hidden;
-    padding:2px 0 2px;
+    padding:5px;
+    border:1px solid rgba(137,96,116,.12);
+    border-radius:18px;
+    background:rgba(255,255,255,.46);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
+    margin-top:10px;
     scrollbar-width:none;
     -ms-overflow-style:none;
   }
@@ -982,12 +1052,12 @@ tbody tr:hover td{
   .mobile-links a{
     flex:0 0 auto;
     min-width:0;
-    min-height:38px;
+    min-height:34px;
     justify-content:center;
-    padding:8px 14px;
+    padding:8px 13px;
     font-size:12px;
     text-align:center;
-    border-radius:999px;
+    border-radius:12px;
   }
 
   .section{
