@@ -305,6 +305,15 @@ main::before{
   align-items:start;
 }
 
+.home-hero{
+  grid-template-columns:minmax(0,1fr);
+  justify-items:start;
+}
+
+.home-hero > *{
+  grid-column:1;
+}
+
 h1{
   max-width:680px;
   color:var(--ink);
@@ -352,30 +361,49 @@ h1{
 
 .role-choice-grid{
   display:grid;
-  gap:14px;
+  gap:18px;
 }
 
 .role-choice{
   min-height:0;
   display:flex;
   flex-direction:column;
-  gap:14px;
+  gap:16px;
   justify-content:space-between;
   padding:22px;
+  overflow:visible;
 }
 
-.role-choice strong{
+.role-choice > strong{
   margin-top:6px;
   font-size:36px;
   line-height:.96;
 }
 
-.role-choice p{
+.role-choice > p{
   margin:0;
 }
 
-.role-choice .btn{
+.role-choice > .btn{
   margin-top:2px;
+}
+
+.role-choice.panel-open{
+  padding-bottom:20px;
+}
+
+.role-choice .split-panel{
+  margin-top:8px;
+  padding:22px 0 0;
+  border:0;
+  border-top:1px solid var(--line);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+.role-choice .split-panel .validator-head{
+  padding:0 2px 2px;
 }
 
 .role-choice-ftso{
@@ -614,7 +642,9 @@ h1{
 
 .info-tip span{
   top:32px;
-  right:-2px;
+  left:50%;
+  right:auto;
+  transform:translateX(-50%);
   width:min(240px, calc(100vw - 72px));
   max-width:240px;
   padding:11px 12px;
@@ -627,6 +657,7 @@ h1{
   font-size:12px;
   line-height:1.45;
   text-wrap:pretty;
+  z-index:40;
 }
 
 .validator-panel{
@@ -641,6 +672,26 @@ h1{
 
 .split-panel[hidden]{
   display:none !important;
+}
+
+.epochs-hero{
+  align-items:center;
+}
+
+.epochs-hero-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:100%;
+  padding:12px 0 6px;
+}
+
+.epochs-hero .lead{
+  margin-top:10px;
+}
+
+.epochs-recent-section .section-title{
+  margin-bottom:32px;
 }
 
 .panel-eyebrow{
@@ -1100,6 +1151,11 @@ tbody tr:hover td{
     gap:16px;
   }
 
+  .epochs-hero,
+  .home-hero{
+    grid-template-columns:1fr;
+  }
+
   .actions .btn{
     min-height:48px;
   }
@@ -1166,6 +1222,20 @@ tbody tr:hover td{
   .reward-chart-wrap{
     padding:10px;
     border-radius:18px;
+  }
+
+  .info-tip span{
+    position:fixed;
+    left:16px;
+    right:16px;
+    top:auto;
+    bottom:16px;
+    transform:none;
+    width:auto;
+    max-width:none;
+    border-radius:16px;
+    box-shadow:0 24px 48px rgba(39,23,31,.28);
+    z-index:80;
   }
 
   .reward-chart{

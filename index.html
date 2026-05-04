@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
   <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v7" />
+  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v8" />
 </head>
 <body>
   <div class="mobile-top">
@@ -77,16 +77,7 @@
               <strong>FTSO provider</strong>
               <p>Check reward rate, availability, performance, conditions, and registration before you delegate.</p>
               <button class="btn decision-btn" type="button" data-panel-toggle="ftso-panel" data-open-label="Open provider metrics" data-close-label="Hide provider metrics" aria-controls="ftso-panel" aria-expanded="false">Open provider metrics</button>
-            </article>
-            <article class="card role-choice role-choice-validator">
-              <b>Stake FLR</b>
-              <strong>Validator node</strong>
-              <p>Check APR, uptime, fee, free capacity, and remaining stake time before you stake.</p>
-              <button class="btn decision-btn" type="button" data-panel-toggle="validator-panel" data-open-label="Open validator metrics" data-close-label="Hide validator metrics" aria-controls="validator-panel" aria-expanded="false">Open validator metrics</button>
-            </article>
-          </div>
-          <div class="command-grid">
-            <div class="validator-panel split-panel" id="ftso-panel" data-accordion-panel hidden>
+              <div class="validator-panel split-panel" id="ftso-panel" data-accordion-panel hidden>
               <div class="validator-head">
                 <div>
                   <div class="panel-eyebrow">Delegate path</div>
@@ -119,8 +110,14 @@
                 <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
                 <p class="table-note">Loaded from provider epoch history. Data updated <span data-field="lastUpdated">-</span>.</p>
               </div>
-            </div>
-            <div class="validator-panel split-panel" id="validator-panel" data-accordion-panel hidden>
+              </div>
+            </article>
+            <article class="card role-choice role-choice-validator">
+              <b>Stake FLR</b>
+              <strong>Validator node</strong>
+              <p>Check APR, uptime, fee, free capacity, and remaining stake time before you stake.</p>
+              <button class="btn decision-btn" type="button" data-panel-toggle="validator-panel" data-open-label="Open validator metrics" data-close-label="Hide validator metrics" aria-controls="validator-panel" aria-expanded="false">Open validator metrics</button>
+              <div class="validator-panel split-panel" id="validator-panel" data-accordion-panel hidden>
               <div class="validator-head">
                 <div>
                   <div class="panel-eyebrow">Stake path</div>
@@ -153,7 +150,8 @@
                 <div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
                 <p class="table-note">Loaded from validator reward history. Data updated <span data-field="lastUpdated">-</span>.</p>
               </div>
-            </div>
+              </div>
+            </article>
           </div>
         </div>
       </section>
@@ -175,7 +173,7 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/assets/operator.js?v=pre-reg-value-fix"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-v7"></script>
+  <script src="/assets/live-refresh.js?v=soft-live-v8"></script>
   <script src="/assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

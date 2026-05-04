@@ -101,12 +101,14 @@
     function setOpenPanel(openId, { scroll = false } = {}) {
       panels.forEach((panel, id) => {
         panel.hidden = id !== openId;
+        panel.closest(".role-choice")?.classList.toggle("panel-open", id === openId);
       });
       syncButtons(openId);
 
       if (scroll && openId) {
         const panel = panels.get(openId);
-        panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+        const target = panel?.closest(".role-choice") || panel;
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
 

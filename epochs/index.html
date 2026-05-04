@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
   <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v7" />
+  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v8" />
 </head>
 <body>
   <div class="mobile-top">
@@ -37,12 +37,12 @@
     </aside>
     <main>
       <section class="section">
-        <div class="inner hero compact">
-          <div><div class="kicker">Epoch history</div><h1>Reward history with context.</h1><p class="lead">Track rewards, rates, and eligibility across recent epochs.</p></div>
+        <div class="inner hero compact epochs-hero">
+          <div class="epochs-hero-copy"><div class="kicker">Epoch history</div><h1>Reward history with context.</h1><p class="lead">Track rewards, rates, and eligibility across recent epochs.</p></div>
           <aside class="status-panel"><div class="panel-head"><strong>Latest epoch</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="Epoch info">i<span>The latest reward epoch shown in the provider history.</span></button><span>Epoch</span><strong data-field="latestEpoch">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Latest reward info">i<span>FLR reward from the latest visible epoch.</span></button><span>Latest reward</span><strong data-field="latestReward">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with actual epoch rewards.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Eligible for reward info">i<span>Whether the latest visible epoch was eligible for rewards.</span></button><span>Eligible for reward</span><strong data-field="latestEligibility">-</strong></div></div></aside>
         </div>
       </section>
-      <section class="section light">
+      <section class="section light epochs-recent-section">
         <div class="inner">
           <div class="section-title"><h2>Recent epochs.</h2><p data-error></p></div>
           <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
@@ -58,7 +58,7 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/assets/operator.js?v=validator-copy"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-v7"></script>
+  <script src="/assets/live-refresh.js?v=soft-live-v8"></script>
   <script src="/assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
