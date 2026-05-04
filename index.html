@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MirSFlr — Flare Validator & FTSO Provider</title>
   <meta name="description" content="MirSFlr runs Flare validator and FTSO infrastructure with live metrics, verified addresses, and delegation guidance." />
-  <meta name="theme-color" content="#0f1212" />
+  <meta name="theme-color" content="#d93f84" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
   <link rel="canonical" href="https://www.mirhollio.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
@@ -19,6 +22,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="manifest" href="/app.webmanifest">
   <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-rollout" />
 </head>
 <body>
@@ -60,6 +64,7 @@
             <p class="lead">Live Flare validator and FTSO metrics: uptime, rewards, stake, and verified addresses.</p>
             <div class="actions">
               <a class="btn primary" href="/addresses/">Verify addresses</a>
+              <button class="btn ghost" type="button" data-install-app hidden>Install app</button>
               <a class="btn ghost" href="/performance/">Performance</a>
               <a class="btn ghost" href="https://flare-systems-explorer.flare.network/providers/ftso/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3" target="_blank" rel="noopener">Flare Explorer</a>
             </div>
@@ -209,5 +214,6 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="/assets/operator.js?v=pre-reg-value-fix"></script>
   <script src="/assets/live-refresh.js?v=soft-live-rollout"></script>
+  <script src="/assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

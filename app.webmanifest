@@ -1,0 +1,48 @@
+{
+  "id": "/",
+  "name": "MirSFlr",
+  "short_name": "MirSFlr",
+  "description": "Flare validator and FTSO provider with live metrics, verified addresses, and delegation guidance.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff8fb",
+  "theme_color": "#d93f84",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live stats",
+      "short_name": "Stats",
+      "url": "/stats/",
+      "description": "Open live provider metrics."
+    },
+    {
+      "name": "Epoch history",
+      "short_name": "Epochs",
+      "url": "/epochs/",
+      "description": "Open recent reward epochs."
+    },
+    {
+      "name": "Verified addresses",
+      "short_name": "Addresses",
+      "url": "/addresses/",
+      "description": "Open verified delegation and provider addresses."
+    }
+  ]
+}
