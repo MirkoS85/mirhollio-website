@@ -306,12 +306,10 @@ main::before{
 }
 
 .home-hero{
-  grid-template-columns:minmax(0,1fr);
-  justify-items:start;
-}
-
-.home-hero > *{
-  grid-column:1;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
 }
 
 h1{
@@ -329,8 +327,9 @@ h1{
 }
 
 .home-hero h1{
-  max-width:620px;
+  max-width:960px;
   font-size:clamp(3.6rem, 5vw, 5.8rem);
+  text-wrap:pretty;
 }
 
 .kicker{
@@ -610,6 +609,7 @@ h1{
 .card{
   min-height:196px;
   padding:18px;
+  z-index:0;
 }
 
 .card strong{
@@ -641,10 +641,11 @@ h1{
 }
 
 .info-tip span{
-  top:32px;
-  left:50%;
-  right:auto;
-  transform:translateX(-50%);
+  top:auto;
+  bottom:calc(100% + 10px);
+  left:auto;
+  right:-4px;
+  transform:none;
   width:min(240px, calc(100vw - 72px));
   max-width:240px;
   padding:11px 12px;
@@ -658,6 +659,18 @@ h1{
   line-height:1.45;
   text-wrap:pretty;
   z-index:40;
+}
+
+.metric,
+.card{
+  z-index:0;
+}
+
+.metric:hover,
+.metric:focus-within,
+.card:hover,
+.card:focus-within{
+  z-index:6;
 }
 
 .validator-panel{
