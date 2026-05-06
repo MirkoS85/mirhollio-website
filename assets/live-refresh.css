@@ -1,4 +1,4 @@
-@import url("/assets/operator.css?v=soft-live-v6-base");
+@import url("operator.css?v=soft-live-v6-base");
 
 :root{
   --bg:#f4dbe7;
@@ -293,6 +293,10 @@ main::before{
   padding-top:34px;
 }
 
+.home-hero-section .inner{
+  max-width:1320px;
+}
+
 .home-role-split{
   display:grid;
   grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);
@@ -310,6 +314,12 @@ main::before{
   flex-direction:column;
   align-items:flex-start;
   justify-content:flex-start;
+  width:100%;
+  padding:8px 0 2px;
+}
+
+.home-hero-copy{
+  width:min(1120px, 100%);
 }
 
 h1{
@@ -327,8 +337,8 @@ h1{
 }
 
 .home-hero h1{
-  max-width:960px;
-  font-size:clamp(3.6rem, 5vw, 5.8rem);
+  max-width:100%;
+  font-size:clamp(4rem, 6.2vw, 6.8rem);
   text-wrap:pretty;
 }
 
@@ -361,6 +371,7 @@ h1{
 .role-choice-grid{
   display:grid;
   gap:18px;
+  overflow-anchor:none;
 }
 
 .role-choice{
@@ -369,8 +380,9 @@ h1{
   flex-direction:column;
   gap:16px;
   justify-content:space-between;
-  padding:22px;
+  padding:22px 24px;
   overflow:visible;
+  overflow-anchor:none;
 }
 
 .role-choice > strong{
@@ -388,21 +400,25 @@ h1{
 }
 
 .role-choice.panel-open{
-  padding-bottom:20px;
+  padding-bottom:0;
 }
 
 .role-choice .split-panel{
-  margin-top:8px;
-  padding:22px 0 0;
+  margin:10px -24px 0;
+  padding:22px 24px 24px;
   border:0;
   border-top:1px solid var(--line);
   border-radius:0;
   background:transparent;
   box-shadow:none;
+  overflow-anchor:none;
 }
 
 .role-choice .split-panel .validator-head{
-  padding:0 2px 2px;
+  margin-bottom:4px;
+  padding:0;
+  align-items:center;
+  justify-content:flex-start;
 }
 
 .role-choice-ftso{
@@ -433,6 +449,16 @@ h1{
     0 18px 34px rgba(217,63,132,.22) !important;
 }
 
+.decision-btn:focus-visible,
+.btn:focus-visible,
+.nav a:focus-visible,
+.mobile-links a:focus-visible,
+.toggle-btn:focus-visible,
+.info-tip:focus-visible{
+  outline:2px solid rgba(217,63,132,.36);
+  outline-offset:3px;
+}
+
 .secondary-actions{
   margin-bottom:14px;
 }
@@ -444,6 +470,19 @@ h1{
 .section-title{
   gap:24px;
   margin-bottom:22px;
+}
+
+.summary-title{
+  display:grid;
+  grid-template-columns:minmax(0, 1fr) minmax(280px, 430px);
+  align-items:end;
+  gap:28px;
+}
+
+.summary-title p{
+  justify-self:end;
+  max-width:430px;
+  text-wrap:pretty;
 }
 
 .section-title h2{
@@ -484,11 +523,14 @@ h1{
 .step,
 .table-wrap{
   border-color:var(--line);
+  overflow:visible;
+  isolation:isolate;
 }
 
 .status-panel,
 .chart-panel,
 .validator-panel{
+  scroll-margin-top:112px;
   border-radius:26px;
   background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,249,252,.78));
   box-shadow:0 18px 42px rgba(124,67,93,.08);
@@ -534,6 +576,7 @@ h1{
 .metric-grid{
   gap:12px;
   padding:14px;
+  isolation:isolate;
 }
 
 .metric,
@@ -547,6 +590,7 @@ h1{
   border-radius:20px;
   background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,248,251,.88));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.84);
+  overflow:visible;
 }
 
 .status-panel .metric:nth-child(1),
@@ -638,16 +682,17 @@ h1{
   color:#7e6774;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.84);
   font-size:11px;
+  z-index:30;
 }
 
 .info-tip span{
   top:auto;
   bottom:calc(100% + 10px);
-  left:auto;
-  right:-4px;
+  left:14px;
+  right:auto;
   transform:none;
-  width:min(240px, calc(100vw - 72px));
-  max-width:240px;
+  width:min(280px, calc(100vw - 72px));
+  max-width:280px;
   padding:11px 12px;
   border-color:rgba(42,34,38,.14);
   border-radius:14px;
@@ -670,7 +715,7 @@ h1{
 .metric:focus-within,
 .card:hover,
 .card:focus-within{
-  z-index:6;
+  z-index:40;
 }
 
 .validator-panel{
@@ -688,7 +733,9 @@ h1{
 }
 
 .epochs-hero{
-  align-items:center;
+  grid-template-columns:minmax(0, 1.08fr) minmax(360px, .92fr);
+  align-items:stretch;
+  gap:34px;
 }
 
 .epochs-hero-copy{
@@ -696,15 +743,20 @@ h1{
   flex-direction:column;
   justify-content:center;
   min-height:100%;
-  padding:12px 0 6px;
+  padding:28px 0 20px;
 }
 
 .epochs-hero .lead{
-  margin-top:10px;
+  margin-top:18px;
+  max-width:620px;
 }
 
-.epochs-recent-section .section-title{
-  margin-bottom:32px;
+.recent-epochs-title{
+  margin-bottom:40px;
+}
+
+.recent-epochs-title p{
+  margin-top:6px;
 }
 
 .panel-eyebrow{
@@ -1048,6 +1100,16 @@ tbody tr:hover td{
     gap:24px;
   }
 
+  .summary-title{
+    grid-template-columns:1fr;
+    align-items:flex-start;
+  }
+
+  .summary-title p{
+    justify-self:start;
+    max-width:640px;
+  }
+
   .panel-head{
     align-items:flex-start;
     flex-direction:column;
@@ -1167,6 +1229,10 @@ tbody tr:hover td{
   .epochs-hero,
   .home-hero{
     grid-template-columns:1fr;
+  }
+
+  .home-hero-copy{
+    width:100%;
   }
 
   .actions .btn{

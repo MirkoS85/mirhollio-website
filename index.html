@@ -19,37 +19,37 @@
   <meta name="twitter:title" content="MirSFlr — Flare Validator & FTSO Provider" />
   <meta name="twitter:description" content="Live Flare provider metrics, verified addresses, and safe delegation guidance." />
   <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v9" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="stylesheet" href="assets/live-refresh.css?v=soft-live-v16" />
 </head>
 <body>
   <div class="mobile-top">
     <div class="mobile-row">
-      <a class="brand" href="/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
-      <a class="btn primary" href="/addresses/">Delegate</a>
+      <a class="brand" href="./"><img src="logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+      <a class="btn primary" href="addresses/">Delegate</a>
     </div>
     <nav class="mobile-links" aria-label="Mobile navigation">
-      <a href="/" aria-current="page">Home</a>
-      <a href="/stats/">Stats</a>
-      <a href="/epochs/">Epochs</a>
-      <a href="/addresses/">Addresses</a>
-      <a href="/performance/">Performance</a>
+      <a href="./" aria-current="page">Home</a>
+      <a href="stats/">Stats</a>
+      <a href="epochs/">Epochs</a>
+      <a href="addresses/">Addresses</a>
+      <a href="performance/">Performance</a>
     </nav>
   </div>
 
   <div class="site-shell">
     <aside class="side">
       <div>
-        <a class="brand" href="/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+        <a class="brand" href="./"><img src="logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
         <nav class="nav" aria-label="Primary navigation">
-          <a href="/" aria-current="page">Home</a>
-          <a href="/stats/">Live stats</a>
-          <a href="/epochs/">Epoch history</a>
-          <a href="/addresses/">Addresses</a>
-          <a href="/performance/">Performance</a>
+          <a href="./" aria-current="page">Home</a>
+          <a href="stats/">Live stats</a>
+          <a href="epochs/">Epoch history</a>
+          <a href="addresses/">Addresses</a>
+          <a href="performance/">Performance</a>
         </nav>
       </div>
       <p class="side-note">Verified Flare infrastructure. Live proof.</p>
@@ -59,8 +59,10 @@
       <section class="section home-hero-section">
         <div class="inner">
           <div class="hero home-hero">
-            <div class="kicker">Flare validator + FTSO provider</div>
-            <h1>Stake with proof. Delegate with confidence.</h1>
+            <div class="home-hero-copy">
+              <div class="kicker">Flare validator + FTSO provider</div>
+              <h1>Stake with proof. Delegate with confidence.</h1>
+            </div>
           </div>
         </div>
       </section>
@@ -79,10 +81,6 @@
               <button class="btn decision-btn" type="button" data-panel-toggle="ftso-panel" data-open-label="Open provider metrics" data-close-label="Hide provider metrics" aria-controls="ftso-panel" aria-expanded="false">Open provider metrics</button>
               <div class="validator-panel split-panel" id="ftso-panel" data-accordion-panel hidden>
               <div class="validator-head">
-                <div>
-                  <div class="panel-eyebrow">Delegate path</div>
-                  <h3>FTSO provider</h3>
-                </div>
                 <span class="status-dot" data-field="status">Loading</span>
               </div>
               <div class="metric-grid split-metrics">
@@ -119,10 +117,6 @@
               <button class="btn decision-btn" type="button" data-panel-toggle="validator-panel" data-open-label="Open validator metrics" data-close-label="Hide validator metrics" aria-controls="validator-panel" aria-expanded="false">Open validator metrics</button>
               <div class="validator-panel split-panel" id="validator-panel" data-accordion-panel hidden>
               <div class="validator-head">
-                <div>
-                  <div class="panel-eyebrow">Stake path</div>
-                  <h3>Validator node</h3>
-                </div>
                 <span class="status-dot" data-field="validatorConnected">Loading</span>
               </div>
               <div class="validator-row">
@@ -172,8 +166,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=pre-reg-value-fix"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-v9"></script>
-  <script src="/assets/pwa.js?v=installable-1"></script>
+  <script src="assets/operator.js?v=pre-reg-value-fix"></script>
+  <script src="assets/live-refresh.js?v=soft-live-v16"></script>
+  <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

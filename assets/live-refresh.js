@@ -87,52 +87,33 @@
     );
     if (!buttons.length || !panels.size) return;
 
-    function syncButtons(openId) {
-      buttons.forEach(button => {
-        const targetId = button.getAttribute("data-panel-toggle");
-        const expanded = targetId === openId;
-        button.setAttribute("aria-expanded", expanded ? "true" : "false");
-        button.textContent = expanded
-          ? (button.getAttribute("data-close-label") || "Hide panel")
-          : (button.getAttribute("data-open-label") || "Open panel");
-      });
-    }
+    function setPanelState(button, expanded) {
+      const targetId = button.getAttribute("data-panel-toggle");
+      const panel = panels.get(targetId);
+      if (!panel) return;
 
-    function setOpenPanel(openId, { scroll = false } = {}) {
-      panels.forEach((panel, id) => {
-        panel.hidden = id !== openId;
-        panel.closest(".role-choice")?.classList.toggle("panel-open", id === openId);
-      });
-      syncButtons(openId);
-
-      if (scroll && openId) {
-        const panel = panels.get(openId);
-        const target = panel?.closest(".role-choice") || panel;
-        target?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      panel.hidden = !expanded;
+      panel.closest(".role-choice")?.classList.toggle("panel-open", expanded);
+      button.setAttribute("aria-expanded", expanded ? "true" : "false");
+      button.textContent = expanded
+        ? (button.getAttribute("data-close-label") || "Hide panel")
+        : (button.getAttribute("data-open-label") || "Open panel");
     }
 
     buttons.forEach(button => {
       button.addEventListener("click", () => {
-        const targetId = button.getAttribute("data-panel-toggle");
         const isOpen = button.getAttribute("aria-expanded") === "true";
-        const nextId = isOpen ? "" : targetId;
-        setOpenPanel(nextId, { scroll: !isOpen });
-
-        if (nextId) {
-          history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${nextId}`);
-        } else {
-          history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
-        }
+        setPanelState(button, !isOpen);
+        history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
       });
     });
 
     const hashId = window.location.hash.replace("#", "");
-    if (hashId && panels.has(hashId)) {
-      setOpenPanel(hashId);
-    } else {
-      setOpenPanel("");
-    }
+    buttons.forEach(button => {
+      const targetId = button.getAttribute("data-panel-toggle");
+      setPanelState(button, hashId && targetId === hashId);
+    });
+    if (hashId) history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
 
   function boot() {
