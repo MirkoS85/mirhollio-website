@@ -5,11 +5,19 @@ const MirSFlr = (() => {
   const FLR_PRICE_URL = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+  const FTSO_EXPLORER_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER}/ftso`;
+  const FTSO_UPTIME_SNAPSHOT = [
+    { reward_epoch_id: 392, availability: 1.0 },
+    { reward_epoch_id: 393, availability: 0.999702380952381 },
+    { reward_epoch_id: 394, availability: 1.0 },
+    { reward_epoch_id: 395, availability: 1.0 }
+  ];
   const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
   const CONTACT_EMAIL = "mirsven@icloud.com";
   let providerData = null;
   let validatorData = null;
   let latestData = null;
+  let ftsoExplorerData = null;
   let prices = { USD: null, EUR: null };
   let activePriceCurrency = "USD";
   let monthlyRewards = { ftso: null, validator: null };
@@ -25,6 +33,14 @@ const MirSFlr = (() => {
     if (!Number.isFinite(n)) return "-";
     const pct = n <= 1 ? n * 100 : n;
     return pct.toFixed(decimals) + "%";
+  }
+
+  function fmtPrecisePct(value, decimals = 2) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    const pct = n <= 1 ? n * 100 : n;
+    if (Math.abs(pct - 100) < 0.000001) return "100%";
+    return `${pct.toFixed(decimals)}%`;
   }
 
   function fmtCompact(value, suffix = "") {
@@ -236,19 +252,47 @@ const MirSFlr = (() => {
     return `E ${latestEpochNumber - total + index}`;
   }
 
+  function normalizeUptimeItems(values) {
+    if (!Array.isArray(values)) return [];
+    return values.map((item, index) => {
+      if (item && typeof item === "object") {
+        return {
+          epoch: Number(item.reward_epoch_id ?? item.epoch ?? item.rewardEpoch),
+          value: Number(item.availability ?? item.uptime ?? item.value)
+        };
+      }
+      return {
+        epoch: null,
+        value: Number(item),
+        index
+      };
+    }).filter(item => Number.isFinite(item.value));
+  }
+
   function renderUptime(values) {
+    const items = normalizeUptimeItems(values);
     document.querySelectorAll("[data-render='validator-uptime']").forEach(mount => {
-      if (!Array.isArray(values) || !values.length) {
+      if (!items.length) {
         mount.innerHTML = "<span>-</span>";
         return;
       }
-      mount.innerHTML = values.map((value, index) => {
-        const pct = Math.round(Number(value));
-        const epoch = uptimeEpochLabel(index, values.length);
-        const title = `${epoch}: ${pct}% uptime`;
-        return `<span title="${title}"><em>${epoch}</em>${pct}%</span>`;
+      mount.innerHTML = items.map((item, index) => {
+        const pct = fmtPrecisePct(item.value);
+        const epoch = Number.isFinite(item.epoch) ? `E ${item.epoch}` : uptimeEpochLabel(index, items.length);
+        const title = `${epoch}: ${pct} availability`;
+        return `<span title="${title}"><em>${epoch}</em>${pct}</span>`;
       }).join("");
     });
+  }
+
+  function recentFtsoAvailability() {
+    const epochs = Array.isArray(ftsoExplorerData?.per_reward_epoch) ? ftsoExplorerData.per_reward_epoch : [];
+    const explorerEpochs = [...epochs]
+      .filter(item => Number.isFinite(Number(item?.reward_epoch_id)) && Number.isFinite(Number(item?.availability)))
+      .sort((a, b) => Number(a.reward_epoch_id) - Number(b.reward_epoch_id));
+    if (explorerEpochs.length) return explorerEpochs;
+
+    return FTSO_UPTIME_SNAPSHOT;
   }
 
   function estimateFtsoMonthlyReward(provider) {
@@ -564,9 +608,9 @@ const MirSFlr = (() => {
     setText("status", "Online");
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
-    setText("votePower", latest?.m_dTotalWeight != null ? fmtNum(latest.m_dTotalWeight, 0) : "-");
-    setText("totalRewards", provider.totalRewards != null ? `${fmtNum(provider.totalRewards, 0)} FLR` : "-");
-    setText("averageReward", provider.averageRewardPerEpoch != null ? `${fmtNum(provider.averageRewardPerEpoch, 0)} FLR` : "-");
+    setText("votePower", latest?.m_dTotalWeight != null ? fmtCompact(latest.m_dTotalWeight) : "-");
+    setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
+    setText("averageReward", provider.averageRewardPerEpoch != null ? fmtCompact(provider.averageRewardPerEpoch, " FLR") : "-");
     setText("availability", provider.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
     setText("performance", provider.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
     setText("performance1", provider.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
@@ -601,7 +645,10 @@ const MirSFlr = (() => {
     renderEpochTable(provider);
     renderAddresses(provider);
     renderRewardChart(provider);
-    if (validatorData) {
+    const ftsoUptime = recentFtsoAvailability();
+    if (ftsoUptime.length) {
+      renderUptime(ftsoUptime);
+    } else if (validatorData) {
       const node = Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null;
       renderUptime(Array.isArray(node?.m_adUptime) ? node.m_adUptime : []);
     }
@@ -616,7 +663,7 @@ const MirSFlr = (() => {
     const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
     const connected = node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "Not exposed";
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
-    const uptime = uptimeValues.length ? uptimeValues.map(v => `${Math.round(Number(v))}%`).join(" / ") : "-";
+    const uptime = uptimeValues.length ? uptimeValues.map(v => fmtPrecisePct(v)).join(" / ") : "-";
     const uptimeAvg = uptimeValues.length ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length : null;
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM)
       ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h ${stake.m_aiTimeLeftDHM[2]}m left`
@@ -650,8 +697,14 @@ const MirSFlr = (() => {
     if (!latestData?.staking?.stakeWithUptime && validator.m_dTotalStake != null) setText("stakedFlr", fmtCompact(validator.m_dTotalStake, " FLR"));
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
-    renderUptime(uptimeValues);
+    if (!recentFtsoAvailability().length) renderUptime(uptimeValues);
     renderValidatorRewardChart(node);
+  }
+
+  function applyFtsoExplorerData(data) {
+    ftsoExplorerData = data;
+    const uptime = recentFtsoAvailability();
+    if (uptime.length) renderUptime(uptime);
   }
 
   function applyProviderV2Data(data) {
@@ -731,6 +784,14 @@ const MirSFlr = (() => {
     }
   }
 
+  async function loadFtsoExplorer() {
+    try {
+      const res = await fetch(FTSO_EXPLORER_URL, { mode: "cors" });
+      if (!res.ok) throw new Error("FTSO Explorer request failed");
+      applyFtsoExplorerData(await res.json());
+    } catch (_) {}
+  }
+
   async function loadProviderV2() {
     try {
       const res = await fetch(PROVIDERS_V2_URL, { mode: "cors" });
@@ -762,6 +823,7 @@ const MirSFlr = (() => {
     bindCopy();
     load();
     loadValidator();
+    loadFtsoExplorer();
     loadPrice();
     window.addEventListener("resize", () => {
       if (providerData) renderRewardChart(providerData);

@@ -619,7 +619,8 @@ h1{
   font-size:30px;
   letter-spacing:-.04em;
   line-height:1.02;
-  overflow-wrap:anywhere;
+  overflow-wrap:normal;
+  white-space:nowrap;
 }
 
 .metric strong.metric-tight{
@@ -640,6 +641,15 @@ h1{
   font-weight:900;
   letter-spacing:.03em;
   opacity:.92;
+}
+
+.metric strong .metric-unit{
+  display:inline;
+  margin-top:0;
+  margin-left:.24em;
+  font-size:.55em;
+  letter-spacing:.02em;
+  vertical-align:baseline;
 }
 
 .metric strong.pre-reg-value{
