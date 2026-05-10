@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=soft-live-v16" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=mobile-epochs-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -131,7 +131,7 @@
                 <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
               </div>
-              <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent validator uptime snapshots should stay close to 100%.</p></article>
+              <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
               <div class="chart-panel">
                 <div class="panel-head">
                   <strong>Validator Rewards per epoch</strong>
@@ -166,8 +166,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=pre-reg-value-fix"></script>
-  <script src="assets/live-refresh.js?v=soft-live-v16"></script>
+  <script src="assets/operator.js?v=mobile-epochs-1"></script>
+  <script src="assets/live-refresh.js?v=mobile-epochs-1"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

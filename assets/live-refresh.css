@@ -619,7 +619,8 @@ h1{
   font-size:30px;
   letter-spacing:-.04em;
   line-height:1.02;
-  overflow-wrap:anywhere;
+  overflow-wrap:normal;
+  white-space:nowrap;
 }
 
 .metric strong.metric-tight{
@@ -640,6 +641,15 @@ h1{
   font-weight:900;
   letter-spacing:.03em;
   opacity:.92;
+}
+
+.metric strong .metric-unit{
+  display:inline;
+  margin-top:0;
+  margin-left:.24em;
+  font-size:.55em;
+  letter-spacing:.02em;
+  vertical-align:baseline;
 }
 
 .metric strong.pre-reg-value{
@@ -947,8 +957,21 @@ table{
   background:rgba(255,255,255,.84);
 }
 
+.table-wrap{
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+}
+
 table{
   min-width:760px;
+}
+
+.ftso-epoch-table,
+.validator-epoch-table{
+  width:100%;
 }
 
 th,
@@ -973,6 +996,8 @@ tbody tr:hover td{
 .chart-panel{
   padding:18px;
   border-radius:26px;
+  max-width:100%;
+  overflow:hidden;
 }
 
 .chart-panel .panel-head{
@@ -980,6 +1005,9 @@ tbody tr:hover td{
 }
 
 .reward-chart-wrap{
+  position:relative;
+  max-width:100%;
+  overflow:hidden;
   padding:14px;
   border:1px solid var(--line);
   border-radius:22px;
@@ -989,7 +1017,14 @@ tbody tr:hover td{
 }
 
 .reward-chart{
+  display:block;
+  width:100%;
+  max-width:100%;
   height:286px;
+}
+
+.table-panel{
+  margin-top:14px;
 }
 
 .chart-tooltip{
@@ -1322,6 +1357,9 @@ tbody tr:hover td{
   }
 
   .chart-summary{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:8px;
     padding-top:12px;
   }
 
@@ -1329,8 +1367,50 @@ tbody tr:hover td{
     border-radius:18px;
   }
 
+  .table-wrap-compact table{
+    min-width:0;
+    table-layout:fixed;
+  }
+
+  .ftso-epoch-table th,
+  .ftso-epoch-table td,
+  .validator-epoch-table th,
+  .validator-epoch-table td{
+    padding:11px 10px;
+    font-size:14px;
+    white-space:nowrap;
+  }
+
+  .ftso-epoch-table th:nth-child(1),
+  .ftso-epoch-table td:nth-child(1),
+  .validator-epoch-table th:nth-child(1),
+  .validator-epoch-table td:nth-child(1){
+    width:22%;
+  }
+
+  .ftso-epoch-table th:nth-child(2),
+  .ftso-epoch-table td:nth-child(2),
+  .validator-epoch-table th:nth-child(2),
+  .validator-epoch-table td:nth-child(2){
+    width:31%;
+  }
+
+  .ftso-epoch-table th:nth-child(3),
+  .ftso-epoch-table td:nth-child(3),
+  .validator-epoch-table th:nth-child(3),
+  .validator-epoch-table td:nth-child(3){
+    width:25%;
+  }
+
+  .ftso-epoch-table th:nth-child(4),
+  .ftso-epoch-table td:nth-child(4),
+  .validator-epoch-table th:nth-child(4),
+  .validator-epoch-table td:nth-child(4){
+    width:22%;
+  }
+
   table{
-    min-width:620px;
+    min-width:560px;
   }
 }
 
@@ -1378,5 +1458,13 @@ tbody tr:hover td{
   .flow .step,
   .table-wrap{
     border-radius:15px;
+  }
+
+  .ftso-epoch-table th,
+  .ftso-epoch-table td,
+  .validator-epoch-table th,
+  .validator-epoch-table td{
+    padding:10px 8px;
+    font-size:13px;
   }
 }

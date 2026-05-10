@@ -19,20 +19,20 @@
   <meta name="twitter:title" content="MirSFlr Epoch History" />
   <meta name="twitter:description" content="Reward and eligibility history for MirSFlr on Flare." />
   <meta name="twitter:image" content="https://www.mirhollio.com/logo.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
-  <link rel="manifest" href="/app.webmanifest">
-  <link rel="stylesheet" href="/assets/live-refresh.css?v=soft-live-v9" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
+  <link rel="manifest" href="../app.webmanifest">
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=mobile-epochs-1" />
 </head>
 <body>
   <div class="mobile-top">
-    <div class="mobile-row"><a class="brand" href="/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="/addresses/">Delegate</a></div>
-    <nav class="mobile-links" aria-label="Mobile navigation"><a href="/">Home</a><a href="/stats/">Stats</a><a href="/epochs/" aria-current="page">Epochs</a><a href="/addresses/">Addresses</a><a href="/performance/">Performance</a></nav>
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="../stats/">Stats</a><a href="./" aria-current="page">Epochs</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
   </div>
   <div class="site-shell">
     <aside class="side">
-      <div><a class="brand" href="/"><img src="/logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="/">Home</a><a href="/stats/">Live stats</a><a href="/epochs/" aria-current="page">Epoch history</a><a href="/addresses/">Addresses</a><a href="/performance/">Performance</a></nav></div>
+      <div><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="../stats/">Live stats</a><a href="./" aria-current="page">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav></div>
       <p class="side-note">Epoch changes are not instant. Recheck after the next epoch before evaluating results.</p>
     </aside>
     <main>
@@ -44,8 +44,18 @@
       </section>
       <section class="section light epochs-recent-section">
         <div class="inner">
-          <div class="section-title"><h2>Recent epochs.</h2><p data-error></p></div>
-          <div class="table-wrap"><table><thead><tr><th>Epoch</th><th>Reward</th><th>Reward rate</th><th>Eligible for reward</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          <div class="section-title recent-epochs-title"><h2>Recent epochs.</h2><p data-error></p></div>
+          <div class="table-wrap table-wrap-compact"><table class="ftso-epoch-table"><thead><tr><th>Epoch</th><th>FTSO reward</th><th>Reward rate</th><th>Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title recent-epochs-title"><h2>Validator epochs.</h2><p>Validator reward history is separate from FTSO provider rewards.</p></div>
+          <button class="btn decision-btn" type="button" data-panel-toggle="validator-epochs-panel" data-open-label="Open validator epochs" data-close-label="Hide validator epochs" aria-controls="validator-epochs-panel" aria-expanded="false">Open validator epochs</button>
+          <div class="validator-panel table-panel" id="validator-epochs-panel" data-accordion-panel hidden>
+            <div class="panel-head"><strong>Validator reward history</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div>
+            <div class="table-wrap table-wrap-compact"><table class="validator-epoch-table"><thead><tr><th>Validator epoch</th><th>Validator reward</th><th>Node reward</th><th>Fee</th></tr></thead><tbody data-render="validator-epoch-table" data-limit="10"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          </div>
         </div>
       </section>
       <section class="section">
@@ -57,8 +67,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="/assets/operator.js?v=validator-copy"></script>
-  <script src="/assets/live-refresh.js?v=soft-live-v9"></script>
-  <script src="/assets/pwa.js?v=installable-1"></script>
+  <script src="../assets/operator.js?v=mobile-epochs-1"></script>
+  <script src="../assets/live-refresh.js?v=mobile-epochs-1"></script>
+  <script src="../assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
