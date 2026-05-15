@@ -1368,8 +1368,8 @@ tbody tr:hover td{
   }
 
   .table-wrap-compact table{
-    min-width:0;
-    table-layout:fixed;
+    min-width:640px;
+    table-layout:auto;
   }
 
   .ftso-epoch-table th,
@@ -1379,34 +1379,6 @@ tbody tr:hover td{
     padding:11px 10px;
     font-size:14px;
     white-space:nowrap;
-  }
-
-  .ftso-epoch-table th:nth-child(1),
-  .ftso-epoch-table td:nth-child(1),
-  .validator-epoch-table th:nth-child(1),
-  .validator-epoch-table td:nth-child(1){
-    width:22%;
-  }
-
-  .ftso-epoch-table th:nth-child(2),
-  .ftso-epoch-table td:nth-child(2),
-  .validator-epoch-table th:nth-child(2),
-  .validator-epoch-table td:nth-child(2){
-    width:31%;
-  }
-
-  .ftso-epoch-table th:nth-child(3),
-  .ftso-epoch-table td:nth-child(3),
-  .validator-epoch-table th:nth-child(3),
-  .validator-epoch-table td:nth-child(3){
-    width:25%;
-  }
-
-  .ftso-epoch-table th:nth-child(4),
-  .ftso-epoch-table td:nth-child(4),
-  .validator-epoch-table th:nth-child(4),
-  .validator-epoch-table td:nth-child(4){
-    width:22%;
   }
 
   table{

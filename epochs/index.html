@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=mobile-epochs-1" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=epoch-panels-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -45,7 +45,11 @@
       <section class="section light epochs-recent-section">
         <div class="inner">
           <div class="section-title recent-epochs-title"><h2>Recent epochs.</h2><p data-error></p></div>
-          <div class="table-wrap table-wrap-compact"><table class="ftso-epoch-table"><thead><tr><th>Epoch</th><th>FTSO reward</th><th>Reward rate</th><th>Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          <button class="btn decision-btn" type="button" data-panel-toggle="ftso-epochs-panel" data-open-label="Open FTSO epochs" data-close-label="Hide FTSO epochs" aria-controls="ftso-epochs-panel" aria-expanded="false">Open FTSO epochs</button>
+          <div class="validator-panel table-panel" id="ftso-epochs-panel" data-accordion-panel hidden>
+            <div class="panel-head"><strong>FTSO reward history</strong><span class="status-dot" data-field="status">Loading</span></div>
+            <div class="table-wrap table-wrap-compact"><table class="ftso-epoch-table"><thead><tr><th>Epoch</th><th>FTSO reward</th><th>Reward rate</th><th>Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+          </div>
         </div>
       </section>
       <section class="section">
@@ -67,8 +71,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=mobile-epochs-1"></script>
-  <script src="../assets/live-refresh.js?v=mobile-epochs-1"></script>
+  <script src="../assets/operator.js?v=epoch-panels-1"></script>
+  <script src="../assets/live-refresh.js?v=epoch-panels-1"></script>
   <script src="../assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
