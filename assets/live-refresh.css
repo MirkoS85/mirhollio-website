@@ -342,6 +342,12 @@ h1{
   text-wrap:pretty;
 }
 
+.home-hero .lead{
+  margin-top:22px;
+  max-width:760px;
+  color:#5f535a;
+}
+
 .kicker{
   gap:10px;
   margin-bottom:16px;
@@ -470,6 +476,14 @@ h1{
 
 .secondary-actions .btn{
   min-width:220px;
+}
+
+.compact-flow{
+  margin-bottom:18px;
+}
+
+.compact-flow .step{
+  min-height:168px;
 }
 
 .section-title{

@@ -71,11 +71,7 @@
       const raw = (el.textContent || "").trim();
       const match = raw.match(/^(\d+)\s*\/\s*(\d+)$/);
       if (!match) return;
-      const passes = Number(match[1]);
-      const strikes = Number(match[2]);
-      const passLabel = passes === 1 ? "pass" : "passes";
-      const strikeLabel = strikes === 1 ? "strike" : "strikes";
-      el.textContent = `${passes} ${passLabel} / ${strikes} ${strikeLabel}`;
+      el.textContent = `${Number(match[1])} / ${Number(match[2])}`;
       el.dataset.previewPasses = "true";
     });
   }
