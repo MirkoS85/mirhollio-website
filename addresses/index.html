@@ -29,11 +29,11 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=epoch-panels-1" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=mobile-a11y-1" />
 </head>
 <body>
   <div class="mobile-top">
-    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><button class="btn primary" type="button" data-copy="delegation">Copy</button></div>
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><button class="btn primary" type="button" data-copy="delegation" aria-label="Copy delegation address">Copy</button></div>
     <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="../stats/">Stats</a><a href="../epochs/">Epochs</a><a href="./" aria-current="page">Addresses</a><a href="../performance/">Performance</a></nav>
   </div>
   <div class="site-shell">
@@ -51,7 +51,7 @@
       <section class="section light">
         <div class="inner">
           <div class="section-title"><h2>Official addresses.</h2><p data-error>Use these addresses for manual comparison before you delegate, stake, or copy anything into a wallet.</p></div>
-          <div class="address-grid" data-render="addresses"><article class="address"><span>Delegation address</span><code>0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</code><div class="copy-row"><div class="copy-help">Use this in your wallet when delegating.</div><button class="btn ghost" type="button" data-copy="delegation">Copy</button></div></article><article class="address"><span>Provider identity</span><code>0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</code><div class="copy-row"><div class="copy-help">Compare this with Explorer and FlareMetrics.</div><button class="btn ghost" type="button" data-copy="identity">Copy</button></div></article></div>
+          <div class="address-grid" data-render="addresses"><article class="address"><span>Delegation address</span><code>0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</code><div class="copy-row"><div class="copy-help">Use this in your wallet when delegating.</div><button class="btn ghost" type="button" data-copy="delegation" aria-label="Copy delegation address">Copy</button></div></article><article class="address"><span>Provider identity</span><code>0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</code><div class="copy-row"><div class="copy-help">Compare this with Explorer and FlareMetrics.</div><button class="btn ghost" type="button" data-copy="identity" aria-label="Copy provider identity">Copy</button></div></article></div>
         </div>
       </section>
       <section class="section">
@@ -63,7 +63,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=cache-currency-1"></script>
+  <script src="../assets/operator.js?v=mobile-a11y-1"></script>
   <script src="../assets/live-refresh.js?v=epoch-panels-1"></script>
   <script src="../assets/pwa.js?v=installable-1"></script>
 </body>

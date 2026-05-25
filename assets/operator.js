@@ -167,9 +167,10 @@ const MirSFlr = (() => {
 
   function renderTableLoading(tbody) {
     const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 4;
+    const labels = tableLabels(tbody);
     tbody.innerHTML = Array.from({ length: 4 }, () => `
       <tr class="table-loading-row">
-        ${Array.from({ length: columns }, () => '<td><span class="skeleton-line"></span></td>').join("")}
+        ${Array.from({ length: columns }, (_, index) => `<td data-label="${labels[index] || ""}"><span class="skeleton-line"></span></td>`).join("")}
       </tr>
     `).join("");
   }
@@ -177,6 +178,11 @@ const MirSFlr = (() => {
   function renderTableEmpty(tbody, message) {
     const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 4;
     tbody.innerHTML = `<tr><td colspan="${columns}"><div class="empty-state">${message}</div></td></tr>`;
+  }
+
+  function tableLabels(tbody) {
+    return [...(tbody.closest("table")?.querySelectorAll("thead th") || [])]
+      .map(th => (th.textContent || "").trim());
   }
 
   function formatRelativeTime(date) {
@@ -543,11 +549,32 @@ const MirSFlr = (() => {
     showToast("Copied");
   }
 
+  async function copyFromButton(text, button) {
+    await copy(text);
+    if (!button) return;
+    const originalText = button.textContent;
+    const originalLabel = button.getAttribute("aria-label");
+    button.textContent = "Copied";
+    button.setAttribute("aria-label", "Copied");
+    button.classList.add("copied");
+    clearTimeout(button.copyTimer);
+    button.copyTimer = setTimeout(() => {
+      button.textContent = originalText;
+      if (originalLabel) {
+        button.setAttribute("aria-label", originalLabel);
+      } else {
+        button.removeAttribute("aria-label");
+      }
+      button.classList.remove("copied");
+    }, 1600);
+  }
+
   function renderEpochTable(provider) {
     const history = [...(provider.epochData || [])]
-      .sort((a, b) => Number(b.epoch) - Number(a.epoch))
+      .sort((a, b) => Number(b.epoch) - Number(a.epoch));
     document.querySelectorAll("[data-render='epoch-table']").forEach(tbody => {
       const rows = history.slice(0, tbody.dataset.limit ? Number(tbody.dataset.limit) : 12);
+      const labels = tableLabels(tbody);
       if (!rows.length) {
         renderTableEmpty(tbody, "No FTSO epoch data is available yet.");
         return;
@@ -555,10 +582,10 @@ const MirSFlr = (() => {
 
       tbody.innerHTML = rows.map(item => `
         <tr>
-          <td>${item.epoch ?? "-"}</td>
-          <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
-          <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
-          <td>${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
+          <th scope="row" data-label="${labels[0] || "Epoch"}">${item.epoch ?? "-"}</th>
+          <td data-label="${labels[1] || "Reward"}">${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
+          <td data-label="${labels[2] || "Reward rate"}">${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
+          <td data-label="${labels[3] || "Eligible"}">${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
         </tr>
       `).join("");
     });
@@ -575,16 +602,17 @@ const MirSFlr = (() => {
         return;
       }
 
+      const labels = tableLabels(tbody);
       const fee = node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-";
       tbody.innerHTML = history.map(item => {
         const validatorReward = Number(item.m_dValidatorReward ?? item.m_dNodeReward);
         const nodeReward = Number(item.m_dNodeReward);
         return `
           <tr>
-            <td>${item.m_dRewardEpoch ?? "-"}</td>
-            <td>${Number.isFinite(validatorReward) ? fmtNum(validatorReward, 2) : "-"}</td>
-            <td>${Number.isFinite(nodeReward) ? fmtNum(nodeReward, 2) : "-"}</td>
-            <td>${fee}</td>
+            <th scope="row" data-label="${labels[0] || "Validator epoch"}">${item.m_dRewardEpoch ?? "-"}</th>
+            <td data-label="${labels[1] || "Validator reward"}">${Number.isFinite(validatorReward) ? fmtNum(validatorReward, 2) : "-"}</td>
+            <td data-label="${labels[2] || "Node reward"}">${Number.isFinite(nodeReward) ? fmtNum(nodeReward, 2) : "-"}</td>
+            <td data-label="${labels[3] || "Fee"}">${fee}</td>
           </tr>
         `;
       }).join("");
@@ -759,10 +787,33 @@ const MirSFlr = (() => {
         <code>${value}</code>
         <div class="copy-row">
           <div class="copy-help">${help}</div>
-          <button class="btn ghost" type="button" data-copy="${value}">Copy</button>
+          <button class="btn ghost" type="button" data-copy="${value}" aria-label="Copy ${label}">Copy</button>
         </div>
       </article>
     `).join("");
+  }
+
+  function enhanceTooltips() {
+    document.querySelectorAll(".info-tip").forEach((button, index) => {
+      const tooltip = button.querySelector("span");
+      if (!tooltip) return;
+      const id = tooltip.id || `tooltip-${index + 1}`;
+      tooltip.id = id;
+      tooltip.setAttribute("role", "tooltip");
+      button.setAttribute("aria-describedby", id);
+    });
+  }
+
+  function enhanceCopyButtons() {
+    document.querySelectorAll("[data-copy]").forEach(button => {
+      if (button.hasAttribute("aria-label")) return;
+      const key = button.getAttribute("data-copy");
+      const label = key === "delegation" ? "delegation address"
+        : key === "identity" ? "provider identity"
+        : key === "email" ? "email address"
+        : "value";
+      button.setAttribute("aria-label", `Copy ${label}`);
+    });
   }
 
   function applyData(provider, latest) {
@@ -964,7 +1015,7 @@ const MirSFlr = (() => {
         : key === "identity" ? (providerData?.voterAddress || TARGET_VOTER)
         : key === "email" ? CONTACT_EMAIL
         : key;
-      copy(value);
+      copyFromButton(value, btn);
     });
 
     document.addEventListener("click", event => {
@@ -987,6 +1038,8 @@ const MirSFlr = (() => {
 
   function init() {
     bindCopy();
+    enhanceTooltips();
+    enhanceCopyButtons();
     restoreCurrencyPreference();
     setLoadingState();
     load();
