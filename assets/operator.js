@@ -21,6 +21,8 @@ const MirSFlr = (() => {
   let prices = { USD: null, EUR: null };
   let activePriceCurrency = "USD";
   let monthlyRewards = { ftso: null, validator: null };
+  let lastUpdatedSet = false;
+  const RETRY_MESSAGE = "Could not load live data. Try again, or use the verification links while the API catches up.";
 
   function fmtNum(value, decimals = 2) {
     const n = Number(value);
@@ -69,7 +71,72 @@ const MirSFlr = (() => {
   function setText(key, value) {
     document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
       el.textContent = value;
+      el.classList.remove("skeleton-value");
+      el.removeAttribute("aria-busy");
     });
+  }
+
+  function setLoadingState() {
+    document.querySelectorAll("[data-field]").forEach(el => {
+      const raw = (el.textContent || "").trim();
+      if (raw && raw !== "-" && raw.toLowerCase() !== "loading") return;
+      el.classList.add("skeleton-value");
+      el.setAttribute("aria-busy", "true");
+      if (!raw || raw === "-") el.textContent = "Loading";
+    });
+
+    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table']").forEach(tbody => {
+      renderTableLoading(tbody);
+    });
+  }
+
+  function clearLiveErrors() {
+    document.querySelectorAll("[data-error]").forEach(el => {
+      el.classList.remove("live-error");
+      el.textContent = "";
+    });
+  }
+
+  function showLiveError(message = RETRY_MESSAGE) {
+    document.querySelectorAll("[data-error]").forEach(el => {
+      el.classList.add("live-error");
+      el.innerHTML = `<span>${message}</span><button class="btn ghost retry-btn" type="button" data-retry-live>Retry</button>`;
+    });
+  }
+
+  function renderTableLoading(tbody) {
+    const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 4;
+    tbody.innerHTML = Array.from({ length: 4 }, () => `
+      <tr class="table-loading-row">
+        ${Array.from({ length: columns }, () => '<td><span class="skeleton-line"></span></td>').join("")}
+      </tr>
+    `).join("");
+  }
+
+  function renderTableEmpty(tbody, message) {
+    const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 4;
+    tbody.innerHTML = `<tr><td colspan="${columns}"><div class="empty-state">${message}</div></td></tr>`;
+  }
+
+  function formatRelativeTime(date) {
+    const ts = date instanceof Date ? date.getTime() : new Date(date).getTime();
+    if (!Number.isFinite(ts)) return "-";
+    const diffSeconds = Math.round((ts - Date.now()) / 1000);
+    const divisions = [
+      ["year", 60 * 60 * 24 * 365],
+      ["month", 60 * 60 * 24 * 30],
+      ["day", 60 * 60 * 24],
+      ["hour", 60 * 60],
+      ["minute", 60],
+      ["second", 1]
+    ];
+    const formatter = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    for (const [unit, seconds] of divisions) {
+      if (Math.abs(diffSeconds) >= seconds || unit === "second") {
+        return formatter.format(Math.round(diffSeconds / seconds), unit);
+      }
+    }
+    return "-";
   }
 
   function setPriceDisplay(currency = activePriceCurrency) {
@@ -413,20 +480,24 @@ const MirSFlr = (() => {
   }
 
   function renderEpochTable(provider) {
-    const tbody = document.querySelector("[data-render='epoch-table']");
-    if (!tbody) return;
     const history = [...(provider.epochData || [])]
       .sort((a, b) => Number(b.epoch) - Number(a.epoch))
-      .slice(0, tbody.dataset.limit ? Number(tbody.dataset.limit) : 12);
+    document.querySelectorAll("[data-render='epoch-table']").forEach(tbody => {
+      const rows = history.slice(0, tbody.dataset.limit ? Number(tbody.dataset.limit) : 12);
+      if (!rows.length) {
+        renderTableEmpty(tbody, "No FTSO epoch data is available yet.");
+        return;
+      }
 
-    tbody.innerHTML = history.map(item => `
-      <tr>
-        <td>${item.epoch ?? "-"}</td>
-        <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
-        <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
-        <td>${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
-      </tr>
-    `).join("");
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td>${item.epoch ?? "-"}</td>
+          <td>${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
+          <td>${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
+          <td>${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
+        </tr>
+      `).join("");
+    });
   }
 
   function renderValidatorEpochTable(node) {
@@ -436,7 +507,7 @@ const MirSFlr = (() => {
         .slice(0, tbody.dataset.limit ? Number(tbody.dataset.limit) : 10);
 
       if (!history.length) {
-        tbody.innerHTML = '<tr><td colspan="4">Validator reward history unavailable.</td></tr>';
+        renderTableEmpty(tbody, "Validator reward history is not available yet.");
         return;
       }
 
@@ -469,6 +540,7 @@ const MirSFlr = (() => {
 
     if (!series.length) {
       svg.innerHTML = `<text x="40" y="40" fill="#b8c1bd" font-size="16" font-weight="700">${emptyMessage}</text>`;
+      if (summary) summary.innerHTML = `<span class="empty-state">${emptyMessage}</span>`;
       return;
     }
 
@@ -739,7 +811,8 @@ const MirSFlr = (() => {
     const wrapped = findProviderV2Data(data);
     if (!wrapped) return;
     if (wrapped.m_xTimestamp) {
-      setText("lastUpdated", new Date(wrapped.m_xTimestamp).toLocaleString());
+      setText("lastUpdated", formatRelativeTime(wrapped.m_xTimestamp));
+      lastUpdatedSet = true;
     }
     const usd = Number(wrapped.m_xCurrencyUSDInfo?.m_dValue);
     const eur = Number(wrapped.m_xCurrencyEURInfo?.m_dValue);
@@ -792,11 +865,11 @@ const MirSFlr = (() => {
       providerData = provider;
       latestData = latestEpoch(provider);
       applyData(providerData, latestData);
+      if (!lastUpdatedSet) setText("lastUpdated", formatRelativeTime(new Date()));
+      clearLiveErrors();
     } catch (error) {
       setText("status", "Delayed");
-      document.querySelectorAll("[data-error]").forEach(el => {
-        el.textContent = "Live data is temporarily unavailable. Verification links and addresses remain available.";
-      });
+      showLiveError();
     }
   }
 
@@ -809,6 +882,9 @@ const MirSFlr = (() => {
       applyValidatorData(validatorData);
     } catch (_) {
       setText("validatorConnected", "Delayed");
+      document.querySelectorAll("[data-render='validator-epoch-table']").forEach(tbody => {
+        renderTableEmpty(tbody, "Validator reward history could not be loaded.");
+      });
     }
   }
 
@@ -841,6 +917,17 @@ const MirSFlr = (() => {
     });
 
     document.addEventListener("click", event => {
+      const btn = event.target.closest("[data-retry-live]");
+      if (!btn) return;
+      clearLiveErrors();
+      setLoadingState();
+      load();
+      loadValidator();
+      loadFtsoExplorer();
+      loadPrice();
+    });
+
+    document.addEventListener("click", event => {
       const btn = event.target.closest("[data-price-currency]");
       if (!btn) return;
       setPriceDisplay(btn.getAttribute("data-price-currency") || "USD");
@@ -849,6 +936,7 @@ const MirSFlr = (() => {
 
   function init() {
     bindCopy();
+    setLoadingState();
     load();
     loadValidator();
     loadFtsoExplorer();
