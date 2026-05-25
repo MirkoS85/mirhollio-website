@@ -4,6 +4,14 @@ const MirSFlr = (() => {
   const PROVIDERS_V2_URL = "https://api.oracle-daemon.com/v2/flare/providers";
   const FLR_PRICE_URL = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
+  const CACHE_PREFIX = "mirsflr_cache_";
+  const CURRENCY_KEY = "mirsflr_currency";
+  const CACHE_TTLS = {
+    provider: 60_000,
+    validator: 90_000,
+    explorer: 90_000,
+    price: 5 * 60_000
+  };
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
   const FTSO_EXPLORER_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER}/ftso`;
   const FTSO_UPTIME_SNAPSHOT = [
@@ -19,7 +27,7 @@ const MirSFlr = (() => {
   let latestData = null;
   let ftsoExplorerData = null;
   let prices = { USD: null, EUR: null };
-  let activePriceCurrency = "USD";
+  let activePriceCurrency = "EUR";
   let monthlyRewards = { ftso: null, validator: null };
   let lastUpdatedSet = false;
   const RETRY_MESSAGE = "Could not load live data. Try again, or use the verification links while the API catches up.";
@@ -74,6 +82,59 @@ const MirSFlr = (() => {
       el.classList.remove("skeleton-value");
       el.removeAttribute("aria-busy");
     });
+  }
+
+  function getStorage(name) {
+    try {
+      return window[name] || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function storageGet(storage, key) {
+    if (!storage) return null;
+    try {
+      return storage.getItem(key);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function storageSet(storage, key, value) {
+    if (!storage) return;
+    try {
+      storage.setItem(key, value);
+    } catch (_) {}
+  }
+
+  function normalizeCurrency(currency) {
+    return currency === "USD" ? "USD" : "EUR";
+  }
+
+  function restoreCurrencyPreference() {
+    activePriceCurrency = normalizeCurrency(storageGet(getStorage("localStorage"), CURRENCY_KEY) || "EUR");
+    document.querySelectorAll("[data-price-currency]").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-price-currency") === activePriceCurrency);
+    });
+  }
+
+  async function fetchJsonWithCache(url, ttlMs = 60_000) {
+    const key = `${CACHE_PREFIX}${url}`;
+    const cache = getStorage("sessionStorage");
+    const cached = storageGet(cache, key);
+    if (cached) {
+      try {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - Number(ts) < ttlMs) return data;
+      } catch (_) {}
+    }
+
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) throw new Error(`Request failed: ${url}`);
+    const data = await res.json();
+    storageSet(cache, key, JSON.stringify({ data, ts: Date.now() }));
+    return data;
   }
 
   function setLoadingState() {
@@ -139,16 +200,19 @@ const MirSFlr = (() => {
     return "-";
   }
 
-  function setPriceDisplay(currency = activePriceCurrency) {
-    activePriceCurrency = currency;
-    const value = prices[currency];
-    const prefix = currency === "EUR" ? "€" : "$";
+  function setPriceDisplay(currency = activePriceCurrency, options = {}) {
+    activePriceCurrency = normalizeCurrency(currency);
+    if (options.persist !== false) {
+      storageSet(getStorage("localStorage"), CURRENCY_KEY, activePriceCurrency);
+    }
+    const value = prices[activePriceCurrency];
+    const prefix = activePriceCurrency === "EUR" ? "€" : "$";
     setText("flrPrice", Number.isFinite(value) ? `${prefix}${value.toFixed(6)}` : "-");
     setText("flrUsd", Number.isFinite(prices.USD) ? `$${prices.USD.toFixed(6)}` : "-");
-    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso, currency));
-    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator, currency));
+    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso, activePriceCurrency));
+    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator, activePriceCurrency));
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
-      btn.classList.toggle("active", btn.getAttribute("data-price-currency") === currency);
+      btn.classList.toggle("active", btn.getAttribute("data-price-currency") === activePriceCurrency);
     });
     if (providerData) renderRewardChart(providerData);
     if (validatorData) renderValidatorRewardChart(Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null);
@@ -824,17 +888,15 @@ const MirSFlr = (() => {
   async function loadPrice() {
     try {
       const [usdRes, eurRes] = await Promise.allSettled([
-        fetch(FLR_PRICE_URL, { mode: "cors" }),
-        fetch(FLR_PRICE_EUR_URL, { mode: "cors" })
+        fetchJsonWithCache(FLR_PRICE_URL, CACHE_TTLS.price),
+        fetchJsonWithCache(FLR_PRICE_EUR_URL, CACHE_TTLS.price)
       ]);
-      if (usdRes.status === "fulfilled" && usdRes.value.ok) {
-        const data = await usdRes.value.json();
-        const price = Number(data?.data?.amount);
+      if (usdRes.status === "fulfilled") {
+        const price = Number(usdRes.value?.data?.amount);
         if (Number.isFinite(price)) prices.USD = price;
       }
-      if (eurRes.status === "fulfilled" && eurRes.value.ok) {
-        const data = await eurRes.value.json();
-        const price = Number(data?.data?.amount);
+      if (eurRes.status === "fulfilled") {
+        const price = Number(eurRes.value?.data?.amount);
         if (Number.isFinite(price)) prices.EUR = price;
       }
       setPriceDisplay(activePriceCurrency);
@@ -847,18 +909,13 @@ const MirSFlr = (() => {
     try {
       let provider = null;
       try {
-        const v2Res = await fetch(PROVIDERS_V2_URL, { mode: "cors" });
-        if (v2Res.ok) {
-          const v2Data = await v2Res.json();
-          applyProviderV2Data(v2Data);
-          provider = findProviderDeep(v2Data);
-        }
+        const v2Data = await fetchJsonWithCache(PROVIDERS_V2_URL, CACHE_TTLS.provider);
+        applyProviderV2Data(v2Data);
+        provider = findProviderDeep(v2Data);
       } catch (_) {}
 
       if (!provider) {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("API request failed");
-        provider = findProviderDeep(await res.json());
+        provider = findProviderDeep(await fetchJsonWithCache(API_URL, CACHE_TTLS.provider));
       }
 
       if (!provider) throw new Error("MirSFlr provider not found");
@@ -875,9 +932,7 @@ const MirSFlr = (() => {
 
   async function loadValidator() {
     try {
-      const res = await fetch(VALIDATORS_URL, { mode: "cors" });
-      if (!res.ok) throw new Error("Validator request failed");
-      const data = await res.json();
+      const data = await fetchJsonWithCache(VALIDATORS_URL, CACHE_TTLS.validator);
       validatorData = findValidatorDeep(data);
       applyValidatorData(validatorData);
     } catch (_) {
@@ -890,17 +945,13 @@ const MirSFlr = (() => {
 
   async function loadFtsoExplorer() {
     try {
-      const res = await fetch(FTSO_EXPLORER_URL, { mode: "cors" });
-      if (!res.ok) throw new Error("FTSO Explorer request failed");
-      applyFtsoExplorerData(await res.json());
+      applyFtsoExplorerData(await fetchJsonWithCache(FTSO_EXPLORER_URL, CACHE_TTLS.explorer));
     } catch (_) {}
   }
 
   async function loadProviderV2() {
     try {
-      const res = await fetch(PROVIDERS_V2_URL, { mode: "cors" });
-      if (!res.ok) throw new Error("Provider v2 request failed");
-      applyProviderV2Data(await res.json());
+      applyProviderV2Data(await fetchJsonWithCache(PROVIDERS_V2_URL, CACHE_TTLS.provider));
     } catch (_) {}
   }
 
@@ -930,12 +981,13 @@ const MirSFlr = (() => {
     document.addEventListener("click", event => {
       const btn = event.target.closest("[data-price-currency]");
       if (!btn) return;
-      setPriceDisplay(btn.getAttribute("data-price-currency") || "USD");
+      setPriceDisplay(btn.getAttribute("data-price-currency") || "EUR");
     });
   }
 
   function init() {
     bindCopy();
+    restoreCurrencyPreference();
     setLoadingState();
     load();
     loadValidator();

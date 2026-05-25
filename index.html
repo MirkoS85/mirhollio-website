@@ -6,6 +6,12 @@
   <title>MirSFlr — Flare Validator & FTSO Provider</title>
   <meta name="description" content="MirSFlr runs Flare validator and FTSO infrastructure with live metrics, verified addresses, and delegation guidance." />
   <meta name="theme-color" content="#d93f84" />
+  <link rel="preconnect" href="https://api.oracle-daemon.com">
+  <link rel="dns-prefetch" href="//api.oracle-daemon.com">
+  <link rel="preconnect" href="https://api.coinbase.com">
+  <link rel="dns-prefetch" href="//api.coinbase.com">
+  <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MirSFlr" />
@@ -71,7 +77,7 @@
         <div class="inner">
           <div class="section-title">
             <h2>Live panels.</h2>
-            <div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn active" type="button" data-price-currency="USD">USD</button><button class="toggle-btn" type="button" data-price-currency="EUR">EUR</button></div></div></div>
+            <div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn" type="button" data-price-currency="USD">USD</button><button class="toggle-btn active" type="button" data-price-currency="EUR">EUR</button></div></div></div>
           </div>
           <div class="role-choice-grid">
             <article class="card role-choice role-choice-ftso">
@@ -166,7 +172,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=epoch-panels-1"></script>
+  <script src="assets/operator.js?v=cache-currency-1"></script>
   <script src="assets/live-refresh.js?v=epoch-panels-1"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
