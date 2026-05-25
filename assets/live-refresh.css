@@ -1089,11 +1089,15 @@ table{
 }
 
 caption{
-  padding:14px 16px 0;
-  color:#7a6b74;
-  font-size:13px;
-  font-weight:850;
-  text-align:left;
+  position:absolute;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  white-space:nowrap;
+  border:0;
 }
 
 .ftso-epoch-table,
@@ -1516,10 +1520,6 @@ tbody tr:hover td{
     min-width:0;
     width:100%;
     background:transparent;
-  }
-
-  table caption{
-    padding:0 2px 12px;
   }
 
   table thead{
