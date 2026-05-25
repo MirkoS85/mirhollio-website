@@ -30,6 +30,37 @@ body{
   color:var(--text);
 }
 
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{
+    navigation:auto;
+  }
+
+  ::view-transition-old(root){
+    animation:mirs-page-out .16s ease both;
+  }
+
+  ::view-transition-new(root){
+    animation:mirs-page-in .22s ease both;
+  }
+
+  body.page-leaving .mobile-top,
+  body.page-leaving .site-shell{
+    opacity:.01;
+    transform:translateY(4px);
+    transition:opacity .14s ease, transform .14s ease;
+  }
+}
+
+@keyframes mirs-page-out{
+  from{opacity:1; transform:none}
+  to{opacity:.01; transform:translateY(4px)}
+}
+
+@keyframes mirs-page-in{
+  from{opacity:.01; transform:translateY(6px)}
+  to{opacity:1; transform:none}
+}
+
 body::before,
 body::after{
   content:"";

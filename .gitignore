@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Local design previews and generated review artifacts
+/previews/
+/previews-minimal/
+/previews-pink/
+/previews-soft/
+/preview-final/
+/preview-shots/
+/previews-live-v*/
+/operator-mobile-preview/
+/brand-directions/
+/design-refresh-analysis.md
+
+# Generated preview assets
+/assets/live-preview-final.css
+/assets/live-preview-final.js
+/previews-live/render/
+/previews-live/render-shots/
+/previews-live/preview-v*.css
+/previews-live/preview-v*.js
