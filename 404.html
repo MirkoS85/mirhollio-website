@@ -4,64 +4,169 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Page not found - MirSFlr</title>
+  <meta name="description" content="The MirSFlr page you requested could not be found. Continue to live stats, epoch history, verified addresses, or performance history." />
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#0b1220" />
+  <meta name="theme-color" content="#d93f84" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/logo.png">
+  <link rel="manifest" href="/app.webmanifest">
   <style>
     :root{
-      --bg:#070b14;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --panel:rgba(255,255,255,.06);
-      --border:rgba(255,255,255,.12);
-      --brand:#7c5cff;
-      --brand2:#23d5ff;
+      --bg:#f4dbe7;
+      --surface:#fff8fb;
+      --paper:#fffafd;
+      --text:#211a1f;
+      --ink:#271f24;
+      --muted:#75656e;
+      --line:rgba(128,88,109,.15);
+      --pink:#d93f84;
+      --pink-dark:#bf2f72;
+      --pink-soft:#f8dde9;
+      --green:#18a36f;
     }
 
     *{box-sizing:border-box}
 
-    html,body{margin:0; min-height:100%; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif}
+    html,
+    body{
+      margin:0;
+      min-height:100%;
+      color:var(--text);
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0) 34%),
+        linear-gradient(135deg, #fff8fb 0%, #f7e4ed 46%, #efccd9 100%);
+    }
 
     body{
+      min-height:100vh;
       display:grid;
       place-items:center;
-      padding:28px;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(124,92,255,.22), transparent 32%),
-        radial-gradient(circle at 80% 0%, rgba(35,213,255,.16), transparent 28%),
-        var(--bg);
+      padding:24px;
     }
 
     main{
-      width:min(720px, 100%);
-      padding:30px;
-      border:1px solid var(--border);
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.035));
-      box-shadow:0 18px 60px rgba(0,0,0,.38);
+      width:min(760px, 100%);
+      padding:clamp(24px, 5vw, 48px);
+      border:1px solid rgba(255,255,255,.72);
+      border-radius:28px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,248,251,.78)),
+        var(--surface);
+      box-shadow:0 28px 80px rgba(123,61,90,.14);
     }
 
-    .brand{display:flex; align-items:center; gap:12px; color:var(--text); text-decoration:none; font-weight:900}
-    .brand img{width:42px; height:42px; border-radius:10px}
-    h1{margin:28px 0 12px; font-size:clamp(34px, 7vw, 60px); line-height:1; letter-spacing:-.04em}
-    p{margin:0; color:var(--muted); line-height:1.7; font-size:17px}
-    .actions{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px}
+    .brand{
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      color:var(--ink);
+      text-decoration:none;
+      font-size:18px;
+      font-weight:950;
+      letter-spacing:0;
+    }
+
+    .brand img{
+      width:44px;
+      height:44px;
+      border-radius:12px;
+      box-shadow:0 12px 28px rgba(118,62,88,.14);
+    }
+
+    .status{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      margin-top:34px;
+      min-height:34px;
+      padding:8px 12px;
+      border:1px solid rgba(24,163,111,.18);
+      border-radius:999px;
+      color:#0d7e55;
+      background:rgba(24,163,111,.08);
+      font-size:14px;
+      font-weight:850;
+    }
+
+    .status::before{
+      content:"";
+      width:9px;
+      height:9px;
+      border-radius:999px;
+      background:var(--green);
+      box-shadow:0 0 0 6px rgba(24,163,111,.1);
+    }
+
+    h1{
+      margin:18px 0 14px;
+      color:var(--ink);
+      font-size:clamp(42px, 11vw, 76px);
+      line-height:.96;
+      letter-spacing:0;
+    }
+
+    p{
+      max-width:58ch;
+      margin:0;
+      color:var(--muted);
+      font-size:18px;
+      line-height:1.65;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:28px;
+    }
+
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:42px;
-      padding:10px 14px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:rgba(255,255,255,.07);
-      color:var(--text);
+      min-height:48px;
+      padding:12px 18px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      color:#31262d;
+      background:rgba(255,255,255,.78);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.84);
       text-decoration:none;
-      font-weight:800;
+      font-size:15px;
+      font-weight:860;
+      letter-spacing:0;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
     }
-    .btn.primary{border-color:rgba(124,92,255,.5); background:linear-gradient(135deg, rgba(124,92,255,.25), rgba(35,213,255,.14))}
+
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(217,63,132,.28);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.86), 0 12px 28px rgba(123,61,90,.11);
+    }
+
+    .btn:focus-visible{
+      outline:3px solid rgba(217,63,132,.32);
+      outline-offset:3px;
+    }
+
+    .btn.primary{
+      color:#fff8fb;
+      border-color:#cf5f93;
+      background:linear-gradient(180deg, #dc6f9e 0%, var(--pink) 100%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.18), 0 14px 30px rgba(217,63,132,.2);
+    }
+
+    @media (max-width:560px){
+      body{padding:16px}
+      main{border-radius:22px}
+      .actions{display:grid}
+      .btn{width:100%}
+    }
   </style>
 </head>
 <body>
@@ -70,11 +175,13 @@
       <img src="/logo.png" alt="MirSFlr logo">
       <span>MirSFlr</span>
     </a>
+    <div class="status">Main pages are online</div>
     <h1>Page not found.</h1>
-    <p>The address may have moved, or the link may be outdated. Use the verified MirSFlr pages below.</p>
-    <div class="actions">
+    <p>The address may have moved, or the link may be outdated. Continue with the verified MirSFlr pages below.</p>
+    <div class="actions" aria-label="MirSFlr pages">
       <a class="btn primary" href="/">Home</a>
       <a class="btn" href="/stats/">Stats</a>
+      <a class="btn" href="/epochs/">Epochs</a>
       <a class="btn" href="/addresses/">Addresses</a>
       <a class="btn" href="/performance/">Performance</a>
     </div>
