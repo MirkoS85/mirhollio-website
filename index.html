@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=page-transitions-1" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=delegation-details-2" />
 </head>
 <body>
   <div class="mobile-top">
@@ -161,6 +161,44 @@
                 <article class="card compact-stat"><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator fee before comparing APR.</p></article>
                 <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
+                <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
+              </div>
+              <article class="card panel-wide-card delegation-summary-card">
+                <div class="panel-head">
+                  <strong>Delegation summary</strong>
+                  <button class="btn ghost detail-toggle" type="button" data-panel-toggle="delegation-details-panel" data-open-label="Open delegation details" data-close-label="Hide delegation details" aria-controls="delegation-details-panel" aria-expanded="false">Open delegation details</button>
+                </div>
+                <div class="delegator-summary">
+                  <span>Total delegators <strong data-field="validatorDelegatorCount">-</strong></span>
+                  <span>Total delegation <strong data-field="validatorDelegatorTotal">-</strong></span>
+                  <span>New (last 5 days) <strong data-field="validatorDelegatorNew">-</strong></span>
+                  <span>Ending (next 5 days) <strong data-field="validatorDelegatorEnding">-</strong></span>
+                </div>
+              </article>
+              <div class="validator-panel delegator-panel" id="delegation-details-panel" data-accordion-panel hidden>
+                <div class="panel-head">
+                  <strong>Delegation details</strong>
+                  <span class="mini-label">Current validator stake</span>
+                </div>
+                <div class="table-wrap table-wrap-compact">
+                  <table class="delegator-table">
+                    <caption>Current validator delegators</caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Share</th>
+                        <th scope="col">Start</th>
+                        <th scope="col">End</th>
+                        <th scope="col">Time left</th>
+                      </tr>
+                    </thead>
+                    <tbody data-render="validator-delegator-table">
+                      <tr><td colspan="7">Loading...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
               <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
               <div class="chart-panel">
@@ -215,7 +253,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=seo-social-1"></script>
+  <script src="assets/operator.js?v=validator-delegators-3"></script>
   <script src="assets/live-refresh.js?v=page-transitions-1"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>

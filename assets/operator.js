@@ -146,7 +146,7 @@ const MirSFlr = (() => {
       if (!raw || raw === "-") el.textContent = "Loading";
     });
 
-    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table']").forEach(tbody => {
+    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table'], [data-render='validator-delegator-table']").forEach(tbody => {
       renderTableLoading(tbody);
     });
   }
@@ -204,6 +204,12 @@ const MirSFlr = (() => {
       }
     }
     return "-";
+  }
+
+  function formatDate(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "-";
+    return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   }
 
   function setPriceDisplay(currency = activePriceCurrency, options = {}) {
@@ -619,6 +625,57 @@ const MirSFlr = (() => {
     });
   }
 
+  function renderValidatorDelegators(node) {
+    const delegators = Array.isArray(node?.m_axDelegation)
+      ? [...node.m_axDelegation].sort((a, b) => Number(b.m_dAmount) - Number(a.m_dAmount))
+      : [];
+    const totalDelegation = delegators.reduce((sum, item) => sum + Number(item.m_dAmount || 0), 0);
+    const now = Date.now();
+    const fiveDays = 5 * 24 * 60 * 60 * 1000;
+    const newDelegators = delegators.filter(item => {
+      const start = new Date(item.m_xTimeStart).getTime();
+      return Number.isFinite(start) && start <= now && start >= now - fiveDays;
+    });
+    const endingDelegators = delegators.filter(item => {
+      const end = new Date(item.m_xTimeEnd).getTime();
+      return Number.isFinite(end) && end >= now && end <= now + fiveDays;
+    });
+    const newAmount = newDelegators.reduce((sum, item) => sum + Number(item.m_dAmount || 0), 0);
+    const endingAmount = endingDelegators.reduce((sum, item) => sum + Number(item.m_dAmount || 0), 0);
+
+    setText("validatorDelegatorCount", fmtNum(delegators.length, 0));
+    setText("validatorDelegatorTotal", fmtCompact(totalDelegation, " FLR"));
+    setText("validatorDelegatorNew", `${fmtNum(newDelegators.length, 0)} / ${fmtCompact(newAmount, " FLR")}`);
+    setText("validatorDelegatorEnding", `${fmtNum(endingDelegators.length, 0)} / ${fmtCompact(endingAmount, " FLR")}`);
+
+    document.querySelectorAll("[data-render='validator-delegator-table']").forEach(tbody => {
+      if (!delegators.length) {
+        renderTableEmpty(tbody, "No validator delegators are visible yet.");
+        return;
+      }
+
+      const labels = tableLabels(tbody);
+      tbody.innerHTML = delegators.map((item, index) => {
+        const amount = Number(item.m_dAmount);
+        const share = totalDelegation > 0 && Number.isFinite(amount) ? (amount / totalDelegation) * 100 : null;
+        const timeLeft = Array.isArray(item.m_aiTimeLeftDHM)
+          ? `${item.m_aiTimeLeftDHM[0]}d ${item.m_aiTimeLeftDHM[1]}h`
+          : "-";
+        return `
+          <tr>
+            <th scope="row" data-label="${labels[0] || "#"}">${index + 1}</th>
+            <td data-label="${labels[1] || "Address"}"><span class="delegator-address">${shortAddr(item.m_sAddressP_Bech32 || item.m_sAddressP || item.m_sAddressC)}</span></td>
+            <td data-label="${labels[2] || "Amount"}">${Number.isFinite(amount) ? fmtNum(amount, 0) : "-"}</td>
+            <td data-label="${labels[3] || "Share"}">${Number.isFinite(share) ? `${fmtNum(share, 1)}%` : "-"}</td>
+            <td data-label="${labels[4] || "Start"}">${formatDate(item.m_xTimeStart)}</td>
+            <td data-label="${labels[5] || "End"}">${formatDate(item.m_xTimeEnd)}</td>
+            <td data-label="${labels[6] || "Time left"}">${timeLeft}</td>
+          </tr>
+        `;
+      }).join("");
+    });
+  }
+
   function rewardWithFiat(value) {
     return `${fmtNum(value, 2)} FLR<br><small>${fmtFiat(value)}</small>`;
   }
@@ -895,7 +952,8 @@ const MirSFlr = (() => {
     setText("validatorUptimeAvg", Number.isFinite(uptimeAvg) ? `${fmtNum(uptimeAvg, 2)}%` : "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
-    monthlyRewards.validator = Number.isFinite(Number(node?.m_dMonthlyReward)) ? Number(node.m_dMonthlyReward) : estimateValidatorMonthlyReward(node);
+    setText("validatorNodeVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "") : "-");
+    monthlyRewards.validator = estimateValidatorMonthlyReward(node);
     renderMonthlyRewards();
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
     setText("validatorTotal", validator.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
@@ -912,6 +970,7 @@ const MirSFlr = (() => {
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
     if (!recentFtsoAvailability().length) renderUptime(uptimeValues);
+    renderValidatorDelegators(node);
     renderValidatorEpochTable(node);
     renderValidatorRewardChart(node);
   }

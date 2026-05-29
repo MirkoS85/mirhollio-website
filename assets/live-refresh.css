@@ -915,8 +915,75 @@ h1{
   padding:16px 18px;
 }
 
+.delegation-summary-card{
+  min-height:0;
+  padding:0;
+}
+
+.delegation-summary-card .panel-head{
+  margin:0;
+  border-radius:22px 22px 0 0;
+}
+
 .panel-wide-card .uptime-pills{
   margin-top:14px;
+}
+
+.delegator-panel{
+  margin-top:12px;
+  overflow:hidden;
+}
+
+.delegator-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  padding:16px;
+}
+
+.delegator-summary span{
+  display:grid;
+  gap:3px;
+  min-height:62px;
+  align-content:center;
+  padding:10px 12px;
+  border:1px solid rgba(137,96,116,.12);
+  border-radius:16px;
+  background:rgba(255,255,255,.62);
+  color:#7a6b74;
+  font-size:13px;
+  font-weight:760;
+}
+
+.delegator-summary strong{
+  color:var(--ink);
+  font-size:18px;
+  letter-spacing:0;
+}
+
+.delegator-summary .metric-unit{
+  display:inline;
+  margin-top:0;
+  margin-left:.22em;
+}
+
+.delegator-table{
+  min-width:980px;
+  width:100%;
+}
+
+.delegator-address{
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color:#8c2d5b;
+  font-size:13px;
+  font-weight:850;
+}
+
+.detail-toggle{
+  min-height:40px;
+  padding:8px 12px;
+  border-radius:12px;
+  font-size:13px;
 }
 
 .compare-grid{
@@ -1140,7 +1207,8 @@ caption{
 }
 
 .ftso-epoch-table,
-.validator-epoch-table{
+.validator-epoch-table,
+.delegator-table{
   width:100%;
 }
 
@@ -1453,7 +1521,8 @@ tbody tr:hover td{
   }
 
   .panel-mini-grid,
-  .split-metrics{
+  .split-metrics,
+  .delegator-summary{
     grid-template-columns:1fr;
   }
 
@@ -1466,6 +1535,10 @@ tbody tr:hover td{
 
   .panel-head{
     padding:14px 16px;
+  }
+
+  .delegator-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
   .metric-grid{
@@ -1594,7 +1667,9 @@ tbody tr:hover td{
   .ftso-epoch-table th,
   .ftso-epoch-table td,
   .validator-epoch-table th,
-  .validator-epoch-table td{
+  .validator-epoch-table td,
+  .delegator-table th,
+  .delegator-table td{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -1690,7 +1765,9 @@ tbody tr:hover td{
   .ftso-epoch-table th,
   .ftso-epoch-table td,
   .validator-epoch-table th,
-  .validator-epoch-table td{
+  .validator-epoch-table td,
+  .delegator-table th,
+  .delegator-table td{
     padding:9px 0;
     font-size:13px;
   }
