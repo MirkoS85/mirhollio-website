@@ -415,6 +415,8 @@ h1{
 }
 
 .role-choice{
+  min-width:0;
+  max-width:100%;
   min-height:0;
   display:flex;
   flex-direction:column;
@@ -444,6 +446,8 @@ h1{
 }
 
 .role-choice .split-panel{
+  min-width:0;
+  max-width:calc(100% + 48px);
   margin:10px -24px 0;
   padding:22px 24px 24px;
   border:0;
@@ -607,12 +611,15 @@ h1{
 }
 
 .panel-head{
+  min-width:0;
+  flex-wrap:wrap;
   padding:16px 18px;
   border-bottom-color:var(--line);
   background:linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,0));
 }
 
 .panel-head strong{
+  min-width:0;
   font-size:16px;
   letter-spacing:-.02em;
 }
@@ -832,10 +839,14 @@ h1{
 }
 
 .validator-panel{
+  min-width:0;
+  max-width:100%;
   padding:28px;
 }
 
 .split-panel{
+  min-width:0;
+  max-width:100%;
   display:flex;
   flex-direction:column;
   gap:14px;
@@ -911,6 +922,8 @@ h1{
 }
 
 .panel-wide-card{
+  min-width:0;
+  max-width:100%;
   min-height:0;
   padding:16px 18px;
 }
@@ -930,11 +943,14 @@ h1{
 }
 
 .delegator-panel{
+  min-width:0;
+  max-width:100%;
   margin-top:12px;
   overflow:hidden;
 }
 
 .delegator-summary{
+  min-width:0;
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:10px;
@@ -980,6 +996,8 @@ h1{
 }
 
 .detail-toggle{
+  flex:0 1 auto;
+  max-width:100%;
   min-height:40px;
   padding:8px 12px;
   border-radius:12px;
@@ -1139,6 +1157,8 @@ table{
 }
 
 .table-wrap{
+  min-width:0;
+  width:100%;
   max-width:100%;
   overflow-x:auto;
   overflow-y:hidden;

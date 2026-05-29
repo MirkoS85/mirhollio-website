@@ -99,8 +99,13 @@
     buttons.forEach(button => {
       button.addEventListener("click", () => {
         const isOpen = button.getAttribute("aria-expanded") === "true";
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
         setPanelState(button, !isOpen);
         history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+        requestAnimationFrame(() => window.scrollTo(scrollX, scrollY));
+        window.setTimeout(() => window.scrollTo(scrollX, scrollY), 80);
+        window.setTimeout(() => window.scrollTo(scrollX, scrollY), 280);
       });
     });
 
