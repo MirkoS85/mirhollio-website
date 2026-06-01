@@ -806,9 +806,10 @@ h1{
 }
 
 .info-tip span{
-  top:auto;
-  bottom:calc(100% + 10px);
-  left:14px;
+  position:fixed;
+  top:var(--tip-top, 16px);
+  bottom:auto;
+  left:var(--tip-left, 16px);
   right:auto;
   transform:none;
   width:min(280px, calc(100vw - 72px));
@@ -823,7 +824,7 @@ h1{
   font-size:12px;
   line-height:1.45;
   text-wrap:pretty;
-  z-index:40;
+  z-index:1000;
 }
 
 .metric,

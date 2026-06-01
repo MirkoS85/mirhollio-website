@@ -76,6 +76,45 @@
     });
   }
 
+  function positionInfoTip(button) {
+    const tooltip = button.querySelector("span");
+    if (!tooltip) return;
+
+    const margin = 16;
+    const gap = 10;
+    const buttonRect = button.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const width = Math.min(tooltipRect.width || 280, window.innerWidth - margin * 2);
+    const height = tooltipRect.height || 120;
+    const preferredLeft = buttonRect.right - width;
+    const left = Math.max(margin, Math.min(preferredLeft, window.innerWidth - width - margin));
+    let top = buttonRect.top - height - gap;
+
+    if (top < margin) top = Math.min(buttonRect.bottom + gap, window.innerHeight - height - margin);
+    top = Math.max(margin, top);
+
+    tooltip.style.setProperty("--tip-left", `${Math.round(left)}px`);
+    tooltip.style.setProperty("--tip-top", `${Math.round(top)}px`);
+  }
+
+  function bindInfoTips() {
+    const buttons = [...document.querySelectorAll(".info-tip")];
+    if (!buttons.length) return;
+
+    buttons.forEach(button => {
+      ["pointerenter", "mouseenter", "focus"].forEach(type => {
+        button.addEventListener(type, () => positionInfoTip(button));
+      });
+    });
+
+    ["scroll", "resize"].forEach(type => {
+      window.addEventListener(type, () => {
+        const active = document.querySelector(".info-tip:hover, .info-tip:focus-visible");
+        if (active) positionInfoTip(active);
+      }, { passive: true });
+    });
+  }
+
   function bindPanelAccordion() {
     const buttons = [...document.querySelectorAll("[data-panel-toggle]")];
     const panels = new Map(
@@ -146,6 +185,7 @@
     tightenLongValues();
     formatPassStrikeValues();
     bindPanelAccordion();
+    bindInfoTips();
     bindPageTransitions();
 
     const observer = new MutationObserver(mutations => {
