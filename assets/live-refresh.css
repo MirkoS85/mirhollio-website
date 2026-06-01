@@ -815,11 +815,11 @@ h1{
 }
 
 .info-tip span{
-  position:fixed;
-  top:var(--tip-top, 16px);
+  position:absolute;
+  top:calc(100% + 10px);
   bottom:auto;
-  left:var(--tip-left, 16px);
-  right:auto;
+  left:auto;
+  right:0;
   transform:none;
   width:min(280px, calc(100vw - 72px));
   max-width:280px;
