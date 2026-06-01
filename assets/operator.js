@@ -13,7 +13,8 @@ const MirSFlr = (() => {
     price: 5 * 60_000
   };
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
-  const FTSO_EXPLORER_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER}/ftso`;
+  const TARGET_VOTER_CHECKSUM = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
+  const FTSO_EXPLORER_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER_CHECKSUM}/ftso`;
   const FTSO_UPTIME_SNAPSHOT = [
     { reward_epoch_id: 392, availability: 1.0 },
     { reward_epoch_id: 393, availability: 0.999702380952381 },
@@ -63,6 +64,12 @@ const MirSFlr = (() => {
     return `${fmtNum(n, 0)}${suffix}`;
   }
 
+  function fmtWeight(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return n.toLocaleString(undefined, { maximumFractionDigits: 3 });
+  }
+
   function fmtChainAmount(value, suffix = " FLR") {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -74,6 +81,10 @@ const MirSFlr = (() => {
     if (!addr) return "-";
     const s = String(addr);
     return `${s.slice(0, 6)}...${s.slice(-4)}`;
+  }
+
+  function isZeroAddress(addr) {
+    return /^0x0{40}$/i.test(String(addr || ""));
   }
 
   function setText(key, value) {
@@ -146,7 +157,7 @@ const MirSFlr = (() => {
       if (!raw || raw === "-") el.textContent = "Loading";
     });
 
-    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table'], [data-render='validator-delegator-table']").forEach(tbody => {
+    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table'], [data-render='validator-delegator-table'], [data-render='entity-address-table']").forEach(tbody => {
       renderTableLoading(tbody);
     });
   }
@@ -850,6 +861,116 @@ const MirSFlr = (() => {
     `).join("");
   }
 
+  function fmtAddressBalance(value) {
+    if (value === null || value === undefined || value === "") return '<span class="balance-empty">-</span>';
+    const n = Number(value);
+    return Number.isFinite(n) ? fmtNum(n, n >= 1000 ? 2 : 4) : '<span class="balance-empty">-</span>';
+  }
+
+  function renderEntityAddresses(provider, validator) {
+    const validatorNode = Array.isArray(validator?.m_axNode) ? validator.m_axNode[0] : null;
+    const fastUpdates = Array.isArray(provider?.fastUpdatesAddresses) ? provider.fastUpdatesAddresses : [];
+    const rows = [];
+
+    function addRow({ scope = "core", role, network = "C-chain", address, flr, wflr = null, purpose }) {
+      if (!address || isZeroAddress(address)) return;
+      rows.push({ scope, role, network, address, flr, wflr, purpose });
+    }
+
+    addRow({
+      role: "Provider identity",
+      address: provider?.voterAddress || TARGET_VOTER,
+      flr: provider?.voterAddressBalance,
+      purpose: "Provider identity used for external verification."
+    });
+    addRow({
+      role: "Delegation address",
+      address: provider?.delegationAddress || TARGET_DELEGATION,
+      flr: provider?.delegationAddressBalance,
+      purpose: "Address shown in wallets for FTSO delegation."
+    });
+    addRow({
+      scope: "technical",
+      role: "Submit address",
+      address: provider?.submitAddress,
+      flr: provider?.submitAddressBalance,
+      purpose: "Operational address for provider submissions."
+    });
+    addRow({
+      scope: "technical",
+      role: "Submit signature",
+      address: provider?.submitSignatureAddress,
+      flr: provider?.submitSignatureAddressBalance,
+      purpose: "Signature address for provider submissions."
+    });
+    addRow({
+      scope: "technical",
+      role: "Signing policy",
+      address: provider?.signingPolicyAddress,
+      flr: provider?.signingPolicyAddressBalance,
+      purpose: "Signing policy address from current provider data."
+    });
+    fastUpdates.forEach((item, index) => addRow({
+      scope: "technical",
+      role: `Fast update ${index + 1}`,
+      address: item.address,
+      flr: item.balance,
+      purpose: "Fast updates operational address."
+    }));
+    addRow({
+      scope: "technical",
+      role: "Validator FTSO C",
+      address: validator?.m_sFtsoAddressC,
+      flr: validator?.m_dTotal,
+      purpose: "Validator entity C-chain address."
+    });
+    addRow({
+      scope: "technical",
+      role: "Validator FTSO P",
+      network: "P-chain",
+      address: validator?.m_sFtsoAddressP_Bech32 || validator?.m_sFtsoAddressP,
+      flr: validator?.m_dTotal,
+      purpose: "Validator entity P-chain address."
+    });
+    addRow({
+      scope: "technical",
+      role: "Validator node",
+      network: "P-chain",
+      address: validatorNode?.m_sAddressP_Bech32 || validatorNode?.m_sAddressP,
+      flr: validatorNode?.m_dStake,
+      purpose: "Node staking address."
+    });
+    addRow({
+      scope: "technical",
+      role: "Node ID",
+      network: "Validator",
+      address: validatorNode?.m_sNodeID,
+      flr: null,
+      purpose: "Public validator node identifier."
+    });
+
+    document.querySelectorAll("[data-render='entity-address-table']").forEach(tbody => {
+      const scope = tbody.getAttribute("data-scope") || "core";
+      const scopedRows = rows.filter(row => row.scope === scope);
+      if (!scopedRows.length) {
+        renderTableEmpty(tbody, scope === "core" ? "No entity address data is available yet." : "No technical address data is available yet.");
+        return;
+      }
+
+      const labels = tableLabels(tbody);
+      tbody.innerHTML = scopedRows.map(row => `
+        <tr>
+          <th scope="row" data-label="${labels[0] || "Role"}">${row.role}</th>
+          <td data-label="${labels[1] || "Network"}">${row.network}</td>
+          <td data-label="${labels[2] || "Address"}"><code>${row.address}</code></td>
+          <td data-label="${labels[3] || "FLR"}">${fmtAddressBalance(row.flr)}</td>
+          <td data-label="${labels[4] || "WFLR"}">${fmtAddressBalance(row.wflr)}</td>
+          <td data-label="${labels[5] || "Purpose"}">${row.purpose}</td>
+        </tr>
+      `).join("");
+    });
+  }
+
   function enhanceTooltips() {
     document.querySelectorAll(".info-tip").forEach((button, index) => {
       const tooltip = button.querySelector("span");
@@ -880,6 +1001,10 @@ const MirSFlr = (() => {
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
     setText("votePower", latest?.m_dTotalWeight != null ? fmtCompact(latest.m_dTotalWeight) : "-");
+    setText("ftsoWeight", latest?.m_dTotalWeight != null ? fmtWeight(latest.m_dTotalWeight) : "-");
+    setText("delegationWeight", latest?.m_dDelegationWeight != null ? fmtWeight(latest.m_dDelegationWeight) : "-");
+    setText("stakeWeight", latest?.m_dStakeWeight != null ? fmtWeight(latest.m_dStakeWeight) : "-");
+    setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
     setText("averageReward", provider.averageRewardPerEpoch != null ? fmtCompact(provider.averageRewardPerEpoch, " FLR") : "-");
     setText("availability", provider.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
@@ -915,6 +1040,7 @@ const MirSFlr = (() => {
     renderConditionPasses(provider, latest);
     renderEpochTable(provider);
     renderAddresses(provider);
+    renderEntityAddresses(provider, validatorData);
     renderRewardChart(provider);
     const ftsoUptime = recentFtsoAvailability();
     if (ftsoUptime.length) {
@@ -970,6 +1096,7 @@ const MirSFlr = (() => {
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
     if (!recentFtsoAvailability().length) renderUptime(uptimeValues);
+    if (providerData) renderEntityAddresses(providerData, validator);
     renderValidatorDelegators(node);
     renderValidatorEpochTable(node);
     renderValidatorRewardChart(node);

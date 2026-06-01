@@ -988,6 +988,35 @@ h1{
   width:100%;
 }
 
+.entity-address-panel{
+  overflow:hidden;
+}
+
+.entity-weight-grid{
+  margin-bottom:14px;
+}
+
+.entity-address-table{
+  min-width:1040px;
+  width:100%;
+}
+
+.entity-address-table code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color:#8c2d5b;
+  font-size:13px;
+  font-weight:850;
+  word-break:break-all;
+}
+
+.balance-empty{
+  color:#9c8b94;
+}
+
+.address-detail-toggle{
+  margin-top:14px;
+}
+
 .delegator-address{
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color:#8c2d5b;
@@ -1228,7 +1257,8 @@ caption{
 
 .ftso-epoch-table,
 .validator-epoch-table,
-.delegator-table{
+.delegator-table,
+.entity-address-table{
   width:100%;
 }
 
@@ -1689,7 +1719,9 @@ tbody tr:hover td{
   .validator-epoch-table th,
   .validator-epoch-table td,
   .delegator-table th,
-  .delegator-table td{
+  .delegator-table td,
+  .entity-address-table th,
+  .entity-address-table td{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -1787,7 +1819,9 @@ tbody tr:hover td{
   .validator-epoch-table th,
   .validator-epoch-table td,
   .delegator-table th,
-  .delegator-table td{
+  .delegator-table td,
+  .entity-address-table th,
+  .entity-address-table td{
     padding:9px 0;
     font-size:13px;
   }
