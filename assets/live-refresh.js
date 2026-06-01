@@ -100,11 +100,28 @@
   function bindInfoTips() {
     const buttons = [...document.querySelectorAll(".info-tip")];
     if (!buttons.length) return;
+    const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+
+    function closeTouchTip(button) {
+      button.classList.remove("info-touch-active");
+      button.blur();
+    }
 
     buttons.forEach(button => {
       ["pointerenter", "mouseenter", "focus"].forEach(type => {
         button.addEventListener(type, () => positionInfoTip(button));
       });
+
+      if (prefersTouch) {
+        button.addEventListener("pointerdown", event => {
+          button.classList.add("info-touch-active");
+          positionInfoTip(button);
+          button.setPointerCapture?.(event.pointerId);
+        });
+        ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
+          button.addEventListener(type, () => closeTouchTip(button));
+        });
+      }
     });
 
     ["scroll", "resize"].forEach(type => {
@@ -113,6 +130,26 @@
         if (active) positionInfoTip(active);
       }, { passive: true });
     });
+  }
+
+  function bindBackToTop() {
+    const button = document.createElement("button");
+    button.className = "back-to-top";
+    button.type = "button";
+    button.setAttribute("aria-label", "Back to top");
+    button.textContent = "Top";
+    document.body.appendChild(button);
+
+    function update() {
+      button.classList.toggle("is-visible", window.scrollY > 520);
+    }
+
+    button.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      button.blur();
+    });
+    window.addEventListener("scroll", update, { passive: true });
+    update();
   }
 
   function bindPanelAccordion() {
@@ -186,6 +223,7 @@
     formatPassStrikeValues();
     bindPanelAccordion();
     bindInfoTips();
+    bindBackToTop();
     bindPageTransitions();
 
     const observer = new MutationObserver(mutations => {

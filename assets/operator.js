@@ -1018,8 +1018,8 @@ const MirSFlr = (() => {
     setText("status", "Online");
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
-    setText("votePower", latest?.m_dTotalWeight != null ? fmtCompact(latest.m_dTotalWeight) : "-");
     if (!ftsoEntityData) {
+      setText("votePower", latest?.m_dTotalWeight != null ? fmtCompact(latest.m_dTotalWeight) : "-");
       setText("ftsoWeight", latest?.m_dTotalWeight != null ? fmtWeight(latest.m_dTotalWeight) : "-");
       setText("delegationWeight", latest?.m_dDelegationWeight != null ? fmtWeight(latest.m_dDelegationWeight) : "-");
       setText("stakeWeight", latest?.m_dStakeWeight != null ? fmtWeight(latest.m_dStakeWeight) : "-");
@@ -1137,6 +1137,7 @@ const MirSFlr = (() => {
     const fee = policy.delegation_fee_bips;
 
     setText("ftsoWeight", totalWeight != null ? fmtWeight(totalWeight) : "-");
+    setText("votePower", totalWeight != null ? fmtWeight(totalWeight) : "-");
     setText("delegationWeight", delegatedWeight != null ? fmtWeight(delegatedWeight) : "-");
     setText("stakeWeight", stakingWeight != null ? fmtWeight(stakingWeight) : "-");
     if (fee != null) setText("ftsoFee", `${fmtNum(Number(fee) / 100, 2)}%`);
