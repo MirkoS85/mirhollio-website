@@ -33,7 +33,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=delegation-details-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=entity-addresses-3" />
 </head>
 <body>
   <div class="mobile-top">
@@ -58,6 +58,37 @@
           <div class="address-grid" data-render="addresses"><article class="address"><span>Delegation address</span><code>0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade</code><div class="copy-row"><div class="copy-help">Use this in your wallet when delegating.</div><button class="btn ghost" type="button" data-copy="delegation" aria-label="Copy delegation address">Copy</button></div></article><article class="address"><span>Provider identity</span><code>0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3</code><div class="copy-row"><div class="copy-help">Compare this with Explorer and FlareMetrics.</div><button class="btn ghost" type="button" data-copy="identity" aria-label="Copy provider identity">Copy</button></div></article></div>
         </div>
       </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Entity addresses.</h2><p>Live FLR balances for the addresses currently exposed by Oracle Daemon. WFLR is shown when a reliable balance source is available.</p></div>
+          <div class="cards three entity-weight-grid">
+            <article class="card compact-stat"><b>FTSO weight</b><strong data-field="delegationWeight">-</strong><p>Delegated WFLR weight used for the latest FTSO reward epoch.</p></article>
+            <article class="card compact-stat"><b>Stake weight</b><strong data-field="stakeWeight">-</strong><p>Validator stake weight counted with provider registration.</p></article>
+            <article class="card compact-stat"><b>Total FTSO weight</b><strong data-field="votePower">-</strong><p>Delegation plus stake weight for epoch <span data-field="latestEpoch">-</span>.</p></article>
+          </div>
+          <div class="validator-panel entity-address-panel">
+            <div class="panel-head"><strong>Core entity addresses</strong><span class="mini-label">FLR / WFLR</span></div>
+            <div class="table-wrap table-wrap-compact">
+              <table class="entity-address-table">
+                <caption>MirSFlr entity addresses and balances</caption>
+                <thead><tr><th scope="col">Role</th><th scope="col">Network</th><th scope="col">Address</th><th scope="col">FLR</th><th scope="col">WFLR</th><th scope="col">Purpose</th></tr></thead>
+                <tbody data-render="entity-address-table" data-scope="core"><tr><td colspan="6">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <button class="btn decision-btn address-detail-toggle" type="button" data-panel-toggle="technical-addresses-panel" data-open-label="Show technical addresses" data-close-label="Hide technical addresses" aria-controls="technical-addresses-panel" aria-expanded="false">Show technical addresses</button>
+          <div class="validator-panel entity-address-panel table-panel" id="technical-addresses-panel" data-accordion-panel hidden>
+            <div class="panel-head"><strong>Technical addresses</strong><span class="mini-label">Operational keys</span></div>
+            <div class="table-wrap table-wrap-compact">
+              <table class="entity-address-table">
+                <caption>MirSFlr technical addresses and balances</caption>
+                <thead><tr><th scope="col">Role</th><th scope="col">Network</th><th scope="col">Address</th><th scope="col">FLR</th><th scope="col">WFLR</th><th scope="col">Purpose</th></tr></thead>
+                <tbody data-render="entity-address-table" data-scope="technical"><tr><td colspan="6">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
       <section class="section">
         <div class="inner">
           <div class="section-title"><h2>Safety notes.</h2><p>Use copy buttons, verify externally, and never share your seed phrase.</p></div>
@@ -67,7 +98,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=validator-delegators-3"></script>
+  <script src="../assets/operator.js?v=weight-split-2"></script>
   <script src="../assets/live-refresh.js?v=delegation-toggle-fix-3"></script>
   <script src="../assets/pwa.js?v=installable-1"></script>
 </body>

@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=delegation-details-3" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=entity-addresses-3" />
 </head>
 <body>
   <div class="mobile-top">
@@ -115,16 +115,21 @@
                 <span class="status-dot" data-field="status">Loading</span>
               </div>
               <div class="metric-grid split-metrics">
+                <div class="metric"><button class="info-tip" type="button" aria-label="Total FTSO weight info">i<span>Total FTSO reward weight currently visible for this provider: delegated WFLR plus counted stake weight.</span></button><span>Total weight</span><strong data-field="ftsoWeight">-</strong></div>
+                <div class="metric"><button class="info-tip" type="button" aria-label="Delegated FTSO weight info">i<span>Delegated WFLR weight received from other delegators and counted for the latest FTSO reward epoch.</span></button><span>Delegated weight</span><strong data-field="delegationWeight">-</strong></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
+                <div class="metric"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><span>FTSO performance</span><strong data-field="performance">-</strong></div>
+                <div class="metric"><button class="info-tip" type="button" aria-label="Delegation fee info">i<span>Provider delegation fee before rewards are distributed to delegators.</span></button><span>Fee</span><strong data-field="ftsoFee">-</strong></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="Condition passes info">i<span>Number of condition passes in the latest epoch. The percentage shows success rate over the most recent epochs.</span></button><span>Condition passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Latest reward-condition snapshot for FTSO, fast updates, FDC, and staking. Green means the condition passed.</span></button><span>Minimal conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
               </div>
+              <p class="table-note">Explorer can show a different aggregate weight; these cards use the latest reward-epoch weights from provider data.</p>
               <div class="panel-mini-grid">
-                <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
+                <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
                 <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
               </div>
               <div class="chart-panel">
@@ -253,7 +258,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=validator-delegators-3"></script>
+  <script src="assets/operator.js?v=weight-split-2"></script>
   <script src="assets/live-refresh.js?v=delegation-toggle-fix-3"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
