@@ -1155,6 +1155,71 @@ h1{
 .condition-dots span.bad{background:linear-gradient(180deg, #f07d95, #de5875)}
 .condition-dots span.unknown{background:#d7d2d7}
 
+.condition-history-panel{
+  overflow:hidden;
+}
+
+.condition-history-wrap{
+  background:rgba(255,255,255,.84);
+}
+
+.condition-history-table{
+  min-width:920px;
+  width:100%;
+  table-layout:fixed;
+}
+
+.condition-history-table th,
+.condition-history-table td{
+  text-align:center;
+  vertical-align:middle;
+}
+
+.condition-history-table th:first-child,
+.condition-history-table td:first-child{
+  width:230px;
+  text-align:left;
+}
+
+.condition-history-header th{
+  border-bottom:1px solid var(--line);
+  background:rgba(248,221,234,.46);
+  color:#6d6067;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:0;
+}
+
+.condition-mark{
+  width:28px;
+  height:28px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  color:#fff;
+  font-size:17px;
+  font-weight:950;
+  line-height:1;
+}
+
+.condition-mark.ok{
+  background:linear-gradient(180deg, #66c978, #47b567);
+}
+
+.condition-mark.bad{
+  background:linear-gradient(180deg, #f07d95, #de5875);
+}
+
+.condition-mark.unknown{
+  background:#b6adb3;
+}
+
+.condition-pass-count{
+  color:#2ea367;
+  font-weight:950;
+}
+
 .uptime-pills span{
   border-color:var(--line);
   border-radius:14px;
@@ -1725,6 +1790,67 @@ tbody tr:hover td{
     border-radius:18px;
     overflow:visible;
     background:transparent;
+  }
+
+  .condition-history-wrap{
+    overflow-x:auto;
+    overflow-y:hidden;
+    background:rgba(255,255,255,.84);
+  }
+
+  .condition-history-table,
+  .condition-history-table tbody,
+  .condition-history-table tr,
+  .condition-history-table th,
+  .condition-history-table td{
+    display:table;
+  }
+
+  .condition-history-table{
+    min-width:780px;
+    table-layout:fixed;
+  }
+
+  .condition-history-table tbody{
+    display:table-row-group;
+  }
+
+  .condition-history-table thead{
+    position:static;
+    width:auto;
+    height:auto;
+    display:table-header-group;
+    overflow:visible;
+    clip:auto;
+    white-space:normal;
+  }
+
+  .condition-history-table tr{
+    display:table-row;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+  }
+
+  .condition-history-table th,
+  .condition-history-table td{
+    display:table-cell;
+    padding:12px 10px;
+    text-align:center;
+    white-space:nowrap;
+  }
+
+  .condition-history-table th:first-child,
+  .condition-history-table td:first-child{
+    width:190px;
+    text-align:left;
+  }
+
+  .condition-history-table th::before,
+  .condition-history-table td::before{
+    content:none;
   }
 
   table,

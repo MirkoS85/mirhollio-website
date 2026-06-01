@@ -409,6 +409,86 @@ const MirSFlr = (() => {
     });
   }
 
+  function conditionState(value) {
+    if (value === true) return "ok";
+    if (value === false) return "bad";
+    return "unknown";
+  }
+
+  function conditionIcon(value, label) {
+    const state = conditionState(value);
+    const text = state === "ok" ? "Pass" : state === "bad" ? "Fail" : "Not exposed";
+    const symbol = state === "ok" ? "✓" : state === "bad" ? "×" : "?";
+    return `<span class="condition-mark ${state}" title="${label}: ${text}" aria-label="${label}: ${text}">${symbol}</span>`;
+  }
+
+  function renderConditionHistoryTable(provider) {
+    const rows = [...(provider?.epochData || [])]
+      .sort((a, b) => Number(b.epoch ?? 0) - Number(a.epoch ?? 0))
+      .slice(0, 10)
+      .reverse();
+
+    document.querySelectorAll("[data-render='condition-history-head']").forEach(head => {
+      head.innerHTML = `
+        <tr class="condition-history-header">
+          <th scope="col">Condition</th>
+          ${rows.map(item => `<th scope="col">E${item.epoch ?? "-"}</th>`).join("")}
+        </tr>
+      `;
+    });
+
+    document.querySelectorAll("[data-render='condition-history-table']").forEach(mount => {
+      if (!rows.length) {
+        renderTableEmpty(mount, "No minimal-condition history is available yet.");
+        return;
+      }
+
+      const checks = [
+        {
+          label: "Participating",
+          value: item => item.passEarned ?? item.eligibleForReward
+        },
+        {
+          label: "Eligible for Rewards",
+          value: item => item.eligibleForReward
+        },
+        {
+          label: "Passes",
+          value: item => `${Number(item.passes ?? item.newNumberOfPasses ?? 0)}/3`,
+          text: true
+        },
+        {
+          label: "FTSO Anchor Feeds",
+          value: item => item.ftsoScaling?.conditionMet
+        },
+        {
+          label: "FTSO Block-Latency Feeds",
+          value: item => item.fastUpdates?.conditionMet
+        },
+        {
+          label: "FDC",
+          value: item => item.fdc?.conditionMet
+        },
+        {
+          label: "Staking",
+          value: item => item.staking?.conditionMet
+        }
+      ];
+
+      mount.innerHTML = `
+        ${checks.map(check => `
+          <tr>
+            <th scope="row">${check.label}</th>
+            ${rows.map(item => {
+              const value = check.value(item);
+              return `<td>${check.text ? `<span class="condition-pass-count">${value}</span>` : conditionIcon(value, check.label)}</td>`;
+            }).join("")}
+          </tr>
+        `).join("")}
+      `;
+    });
+  }
+
   function renderPreRegisteredState(value) {
     document.querySelectorAll("[data-state='preRegistered']").forEach(el => {
       el.classList.toggle("ok", value === "Yes");
@@ -1058,6 +1138,7 @@ const MirSFlr = (() => {
     setBar("fdcAvailability", provider.fdcPerformance?.availability);
     renderConditions(latest);
     renderConditionPasses(provider, latest);
+    renderConditionHistoryTable(provider);
     renderEpochTable(provider);
     renderAddresses(provider);
     renderEntityAddresses(provider, validatorData);
