@@ -126,7 +126,7 @@
                 <div class="metric"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Latest reward-condition snapshot for FTSO, fast updates, FDC, and staking. Green means the condition passed.</span></button><span>Minimal conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
                 <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
               </div>
-              <p class="table-note">Explorer can show a different aggregate weight; these cards use the latest reward-epoch weights from provider data.</p>
+              <p class="table-note">Weight is sourced from Flare Systems Explorer signing-policy data; Oracle Daemon can lag or show a smaller provider snapshot.</p>
               <div class="panel-mini-grid">
                 <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
                 <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
@@ -258,7 +258,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=weight-split-2"></script>
+  <script src="assets/operator.js?v=explorer-weight-1"></script>
   <script src="assets/live-refresh.js?v=delegation-toggle-fix-3"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
