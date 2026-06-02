@@ -937,10 +937,10 @@ const MirSFlr = (() => {
   }
 
   function hourlyAvailabilityColor(value) {
-    if (value >= 0.98) return "#cf3679";
-    if (value >= 0.8) return "#f0a1c2";
-    if (value >= 0.5) return "#df5268";
-    return "#2a2226";
+    if (value >= 0.98) return { fill: "#c61f6b", stroke: "#a91657" };
+    if (value >= 0.8) return { fill: "#e56aa0", stroke: "#cf4f86" };
+    if (value >= 0.5) return { fill: "#f5bad3", stroke: "#e695ba" };
+    return { fill: "#fffafd", stroke: "#ead8e2" };
   }
 
   function hourlyAvailabilityLabel(index, total) {
@@ -997,8 +997,8 @@ const MirSFlr = (() => {
       const color = hourlyAvailabilityColor(value);
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(value)}" aria-label="${label} ${metricLabel}: ${pct(value)}">
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="${color}" opacity=".94"></rect>
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="rgba(255,255,255,.12)"></rect>
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2" opacity=".96"></rect>
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="rgba(255,255,255,.10)"></rect>
         </g>
       `;
     }).join("");

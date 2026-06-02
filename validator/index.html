@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr Validator Node Metrics</title>
+  <meta name="description" content="Live MirSFlr validator node metrics, APR, uptime, stake capacity, delegation details, and validator reward history." />
+  <meta name="theme-color" content="#d93f84" />
+  <link rel="preconnect" href="https://api.oracle-daemon.com">
+  <link rel="dns-prefetch" href="//api.oracle-daemon.com">
+  <link rel="preconnect" href="https://api.coinbase.com">
+  <link rel="dns-prefetch" href="//api.coinbase.com">
+  <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
+  <link rel="canonical" href="https://www.mirhollio.com/validator/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr Validator Node Metrics" />
+  <meta property="og:description" content="Live validator APR, uptime, capacity, delegation details, and reward history for MirSFlr." />
+  <meta property="og:url" content="https://www.mirhollio.com/validator/" />
+  <meta property="og:image" content="https://www.mirhollio.com/og-image.png" />
+  <meta property="og:image:width" content="2400" />
+  <meta property="og:image:height" content="1260" />
+  <meta property="og:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MirSFlr Validator Node Metrics" />
+  <meta name="twitter:description" content="Live validator node metrics for MirSFlr." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/og-image.png" />
+  <meta name="twitter:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
+  <link rel="manifest" href="../app.webmanifest">
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-dedupe-1" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="../ftso/">FTSO</a><a href="./" aria-current="page">Validator</a><a href="../epochs/">Epochs</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div>
+        <a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+        <nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="../ftso/">FTSO provider</a><a href="./" aria-current="page">Validator node</a><a href="../epochs/">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
+      </div>
+      <p class="side-note">Independent Flare validator and FTSO provider.</p>
+    </aside>
+    <main>
+      <section class="section">
+        <div class="inner hero compact">
+          <div><div class="kicker">Stake FLR</div><h1>Validator node metrics.</h1><p class="lead">APR, uptime, capacity, delegation details, and validator reward history for MirSFlr.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Validator status</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div><div class="metric-grid"><div class="metric"><span>APR</span><strong data-field="validatorApr">-</strong></div><div class="metric"><span>Free space</span><strong data-field="freeDelegationSpace">-</strong></div></div></aside>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Validator node.</h2><div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn" type="button" data-price-currency="USD">USD</button><button class="toggle-btn active" type="button" data-price-currency="EUR">EUR</button></div></div></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="validator-panel">
+            <div class="validator-head"><span class="status-dot" data-field="validatorConnected">Loading</span></div>
+            <div class="validator-row">
+              <div class="validator-id"><span>Node</span><strong data-field="validatorNodeId">-</strong></div>
+              <div class="validator-stat"><span>APR</span><strong data-field="validatorApr">-</strong></div>
+              <div class="validator-stat"><span>Uptime</span><strong data-field="validatorUptimeAvg">-</strong></div>
+              <div class="validator-progress"><span>Stake <b data-field="validatorCapacityText">-</b></span><div class="bar-track"><div class="bar-fill" data-bar="validatorStakeCapacity"></div></div><em data-field="validatorCapacityPct">-</em></div>
+              <div class="validator-progress"><span>Time left <b data-field="stakeTimeLeft">-</b></span><div class="bar-track green"><div class="bar-fill" data-bar="validatorTimeLeft"></div></div><em data-field="validatorTimeLeftPct">-</em></div>
+            </div>
+            <div class="panel-mini-grid">
+              <article class="card compact-stat"><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator fee before comparing APR.</p></article>
+              <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
+              <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
+              <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
+            </div>
+            <article class="card panel-wide-card delegation-summary-card">
+              <div class="panel-head"><strong>Delegation summary</strong><button class="btn ghost detail-toggle" type="button" data-panel-toggle="delegation-details-panel" data-open-label="Open delegation details" data-close-label="Hide delegation details" aria-controls="delegation-details-panel" aria-expanded="false">Open delegation details</button></div>
+              <div class="delegator-summary">
+                <span>Total delegators <strong data-field="validatorDelegatorCount">-</strong></span>
+                <span>Total delegation <strong data-field="validatorDelegatorTotal">-</strong></span>
+                <span>New (last 5 days) <strong data-field="validatorDelegatorNew">-</strong></span>
+                <span>Ending (next 5 days) <strong data-field="validatorDelegatorEnding">-</strong></span>
+              </div>
+            </article>
+            <div class="validator-panel delegator-panel" id="delegation-details-panel" data-accordion-panel hidden>
+              <div class="panel-head"><strong>Delegation details</strong><span class="mini-label">Current validator stake</span></div>
+              <div class="table-wrap table-wrap-compact"><table class="delegator-table"><caption>Current validator delegators</caption><thead><tr><th scope="col">#</th><th scope="col">Address</th><th scope="col">Amount</th><th scope="col">Share</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Time left</th></tr></thead><tbody data-render="validator-delegator-table"><tr><td colspan="7">Loading...</td></tr></tbody></table></div>
+            </div>
+            <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
+            <div class="chart-panel"><div class="panel-head"><strong>Validator Rewards per epoch</strong><span class="mini-label">Latest 20</span></div><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/operator.js?v=ftso-dedupe-1"></script>
+  <script src="../assets/live-refresh.js?v=ftso-dedupe-1"></script>
+  <script src="../assets/pwa.js?v=installable-1"></script>
+</body>
+</html>

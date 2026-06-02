@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=tooltip-compact-1" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=ftso-dedupe-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -63,7 +63,8 @@
     </div>
     <nav class="mobile-links" aria-label="Mobile navigation">
       <a href="./" aria-current="page">Home</a>
-      <a href="stats/">Stats</a>
+      <a href="ftso/">FTSO</a>
+      <a href="validator/">Validator</a>
       <a href="epochs/">Epochs</a>
       <a href="addresses/">Addresses</a>
       <a href="performance/">Performance</a>
@@ -76,13 +77,14 @@
         <a class="brand" href="./"><img src="logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
         <nav class="nav" aria-label="Primary navigation">
           <a href="./" aria-current="page">Home</a>
-          <a href="stats/">Live stats</a>
+          <a href="ftso/">FTSO provider</a>
+          <a href="validator/">Validator node</a>
           <a href="epochs/">Epoch history</a>
           <a href="addresses/">Addresses</a>
           <a href="performance/">Performance</a>
         </nav>
       </div>
-      <p class="side-note">Independent Flare operator with live metrics and verified addresses.</p>
+      <p class="side-note">Independent Flare validator and FTSO provider.</p>
     </aside>
 
     <main>
@@ -101,169 +103,33 @@
       <section class="section light">
         <div class="inner">
           <div class="section-title">
-            <h2>Live panels.</h2>
+            <h2>Live snapshot.</h2>
             <div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn" type="button" data-price-currency="USD">USD</button><button class="toggle-btn active" type="button" data-price-currency="EUR">EUR</button></div></div></div>
           </div>
-          <div class="role-choice-grid">
+          <div class="role-choice-grid home-snapshot-grid">
             <article class="card role-choice role-choice-ftso">
               <b>Delegate WFLR</b>
               <strong>FTSO provider</strong>
-              <p>Check reward rate, availability, performance, conditions, and registration before you delegate.</p>
-              <button class="btn decision-btn" type="button" data-panel-toggle="ftso-panel" data-open-label="Open provider metrics" data-close-label="Hide provider metrics" aria-controls="ftso-panel" aria-expanded="false">Open provider metrics</button>
-              <div class="validator-panel split-panel" id="ftso-panel" data-accordion-panel hidden>
-              <div class="validator-head">
-                <span class="status-dot" data-field="status">Loading</span>
+              <p>Quick read for delegators before opening the full FTSO metric stack.</p>
+              <div class="home-snap-metrics">
+                <div class="snap-metric"><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
+                <div class="snap-metric"><span>Availability</span><strong data-field="availability">-</strong></div>
+                <div class="snap-metric"><span>Fee</span><strong data-field="ftsoFee">-</strong></div>
+                <div class="snap-metric"><span>Status</span><strong data-field="preRegisteredStatus">-</strong></div>
               </div>
-              <div class="metric-grid split-metrics">
-                <div class="metric"><button class="info-tip" type="button" aria-label="Total FTSO weight info">i<span>Total FTSO reward weight currently visible for this provider: delegated WFLR plus counted stake weight.</span></button><span>Total weight</span><strong data-field="ftsoWeight">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Delegated FTSO weight info">i<span>Delegated WFLR weight received from other delegators and counted for the latest FTSO reward epoch.</span></button><span>Delegated weight</span><strong data-field="delegationWeight">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><span>FTSO performance</span><strong data-field="performance">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Delegation fee info">i<span>Provider delegation fee before rewards are distributed to delegators.</span></button><span>Fee</span><strong data-field="ftsoFee">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Condition passes info">i<span>Number of condition passes in the latest epoch. The percentage shows success rate over the most recent epochs.</span></button><span>Condition passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Latest reward-condition snapshot for FTSO, fast updates, FDC, and staking. Green means the condition passed.</span></button><span>Minimal conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
-                <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
-              </div>
-              <div class="panel-mini-grid">
-                <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
-                <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
-                <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
-              </div>
-              <div class="hourly-chart-grid">
-                <div class="chart-panel hourly-chart-panel">
-                  <div class="panel-head">
-                    <strong>FTSO Availability (per hour)</strong>
-                    <span class="mini-label">Last 24h</span>
-                  </div>
-                  <div class="reward-chart-wrap hourly-chart-wrap">
-                    <svg class="hourly-chart" data-render="ftso-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="FTSO availability per hour chart"></svg>
-                    <div class="chart-tooltip" data-render="ftso-hourly-tooltip"></div>
-                  </div>
-                  <div class="chart-summary" data-render="ftso-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div>
-                </div>
-                <div class="chart-panel hourly-chart-panel">
-                  <div class="panel-head">
-                    <strong>FDC Availability (per hour)</strong>
-                    <span class="mini-label">Last 24h</span>
-                  </div>
-                  <div class="reward-chart-wrap hourly-chart-wrap">
-                    <svg class="hourly-chart" data-render="fdc-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="FDC availability per hour chart"></svg>
-                    <div class="chart-tooltip" data-render="fdc-hourly-tooltip"></div>
-                  </div>
-                  <div class="chart-summary" data-render="fdc-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div>
-                </div>
-                <div class="chart-panel hourly-chart-panel performance-hourly-panel">
-                  <div class="panel-head">
-                    <strong>FTSO Performance (per hour)</strong>
-                    <span class="mini-label">Last 24h</span>
-                  </div>
-                  <div class="reward-chart-wrap hourly-chart-wrap performance-hourly-wrap">
-                    <svg class="hourly-chart performance-hourly-chart" data-render="ftso-performance-hourly-chart" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-label="FTSO performance per hour chart"></svg>
-                    <div class="chart-tooltip" data-render="ftso-performance-hourly-tooltip"></div>
-                  </div>
-                  <div class="chart-summary" data-render="ftso-performance-hourly-summary"><span>Performance <strong>-</strong></span><span>Primary <strong>-</strong></span><span>Secondary <strong>-</strong></span></div>
-                </div>
-              </div>
-              <div class="chart-panel condition-history-panel">
-                <div class="panel-head">
-                  <strong>Minimal Conditions</strong>
-                  <span class="mini-label">Latest 10</span>
-                </div>
-                <div class="table-wrap condition-history-wrap">
-                  <table class="condition-history-table">
-                    <caption>Minimal conditions by recent FTSO epoch</caption>
-                    <thead data-render="condition-history-head"><tr><th scope="col">Condition</th></tr></thead>
-                    <tbody data-render="condition-history-table"><tr><td>Loading...</td></tr></tbody>
-                  </table>
-                </div>
-              </div>
-              <div class="chart-panel">
-                <div class="panel-head">
-                  <strong>FTSO Rewards per epoch</strong>
-                  <span class="mini-label">Latest 20</span>
-                </div>
-                <div class="reward-chart-wrap">
-                  <svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg>
-                  <div class="chart-tooltip" data-render="reward-tooltip"></div>
-                </div>
-                <div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
-              </div>
-              </div>
+              <div class="home-snap-actions"><a class="btn decision-btn" href="ftso/">View FTSO metrics</a></div>
             </article>
             <article class="card role-choice role-choice-validator">
               <b>Stake FLR</b>
               <strong>Validator node</strong>
-              <p>Check APR, uptime, fee, free capacity, and remaining stake time before you stake.</p>
-              <button class="btn decision-btn" type="button" data-panel-toggle="validator-panel" data-open-label="Open validator metrics" data-close-label="Hide validator metrics" aria-controls="validator-panel" aria-expanded="false">Open validator metrics</button>
-              <div class="validator-panel split-panel" id="validator-panel" data-accordion-panel hidden>
-              <div class="validator-head">
-                <span class="status-dot" data-field="validatorConnected">Loading</span>
+              <p>Quick read for stakers before opening capacity, delegators, uptime, and reward history.</p>
+              <div class="home-snap-metrics">
+                <div class="snap-metric"><span>APR</span><strong data-field="validatorApr">-</strong></div>
+                <div class="snap-metric"><span>Uptime</span><strong data-field="validatorUptimeAvg">-</strong></div>
+                <div class="snap-metric"><span>Free space</span><strong data-field="freeDelegationSpace">-</strong></div>
+                <div class="snap-metric"><span>Status</span><strong data-field="validatorConnected">-</strong></div>
               </div>
-              <div class="validator-row">
-                <div class="validator-id"><span>Node</span><strong data-field="validatorNodeId">-</strong></div>
-                <div class="validator-stat"><span>APR</span><strong data-field="validatorApr">-</strong></div>
-                <div class="validator-stat"><span>Uptime</span><strong data-field="validatorUptimeAvg">-</strong></div>
-                <div class="validator-progress"><span>Stake <b data-field="validatorCapacityText">-</b></span><div class="bar-track"><div class="bar-fill" data-bar="validatorStakeCapacity"></div></div><em data-field="validatorCapacityPct">-</em></div>
-                <div class="validator-progress"><span>Time left <b data-field="stakeTimeLeft">-</b></span><div class="bar-track green"><div class="bar-fill" data-bar="validatorTimeLeft"></div></div><em data-field="validatorTimeLeftPct">-</em></div>
-              </div>
-              <div class="panel-mini-grid">
-                <article class="card compact-stat"><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator fee before comparing APR.</p></article>
-                <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
-                <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
-                <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
-              </div>
-              <article class="card panel-wide-card delegation-summary-card">
-                <div class="panel-head">
-                  <strong>Delegation summary</strong>
-                  <button class="btn ghost detail-toggle" type="button" data-panel-toggle="delegation-details-panel" data-open-label="Open delegation details" data-close-label="Hide delegation details" aria-controls="delegation-details-panel" aria-expanded="false">Open delegation details</button>
-                </div>
-                <div class="delegator-summary">
-                  <span>Total delegators <strong data-field="validatorDelegatorCount">-</strong></span>
-                  <span>Total delegation <strong data-field="validatorDelegatorTotal">-</strong></span>
-                  <span>New (last 5 days) <strong data-field="validatorDelegatorNew">-</strong></span>
-                  <span>Ending (next 5 days) <strong data-field="validatorDelegatorEnding">-</strong></span>
-                </div>
-              </article>
-              <div class="validator-panel delegator-panel" id="delegation-details-panel" data-accordion-panel hidden>
-                <div class="panel-head">
-                  <strong>Delegation details</strong>
-                  <span class="mini-label">Current validator stake</span>
-                </div>
-                <div class="table-wrap table-wrap-compact">
-                  <table class="delegator-table">
-                    <caption>Current validator delegators</caption>
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Address</th>
-                        <th scope="col">Amount</th>
-                        <th scope="col">Share</th>
-                        <th scope="col">Start</th>
-                        <th scope="col">End</th>
-                        <th scope="col">Time left</th>
-                      </tr>
-                    </thead>
-                    <tbody data-render="validator-delegator-table">
-                      <tr><td colspan="7">Loading...</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
-              <div class="chart-panel">
-                <div class="panel-head">
-                  <strong>Validator Rewards per epoch</strong>
-                  <span class="mini-label">Latest 20</span>
-                </div>
-                <div class="reward-chart-wrap">
-                  <svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg>
-                  <div class="chart-tooltip" data-render="validator-reward-tooltip"></div>
-                </div>
-                <div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div>
-              </div>
-              </div>
+              <div class="home-snap-actions"><a class="btn decision-btn" href="validator/">View validator metrics</a></div>
             </article>
           </div>
         </div>
@@ -273,10 +139,10 @@
         <div class="inner">
           <div class="section-title">
             <h2>Delegate safely.</h2>
-            <p>Use the live panels for performance, then verify the address before any wallet action.</p>
+            <p>Use the FTSO and Validator pages for performance, then verify the address before any wallet action.</p>
           </div>
           <div class="flow compact-flow">
-            <div class="step"><em>1</em><strong>Check live data</strong><p>Open provider or validator metrics and compare rewards, availability, capacity, and eligibility.</p></div>
+            <div class="step"><em>1</em><strong>Check live data</strong><p>Open FTSO provider or Validator node metrics and compare rewards, availability, capacity, and eligibility.</p></div>
             <div class="step"><em>2</em><strong>Verify address</strong><p>Use the Addresses page and external explorers before copying anything into a wallet.</p></div>
             <div class="step"><em>3</em><strong>Wait for epoch</strong><p>Delegation changes need the next epoch before performance can be evaluated fairly.</p></div>
           </div>
@@ -303,8 +169,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=tooltip-compact-1"></script>
-  <script src="assets/live-refresh.js?v=tooltip-compact-1"></script>
+  <script src="assets/operator.js?v=ftso-dedupe-1"></script>
+  <script src="assets/live-refresh.js?v=ftso-dedupe-1"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

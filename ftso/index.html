@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MirSFlr FTSO Provider Metrics</title>
+  <meta name="description" content="Live MirSFlr FTSO provider metrics, reward rate, availability, performance, minimal conditions, and epoch rewards." />
+  <meta name="theme-color" content="#d93f84" />
+  <link rel="preconnect" href="https://api.oracle-daemon.com">
+  <link rel="dns-prefetch" href="//api.oracle-daemon.com">
+  <link rel="preconnect" href="https://api.coinbase.com">
+  <link rel="dns-prefetch" href="//api.coinbase.com">
+  <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
+  <link rel="canonical" href="https://www.mirhollio.com/ftso/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="MirSFlr FTSO Provider Metrics" />
+  <meta property="og:description" content="Live FTSO reward, availability, performance, and minimal-condition history for MirSFlr." />
+  <meta property="og:url" content="https://www.mirhollio.com/ftso/" />
+  <meta property="og:image" content="https://www.mirhollio.com/og-image.png" />
+  <meta property="og:image:width" content="2400" />
+  <meta property="og:image:height" content="1260" />
+  <meta property="og:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MirSFlr FTSO Provider Metrics" />
+  <meta name="twitter:description" content="Live FTSO provider metrics for MirSFlr." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/og-image.png" />
+  <meta name="twitter:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
+  <link rel="manifest" href="../app.webmanifest">
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-dedupe-1" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="./" aria-current="page">FTSO</a><a href="../validator/">Validator</a><a href="../epochs/">Epochs</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div>
+        <a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+        <nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="./" aria-current="page">FTSO provider</a><a href="../validator/">Validator node</a><a href="../epochs/">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
+      </div>
+      <p class="side-note">Independent Flare validator and FTSO provider.</p>
+    </aside>
+    <main>
+      <section class="section">
+        <div class="inner hero compact">
+          <div><div class="kicker">Delegate WFLR</div><h1>FTSO provider metrics.</h1><p class="lead">Reward rate, availability, performance, minimal conditions, and reward history for MirSFlr.</p></div>
+          <aside class="status-panel"><div class="panel-head"><strong>Data status</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><span>Total weight</span><strong data-field="ftsoWeight">-</strong></div><div class="metric"><span>Delegated weight</span><strong data-field="delegationWeight">-</strong></div></div></aside>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>FTSO provider.</h2><div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn" type="button" data-price-currency="USD">USD</button><button class="toggle-btn active" type="button" data-price-currency="EUR">EUR</button></div></div></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="ftso-panel">
+            <div class="metric-grid split-metrics">
+              <div class="metric"><button class="info-tip" type="button" aria-label="Reward rate info">i<span>Estimated reward rate from recent provider data. Use it as a quick signal, then compare it with epoch rewards and eligibility.</span></button><span>Reward rate</span><strong data-field="rewardRate">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FDC availability info">i<span>Participation in FDC rounds. Higher means the provider is more consistently present for FDC work.</span></button><span>FDC availability</span><strong data-field="fdcAvailability">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="FTSO performance info">i<span>How well the provider's submitted prices perform in reward calculations. Higher is better, especially when availability is also strong.</span></button><span>FTSO performance</span><strong data-field="performance">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Delegation fee info">i<span>Provider delegation fee before rewards are distributed to delegators.</span></button><span>Fee</span><strong data-field="ftsoFee">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Condition passes info">i<span>Number of condition passes in the latest epoch. The percentage shows success rate over the most recent epochs.</span></button><span>Condition passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Latest reward-condition snapshot for FTSO, fast updates, FDC, and staking. Green means the condition passed.</span></button><span>Minimal conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
+            </div>
+            <div class="panel-mini-grid">
+              <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
+              <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
+              <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
+            </div>
+            <div class="hourly-chart-grid">
+              <div class="chart-panel hourly-chart-panel"><div class="panel-head"><strong>FTSO Availability (per hour)</strong><span class="mini-label">Last 24h</span></div><div class="reward-chart-wrap hourly-chart-wrap"><svg class="hourly-chart" data-render="ftso-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="FTSO availability per hour chart"></svg><div class="chart-tooltip" data-render="ftso-hourly-tooltip"></div></div><div class="chart-summary" data-render="ftso-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div></div>
+              <div class="chart-panel hourly-chart-panel"><div class="panel-head"><strong>FDC Availability (per hour)</strong><span class="mini-label">Last 24h</span></div><div class="reward-chart-wrap hourly-chart-wrap"><svg class="hourly-chart" data-render="fdc-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-label="FDC availability per hour chart"></svg><div class="chart-tooltip" data-render="fdc-hourly-tooltip"></div></div><div class="chart-summary" data-render="fdc-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div><div class="availability-scale" aria-label="Oracle Daemon availability color scale"><span><i class="scale-best"></i>98-100%</span><span><i class="scale-good"></i>80-97.99%</span><span><i class="scale-watch"></i>50-79.99%</span><span><i class="scale-low"></i>&lt;50%</span></div></div>
+              <div class="chart-panel hourly-chart-panel performance-hourly-panel"><div class="panel-head"><strong>FTSO Performance (per hour)</strong><span class="mini-label">Last 24h</span></div><div class="reward-chart-wrap hourly-chart-wrap performance-hourly-wrap"><svg class="hourly-chart performance-hourly-chart" data-render="ftso-performance-hourly-chart" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-label="FTSO performance per hour chart"></svg><div class="chart-tooltip" data-render="ftso-performance-hourly-tooltip"></div></div><div class="chart-summary" data-render="ftso-performance-hourly-summary"><span>Performance <strong>-</strong></span><span>Primary <strong>-</strong></span><span>Secondary <strong>-</strong></span></div></div>
+            </div>
+            <div class="chart-panel condition-history-panel"><div class="panel-head"><strong>Minimal Conditions</strong><span class="mini-label">Latest 10</span></div><div class="table-wrap condition-history-wrap"><table class="condition-history-table"><caption>Minimal conditions by recent FTSO epoch</caption><thead data-render="condition-history-head"><tr><th scope="col">Condition</th></tr></thead><tbody data-render="condition-history-table"><tr><td>Loading...</td></tr></tbody></table></div></div>
+            <div class="chart-panel"><div class="panel-head"><strong>FTSO Rewards per epoch</strong><span class="mini-label">Latest 20</span></div><div class="reward-chart-wrap"><svg class="reward-chart" data-render="reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="FTSO rewards per epoch chart"></svg><div class="chart-tooltip" data-render="reward-tooltip"></div></div><div class="chart-summary" data-render="reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/operator.js?v=ftso-dedupe-1"></script>
+  <script src="../assets/live-refresh.js?v=ftso-dedupe-1"></script>
+  <script src="../assets/pwa.js?v=installable-1"></script>
+</body>
+</html>
