@@ -223,12 +223,22 @@ body::after{
 }
 
 @media (min-width:981px){
+  .site-shell{
+    position:relative;
+    grid-template-columns:290px minmax(0,1fr);
+  }
+
+  .site-shell > main{
+    grid-column:2;
+    min-width:0;
+  }
+
   .side{
     position:fixed;
     top:22px;
     left:max(22px, calc((100vw - 1500px) / 2 + 22px));
     width:290px;
-    z-index:5;
+    z-index:20;
   }
 }
 
