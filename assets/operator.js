@@ -936,6 +936,139 @@ const MirSFlr = (() => {
     });
   }
 
+  function hourlyAvailabilityColor(value) {
+    if (value >= 0.995) return "#cf3679";
+    if (value >= 0.98) return "#f0a1c2";
+    if (value >= 0.95) return "#f7c9dc";
+    if (value >= 0.9) return "#df5268";
+    return "#2a2226";
+  }
+
+  function hourlyAvailabilityLabel(index, total) {
+    const hoursAgo = total - index - 1;
+    if (hoursAgo <= 0) return "now";
+    if (hoursAgo === 1) return "1h ago";
+    return `${hoursAgo}h ago`;
+  }
+
+  function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
+    if (!svg) return;
+    const series = [...(values || [])]
+      .map(value => Number(value))
+      .filter(value => Number.isFinite(value))
+      .slice(-24);
+
+    if (!series.length) {
+      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#8d7f87" font-size="20" font-weight="800">${emptyMessage}</text>`;
+      if (summary) summary.innerHTML = `<span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span>`;
+      return;
+    }
+
+    const width = 1000;
+    const height = 220;
+    const padLeft = 58;
+    const padRight = 18;
+    const padTop = 16;
+    const padBottom = 42;
+    const chartW = width - padLeft - padRight;
+    const chartH = height - padTop - padBottom;
+    const gap = 10;
+    const barW = Math.max(12, (chartW - gap * (series.length - 1)) / series.length);
+    const ticks = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0];
+    const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
+    const pct = value => `${(value * 100).toFixed(2)}%`;
+    const avg = series.reduce((sum, value) => sum + value, 0) / series.length;
+    const low = Math.min(...series);
+    const latest = series[series.length - 1];
+
+    const grid = ticks.map(tick => {
+      const y = yFor(tick);
+      const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
+      return `
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
+        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="12" font-weight="800">${label}</text>
+      `;
+    }).join("");
+
+    const bars = series.map((value, index) => {
+      const x = padLeft + index * (barW + gap);
+      const y = yFor(value);
+      const h = Math.max(4, height - padBottom - y);
+      const label = hourlyAvailabilityLabel(index, series.length);
+      const color = hourlyAvailabilityColor(value);
+      return `
+        <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(value)}" aria-label="${label} ${metricLabel}: ${pct(value)}">
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="${color}" opacity=".94"></rect>
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="rgba(255,255,255,.12)"></rect>
+        </g>
+      `;
+    }).join("");
+
+    const labels = series.map((_, index) => {
+      if (index % 3 !== 0 && index !== series.length - 1) return "";
+      const x = padLeft + index * (barW + gap) + barW / 2;
+      const label = hourlyAvailabilityLabel(index, series.length);
+      return `<text x="${x}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="12" font-weight="800">${label}</text>`;
+    }).join("");
+
+    svg.innerHTML = `${grid}${bars}${labels}`;
+
+    const showTooltip = target => {
+      if (!tooltip) return;
+      const index = Number(target.getAttribute("data-chart-index"));
+      const value = series[index];
+      if (!Number.isFinite(value)) return;
+      const rect = target.querySelector("rect")?.getBoundingClientRect();
+      const wrapRect = svg.parentElement.getBoundingClientRect();
+      if (!rect) return;
+      tooltip.innerHTML = `<strong>${hourlyAvailabilityLabel(index, series.length)}</strong><br>${metricLabel}: ${pct(value)}`;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 40, wrapRect.width - 178))}px`;
+      tooltip.style.top = `${Math.max(8, rect.top - wrapRect.top - 54)}px`;
+    };
+    const hideTooltip = () => {
+      if (tooltip) tooltip.style.display = "none";
+    };
+
+    svg.querySelectorAll("[data-chart-index]").forEach(target => {
+      target.addEventListener("mouseenter", () => showTooltip(target));
+      target.addEventListener("focus", () => showTooltip(target));
+      target.addEventListener("click", event => {
+        event.preventDefault();
+        showTooltip(target);
+      });
+      target.addEventListener("touchstart", event => {
+        event.preventDefault();
+        showTooltip(target);
+      }, { passive: false });
+      target.addEventListener("mouseleave", hideTooltip);
+      target.addEventListener("blur", hideTooltip);
+    });
+
+    if (summary) {
+      summary.innerHTML = `<span>Latest <strong>${pct(latest)}</strong></span><span>Average <strong>${pct(avg)}</strong></span><span>Low <strong>${pct(low)}</strong></span>`;
+    }
+  }
+
+  function renderHourlyAvailabilityCharts(provider) {
+    renderHourlyAvailabilityChart({
+      svg: document.querySelector("[data-render='ftso-hourly-chart']"),
+      tooltip: document.querySelector("[data-render='ftso-hourly-tooltip']"),
+      summary: document.querySelector("[data-render='ftso-hourly-summary']"),
+      values: provider?.ftsoPerformance?.availability1h,
+      metricLabel: "FTSO availability",
+      emptyMessage: "FTSO hourly data unavailable"
+    });
+    renderHourlyAvailabilityChart({
+      svg: document.querySelector("[data-render='fdc-hourly-chart']"),
+      tooltip: document.querySelector("[data-render='fdc-hourly-tooltip']"),
+      summary: document.querySelector("[data-render='fdc-hourly-summary']"),
+      values: provider?.fdcPerformance?.availability1h,
+      metricLabel: "FDC availability",
+      emptyMessage: "FDC hourly data unavailable"
+    });
+  }
+
   function renderAddresses(provider) {
     const mount = document.querySelector("[data-render='addresses']");
     if (!mount) return;
@@ -1139,6 +1272,7 @@ const MirSFlr = (() => {
     renderConditions(latest);
     renderConditionPasses(provider, latest);
     renderConditionHistoryTable(provider);
+    renderHourlyAvailabilityCharts(provider);
     renderEpochTable(provider);
     renderAddresses(provider);
     renderEntityAddresses(provider, validatorData);
