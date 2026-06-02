@@ -1475,11 +1475,49 @@ tbody tr:hover td{
 }
 
 .chart-tooltip{
+  position:absolute;
+  z-index:8;
+  display:none;
+  width:max-content;
+  max-width:180px;
+  padding:10px 12px 9px;
   border-color:rgba(137,96,116,.16);
-  border-radius:14px;
+  border-radius:12px;
   background:rgba(255,255,255,.96);
-  box-shadow:0 20px 44px rgba(121,68,94,.14);
+  box-shadow:0 14px 32px rgba(121,68,94,.13);
   backdrop-filter:blur(16px);
+  color:var(--ink);
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.18;
+  pointer-events:none;
+  white-space:normal;
+}
+
+.chart-tooltip strong,
+.chart-tooltip b{
+  display:block;
+  font-size:19px;
+  font-weight:950;
+  line-height:1;
+}
+
+.chart-tooltip span{
+  display:block;
+  margin-top:5px;
+  color:#6f636b;
+  font-size:11px;
+  letter-spacing:0;
+}
+
+.chart-tooltip small{
+  display:block;
+  margin-top:5px;
+  color:#968892;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.02em;
 }
 
 .chart-summary{

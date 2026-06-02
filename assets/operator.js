@@ -1020,10 +1020,10 @@ const MirSFlr = (() => {
       const rect = target.querySelector("rect")?.getBoundingClientRect();
       const wrapRect = svg.parentElement.getBoundingClientRect();
       if (!rect) return;
-      tooltip.innerHTML = `<strong>${hourlyAvailabilityLabel(index, series.length)}</strong><br>${metricLabel}: ${pct(value)}`;
+      tooltip.innerHTML = `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 40, wrapRect.width - 178))}px`;
-      tooltip.style.top = `${Math.max(8, rect.top - wrapRect.top - 54)}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 24, wrapRect.width - 138))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - 106))}px`;
     };
     const hideTooltip = () => {
       if (tooltip) tooltip.style.display = "none";
@@ -1168,10 +1168,10 @@ const MirSFlr = (() => {
       if (!Number.isFinite(index)) return;
       const rect = target.getBoundingClientRect();
       const wrapRect = svg.parentElement.getBoundingClientRect();
-      tooltip.innerHTML = `<strong>${hourlyAvailabilityLabel(index, count)}</strong><br>${series.map(item => `${item.label}: ${pct(item.values[index])}`).join("<br>")}`;
+      tooltip.innerHTML = `${series.map(item => `<span><b>${pct(item.values[index])}</b> ${item.label}</span>`).join("")}<small>${hourlyAvailabilityLabel(index, count)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 48, wrapRect.width - 214))}px`;
-      tooltip.style.top = `${Math.max(8, rect.top - wrapRect.top + 16)}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 38, wrapRect.width - 188))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 16, wrapRect.height - 116))}px`;
     };
     const hideTooltip = () => {
       if (tooltip) tooltip.style.display = "none";
