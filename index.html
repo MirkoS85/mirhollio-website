@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=hourly-availability-2" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=hourly-performance-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -153,6 +153,17 @@
                     <div class="chart-tooltip" data-render="fdc-hourly-tooltip"></div>
                   </div>
                   <div class="chart-summary" data-render="fdc-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div>
+                </div>
+                <div class="chart-panel hourly-chart-panel performance-hourly-panel">
+                  <div class="panel-head">
+                    <strong>FTSO Performance (per hour)</strong>
+                    <span class="mini-label">Last 24h</span>
+                  </div>
+                  <div class="reward-chart-wrap hourly-chart-wrap performance-hourly-wrap">
+                    <svg class="hourly-chart performance-hourly-chart" data-render="ftso-performance-hourly-chart" viewBox="0 0 1000 260" preserveAspectRatio="none" aria-label="FTSO performance per hour chart"></svg>
+                    <div class="chart-tooltip" data-render="ftso-performance-hourly-tooltip"></div>
+                  </div>
+                  <div class="chart-summary" data-render="ftso-performance-hourly-summary"><span>Performance <strong>-</strong></span><span>Primary <strong>-</strong></span><span>Secondary <strong>-</strong></span></div>
                 </div>
               </div>
               <div class="chart-panel condition-history-panel">
@@ -292,8 +303,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=hourly-availability-2"></script>
-  <script src="assets/live-refresh.js?v=hourly-availability-2"></script>
+  <script src="assets/operator.js?v=hourly-performance-1"></script>
+  <script src="assets/live-refresh.js?v=hourly-performance-1"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>

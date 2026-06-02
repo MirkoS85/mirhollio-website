@@ -937,10 +937,9 @@ const MirSFlr = (() => {
   }
 
   function hourlyAvailabilityColor(value) {
-    if (value >= 0.995) return "#cf3679";
-    if (value >= 0.98) return "#f0a1c2";
-    if (value >= 0.95) return "#f7c9dc";
-    if (value >= 0.9) return "#df5268";
+    if (value >= 0.98) return "#cf3679";
+    if (value >= 0.8) return "#f0a1c2";
+    if (value >= 0.5) return "#df5268";
     return "#2a2226";
   }
 
@@ -1066,6 +1065,146 @@ const MirSFlr = (() => {
       values: provider?.fdcPerformance?.availability1h,
       metricLabel: "FDC availability",
       emptyMessage: "FDC hourly data unavailable"
+    });
+  }
+
+  function renderHourlyPerformanceChart({ svg, tooltip, summary, provider }) {
+    if (!svg) return;
+    const rawSeries = [
+      {
+        key: "performance",
+        label: "Performance",
+        values: provider?.ftsoPerformance?.performance1h,
+        color: "#cf3679",
+        dash: ""
+      },
+      {
+        key: "primary",
+        label: "Primary band (IQR)",
+        values: provider?.ftsoPerformance?.performance1_1h,
+        color: "#f0a1c2",
+        dash: "8 7"
+      },
+      {
+        key: "secondary",
+        label: "Secondary band",
+        values: provider?.ftsoPerformance?.performance2_1h,
+        color: "#df5268",
+        dash: "8 7"
+      }
+    ].map(series => ({
+      ...series,
+      values: [...(series.values || [])].map(value => Number(value)).filter(value => Number.isFinite(value)).slice(-24)
+    }));
+
+    const usable = rawSeries.filter(series => series.values.length);
+    const count = Math.min(...usable.map(series => series.values.length));
+    if (!usable.length || !Number.isFinite(count) || count <= 0) {
+      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#8d7f87" font-size="20" font-weight="800">FTSO performance data unavailable</text>`;
+      if (summary) summary.innerHTML = `<span>Performance <strong>-</strong></span><span>Primary <strong>-</strong></span><span>Secondary <strong>-</strong></span>`;
+      return;
+    }
+
+    const series = rawSeries.map(item => ({ ...item, values: item.values.slice(-count) }));
+    const width = 1000;
+    const height = 260;
+    const padLeft = 58;
+    const padRight = 22;
+    const padTop = 30;
+    const padBottom = 44;
+    const chartW = width - padLeft - padRight;
+    const chartH = height - padTop - padBottom;
+    const ticks = [1, 0.8, 0.6, 0.4, 0.2, 0];
+    const xFor = index => padLeft + (count === 1 ? chartW / 2 : (index / (count - 1)) * chartW);
+    const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
+    const pct = value => `${(value * 100).toFixed(2)}%`;
+
+    const grid = ticks.map(tick => {
+      const y = yFor(tick);
+      return `
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
+        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="12" font-weight="800">${Math.round(tick * 100)}%</text>
+      `;
+    }).join("");
+
+    const lines = series.map(item => {
+      const points = item.values.map((value, index) => `${xFor(index)},${yFor(value)}`).join(" ");
+      const circles = item.values.map((value, index) => `
+        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#fff8fb" stroke="${item.color}" stroke-width="2"></circle>
+      `).join("");
+      return `
+        <g class="performance-line performance-line-${item.key}">
+          <polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.key === "performance" ? 4 : 3}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${item.dash}" opacity="${item.key === "performance" ? 1 : .92}"></polyline>
+          ${circles}
+        </g>
+      `;
+    }).join("");
+
+    const hitTargets = Array.from({ length: count }, (_, index) => {
+      const label = hourlyAvailabilityLabel(index, count);
+      const values = series.map(item => `${item.label}: ${pct(item.values[index])}`).join(", ");
+      return `
+        <rect class="performance-hit-target" tabindex="0" data-chart-index="${index}" x="${xFor(index) - 15}" y="${padTop}" width="30" height="${chartH}" fill="transparent" aria-label="${label} ${values}"></rect>
+      `;
+    }).join("");
+
+    const labels = Array.from({ length: count }, (_, index) => {
+      if (index % 3 !== 0 && index !== count - 1) return "";
+      return `<text x="${xFor(index)}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="12" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
+    }).join("");
+
+    const legend = series.map((item, index) => `
+      <g transform="translate(${360 + index * 170}, 12)">
+        <circle cx="0" cy="0" r="7" fill="none" stroke="${item.color}" stroke-width="3"></circle>
+        <text x="12" y="5" fill="#7d7178" font-size="13" font-weight="850">${item.label}</text>
+      </g>
+    `).join("");
+
+    svg.innerHTML = `${grid}${legend}${lines}${hitTargets}${labels}`;
+
+    const showTooltip = target => {
+      if (!tooltip) return;
+      const index = Number(target.getAttribute("data-chart-index"));
+      if (!Number.isFinite(index)) return;
+      const rect = target.getBoundingClientRect();
+      const wrapRect = svg.parentElement.getBoundingClientRect();
+      tooltip.innerHTML = `<strong>${hourlyAvailabilityLabel(index, count)}</strong><br>${series.map(item => `${item.label}: ${pct(item.values[index])}`).join("<br>")}`;
+      tooltip.style.display = "block";
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 48, wrapRect.width - 214))}px`;
+      tooltip.style.top = `${Math.max(8, rect.top - wrapRect.top + 16)}px`;
+    };
+    const hideTooltip = () => {
+      if (tooltip) tooltip.style.display = "none";
+    };
+
+    svg.querySelectorAll("[data-chart-index]").forEach(target => {
+      target.addEventListener("mouseenter", () => showTooltip(target));
+      target.addEventListener("focus", () => showTooltip(target));
+      target.addEventListener("click", event => {
+        event.preventDefault();
+        showTooltip(target);
+      });
+      target.addEventListener("touchstart", event => {
+        event.preventDefault();
+        showTooltip(target);
+      }, { passive: false });
+      target.addEventListener("mouseleave", hideTooltip);
+      target.addEventListener("blur", hideTooltip);
+    });
+
+    if (summary) {
+      const latest = series.map(item => [item.key, item.values[item.values.length - 1]]);
+      const byKey = Object.fromEntries(latest);
+      summary.innerHTML = `<span>Performance <strong>${Number.isFinite(byKey.performance) ? pct(byKey.performance) : "-"}</strong></span><span>Primary <strong>${Number.isFinite(byKey.primary) ? pct(byKey.primary) : "-"}</strong></span><span>Secondary <strong>${Number.isFinite(byKey.secondary) ? pct(byKey.secondary) : "-"}</strong></span>`;
+    }
+  }
+
+  function renderHourlyPerformanceCharts(provider) {
+    renderHourlyPerformanceChart({
+      svg: document.querySelector("[data-render='ftso-performance-hourly-chart']"),
+      tooltip: document.querySelector("[data-render='ftso-performance-hourly-tooltip']"),
+      summary: document.querySelector("[data-render='ftso-performance-hourly-summary']"),
+      provider
     });
   }
 
@@ -1273,6 +1412,7 @@ const MirSFlr = (() => {
     renderConditionPasses(provider, latest);
     renderConditionHistoryTable(provider);
     renderHourlyAvailabilityCharts(provider);
+    renderHourlyPerformanceCharts(provider);
     renderEpochTable(provider);
     renderAddresses(provider);
     renderEntityAddresses(provider, validatorData);

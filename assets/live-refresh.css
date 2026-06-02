@@ -1456,6 +1456,20 @@ tbody tr:hover td{
   opacity:1;
 }
 
+.performance-hourly-chart{
+  height:224px;
+}
+
+.performance-hit-target{
+  cursor:crosshair;
+  outline:none;
+}
+
+.performance-hit-target:focus{
+  stroke:rgba(207,54,121,.34);
+  stroke-width:2;
+}
+
 .table-panel{
   margin-top:14px;
 }
@@ -1815,6 +1829,10 @@ tbody tr:hover td{
 
   .hourly-chart{
     height:170px;
+  }
+
+  .performance-hourly-chart{
+    height:210px;
   }
 
   .chart-summary{
