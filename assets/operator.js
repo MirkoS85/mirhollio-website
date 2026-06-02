@@ -951,7 +951,7 @@ const MirSFlr = (() => {
   }
 
   function isCompactChart() {
-    return window.matchMedia("(max-width: 620px)").matches;
+    return window.matchMedia("(max-width: 760px)").matches;
   }
 
   function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
@@ -968,16 +968,17 @@ const MirSFlr = (() => {
     }
 
     const compact = isCompactChart();
-    const width = 1000;
-    const height = compact ? 238 : 220;
-    const padLeft = compact ? 54 : 58;
-    const padRight = 18;
-    const padTop = compact ? 22 : 16;
-    const padBottom = compact ? 38 : 42;
+    const width = compact ? 420 : 1000;
+    const height = compact ? 218 : 220;
+    const padLeft = compact ? 38 : 58;
+    const padRight = compact ? 12 : 18;
+    const padTop = compact ? 14 : 16;
+    const padBottom = compact ? 30 : 42;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
-    const gap = compact ? 12 : 10;
-    const barW = Math.max(12, (chartW - gap * (series.length - 1)) / series.length);
+    const gap = compact ? 4 : 10;
+    const barW = Math.max(compact ? 7 : 12, (chartW - gap * (series.length - 1)) / series.length);
+    const barRadius = compact ? 5 : 8;
     const ticks = compact ? [1, 0.8, 0.5, 0] : [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0];
     const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
     const pct = value => `${(value * 100).toFixed(2)}%`;
@@ -990,7 +991,7 @@ const MirSFlr = (() => {
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
         <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
-        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${label}</text>
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
       `;
     }).join("");
 
@@ -1002,8 +1003,8 @@ const MirSFlr = (() => {
       const color = hourlyAvailabilityColor(value);
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(value)}" aria-label="${label} ${metricLabel}: ${pct(value)}">
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2" opacity=".96"></rect>
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="8" fill="rgba(255,255,255,.10)"></rect>
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2" opacity=".96"></rect>
+          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="rgba(255,255,255,.10)"></rect>
         </g>
       `;
     }).join("");
@@ -1013,9 +1014,10 @@ const MirSFlr = (() => {
       if (index % interval !== 0 && index !== series.length - 1) return "";
       const x = padLeft + index * (barW + gap) + barW / 2;
       const label = hourlyAvailabilityLabel(index, series.length);
-      return `<text x="${x}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${label}</text>`;
+      return `<text x="${x}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>`;
     }).join("");
 
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${bars}${labels}`;
 
     let tooltipTimer = 0;
@@ -1029,8 +1031,8 @@ const MirSFlr = (() => {
       if (!rect) return;
       tooltip.innerHTML = `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 18, wrapRect.width - (compact ? 128 : 138)))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - (compact ? 92 : 106)))}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 12, wrapRect.width - (compact ? 118 : 138)))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 10, wrapRect.height - (compact ? 82 : 106)))}px`;
       if (compact) {
         window.clearTimeout(tooltipTimer);
         tooltipTimer = window.setTimeout(hideTooltip, 1600);
@@ -1123,12 +1125,12 @@ const MirSFlr = (() => {
 
     const series = rawSeries.map(item => ({ ...item, values: item.values.slice(-count) }));
     const compact = isCompactChart();
-    const width = 1000;
-    const height = compact ? 282 : 260;
-    const padLeft = compact ? 54 : 58;
-    const padRight = 22;
-    const padTop = compact ? 22 : 30;
-    const padBottom = compact ? 38 : 44;
+    const width = compact ? 420 : 1000;
+    const height = compact ? 236 : 260;
+    const padLeft = compact ? 38 : 58;
+    const padRight = compact ? 12 : 22;
+    const padTop = compact ? 14 : 30;
+    const padBottom = compact ? 30 : 44;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
     const ticks = compact ? [1, 0.8, 0.6, 0.4, 0.2, 0] : [1, 0.8, 0.6, 0.4, 0.2, 0];
@@ -1140,7 +1142,7 @@ const MirSFlr = (() => {
       const y = yFor(tick);
       return `
         <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
-        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${Math.round(tick * 100)}%</text>
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${Math.round(tick * 100)}%</text>
       `;
     }).join("");
 
@@ -1168,7 +1170,7 @@ const MirSFlr = (() => {
     const labels = Array.from({ length: count }, (_, index) => {
       const interval = compact ? 6 : 3;
       if (index % interval !== 0 && index !== count - 1) return "";
-      return `<text x="${xFor(index)}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
+      return `<text x="${xFor(index)}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
     }).join("");
 
     const legend = compact ? "" : series.map((item, index) => `
@@ -1178,6 +1180,7 @@ const MirSFlr = (() => {
       </g>
     `).join("");
 
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${legend}${lines}${hitTargets}${labels}`;
 
     let tooltipTimer = 0;
@@ -1189,8 +1192,8 @@ const MirSFlr = (() => {
       const wrapRect = svg.parentElement.getBoundingClientRect();
       tooltip.innerHTML = `${series.map(item => `<span><b>${pct(item.values[index])}</b> ${item.label}</span>`).join("")}<small>${hourlyAvailabilityLabel(index, count)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 24, wrapRect.width - (compact ? 154 : 188)))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - (compact ? 132 : 116)))}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 12, wrapRect.width - (compact ? 136 : 188)))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 10, wrapRect.height - (compact ? 112 : 116)))}px`;
       if (compact) {
         window.clearTimeout(tooltipTimer);
         tooltipTimer = window.setTimeout(hideTooltip, 1800);

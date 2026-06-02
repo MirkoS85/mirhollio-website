@@ -166,13 +166,18 @@
     toggle.setAttribute("aria-expanded", "false");
     toggle.innerHTML = "<span></span><span></span><span></span>";
 
-    const delegateButton = row.querySelector(".btn");
-    row.insertBefore(toggle, delegateButton || null);
+    row.insertBefore(toggle, row.firstElementChild || null);
+
+    function syncTopHeight() {
+      const height = Math.ceil(mobileTop.getBoundingClientRect().height || 0);
+      if (height > 0) document.documentElement.style.setProperty("--mobile-top-height", `${height}px`);
+    }
 
     function setOpen(open) {
       document.body.classList.toggle("mobile-nav-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+      window.requestAnimationFrame(syncTopHeight);
     }
 
     toggle.addEventListener("click", event => {
@@ -196,7 +201,13 @@
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 620) setOpen(false);
+      syncTopHeight();
     }, { passive: true });
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(syncTopHeight).observe(mobileTop);
+    }
+    window.requestAnimationFrame(syncTopHeight);
   }
 
   function bindBackToTop() {
