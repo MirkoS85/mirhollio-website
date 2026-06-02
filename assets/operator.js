@@ -950,6 +950,10 @@ const MirSFlr = (() => {
     return `${hoursAgo}h ago`;
   }
 
+  function isCompactChart() {
+    return window.matchMedia("(max-width: 620px)").matches;
+  }
+
   function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
     if (!svg) return;
     const series = [...(values || [])]
@@ -963,17 +967,18 @@ const MirSFlr = (() => {
       return;
     }
 
+    const compact = isCompactChart();
     const width = 1000;
-    const height = 220;
-    const padLeft = 58;
+    const height = compact ? 238 : 220;
+    const padLeft = compact ? 54 : 58;
     const padRight = 18;
-    const padTop = 16;
-    const padBottom = 42;
+    const padTop = compact ? 22 : 16;
+    const padBottom = compact ? 38 : 42;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
-    const gap = 10;
+    const gap = compact ? 12 : 10;
     const barW = Math.max(12, (chartW - gap * (series.length - 1)) / series.length);
-    const ticks = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0];
+    const ticks = compact ? [1, 0.8, 0.5, 0] : [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0];
     const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
     const pct = value => `${(value * 100).toFixed(2)}%`;
     const avg = series.reduce((sum, value) => sum + value, 0) / series.length;
@@ -985,7 +990,7 @@ const MirSFlr = (() => {
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
         <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
-        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="12" font-weight="800">${label}</text>
+        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${label}</text>
       `;
     }).join("");
 
@@ -1004,14 +1009,16 @@ const MirSFlr = (() => {
     }).join("");
 
     const labels = series.map((_, index) => {
-      if (index % 3 !== 0 && index !== series.length - 1) return "";
+      const interval = compact ? 6 : 3;
+      if (index % interval !== 0 && index !== series.length - 1) return "";
       const x = padLeft + index * (barW + gap) + barW / 2;
       const label = hourlyAvailabilityLabel(index, series.length);
-      return `<text x="${x}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="12" font-weight="800">${label}</text>`;
+      return `<text x="${x}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${label}</text>`;
     }).join("");
 
     svg.innerHTML = `${grid}${bars}${labels}`;
 
+    let tooltipTimer = 0;
     const showTooltip = target => {
       if (!tooltip) return;
       const index = Number(target.getAttribute("data-chart-index"));
@@ -1022,10 +1029,15 @@ const MirSFlr = (() => {
       if (!rect) return;
       tooltip.innerHTML = `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 24, wrapRect.width - 138))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - 106))}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 18, wrapRect.width - (compact ? 128 : 138)))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - (compact ? 92 : 106)))}px`;
+      if (compact) {
+        window.clearTimeout(tooltipTimer);
+        tooltipTimer = window.setTimeout(hideTooltip, 1600);
+      }
     };
     const hideTooltip = () => {
+      window.clearTimeout(tooltipTimer);
       if (tooltip) tooltip.style.display = "none";
     };
 
@@ -1040,6 +1052,10 @@ const MirSFlr = (() => {
         event.preventDefault();
         showTooltip(target);
       }, { passive: false });
+      target.addEventListener("touchend", () => {
+        tooltipTimer = window.setTimeout(hideTooltip, 500);
+      }, { passive: true });
+      target.addEventListener("touchcancel", hideTooltip, { passive: true });
       target.addEventListener("mouseleave", hideTooltip);
       target.addEventListener("blur", hideTooltip);
     });
@@ -1106,15 +1122,16 @@ const MirSFlr = (() => {
     }
 
     const series = rawSeries.map(item => ({ ...item, values: item.values.slice(-count) }));
+    const compact = isCompactChart();
     const width = 1000;
-    const height = 260;
-    const padLeft = 58;
+    const height = compact ? 282 : 260;
+    const padLeft = compact ? 54 : 58;
     const padRight = 22;
-    const padTop = 30;
-    const padBottom = 44;
+    const padTop = compact ? 22 : 30;
+    const padBottom = compact ? 38 : 44;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
-    const ticks = [1, 0.8, 0.6, 0.4, 0.2, 0];
+    const ticks = compact ? [1, 0.8, 0.6, 0.4, 0.2, 0] : [1, 0.8, 0.6, 0.4, 0.2, 0];
     const xFor = index => padLeft + (count === 1 ? chartW / 2 : (index / (count - 1)) * chartW);
     const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
     const pct = value => `${(value * 100).toFixed(2)}%`;
@@ -1123,7 +1140,7 @@ const MirSFlr = (() => {
       const y = yFor(tick);
       return `
         <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
-        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="12" font-weight="800">${Math.round(tick * 100)}%</text>
+        <text x="${padLeft - 12}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${Math.round(tick * 100)}%</text>
       `;
     }).join("");
 
@@ -1149,11 +1166,12 @@ const MirSFlr = (() => {
     }).join("");
 
     const labels = Array.from({ length: count }, (_, index) => {
-      if (index % 3 !== 0 && index !== count - 1) return "";
-      return `<text x="${xFor(index)}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="12" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
+      const interval = compact ? 6 : 3;
+      if (index % interval !== 0 && index !== count - 1) return "";
+      return `<text x="${xFor(index)}" y="${height - 12}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 13 : 12}" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
     }).join("");
 
-    const legend = series.map((item, index) => `
+    const legend = compact ? "" : series.map((item, index) => `
       <g transform="translate(${360 + index * 170}, 12)">
         <circle cx="0" cy="0" r="7" fill="none" stroke="${item.color}" stroke-width="3"></circle>
         <text x="12" y="5" fill="#7d7178" font-size="13" font-weight="850">${item.label}</text>
@@ -1162,6 +1180,7 @@ const MirSFlr = (() => {
 
     svg.innerHTML = `${grid}${legend}${lines}${hitTargets}${labels}`;
 
+    let tooltipTimer = 0;
     const showTooltip = target => {
       if (!tooltip) return;
       const index = Number(target.getAttribute("data-chart-index"));
@@ -1170,10 +1189,15 @@ const MirSFlr = (() => {
       const wrapRect = svg.parentElement.getBoundingClientRect();
       tooltip.innerHTML = `${series.map(item => `<span><b>${pct(item.values[index])}</b> ${item.label}</span>`).join("")}<small>${hourlyAvailabilityLabel(index, count)}</small>`;
       tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 38, wrapRect.width - 188))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 16, wrapRect.height - 116))}px`;
+      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 24, wrapRect.width - (compact ? 154 : 188)))}px`;
+      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 12, wrapRect.height - (compact ? 132 : 116)))}px`;
+      if (compact) {
+        window.clearTimeout(tooltipTimer);
+        tooltipTimer = window.setTimeout(hideTooltip, 1800);
+      }
     };
     const hideTooltip = () => {
+      window.clearTimeout(tooltipTimer);
       if (tooltip) tooltip.style.display = "none";
     };
 
@@ -1188,6 +1212,10 @@ const MirSFlr = (() => {
         event.preventDefault();
         showTooltip(target);
       }, { passive: false });
+      target.addEventListener("touchend", () => {
+        tooltipTimer = window.setTimeout(hideTooltip, 500);
+      }, { passive: true });
+      target.addEventListener("touchcancel", hideTooltip, { passive: true });
       target.addEventListener("mouseleave", hideTooltip);
       target.addEventListener("blur", hideTooltip);
     });

@@ -100,11 +100,18 @@
   function bindInfoTips() {
     const buttons = [...document.querySelectorAll(".info-tip")];
     if (!buttons.length) return;
-    const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+    const prefersTouch = window.matchMedia("(pointer: coarse)").matches
+      || window.matchMedia("(max-width: 620px)").matches
+      || navigator.maxTouchPoints > 0
+      || "ontouchstart" in window;
 
     function closeTouchTip(button) {
       button.classList.remove("info-touch-active");
       button.blur();
+    }
+
+    function closeAllTouchTips() {
+      buttons.forEach(closeTouchTip);
     }
 
     buttons.forEach(button => {
@@ -113,23 +120,83 @@
       });
 
       if (prefersTouch) {
-        button.addEventListener("pointerdown", event => {
+        const openTip = event => {
+          closeAllTouchTips();
           button.classList.add("info-touch-active");
           positionInfoTip(button);
           button.setPointerCapture?.(event.pointerId);
-        });
-        ["pointerup", "pointercancel", "pointerleave"].forEach(type => {
+        };
+
+        button.addEventListener("pointerdown", openTip);
+        button.addEventListener("touchstart", openTip, { passive: true });
+
+        ["pointerup", "pointercancel", "pointerleave", "lostpointercapture", "touchend", "touchcancel"].forEach(type => {
           button.addEventListener(type, () => closeTouchTip(button));
+        });
+
+        button.addEventListener("click", () => {
+          window.setTimeout(() => closeTouchTip(button), 0);
         });
       }
     });
 
     ["scroll", "resize"].forEach(type => {
       window.addEventListener(type, () => {
+        closeAllTouchTips();
         const active = document.querySelector(".info-tip:hover, .info-tip:focus-visible");
         if (active) positionInfoTip(active);
       }, { passive: true });
     });
+  }
+
+  function bindMobileNav() {
+    const mobileTop = document.querySelector(".mobile-top");
+    const row = mobileTop?.querySelector(".mobile-row");
+    const nav = mobileTop?.querySelector(".mobile-links");
+    if (!mobileTop || !row || !nav || row.querySelector(".mobile-nav-toggle")) return;
+
+    const navId = nav.id || "mobile-navigation";
+    nav.id = navId;
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "mobile-nav-toggle";
+    toggle.setAttribute("aria-label", "Open navigation");
+    toggle.setAttribute("aria-controls", navId);
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.innerHTML = "<span></span><span></span><span></span>";
+
+    const delegateButton = row.querySelector(".btn");
+    row.insertBefore(toggle, delegateButton || null);
+
+    function setOpen(open) {
+      document.body.classList.toggle("mobile-nav-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    }
+
+    toggle.addEventListener("click", event => {
+      event.stopPropagation();
+      setOpen(!document.body.classList.contains("mobile-nav-open"));
+    });
+
+    nav.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    document.addEventListener("click", event => {
+      if (!document.body.classList.contains("mobile-nav-open")) return;
+      if (mobileTop.contains(event.target)) return;
+      setOpen(false);
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 620) setOpen(false);
+    }, { passive: true });
   }
 
   function bindBackToTop() {
@@ -222,6 +289,7 @@
     tightenLongValues();
     formatPassStrikeValues();
     bindPanelAccordion();
+    bindMobileNav();
     bindInfoTips();
     bindBackToTop();
     bindPageTransitions();
