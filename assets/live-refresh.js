@@ -272,26 +272,7 @@
   }
 
   function bindPageTransitions() {
-    if (!window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
-
-    document.addEventListener("click", event => {
-      const link = event.target.closest("a[href]");
-      if (!link) return;
-      if (event.defaultPrevented || event.button !== 0) return;
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      if (link.target && link.target !== "_self") return;
-      if (link.hasAttribute("download")) return;
-
-      const url = new URL(link.href, window.location.href);
-      if (url.origin !== window.location.origin) return;
-      if (url.pathname === window.location.pathname && url.search === window.location.search) return;
-
-      event.preventDefault();
-      document.body.classList.add("page-leaving");
-      window.setTimeout(() => {
-        window.location.href = url.href;
-      }, 120);
-    });
+    // Keep page navigation direct. The previous fade-out made sidebar clicks feel slow.
   }
 
   function boot() {

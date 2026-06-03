@@ -18,6 +18,7 @@
   --green:#18a36f;
   --yellow:#d9a642;
   --danger:#ef6786;
+  --max:1280px;
 }
 
 body{
@@ -37,37 +38,6 @@ html{
   overflow-x:hidden;
   max-width:100%;
   overscroll-behavior-x:none;
-}
-
-@media (prefers-reduced-motion:no-preference){
-  @view-transition{
-    navigation:auto;
-  }
-
-  ::view-transition-old(root){
-    animation:mirs-page-out .16s ease both;
-  }
-
-  ::view-transition-new(root){
-    animation:mirs-page-in .22s ease both;
-  }
-
-  body.page-leaving .mobile-top,
-  body.page-leaving .site-shell{
-    opacity:.01;
-    transform:translateY(4px);
-    transition:opacity .14s ease, transform .14s ease;
-  }
-}
-
-@keyframes mirs-page-out{
-  from{opacity:1; transform:none}
-  to{opacity:.01; transform:translateY(4px)}
-}
-
-@keyframes mirs-page-in{
-  from{opacity:.01; transform:translateY(6px)}
-  to{opacity:1; transform:none}
 }
 
 body::before,
@@ -768,6 +738,10 @@ h1{
   white-space:nowrap;
 }
 
+[data-full-value]{
+  cursor:help;
+}
+
 .skeleton-value{
   position:relative;
   display:inline-block;
@@ -1460,21 +1434,21 @@ tbody tr:hover td{
 }
 
 .chart-panel{
-  padding:18px;
+  padding:22px;
   border-radius:26px;
   max-width:100%;
   overflow:hidden;
 }
 
 .chart-panel .panel-head{
-  margin:-18px -18px 16px;
+  margin:-22px -22px 18px;
 }
 
 .reward-chart-wrap{
   position:relative;
   max-width:100%;
   overflow:hidden;
-  padding:14px;
+  padding:18px;
   border:1px solid var(--line);
   border-radius:22px;
   background:
@@ -1486,14 +1460,14 @@ tbody tr:hover td{
   display:block;
   width:100%;
   max-width:100%;
-  height:286px;
+  height:330px;
 }
 
 .hourly-chart-grid{
   display:grid;
   grid-template-columns:1fr;
-  gap:14px;
-  margin-top:14px;
+  gap:18px;
+  margin-top:18px;
 }
 
 .hourly-chart-panel{
@@ -1501,14 +1475,14 @@ tbody tr:hover td{
 }
 
 .hourly-chart-wrap{
-  padding:12px;
+  padding:16px;
 }
 
 .hourly-chart{
   display:block;
   width:100%;
   max-width:100%;
-  height:188px;
+  height:230px;
 }
 
 .hourly-point{
@@ -1523,7 +1497,7 @@ tbody tr:hover td{
 }
 
 .performance-hourly-chart{
-  height:224px;
+  height:270px;
 }
 
 .performance-hit-target{
@@ -2912,5 +2886,43 @@ tbody tr:hover td{
 
   .condition-pass-count{
     font-size:13px;
+  }
+}
+
+@media (max-width:620px){
+  .kicker,
+  .metric span,
+  .snap-metric span,
+  .compact-stat b,
+  .currency-control span,
+  .mini-label,
+  .chart-panel .mini-label,
+  .panel-head .mini-label,
+  .address-stat span,
+  .copy-title,
+  .row span,
+  .validator-id span,
+  .validator-stat span,
+  .validator-progress span,
+  .validator-foot span,
+  .delegator-summary span,
+  .availability-scale span,
+  tbody th::before,
+  tbody td::before{
+    color:#7a6b74 !important;
+    font-size:11px !important;
+    font-weight:400 !important;
+    letter-spacing:0 !important;
+    text-transform:none !important;
+  }
+
+  .status-dot{
+    gap:7px;
+  }
+
+  .metric span,
+  .snap-metric span,
+  .compact-stat b{
+    line-height:1.2;
   }
 }

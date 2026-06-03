@@ -79,7 +79,13 @@ const MirSFlr = (() => {
   function fmtWeight(value) {
     const n = normalizedWeight(value);
     if (!Number.isFinite(n)) return "-";
-    return `${(n / 1_000_000).toLocaleString("sl-SI", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} mil`;
+    return `${Math.round(n / 1_000_000).toLocaleString("en-US")}M`;
+  }
+
+  function fmtFullWeight(value, suffix = " WFLR") {
+    const n = normalizedWeight(value);
+    if (!Number.isFinite(n)) return "-";
+    return `${Math.round(n).toLocaleString("en-US")}${suffix}`;
   }
 
   function normalizedWeight(value) {
@@ -111,6 +117,25 @@ const MirSFlr = (() => {
       el.classList.remove("skeleton-value");
       el.removeAttribute("aria-busy");
     });
+  }
+
+  function setFieldTitle(key, value) {
+    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+      if (!value || value === "-") {
+        el.removeAttribute("title");
+        el.removeAttribute("aria-label");
+        delete el.dataset.fullValue;
+        return;
+      }
+      el.title = value;
+      el.setAttribute("aria-label", value);
+      el.dataset.fullValue = value;
+    });
+  }
+
+  function setWeightText(key, value, suffix = " WFLR") {
+    setText(key, fmtWeight(value));
+    setFieldTitle(key, fmtFullWeight(value, suffix));
   }
 
   function getStorage(name) {
@@ -1402,10 +1427,10 @@ const MirSFlr = (() => {
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
     if (!ftsoEntityData) {
-      setText("votePower", latest?.m_dTotalWeight != null ? fmtCompact(latest.m_dTotalWeight) : "-");
-      setText("ftsoWeight", latest?.m_dTotalWeight != null ? fmtWeight(latest.m_dTotalWeight) : "-");
-      setText("delegationWeight", latest?.m_dDelegationWeight != null ? fmtWeight(latest.m_dDelegationWeight) : "-");
-      setText("stakeWeight", latest?.m_dStakeWeight != null ? fmtWeight(latest.m_dStakeWeight) : "-");
+      setWeightText("votePower", latest?.m_dTotalWeight);
+      setWeightText("ftsoWeight", latest?.m_dTotalWeight);
+      setWeightText("delegationWeight", latest?.m_dDelegationWeight);
+      setWeightText("stakeWeight", latest?.m_dStakeWeight);
       setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     }
     setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
@@ -1522,10 +1547,10 @@ const MirSFlr = (() => {
     const stakingWeight = policy.staking_weight;
     const fee = policy.delegation_fee_bips;
 
-    setText("ftsoWeight", totalWeight != null ? fmtWeight(totalWeight) : "-");
-    setText("votePower", totalWeight != null ? fmtWeight(totalWeight) : "-");
-    setText("delegationWeight", delegatedWeight != null ? fmtWeight(delegatedWeight) : "-");
-    setText("stakeWeight", stakingWeight != null ? fmtWeight(stakingWeight) : "-");
+    setWeightText("ftsoWeight", totalWeight);
+    setWeightText("votePower", totalWeight);
+    setWeightText("delegationWeight", delegatedWeight);
+    setWeightText("stakeWeight", stakingWeight);
     if (fee != null) setText("ftsoFee", `${fmtNum(Number(fee) / 100, 2)}%`);
   }
 
@@ -1658,6 +1683,7 @@ const MirSFlr = (() => {
     enhanceCopyButtons();
     restoreCurrencyPreference();
     setLoadingState();
+    applyFtsoEntityData(FTSO_ENTITY_SNAPSHOT);
     load();
     loadValidator();
     loadFtsoExplorer();
