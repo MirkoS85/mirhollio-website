@@ -2969,3 +2969,9 @@ tbody tr:hover td{
     box-shadow:none !important;
   }
 }
+
+@media (max-width:620px){
+  .home-snapshot-grid .role-choice > b{
+    display:none;
+  }
+}
