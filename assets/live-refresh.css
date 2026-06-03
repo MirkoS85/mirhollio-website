@@ -2296,6 +2296,13 @@ tbody tr:hover td{
 }
 
 @media (max-width:620px){
+  .snap-metric{
+    border:0;
+    background:var(--surface-2);
+  }
+}
+
+@media (max-width:620px){
   main,
   .mobile-top,
   .site-shell,
