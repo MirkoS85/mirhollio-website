@@ -2974,4 +2974,8 @@ tbody tr:hover td{
   .home-snapshot-grid .role-choice > b{
     display:none;
   }
+
+  .home-snapshot-grid .role-choice > p{
+    display:none;
+  }
 }
