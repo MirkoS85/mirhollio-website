@@ -149,6 +149,39 @@
     });
   }
 
+  function createShellLiveStats(className) {
+    const block = document.createElement("div");
+    block.className = `shell-live ${className}`;
+    block.setAttribute("aria-label", "Live site stats");
+    block.innerHTML = `
+      <div class="shell-live-row">
+        <span>FLR price</span>
+        <strong data-field="flrPrice">-</strong>
+      </div>
+      <div class="shell-live-row">
+        <span>Epoch</span>
+        <strong data-field="latestEpoch">-</strong>
+      </div>
+      <div class="shell-live-row">
+        <span>FTSO status</span>
+        <strong class="shell-live-status"><i aria-hidden="true"></i><b data-field="status">Loading</b></strong>
+      </div>
+    `;
+    return block;
+  }
+
+  function injectShellLiveStats() {
+    const primaryNav = document.querySelector(".side .nav");
+    if (primaryNav && !document.querySelector(".side-live")) {
+      primaryNav.insertAdjacentElement("afterend", createShellLiveStats("side-live"));
+    }
+
+    const mobileNav = document.querySelector(".mobile-links");
+    if (mobileNav && !mobileNav.querySelector(".mobile-live")) {
+      mobileNav.appendChild(createShellLiveStats("mobile-live"));
+    }
+  }
+
   function bindMobileNav() {
     const mobileTop = document.querySelector(".mobile-top");
     const row = mobileTop?.querySelector(".mobile-row");
@@ -281,6 +314,7 @@
     tightenLongValues();
     formatPassStrikeValues();
     bindPanelAccordion();
+    injectShellLiveStats();
     bindMobileNav();
     bindInfoTips();
     bindBackToTop();
