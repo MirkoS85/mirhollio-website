@@ -2948,3 +2948,24 @@ tbody tr:hover td{
     line-height:1.2;
   }
 }
+
+@media (max-width:620px){
+  .mobile-links a[aria-current="page"]{
+    justify-content:flex-start;
+    padding-left:10px !important;
+    color:var(--ink) !important;
+    border-color:rgba(137,96,116,.12) !important;
+    border-left:3px solid var(--pink) !important;
+    background:rgba(217,63,132,.06) !important;
+    box-shadow:none !important;
+  }
+
+  .mobile-links a[aria-current="page"]:hover,
+  .mobile-links a[aria-current="page"]:focus-visible{
+    color:var(--ink) !important;
+    border-color:rgba(137,96,116,.16) !important;
+    border-left-color:var(--pink) !important;
+    background:rgba(217,63,132,.08) !important;
+    box-shadow:none !important;
+  }
+}
