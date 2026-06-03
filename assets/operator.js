@@ -58,6 +58,14 @@ const MirSFlr = (() => {
     return pct.toFixed(decimals) + "%";
   }
 
+  function fmtSnapshotPct(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    const pct = n <= 1 ? n * 100 : n;
+    const rounded = Math.round(pct * 10) / 10;
+    return Math.abs(rounded - 100) < 0.05 ? "100%" : `${rounded.toFixed(1)}%`;
+  }
+
   function fmtPrecisePct(value, decimals = 2) {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -1426,16 +1434,19 @@ const MirSFlr = (() => {
     setText("status", "Online");
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
+    setText("rewardRateSnapshot", latest?.m_dRewardRate != null ? fmtSnapshotPct(latest.m_dRewardRate) : "-");
     if (!ftsoEntityData) {
       setWeightText("votePower", latest?.m_dTotalWeight);
       setWeightText("ftsoWeight", latest?.m_dTotalWeight);
       setWeightText("delegationWeight", latest?.m_dDelegationWeight);
       setWeightText("stakeWeight", latest?.m_dStakeWeight);
       setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
+      setText("ftsoFeeSnapshot", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     }
     setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
     setText("averageReward", provider.averageRewardPerEpoch != null ? fmtCompact(provider.averageRewardPerEpoch, " FLR") : "-");
     setText("availability", provider.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
+    setText("availabilitySnapshot", provider.ftsoPerformance?.availability != null ? fmtSnapshotPct(provider.ftsoPerformance.availability) : "-");
     setText("performance", provider.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
     setText("performance1", provider.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
     setText("performance2", provider.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
@@ -1506,7 +1517,9 @@ const MirSFlr = (() => {
     setText("validatorConnected", connected);
     setText("validatorNodeId", shortAddr(node?.m_sNodeID));
     setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
+    setText("validatorAprSnapshot", Number.isFinite(estimateValidatorApr(node)) ? fmtSnapshotPct(estimateValidatorApr(node)) : "-");
     setText("validatorUptimeAvg", Number.isFinite(uptimeAvg) ? `${fmtNum(uptimeAvg, 2)}%` : "-");
+    setText("validatorUptimeSnapshot", Number.isFinite(uptimeAvg) ? fmtSnapshotPct(uptimeAvg) : "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
     setText("validatorNodeVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "") : "-");
@@ -1552,6 +1565,7 @@ const MirSFlr = (() => {
     setWeightText("delegationWeight", delegatedWeight);
     setWeightText("stakeWeight", stakingWeight);
     if (fee != null) setText("ftsoFee", `${fmtNum(Number(fee) / 100, 2)}%`);
+    if (fee != null) setText("ftsoFeeSnapshot", `${fmtNum(Number(fee) / 100, 2)}%`);
   }
 
   function applyProviderV2Data(data) {
