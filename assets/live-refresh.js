@@ -76,6 +76,25 @@
     });
   }
 
+  function labelPreRegisteredStatus(root = document) {
+    root.querySelectorAll("[data-field='preRegisteredStatus']").forEach(el => {
+      const raw = (el.textContent || "").trim().toLowerCase();
+      let label = "Pre-reg unknown";
+      let state = "unknown";
+
+      if (raw === "pre-reg" || raw === "pre-registered" || raw === "yes") {
+        label = "Pre-registered";
+        state = "ok";
+      } else if (raw === "no pre-reg" || raw === "not pre-registered" || raw === "no") {
+        label = "Not pre-registered";
+        state = "bad";
+      }
+
+      el.dataset.mobileLabel = label;
+      el.dataset.mobileStatus = state;
+    });
+  }
+
   function positionInfoTip(button) {
     const tooltip = button.querySelector("span");
     if (!tooltip) return;
@@ -313,6 +332,7 @@
     simplifyConditionDots();
     tightenLongValues();
     formatPassStrikeValues();
+    labelPreRegisteredStatus();
     bindPanelAccordion();
     injectShellLiveStats();
     bindMobileNav();
@@ -327,6 +347,7 @@
           simplifyConditionDots();
           tightenLongValues();
           formatPassStrikeValues();
+          labelPreRegisteredStatus();
           break;
         }
       }
