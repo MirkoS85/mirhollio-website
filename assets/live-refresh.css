@@ -2300,6 +2300,21 @@ tbody tr:hover td{
     border:0;
     background:var(--surface-2);
   }
+
+  .home-snap-actions .decision-btn{
+    color:var(--ink) !important;
+    border:1px solid rgba(128,88,109,.24) !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  .home-snap-actions .decision-btn:hover,
+  .home-snap-actions .decision-btn:focus-visible{
+    color:#752946 !important;
+    border-color:rgba(217,63,132,.42) !important;
+    background:rgba(255,255,255,.34) !important;
+    box-shadow:none !important;
+  }
 }
 
 @media (max-width:620px){
