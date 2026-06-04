@@ -486,35 +486,6 @@ h1{
   color:#5f535a;
 }
 
-.page-hero-section{
-  padding-top:28px;
-  padding-bottom:26px;
-}
-
-.page-hero{
-  min-height:auto;
-  display:block;
-  padding:0;
-}
-
-.page-hero h1{
-  max-width:1120px;
-  font-size:clamp(2.8rem, 3.3vw, 3.45rem);
-  line-height:.96;
-  letter-spacing:-.045em;
-  text-wrap:balance;
-}
-
-.page-hero .lead{
-  margin-top:18px;
-  max-width:680px;
-  color:#5f535a;
-}
-
-.page-hero-strip{
-  margin-top:18px;
-}
-
 .hero-live-strip{
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -912,30 +883,6 @@ h1{
   }
 
   .home-hero .hero-live-tile strong{
-    font-size:28px;
-  }
-
-  .page-hero .lead{
-    display:none;
-  }
-
-  .page-hero .page-hero-strip{
-    grid-template-columns:repeat(4, minmax(0, 1fr));
-    gap:12px;
-    max-width:930px;
-    padding:0;
-    border:0;
-    border-radius:0;
-    background:transparent;
-    box-shadow:none;
-  }
-
-  .page-hero .hero-live-tile{
-    min-height:76px;
-    padding:13px 16px;
-  }
-
-  .page-hero .hero-live-tile strong{
     font-size:28px;
   }
 
