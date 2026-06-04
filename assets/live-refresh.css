@@ -646,6 +646,7 @@ h1{
   border:0;
   border-radius:18px;
   background:var(--surface-2);
+  container-type:inline-size;
 }
 
 .snap-metric span{
@@ -666,10 +667,13 @@ h1{
   overflow-wrap:anywhere;
 }
 
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]{
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
   display:inline-flex;
   align-items:center;
   gap:8px;
+  max-width:100%;
+  min-width:0;
   color:var(--green);
   font-size:0;
   line-height:1;
@@ -677,51 +681,7 @@ h1{
   overflow-wrap:normal;
 }
 
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before{
-  content:"";
-  flex:0 0 auto;
-  width:8px;
-  height:8px;
-  border-radius:999px;
-  background:currentColor;
-  box-shadow:0 0 0 5px rgba(24,163,111,.10);
-}
-
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after{
-  content:attr(data-mobile-label);
-  color:inherit;
-  font-size:26px;
-  font-weight:950;
-  letter-spacing:0;
-}
-
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]{
-  color:#c75376;
-}
-
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before{
-  box-shadow:0 0 0 5px rgba(199,83,118,.10);
-}
-
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]{
-  color:#7a6b74;
-}
-
-.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]::before{
-  box-shadow:0 0 0 5px rgba(122,107,116,.10);
-}
-
-.snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  color:var(--green);
-  font-size:0;
-  line-height:1;
-  white-space:normal;
-  overflow-wrap:normal;
-}
-
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before,
 .snap-metric strong[data-field="validatorConnected"][data-mobile-label]::before{
   content:"";
   flex:0 0 auto;
@@ -732,26 +692,35 @@ h1{
   box-shadow:0 0 0 5px rgba(24,163,111,.10);
 }
 
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after,
 .snap-metric strong[data-field="validatorConnected"][data-mobile-label]::after{
   content:attr(data-mobile-label);
+  flex:0 1 auto;
+  min-width:0;
+  max-width:100%;
   color:inherit;
-  font-size:26px;
+  font-size:clamp(14px, 1.7vw, 26px);
+  font-size:clamp(14px, 7.9cqw, 26px);
   font-weight:950;
   letter-spacing:0;
 }
 
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"],
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]{
   color:#c75376;
 }
 
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before,
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]::before{
   box-shadow:0 0 0 5px rgba(199,83,118,.10);
 }
 
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"],
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="unknown"]{
   color:#7a6b74;
 }
 
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]::before,
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="unknown"]::before{
   box-shadow:0 0 0 5px rgba(122,107,116,.10);
 }
@@ -923,7 +892,8 @@ h1{
 
   .home-snapshot-grid .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after,
   .home-snapshot-grid .snap-metric strong[data-field="validatorConnected"][data-mobile-label]::after{
-    font-size:25px;
+    font-size:clamp(14px, 1.55vw, 25px);
+    font-size:clamp(14px, 7.4cqw, 25px);
   }
 
   .delegate-section{
@@ -3448,7 +3418,8 @@ tbody tr:hover td{
     line-height:1.2;
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
     display:inline-flex;
     align-items:center;
     gap:6px;
@@ -3461,7 +3432,8 @@ tbody tr:hover td{
     overflow-wrap:normal;
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before,
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-label]::before{
     content:"";
     flex:0 0 auto;
     width:7px;
@@ -3471,12 +3443,14 @@ tbody tr:hover td{
     box-shadow:0 0 0 4px rgba(24,163,111,.10);
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after,
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-label]::after{
     content:attr(data-mobile-label);
     min-width:0;
     max-width:100%;
     color:inherit;
-    font-size:clamp(16px, 4vw, 18px);
+    font-size:clamp(15px, 3.8vw, 18px);
+    font-size:clamp(14px, 8.4cqw, 18px);
     line-height:1;
     font-weight:950;
     letter-spacing:0;
@@ -3486,19 +3460,23 @@ tbody tr:hover td{
     content:"Pre-registered";
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"],
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]{
     color:#c75376 !important;
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before,
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]::before{
     box-shadow:0 0 0 5px rgba(199,83,118,.10);
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"],
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-status="unknown"]{
     color:#7a6b74 !important;
   }
 
-  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]::before{
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]::before,
+  .snap-metric strong[data-field="validatorConnected"][data-mobile-status="unknown"]::before{
     box-shadow:0 0 0 5px rgba(122,107,116,.10);
   }
 }
