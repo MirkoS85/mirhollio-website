@@ -846,6 +846,11 @@ h1{
     box-shadow:none;
   }
 
+  .home-hero .hero-live-strip.hero-live-strip-3{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    max-width:760px;
+  }
+
   .home-hero .hero-live-tile{
     min-height:76px;
     padding:13px 16px;
