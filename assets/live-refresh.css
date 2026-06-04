@@ -2748,6 +2748,54 @@ tbody tr:hover td{
     background:var(--surface-2);
   }
 
+  .contact-section .section-title{
+    gap:8px;
+    margin-bottom:14px;
+  }
+
+  .contact-section .section-title h2{
+    font-size:28px;
+    line-height:1;
+  }
+
+  .contact-section .section-title p{
+    max-width:26rem;
+    font-size:13px;
+    line-height:1.45;
+  }
+
+  .contact-section .cards{
+    gap:9px;
+  }
+
+  .contact-section .card{
+    min-height:0;
+    padding:14px;
+  }
+
+  .contact-section .card b{
+    font-size:11px !important;
+    line-height:1.15;
+  }
+
+  .contact-section .card strong{
+    margin-top:8px;
+    font-size:clamp(16px, 4.1vw, 18px);
+    line-height:1.08;
+    letter-spacing:-.02em;
+    overflow-wrap:anywhere;
+  }
+
+  .contact-section .card p{
+    margin-top:10px;
+  }
+
+  .contact-section .card .btn{
+    min-height:40px;
+    padding:9px 12px;
+    font-size:12px;
+  }
+
   .home-snap-actions .decision-btn{
     color:var(--ink) !important;
     border:1px solid rgba(128,88,109,.24) !important;
