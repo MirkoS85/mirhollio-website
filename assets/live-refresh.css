@@ -552,12 +552,12 @@ h1{
 
 .snap-metric span{
   display:block;
-  margin-bottom:8px;
-  color:#7e7379;
+  margin-bottom:7px;
+  color:#7a6b74;
   font-size:12px;
-  font-weight:900;
-  letter-spacing:.08em;
-  text-transform:uppercase;
+  font-weight:400;
+  letter-spacing:0;
+  text-transform:none;
 }
 
 .snap-metric strong{
@@ -566,6 +566,51 @@ h1{
   font-size:28px;
   line-height:1;
   overflow-wrap:anywhere;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--green);
+  font-size:0;
+  line-height:1;
+  white-space:nowrap;
+  overflow-wrap:normal;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before{
+  content:"";
+  flex:0 0 auto;
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:currentColor;
+  box-shadow:0 0 0 5px rgba(24,163,111,.10);
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after{
+  content:attr(data-mobile-label);
+  color:inherit;
+  font-size:26px;
+  font-weight:950;
+  letter-spacing:0;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]{
+  color:#c75376;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before{
+  box-shadow:0 0 0 5px rgba(199,83,118,.10);
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]{
+  color:#7a6b74;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]::before{
+  box-shadow:0 0 0 5px rgba(122,107,116,.10);
 }
 
 .home-snap-actions{
