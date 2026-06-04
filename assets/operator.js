@@ -1455,7 +1455,7 @@ const MirSFlr = (() => {
     setText("passes", `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`);
     const preReg = detectPreRegistration(provider);
     setText("preRegistered", preReg);
-    setText("preRegisteredStatus", preReg === "Yes" ? "Pre-reg" : preReg === "No" ? "No pre-reg" : "Pre-reg unknown");
+    setText("preRegisteredStatus", preReg === "Yes" ? "Pre-registered" : preReg === "No" ? "Not pre-registered" : "Pre-reg unknown");
     renderPreRegisteredState(preReg);
     setText("minimalConditions", minimalConditions(provider, latest));
     monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
