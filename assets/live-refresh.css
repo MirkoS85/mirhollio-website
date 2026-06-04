@@ -3416,12 +3416,18 @@ tbody tr:hover td{
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]{
     display:inline-flex;
     align-items:center;
-    gap:7px;
+    gap:6px;
     max-width:100%;
     min-width:0;
+    width:max-content;
+    min-height:31px;
+    padding:6px 10px;
+    border:1px solid rgba(24,163,111,.16);
+    border-radius:999px;
+    background:rgba(24,163,111,.09);
     color:var(--green) !important;
     font-size:0 !important;
-    line-height:1.08;
+    line-height:1;
     white-space:normal;
     overflow-wrap:normal;
   }
@@ -3429,11 +3435,11 @@ tbody tr:hover td{
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before{
     content:"";
     flex:0 0 auto;
-    width:8px;
-    height:8px;
+    width:7px;
+    height:7px;
     border-radius:999px;
     background:currentColor;
-    box-shadow:0 0 0 5px rgba(24,163,111,.10);
+    box-shadow:0 0 0 4px rgba(24,163,111,.10);
   }
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after{
@@ -3441,13 +3447,19 @@ tbody tr:hover td{
     min-width:0;
     max-width:100%;
     color:inherit;
-    font-size:clamp(18px, 4.4vw, 20px);
-    line-height:1.08;
-    font-weight:950;
+    font-size:clamp(15px, 3.8vw, 17px);
+    line-height:1;
+    font-weight:900;
     letter-spacing:0;
   }
 
+  .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="ok"]::after{
+    content:"Pre-reg";
+  }
+
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]{
+    border-color:rgba(199,83,118,.18);
+    background:rgba(199,83,118,.08);
     color:#c75376 !important;
   }
 
@@ -3456,6 +3468,8 @@ tbody tr:hover td{
   }
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"]{
+    border-color:rgba(122,107,116,.18);
+    background:rgba(122,107,116,.08);
     color:#7a6b74 !important;
   }
 
