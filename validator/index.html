@@ -49,10 +49,17 @@
       <p class="side-note">Independent Flare validator and FTSO provider.</p>
     </aside>
     <main>
-      <section class="section">
-        <div class="inner hero compact">
-          <div><div class="kicker">Stake FLR</div><h1>Validator node metrics.</h1><p class="lead">APR, uptime, capacity, delegation details, and validator reward history for MirSFlr.</p></div>
-          <aside class="status-panel"><div class="panel-head"><strong>Validator status</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div><div class="metric-grid"><div class="metric"><span>APR</span><strong data-field="validatorApr">-</strong></div><div class="metric"><span>Free space</span><strong data-field="freeDelegationSpace">-</strong></div></div></aside>
+      <section class="section page-hero-section">
+        <div class="inner">
+          <div class="hero page-hero">
+            <div class="page-hero-copy"><div class="kicker">Stake FLR</div><h1>Validator node metrics.</h1><p class="lead">APR, uptime, capacity, delegation details, and validator reward history for MirSFlr.</p></div>
+            <div class="hero-live-strip page-hero-strip" aria-label="Validator metric highlights">
+              <div class="hero-live-tile"><span>Status</span><strong data-field="validatorConnected">-</strong></div>
+              <div class="hero-live-tile"><span>APR</span><strong data-field="validatorAprSnapshot">-</strong></div>
+              <div class="hero-live-tile"><span>Free space</span><strong data-field="freeDelegationSpace">-</strong></div>
+              <div class="hero-live-tile"><span>Uptime</span><strong data-field="validatorUptimeSnapshot">-</strong></div>
+            </div>
+          </div>
         </div>
       </section>
       <section class="section light">

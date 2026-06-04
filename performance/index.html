@@ -46,10 +46,17 @@
       <p class="side-note">Mixed operator view: provider execution, validator uptime, capacity, and readiness in one place.</p>
     </aside>
     <main>
-      <section class="section">
-        <div class="inner hero compact">
-          <div><div class="kicker">Operator health</div><h1>Provider + validator health.</h1><p class="lead">One operator view across provider execution, validator uptime, free capacity, and readiness.</p></div>
-          <aside class="status-panel"><div class="panel-head"><strong>Operator snapshot</strong><span class="status-dot" data-field="status">Loading</span></div><div class="metric-grid"><div class="metric"><button class="info-tip" type="button" aria-label="FTSO availability info">i<span>How often the provider is online and submitting FTSO data when expected. Higher is better.</span></button><span>FTSO availability</span><strong data-field="availability">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Validator info">i<span>Whether the validator node is currently reachable. This is a basic live health signal.</span></button><span>Validator</span><strong data-field="validatorConnected">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Free delegation info">i<span>How much more FLR can still be added before this validator reaches its current capacity.</span></button><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div><div class="metric"><button class="info-tip" type="button" aria-label="Passes and strikes info">i<span>Total passed checks compared with total strikes across the available provider history.</span></button><span>Passes / strikes</span><strong data-field="passes">-</strong></div></div></aside>
+      <section class="section page-hero-section">
+        <div class="inner">
+          <div class="hero page-hero">
+            <div class="page-hero-copy"><div class="kicker">Operator health</div><h1>Provider + validator health.</h1><p class="lead">One operator view across provider execution, validator uptime, free capacity, and readiness.</p></div>
+            <div class="hero-live-strip page-hero-strip" aria-label="Operator health highlights">
+              <div class="hero-live-tile"><span>FTSO availability</span><strong data-field="availabilitySnapshot">-</strong></div>
+              <div class="hero-live-tile"><span>Validator</span><strong data-field="validatorConnected">-</strong></div>
+              <div class="hero-live-tile"><span>Free delegation</span><strong data-field="freeDelegationSpace">-</strong></div>
+              <div class="hero-live-tile"><span>Passes / strikes</span><strong data-field="passes">-</strong></div>
+            </div>
+          </div>
         </div>
       </section>
       <section class="section light">
