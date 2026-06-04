@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=points-web-4" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=points-web-5" />
 </head>
 <body>
   <div class="mobile-top">
@@ -95,6 +95,12 @@
               <div class="kicker">Flare validator + FTSO provider</div>
               <h1>Stake with proof. Delegate with confidence.</h1>
               <p class="lead">Independent Flare validator and FTSO provider with live metrics, verified addresses, and transparent performance history.</p>
+            </div>
+            <div class="hero-live-strip" aria-label="Live metric highlights">
+              <div class="hero-live-tile"><span>Reward rate</span><strong data-field="rewardRateSnapshot">-</strong></div>
+              <div class="hero-live-tile"><span>Availability</span><strong data-field="availabilitySnapshot">-</strong></div>
+              <div class="hero-live-tile"><span>APR</span><strong data-field="validatorAprSnapshot">-</strong></div>
+              <div class="hero-live-tile"><span>Uptime</span><strong data-field="validatorUptimeSnapshot">-</strong></div>
             </div>
           </div>
         </div>
@@ -169,8 +175,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=points-web-4"></script>
-  <script src="assets/live-refresh.js?v=points-web-4"></script>
+  <script src="assets/operator.js?v=points-web-5"></script>
+  <script src="assets/live-refresh.js?v=points-web-5"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
