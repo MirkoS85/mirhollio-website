@@ -538,14 +538,27 @@ h1{
   overflow-anchor:none;
 }
 
-.role-choice > strong{
-  margin-top:6px;
+.role-choice-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.role-choice-head strong{
   font-size:36px;
   line-height:.96;
 }
 
-.role-choice > p{
-  margin:0;
+.role-choice-head span{
+  flex:0 0 auto;
+  margin-top:3px;
+  color:#7a6b74;
+  font-size:15px;
+  font-weight:800;
+  line-height:1.1;
+  letter-spacing:-.01em;
+  text-align:right;
 }
 
 .role-choice > .btn{
@@ -2198,7 +2211,7 @@ tbody tr:hover td{
     padding:16px;
   }
 
-  .role-choice strong,
+  .role-choice-head strong,
   .card strong{
     font-size:25px;
   }
@@ -3272,12 +3285,15 @@ tbody tr:hover td{
 }
 
 @media (max-width:620px){
-  .home-snapshot-grid .role-choice > b{
-    display:none;
+  .role-choice-head{
+    align-items:flex-start;
+    gap:10px;
   }
 
-  .home-snapshot-grid .role-choice > p{
-    display:none;
+  .role-choice-head span{
+    margin-top:2px;
+    font-size:12px;
+    font-weight:700;
   }
 }
 
