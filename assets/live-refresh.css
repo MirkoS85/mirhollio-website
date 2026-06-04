@@ -1341,16 +1341,16 @@ h1{
 
 .epochs-hero{
   grid-template-columns:minmax(0, 1.08fr) minmax(360px, .92fr);
-  align-items:stretch;
+  align-items:start;
   gap:34px;
 }
 
 .epochs-hero-copy{
   display:flex;
   flex-direction:column;
-  justify-content:center;
-  min-height:100%;
-  padding:28px 0 20px;
+  justify-content:flex-start;
+  min-height:0;
+  padding:0;
 }
 
 .epochs-hero .lead{
