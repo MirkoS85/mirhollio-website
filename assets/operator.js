@@ -891,14 +891,22 @@ const MirSFlr = (() => {
     const showTooltip = target => {
         const point = points[Number(target.getAttribute("data-chart-index"))];
         if (!tooltip || !point) return;
-        const wrapRect = svg.parentElement.getBoundingClientRect();
+        const wrap = svg.parentElement;
+        if (!wrap) return;
+        const wrapRect = wrap.getBoundingClientRect();
         const svgRect = svg.getBoundingClientRect();
-        const left = (point.x / width) * svgRect.width;
-        const top = (point.y / height) * svgRect.height;
+        const anchorLeft = (point.x / width) * svgRect.width + (svgRect.left - wrapRect.left) + wrap.scrollLeft;
+        const anchorTop = (point.y / height) * svgRect.height + (svgRect.top - wrapRect.top) + wrap.scrollTop;
         tooltip.innerHTML = `Epoch ${point.epoch}<br>${rewardWithFiat(point.reward)}`;
         tooltip.style.display = "block";
-        tooltip.style.left = `${Math.max(8, Math.min(left - 48, wrapRect.width - 160))}px`;
-        tooltip.style.top = `${Math.max(8, top - 52)}px`;
+        const tooltipWidth = tooltip.offsetWidth || 140;
+        const tooltipHeight = tooltip.offsetHeight || 74;
+        const minLeft = wrap.scrollLeft + 8;
+        const maxLeft = wrap.scrollLeft + (wrap.clientWidth || wrapRect.width) - tooltipWidth - 8;
+        const minTop = wrap.scrollTop + 8;
+        const maxTop = wrap.scrollTop + (wrap.clientHeight || wrapRect.height) - tooltipHeight - 8;
+        tooltip.style.left = `${Math.max(minLeft, Math.min(anchorLeft - tooltipWidth / 2, Math.max(minLeft, maxLeft)))}px`;
+        tooltip.style.top = `${Math.max(minTop, Math.min(anchorTop - tooltipHeight - 12, Math.max(minTop, maxTop)))}px`;
     };
     const hideTooltip = () => {
       if (tooltip) tooltip.style.display = "none";
