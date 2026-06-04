@@ -362,6 +362,37 @@ body::after{
   color:inherit;
 }
 
+.install-app-button{
+  width:100%;
+  min-height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  padding:10px 13px;
+  border:1px solid rgba(137,96,116,.16);
+  border-radius:16px;
+  background:rgba(255,255,255,.72);
+  color:var(--ink);
+  font:inherit;
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:-.01em;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
+  transition:background .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.install-app-button[hidden]{
+  display:none !important;
+}
+
+.install-app-button:hover{
+  color:#752946;
+  border-color:rgba(217,63,132,.34);
+  background:rgba(255,255,255,.88);
+}
+
 main{
   position:relative;
   overflow:hidden;
@@ -783,6 +814,7 @@ h1{
 .btn:focus-visible,
 .nav a:focus-visible,
 .mobile-links a:focus-visible,
+.install-app-button:focus-visible,
 .toggle-btn:focus-visible,
 .info-tip:focus-visible{
   outline:2px solid #d93f84;
@@ -3503,6 +3535,16 @@ tbody tr:hover td{
   }
 
   .mobile-links .shell-live strong{
+    font-size:12px;
+  }
+
+  .mobile-links .install-app-button{
+    grid-column:1 / -1;
+    min-height:36px;
+    margin-top:0;
+    padding:7px 10px;
+    border-radius:11px;
+    background:rgba(255,255,255,.62);
     font-size:12px;
   }
 }

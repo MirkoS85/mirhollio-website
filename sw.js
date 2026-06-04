@@ -1,17 +1,18 @@
-const CACHE_NAME = "mirsflr-shell-v106";
+const CACHE_NAME = "mirsflr-shell-v107";
 const APP_SHELL = [
   "/",
   "/ftso/",
   "/validator/",
   "/epochs/",
   "/addresses/",
+  "/stats/",
   "/performance/",
   "/assets/operator.css?v=pre-reg-value-fix",
   "/assets/operator.css?v=validator-copy",
-  "/assets/live-refresh.css?v=epoch-hero-align-1",
-  "/assets/operator.js?v=epoch-hero-align-1",
-  "/assets/live-refresh.js?v=epoch-hero-align-1",
-  "/assets/pwa.js?v=installable-1",
+  "/assets/live-refresh.css?v=pwa-install-1",
+  "/assets/operator.js?v=pwa-install-1",
+  "/assets/live-refresh.js?v=pwa-install-1",
+  "/assets/pwa.js?v=pwa-install-1",
   "/app.webmanifest",
   "/logo.png",
   "/flare-icon.png",
