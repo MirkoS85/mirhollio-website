@@ -545,9 +545,9 @@ h1{
 .snap-metric{
   min-width:0;
   padding:14px;
-  border:1px solid var(--line);
+  border:0;
   border-radius:18px;
-  background:rgba(255,255,255,.62);
+  background:var(--surface-2);
 }
 
 .snap-metric span{
