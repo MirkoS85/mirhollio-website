@@ -95,6 +95,25 @@
     });
   }
 
+  function labelValidatorSnapshotStatus(root = document) {
+    root.querySelectorAll(".snap-metric strong[data-field='validatorConnected']").forEach(el => {
+      const raw = (el.textContent || "").trim().toLowerCase();
+      let label = raw ? el.textContent.trim() : "Unknown";
+      let state = "unknown";
+
+      if (raw === "connected") {
+        label = "Connected";
+        state = "ok";
+      } else if (raw === "offline" || raw === "not exposed") {
+        label = el.textContent.trim();
+        state = "bad";
+      }
+
+      el.dataset.mobileLabel = label;
+      el.dataset.mobileStatus = state;
+    });
+  }
+
   function positionInfoTip(button) {
     const tooltip = button.querySelector("span");
     if (!tooltip) return;
@@ -333,6 +352,7 @@
     tightenLongValues();
     formatPassStrikeValues();
     labelPreRegisteredStatus();
+    labelValidatorSnapshotStatus();
     bindPanelAccordion();
     injectShellLiveStats();
     bindMobileNav();
@@ -348,6 +368,7 @@
           tightenLongValues();
           formatPassStrikeValues();
           labelPreRegisteredStatus();
+          labelValidatorSnapshotStatus();
           break;
         }
       }
