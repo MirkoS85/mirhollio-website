@@ -628,6 +628,51 @@ h1{
   min-height:168px;
 }
 
+.delegate-list{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:18px;
+  margin:0 0 18px;
+  padding:0;
+  list-style:none;
+  counter-reset:delegate-step;
+}
+
+.delegate-list li{
+  position:relative;
+  min-width:0;
+  padding-left:34px;
+  counter-increment:delegate-step;
+}
+
+.delegate-list li::before{
+  content:counter(delegate-step) ".";
+  position:absolute;
+  left:0;
+  top:1px;
+  color:var(--pink);
+  font-size:15px;
+  font-weight:950;
+  line-height:1.25;
+}
+
+.delegate-list strong{
+  display:block;
+  color:var(--ink);
+  font-size:16px;
+  font-weight:950;
+  line-height:1.25;
+  letter-spacing:-.01em;
+}
+
+.delegate-list p{
+  margin:6px 0 0;
+  max-width:320px;
+  color:#72646d;
+  font-size:14px;
+  line-height:1.45;
+}
+
 .section-title{
   gap:24px;
   margin-bottom:22px;
@@ -2776,6 +2821,31 @@ tbody tr:hover td{
   .inner{
     width:100vw !important;
     max-width:100vw !important;
+  }
+
+  .delegate-list{
+    grid-template-columns:1fr;
+    gap:14px;
+    margin:0 14px 16px;
+  }
+
+  .delegate-list li{
+    padding-left:28px;
+  }
+
+  .delegate-list li::before{
+    font-size:13px;
+  }
+
+  .delegate-list strong{
+    font-size:15px;
+  }
+
+  .delegate-list p{
+    margin-top:4px;
+    max-width:100%;
+    font-size:13px;
+    line-height:1.42;
   }
 
   .hero,

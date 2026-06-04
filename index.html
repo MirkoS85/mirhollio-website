@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="logo.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=points-polish-10a" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=points-polish-11" />
 </head>
 <body>
   <div class="mobile-top">
@@ -141,11 +141,11 @@
             <h2>Delegate safely.</h2>
             <p>Use the FTSO and Validator pages for performance, then verify the address before any wallet action.</p>
           </div>
-          <div class="flow compact-flow">
-            <div class="step"><em>1</em><strong>Check live data</strong><p>Open FTSO provider or Validator node metrics and compare rewards, availability, capacity, and eligibility.</p></div>
-            <div class="step"><em>2</em><strong>Verify address</strong><p>Use the Addresses page and external explorers before copying anything into a wallet.</p></div>
-            <div class="step"><em>3</em><strong>Wait for epoch</strong><p>Delegation changes need the next epoch before performance can be evaluated fairly.</p></div>
-          </div>
+          <ol class="delegate-list">
+            <li><strong>Check live data</strong><p>Review FTSO or Validator metrics before committing.</p></li>
+            <li><strong>Verify address</strong><p>Cross-check on the Addresses page before any wallet action.</p></li>
+            <li><strong>Wait for epoch</strong><p>Delegation needs one full epoch before results show.</p></li>
+          </ol>
           <div class="actions secondary-actions">
             <a class="btn primary" href="addresses/">Verify addresses</a>
             <a class="btn ghost" href="epochs/">Check epochs</a>
@@ -169,8 +169,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=points-polish-10a"></script>
-  <script src="assets/live-refresh.js?v=points-polish-10a"></script>
+  <script src="assets/operator.js?v=points-polish-11"></script>
+  <script src="assets/live-refresh.js?v=points-polish-11"></script>
   <script src="assets/pwa.js?v=installable-1"></script>
 </body>
 </html>
