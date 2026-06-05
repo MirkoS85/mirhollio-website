@@ -1049,6 +1049,15 @@ const MirSFlr = (() => {
     return window.matchMedia("(max-width: 760px)").matches;
   }
 
+  function measuredSvgSize(svg, fallbackWidth, fallbackHeight) {
+    const width = Math.round(svg.getBoundingClientRect().width || svg.clientWidth || fallbackWidth);
+    const height = Math.round(parseFloat(getComputedStyle(svg).height) || svg.getBoundingClientRect().height || fallbackHeight);
+    return {
+      width: Math.max(320, width),
+      height: Math.max(160, height)
+    };
+  }
+
   function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
     if (!svg) return;
     const series = [...(values || [])]
@@ -1063,8 +1072,9 @@ const MirSFlr = (() => {
     }
 
     const compact = isCompactChart();
-    const width = compact ? 420 : 1000;
-    const height = compact ? 218 : 220;
+    const size = measuredSvgSize(svg, compact ? 420 : 1000, compact ? 218 : 220);
+    const width = size.width;
+    const height = size.height;
     const padLeft = compact ? 38 : 58;
     const padRight = compact ? 12 : 18;
     const padTop = compact ? 14 : 16;
@@ -1112,6 +1122,7 @@ const MirSFlr = (() => {
       return `<text x="${x}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>`;
     }).join("");
 
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${bars}${labels}`;
 
@@ -1220,8 +1231,9 @@ const MirSFlr = (() => {
 
     const series = rawSeries.map(item => ({ ...item, values: item.values.slice(-count) }));
     const compact = isCompactChart();
-    const width = compact ? 420 : 1000;
-    const height = compact ? 236 : 260;
+    const size = measuredSvgSize(svg, compact ? 420 : 1000, compact ? 236 : 260);
+    const width = size.width;
+    const height = size.height;
     const padLeft = compact ? 38 : 58;
     const padRight = compact ? 12 : 22;
     const padTop = compact ? 14 : 30;
@@ -1275,6 +1287,7 @@ const MirSFlr = (() => {
       </g>
     `).join("");
 
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${legend}${lines}${hitTargets}${labels}`;
 
@@ -1772,8 +1785,15 @@ const MirSFlr = (() => {
     loadFtsoExplorer();
     loadFtsoEntity();
     loadPrice();
+    let resizeTimer = 0;
     window.addEventListener("resize", () => {
-      if (providerData) renderRewardChart(providerData);
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        if (!providerData) return;
+        renderRewardChart(providerData);
+        renderHourlyAvailabilityCharts(providerData);
+        renderHourlyPerformanceCharts(providerData);
+      }, 120);
     });
   }
 
