@@ -6,6 +6,7 @@ const MirSFlr = (() => {
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
   const CACHE_PREFIX = "mirsflr_cache_";
   const CURRENCY_KEY = "mirsflr_currency";
+  const DELEGATOR_SORT_KEY = "mirsflr_delegator_sort";
   const CACHE_TTLS = {
     provider: 60_000,
     validator: 90_000,
@@ -41,6 +42,7 @@ const MirSFlr = (() => {
   let ftsoEntityData = null;
   let prices = { USD: null, EUR: null };
   let activePriceCurrency = "EUR";
+  let activeDelegatorSort = "amount-desc";
   let monthlyRewards = { ftso: null, validator: null };
   let lastUpdatedSet = false;
   const RETRY_MESSAGE = "Could not load live data. Try again, or use the verification links while the API catches up.";
@@ -179,6 +181,34 @@ const MirSFlr = (() => {
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
       btn.classList.toggle("active", btn.getAttribute("data-price-currency") === activePriceCurrency);
     });
+  }
+
+  function normalizeDelegatorSort(value) {
+    return [
+      "amount-desc",
+      "amount-asc",
+      "start-asc",
+      "start-desc",
+      "end-asc",
+      "end-desc"
+    ].includes(value) ? value : "amount-desc";
+  }
+
+  function restoreDelegatorSortPreference() {
+    activeDelegatorSort = normalizeDelegatorSort(storageGet(getStorage("localStorage"), DELEGATOR_SORT_KEY) || activeDelegatorSort);
+    document.querySelectorAll("[data-delegator-sort]").forEach(select => {
+      select.value = activeDelegatorSort;
+    });
+  }
+
+  function setDelegatorSort(value) {
+    activeDelegatorSort = normalizeDelegatorSort(value);
+    storageSet(getStorage("localStorage"), DELEGATOR_SORT_KEY, activeDelegatorSort);
+    document.querySelectorAll("[data-delegator-sort]").forEach(select => {
+      select.value = activeDelegatorSort;
+    });
+    const node = Array.isArray(validatorData?.m_axNode) ? validatorData.m_axNode[0] : null;
+    if (node) renderValidatorDelegators(node);
   }
 
   async function fetchJsonWithCache(url, ttlMs = 60_000) {
@@ -767,10 +797,34 @@ const MirSFlr = (() => {
     });
   }
 
+  function delegatorSortValue(item, field) {
+    if (field === "amount") {
+      const amount = Number(item.m_dAmount);
+      return Number.isFinite(amount) ? amount : null;
+    }
+    const ts = new Date(field === "end" ? item.m_xTimeEnd : item.m_xTimeStart).getTime();
+    return Number.isFinite(ts) ? ts : null;
+  }
+
+  function sortDelegators(delegators) {
+    const [field, direction] = activeDelegatorSort.split("-");
+    const multiplier = direction === "asc" ? 1 : -1;
+    return [...delegators].sort((a, b) => {
+      const aValue = delegatorSortValue(a, field);
+      const bValue = delegatorSortValue(b, field);
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+      if (aValue === bValue) return Number(b.m_dAmount || 0) - Number(a.m_dAmount || 0);
+      return (aValue - bValue) * multiplier;
+    });
+  }
+
   function renderValidatorDelegators(node) {
     const delegators = Array.isArray(node?.m_axDelegation)
-      ? [...node.m_axDelegation].sort((a, b) => Number(b.m_dAmount) - Number(a.m_dAmount))
+      ? [...node.m_axDelegation]
       : [];
+    const sortedDelegators = sortDelegators(delegators);
     const totalDelegation = delegators.reduce((sum, item) => sum + Number(item.m_dAmount || 0), 0);
     const now = Date.now();
     const fiveDays = 5 * 24 * 60 * 60 * 1000;
@@ -797,7 +851,7 @@ const MirSFlr = (() => {
       }
 
       const labels = tableLabels(tbody);
-      tbody.innerHTML = delegators.map((item, index) => {
+      tbody.innerHTML = sortedDelegators.map((item, index) => {
         const amount = Number(item.m_dAmount);
         const share = totalDelegation > 0 && Number.isFinite(amount) ? (amount / totalDelegation) * 100 : null;
         const timeLeft = Array.isArray(item.m_aiTimeLeftDHM)
@@ -1697,6 +1751,12 @@ const MirSFlr = (() => {
       if (!btn) return;
       setPriceDisplay(btn.getAttribute("data-price-currency") || "EUR");
     });
+
+    document.addEventListener("change", event => {
+      const select = event.target.closest("[data-delegator-sort]");
+      if (!select) return;
+      setDelegatorSort(select.value);
+    });
   }
 
   function init() {
@@ -1704,6 +1764,7 @@ const MirSFlr = (() => {
     enhanceTooltips();
     enhanceCopyButtons();
     restoreCurrencyPreference();
+    restoreDelegatorSortPreference();
     setLoadingState();
     applyFtsoEntityData(FTSO_ENTITY_SNAPSHOT);
     load();
