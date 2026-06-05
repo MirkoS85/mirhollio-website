@@ -2667,6 +2667,17 @@ tbody tr:hover td{
     text-align:right;
   }
 
+  .entity-address-table code{
+    font-size:10.7px;
+    letter-spacing:-.075em;
+    white-space:nowrap;
+    word-break:normal;
+  }
+
+  .entity-address-table td[data-label="Address"]{
+    gap:8px;
+  }
+
   tbody th:first-child{
     padding-top:0;
     color:var(--pink);
@@ -2759,16 +2770,6 @@ tbody tr:hover td{
     font-size:13px;
   }
 
-  .entity-address-table code{
-    font-size:10.7px;
-    letter-spacing:-.075em;
-    white-space:nowrap;
-    word-break:normal;
-  }
-
-  .entity-address-table td[data-label="Address"]{
-    gap:8px;
-  }
 }
 
 @media (max-width:620px){
