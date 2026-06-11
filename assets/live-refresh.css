@@ -26,7 +26,6 @@ body{
   overflow-x:hidden;
   max-width:100%;
   overscroll-behavior-x:none;
-  overscroll-behavior-y:none;
   min-height:100vh;
   background:
     radial-gradient(circle at top left, rgba(255,255,255,.58), transparent 28%),
@@ -39,7 +38,6 @@ html{
   overflow-x:hidden;
   max-width:100%;
   overscroll-behavior-x:none;
-  overscroll-behavior-y:none;
 }
 
 body::before,
@@ -3727,7 +3725,6 @@ tbody tr:hover td{
   body{
     min-height:100%;
     overscroll-behavior-x:none;
-    overscroll-behavior-y:none;
   }
 
   body{
@@ -3736,5 +3733,12 @@ tbody tr:hover td{
 
   .site-shell{
     min-height:calc(100dvh - var(--mobile-top-height, 76px));
+  }
+}
+
+@media (max-width:620px) and (pointer:coarse){
+  html,
+  body{
+    overscroll-behavior-y:none;
   }
 }
