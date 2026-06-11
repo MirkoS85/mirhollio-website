@@ -1059,12 +1059,17 @@ const MirSFlr = (() => {
     };
   }
 
-  function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
-    if (!svg) return;
-    const series = [...(values || [])]
+  function hourlySeries(values) {
+    return [...(values || [])]
       .map(value => Number(value))
       .filter(value => Number.isFinite(value))
-      .slice(-24);
+      .slice(0, 24)
+      .reverse();
+  }
+
+  function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
+    if (!svg) return;
+    const series = hourlySeries(values);
 
     if (!series.length) {
       svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#8d7f87" font-size="20" font-weight="800">${emptyMessage}</text>`;
@@ -1229,7 +1234,7 @@ const MirSFlr = (() => {
       }
     ].map(series => ({
       ...series,
-      values: [...(series.values || [])].map(value => Number(value)).filter(value => Number.isFinite(value)).slice(-24)
+      values: hourlySeries(series.values)
     }));
 
     const usable = rawSeries.filter(series => series.values.length);
