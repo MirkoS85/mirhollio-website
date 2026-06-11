@@ -301,6 +301,110 @@
     update();
   }
 
+  function bindPullToRefresh() {
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
+      || navigator.maxTouchPoints > 0
+      || "ontouchstart" in window;
+    if (!isTouchDevice || document.querySelector(".pull-refresh-indicator")) return;
+
+    const threshold = 92;
+    const maxOffset = 82;
+    let startY = 0;
+    let currentY = 0;
+    let active = false;
+    let eligible = false;
+    let refreshing = false;
+
+    const indicator = document.createElement("div");
+    indicator.className = "pull-refresh-indicator";
+    indicator.setAttribute("role", "status");
+    indicator.setAttribute("aria-live", "polite");
+    indicator.innerHTML = '<span aria-hidden="true"></span><strong>Pull to refresh</strong>';
+    document.body.appendChild(indicator);
+
+    const label = indicator.querySelector("strong");
+
+    function atPageTop() {
+      const scrollTop = Math.max(
+        window.scrollY || 0,
+        document.documentElement.scrollTop || 0,
+        document.body.scrollTop || 0
+      );
+      return scrollTop <= 2;
+    }
+
+    function setIndicator(distance) {
+      const offset = Math.min(Math.max(distance * 0.54, 0), maxOffset);
+      const progress = Math.min(Math.max(distance / threshold, 0), 1);
+      indicator.style.setProperty("--pull-refresh-offset", `${Math.round(offset)}px`);
+      indicator.style.setProperty("--pull-refresh-progress", progress.toFixed(3));
+      indicator.classList.toggle("is-ready", distance >= threshold);
+      label.textContent = distance >= threshold ? "Release to refresh" : "Pull to refresh";
+    }
+
+    function resetIndicator() {
+      active = false;
+      eligible = false;
+      startY = 0;
+      currentY = 0;
+      indicator.classList.remove("is-ready");
+      indicator.style.setProperty("--pull-refresh-offset", "0px");
+      indicator.style.setProperty("--pull-refresh-progress", "0");
+      label.textContent = "Pull to refresh";
+    }
+
+    document.addEventListener("touchstart", event => {
+      if (refreshing || event.touches.length !== 1) return;
+      if (document.body.classList.contains("mobile-nav-open")) return;
+      if (!atPageTop()) return;
+
+      eligible = true;
+      active = false;
+      startY = event.touches[0].clientY;
+      currentY = startY;
+    }, { passive: true });
+
+    document.addEventListener("touchmove", event => {
+      if (!eligible || refreshing || event.touches.length !== 1) return;
+
+      currentY = event.touches[0].clientY;
+      const distance = currentY - startY;
+      if (distance <= 0) {
+        resetIndicator();
+        return;
+      }
+
+      if (!active && !atPageTop()) return;
+      if (distance > 8) active = true;
+      if (!active) return;
+
+      event.preventDefault();
+      setIndicator(distance);
+    }, { passive: false });
+
+    document.addEventListener("touchend", () => {
+      if (!eligible) return;
+
+      const distance = currentY - startY;
+      if (active && distance >= threshold) {
+        refreshing = true;
+        indicator.classList.add("is-refreshing");
+        indicator.classList.remove("is-ready");
+        indicator.style.setProperty("--pull-refresh-offset", `${maxOffset}px`);
+        indicator.style.setProperty("--pull-refresh-progress", "1");
+        label.textContent = "Refreshing";
+        window.setTimeout(() => window.location.reload(), 180);
+        return;
+      }
+
+      resetIndicator();
+    }, { passive: true });
+
+    document.addEventListener("touchcancel", () => {
+      if (!refreshing) resetIndicator();
+    }, { passive: true });
+  }
+
   function bindPanelAccordion() {
     const buttons = [...document.querySelectorAll("[data-panel-toggle]")];
     const panels = new Map(
@@ -358,6 +462,7 @@
     bindMobileNav();
     bindInfoTips();
     bindBackToTop();
+    bindPullToRefresh();
     bindPageTransitions();
 
     const observer = new MutationObserver(mutations => {

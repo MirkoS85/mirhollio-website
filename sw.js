@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirsflr-shell-v121";
+const CACHE_NAME = "mirsflr-shell-v122";
 const APP_SHELL = [
   "/",
   "/ftso/",
@@ -9,9 +9,9 @@ const APP_SHELL = [
   "/performance/",
   "/assets/operator.css?v=pre-reg-value-fix",
   "/assets/operator.css?v=validator-copy",
-  "/assets/live-refresh.css?v=availability-line-2",
+  "/assets/live-refresh.css?v=pull-refresh-1",
   "/assets/operator.js?v=hourly-order-1",
-  "/assets/live-refresh.js?v=pwa-install-1",
+  "/assets/live-refresh.js?v=pull-refresh-1",
   "/assets/pwa.js?v=pwa-install-1",
   "/app.webmanifest",
   "/logo.png",
