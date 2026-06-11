@@ -1031,15 +1031,12 @@ const MirSFlr = (() => {
     });
   }
 
-  function hourlyAvailabilityColor(value) {
-    if (value >= 0.98) return { fill: "#fffdfd", stroke: "#c61f6b", pattern: "" };
-    if (value >= 0.8) return { fill: "#ffe9f2", stroke: "#d84b8a", pattern: "good" };
-    if (value >= 0.5) return { fill: "#f6b9d0", stroke: "#c83b78", pattern: "watch" };
-    return { fill: "#c61f6b", stroke: "#8f154d", pattern: "low" };
-  }
-
-  function hourlyPatternId(metricLabel, pattern) {
-    return `hourly-${String(metricLabel || "availability").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${pattern}`;
+  function hourlyAvailabilityDomain(series) {
+    const low = Math.min(...series);
+    if (low >= 0.9) return { min: 0.9, ticks: [1, 0.98, 0.95, 0.9] };
+    if (low >= 0.8) return { min: 0.8, ticks: [1, 0.98, 0.9, 0.8] };
+    if (low >= 0.5) return { min: 0.5, ticks: [1, 0.8, 0.5] };
+    return { min: 0, ticks: [1, 0.5, 0] };
   }
 
   function hourlyAvailabilityLabel(index, total) {
@@ -1087,51 +1084,43 @@ const MirSFlr = (() => {
     const chartH = height - padTop - padBottom;
     const gap = compact ? 4 : 10;
     const barW = Math.max(compact ? 7 : 12, (chartW - gap * (series.length - 1)) / series.length);
-    const barRadius = compact ? 5 : 8;
-    const ticks = compact ? [1, 0.8, 0.5, 0] : [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0];
-    const yFor = value => padTop + (1 - Math.max(0, Math.min(1, value))) * chartH;
     const pct = value => `${(value * 100).toFixed(2)}%`;
     const avg = series.reduce((sum, value) => sum + value, 0) / series.length;
     const low = Math.min(...series);
     const latest = series[series.length - 1];
-    const patternPrefix = String(metricLabel || "availability").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const domain = hourlyAvailabilityDomain(series);
+    const domainMax = 1;
+    const domainMin = domain.min;
+    const domainRange = Math.max(0.01, domainMax - domainMin);
+    const xFor = index => padLeft + (series.length === 1 ? chartW / 2 : (chartW / (series.length - 1)) * index);
 
-    const defs = `
-      <defs>
-        <pattern id="hourly-${patternPrefix}-good" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="9" stroke="#d84b8a" stroke-width="2" opacity=".32"></line>
-        </pattern>
-        <pattern id="hourly-${patternPrefix}-watch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <line x1="0" y1="0" x2="0" y2="8" stroke="#a91d5c" stroke-width="2.2" opacity=".42"></line>
-          <line x1="4" y1="0" x2="4" y2="8" stroke="#ffffff" stroke-width="1.3" opacity=".34"></line>
-        </pattern>
-        <pattern id="hourly-${patternPrefix}-low" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-          <line x1="0" y1="0" x2="0" y2="7" stroke="#ffffff" stroke-width="2" opacity=".52"></line>
-        </pattern>
-      </defs>
-    `;
-
-    const grid = ticks.map(tick => {
-      const y = yFor(tick);
+    const grid = domain.ticks.map(tick => {
+      const isTarget = Math.abs(tick - 0.98) < 0.001;
+      const y = padTop + ((domainMax - tick) / domainRange) * chartH;
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.11)" />
-        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${isTarget ? "rgba(217,63,132,.42)" : "rgba(137,96,116,.11)"}" stroke-dasharray="${isTarget ? "7 8" : "0"}" />
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="${isTarget ? "#b83472" : "#8d7f87"}" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
       `;
     }).join("");
 
-    const bars = series.map((value, index) => {
-      const x = padLeft + index * (barW + gap);
-      const y = yFor(value);
-      const h = Math.max(4, height - padBottom - y);
+    const points = series.map((value, index) => ({
+      value,
+      x: xFor(index),
+      y: padTop + ((domainMax - Math.max(domainMin, Math.min(domainMax, value))) / domainRange) * chartH
+    }));
+    const linePath = points.map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`).join(" ");
+    const areaPath = `M${points[0].x} ${height - padBottom} L${points.map(point => `${point.x} ${point.y}`).join(" L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
+    const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#d93f84" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
+    const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(217,63,132,.12)"></path>`;
+
+    const markers = points.map((point, index) => {
       const label = hourlyAvailabilityLabel(index, series.length);
-      const color = hourlyAvailabilityColor(value);
-      const pattern = color.pattern ? `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="url(#${hourlyPatternId(metricLabel, color.pattern)})" opacity=".86"></rect>` : "";
+      const isLatest = index === series.length - 1;
       return `
-        <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(value)}" aria-label="${label} ${metricLabel}: ${pct(value)}">
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2" opacity=".96"></rect>
-          ${pattern}
-          <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="rgba(255,255,255,.10)"></rect>
+        <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(point.value)}" aria-label="${label} ${metricLabel}: ${pct(point.value)}">
+          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#d93f84" : "#fffdfd"}" stroke="#d93f84" stroke-width="${compact ? 2.6 : 2.8}"></circle>
+          <rect class="hourly-hit" x="${point.x - Math.max(10, barW / 2)}" y="${padTop}" width="${Math.max(20, barW)}" height="${chartH}" fill="transparent"></rect>
         </g>
       `;
     }).join("");
@@ -1139,14 +1128,14 @@ const MirSFlr = (() => {
     const labels = series.map((_, index) => {
       const interval = compact ? 6 : 3;
       if (index % interval !== 0 && index !== series.length - 1) return "";
-      const x = padLeft + index * (barW + gap) + barW / 2;
+      const x = xFor(index);
       const label = hourlyAvailabilityLabel(index, series.length);
       return `<text x="${x}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>`;
     }).join("");
 
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.innerHTML = `${defs}${grid}${bars}${labels}`;
+    svg.innerHTML = `${grid}${area}${line}${markers}${labels}`;
 
     let tooltipTimer = 0;
     const showTooltip = target => {
@@ -1154,7 +1143,7 @@ const MirSFlr = (() => {
       const index = Number(target.getAttribute("data-chart-index"));
       const value = series[index];
       if (!Number.isFinite(value)) return;
-      const rect = target.querySelector("rect")?.getBoundingClientRect();
+      const rect = target.querySelector(".hourly-dot")?.getBoundingClientRect();
       const wrapRect = svg.parentElement.getBoundingClientRect();
       if (!rect) return;
       tooltip.innerHTML = `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
