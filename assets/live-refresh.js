@@ -19,6 +19,7 @@
 
   function tightenLongValues(root = document) {
     root.querySelectorAll(targets.join(", ")).forEach(el => {
+      if (el.classList.contains("pre-reg-value")) return;
       el.classList.remove("metric-tight", "metric-ultra-tight");
       if (el.querySelector(".metric-unit")) return;
 
@@ -301,6 +302,41 @@
     update();
   }
 
+  function syncLatestHistoryScroll(root = document) {
+    if (!window.matchMedia("(max-width: 620px)").matches) return;
+
+    const conditionWrappers = root.querySelectorAll
+      ? [...root.querySelectorAll(".condition-history-wrap")]
+      : [];
+    const rewardWrappers = [...document.querySelectorAll("[data-render='reward-chart'], [data-render='validator-reward-chart']")]
+      .map(svg => svg.closest(".reward-chart-wrap"))
+      .filter(Boolean);
+    const wrappers = [
+      ...conditionWrappers,
+      ...rewardWrappers
+    ];
+
+    wrappers.forEach(wrapper => {
+      const svg = wrapper.querySelector("svg");
+      const table = wrapper.querySelector("table");
+      const signature = [
+        wrapper.scrollWidth,
+        wrapper.clientWidth,
+        svg?.innerHTML.length || 0,
+        table?.rows.length || 0,
+        table?.textContent.length || 0
+      ].join(":");
+
+      if (wrapper.dataset.latestScrollSignature === signature) return;
+      wrapper.dataset.latestScrollSignature = signature;
+
+      window.requestAnimationFrame(() => {
+        const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+        if (maxScroll > 4) wrapper.scrollLeft = maxScroll;
+      });
+    });
+  }
+
   function bindPullToRefresh() {
     const isTouchDevice = window.matchMedia("(pointer: coarse)").matches
       || navigator.maxTouchPoints > 0
@@ -461,6 +497,7 @@
     bindMobileNav();
     bindInfoTips();
     bindBackToTop();
+    syncLatestHistoryScroll();
     bindPullToRefresh();
     bindPageTransitions();
 
@@ -473,6 +510,7 @@
           formatPassStrikeValues();
           labelPreRegisteredStatus();
           labelValidatorSnapshotStatus();
+          syncLatestHistoryScroll();
           break;
         }
       }

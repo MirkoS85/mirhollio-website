@@ -554,8 +554,11 @@ const MirSFlr = (() => {
 
   function renderPreRegisteredState(value) {
     document.querySelectorAll("[data-state='preRegistered']").forEach(el => {
+      const state = value === "Yes" ? "ok" : value === "No" ? "bad" : "unknown";
       el.classList.toggle("ok", value === "Yes");
       el.classList.toggle("bad", value === "No");
+      el.classList.toggle("unknown", state === "unknown");
+      el.textContent = value === "Yes" ? "✓" : value === "No" ? "×" : "?";
       el.setAttribute("aria-label", `Pre-registered: ${value}`);
       el.removeAttribute("aria-hidden");
     });

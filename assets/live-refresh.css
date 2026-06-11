@@ -1223,11 +1223,38 @@ h1{
 }
 
 .metric strong.pre-reg-value{
-  font-size:34px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  max-width:100%;
+  color:var(--ink);
+  font-size:clamp(21px, 2.25vw, 28px);
+  letter-spacing:-.035em;
+  line-height:1;
+  white-space:nowrap;
+  overflow-wrap:normal;
+}
+
+.metric strong.pre-reg-value em{
+  min-width:0;
+  font-style:normal;
+  font-weight:950;
+}
+
+.metric strong.pre-reg-value b{
+  color:inherit;
+  font:inherit;
 }
 
 .metric strong.pre-reg-value span{
   color:var(--ink);
+}
+
+.metric strong.pre-reg-value .pre-reg-state{
+  width:28px;
+  height:28px;
+  flex:0 0 auto;
+  font-size:17px;
 }
 
 .card{

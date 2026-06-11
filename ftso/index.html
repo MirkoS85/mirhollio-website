@@ -33,7 +33,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../logo.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=pull-refresh-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=pre-reg-scroll-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -74,7 +74,7 @@
               <div class="metric"><button class="info-tip" type="button" aria-label="Delegation fee info">i<span>Provider delegation fee before rewards are distributed to delegators.</span></button><span>Fee</span><strong data-field="ftsoFee">-</strong></div>
               <div class="metric"><button class="info-tip" type="button" aria-label="Condition passes info">i<span>Number of condition passes in the latest epoch. The percentage shows success rate over the most recent epochs.</span></button><span>Condition passes</span><strong class="condition-pass-value" data-render="condition-passes">-</strong></div>
               <div class="metric"><button class="info-tip" type="button" aria-label="Minimal conditions info">i<span>Latest reward-condition snapshot for FTSO, fast updates, FDC, and staking. Green means the condition passed.</span></button><span>Minimal conditions</span><div class="condition-dots compact" data-render="conditions"><span></span><span></span><span></span><span></span></div></div>
-              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><span data-field="preRegistered">-</span><i class="state-dot" data-state="preRegistered" aria-hidden="true"></i></strong></div>
+              <div class="metric"><button class="info-tip" type="button" aria-label="Pre-registered info">i<span>The provider is registered ahead of the reward epoch. This is a readiness signal, not a guarantee of rewards.</span></button><span>Pre-registered</span><strong class="pre-reg-value"><i class="condition-mark pre-reg-state" data-state="preRegistered" aria-hidden="true"></i><em>Pre-registered: <b data-field="preRegistered">-</b></em></strong></div>
             </div>
             <div class="panel-mini-grid">
               <article class="card compact-stat"><b>Monthly est.</b><strong data-field="ftsoMonthlyRewards">-</strong><p data-field="ftsoMonthlyFiat">-</p></article>
@@ -94,8 +94,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=hourly-order-1"></script>
-  <script src="../assets/live-refresh.js?v=pull-refresh-3"></script>
+  <script src="../assets/operator.js?v=pre-reg-scroll-1"></script>
+  <script src="../assets/live-refresh.js?v=pre-reg-scroll-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>
 </html>
