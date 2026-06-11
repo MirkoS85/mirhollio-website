@@ -307,8 +307,8 @@
       || "ontouchstart" in window;
     if (!isTouchDevice || document.querySelector(".pull-refresh-indicator")) return;
 
-    const threshold = 92;
-    const maxOffset = 82;
+    const threshold = 88;
+    const maxOffset = 72;
     let startY = 0;
     let currentY = 0;
     let active = false;
@@ -319,10 +319,9 @@
     indicator.className = "pull-refresh-indicator";
     indicator.setAttribute("role", "status");
     indicator.setAttribute("aria-live", "polite");
-    indicator.innerHTML = '<span aria-hidden="true"></span><strong>Pull to refresh</strong>';
+    indicator.setAttribute("aria-label", "Pull to refresh");
+    indicator.innerHTML = '<span aria-hidden="true"></span>';
     document.body.appendChild(indicator);
-
-    const label = indicator.querySelector("strong");
 
     function atPageTop() {
       const scrollTop = Math.max(
@@ -339,7 +338,7 @@
       indicator.style.setProperty("--pull-refresh-offset", `${Math.round(offset)}px`);
       indicator.style.setProperty("--pull-refresh-progress", progress.toFixed(3));
       indicator.classList.toggle("is-ready", distance >= threshold);
-      label.textContent = distance >= threshold ? "Release to refresh" : "Pull to refresh";
+      indicator.setAttribute("aria-label", distance >= threshold ? "Release to refresh" : "Pull to refresh");
     }
 
     function resetIndicator() {
@@ -350,7 +349,7 @@
       indicator.classList.remove("is-ready");
       indicator.style.setProperty("--pull-refresh-offset", "0px");
       indicator.style.setProperty("--pull-refresh-progress", "0");
-      label.textContent = "Pull to refresh";
+      indicator.setAttribute("aria-label", "Pull to refresh");
     }
 
     document.addEventListener("touchstart", event => {
@@ -392,7 +391,7 @@
         indicator.classList.remove("is-ready");
         indicator.style.setProperty("--pull-refresh-offset", `${maxOffset}px`);
         indicator.style.setProperty("--pull-refresh-progress", "1");
-        label.textContent = "Refreshing";
+        indicator.setAttribute("aria-label", "Refreshing");
         window.setTimeout(() => window.location.reload(), 180);
         return;
       }
