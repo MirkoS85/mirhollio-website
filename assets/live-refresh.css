@@ -2105,23 +2105,29 @@ tbody tr:hover td{
 }
 
 .availability-scale .scale-best{
-  background:#c61f6b;
-  border-color:#a91657;
+  background:#fffdfd;
+  border-color:#c61f6b;
 }
 
 .availability-scale .scale-good{
-  background:#e56aa0;
-  border-color:#cf4f86;
+  background:
+    repeating-linear-gradient(45deg, rgba(216,75,138,.32) 0 2px, transparent 2px 7px),
+    #ffe9f2;
+  border-color:#d84b8a;
 }
 
 .availability-scale .scale-watch{
-  background:#f5bad3;
-  border-color:#e695ba;
+  background:
+    repeating-linear-gradient(45deg, rgba(169,29,92,.42) 0 2px, rgba(255,255,255,.34) 2px 4px, transparent 4px 8px),
+    #f6b9d0;
+  border-color:#c83b78;
 }
 
 .availability-scale .scale-low{
-  background:#fffafd;
-  border-color:#ead8e2;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.52) 0 2px, transparent 2px 7px),
+    #c61f6b;
+  border-color:#8f154d;
 }
 
 .bars{

@@ -1032,10 +1032,14 @@ const MirSFlr = (() => {
   }
 
   function hourlyAvailabilityColor(value) {
-    if (value >= 0.98) return { fill: "#c61f6b", stroke: "#a91657" };
-    if (value >= 0.8) return { fill: "#e56aa0", stroke: "#cf4f86" };
-    if (value >= 0.5) return { fill: "#f5bad3", stroke: "#e695ba" };
-    return { fill: "#fffafd", stroke: "#ead8e2" };
+    if (value >= 0.98) return { fill: "#fffdfd", stroke: "#c61f6b", pattern: "" };
+    if (value >= 0.8) return { fill: "#ffe9f2", stroke: "#d84b8a", pattern: "good" };
+    if (value >= 0.5) return { fill: "#f6b9d0", stroke: "#c83b78", pattern: "watch" };
+    return { fill: "#c61f6b", stroke: "#8f154d", pattern: "low" };
+  }
+
+  function hourlyPatternId(metricLabel, pattern) {
+    return `hourly-${String(metricLabel || "availability").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${pattern}`;
   }
 
   function hourlyAvailabilityLabel(index, total) {
@@ -1090,6 +1094,22 @@ const MirSFlr = (() => {
     const avg = series.reduce((sum, value) => sum + value, 0) / series.length;
     const low = Math.min(...series);
     const latest = series[series.length - 1];
+    const patternPrefix = String(metricLabel || "availability").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+    const defs = `
+      <defs>
+        <pattern id="hourly-${patternPrefix}-good" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="9" stroke="#d84b8a" stroke-width="2" opacity=".32"></line>
+        </pattern>
+        <pattern id="hourly-${patternPrefix}-watch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="8" stroke="#a91d5c" stroke-width="2.2" opacity=".42"></line>
+          <line x1="4" y1="0" x2="4" y2="8" stroke="#ffffff" stroke-width="1.3" opacity=".34"></line>
+        </pattern>
+        <pattern id="hourly-${patternPrefix}-low" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+          <line x1="0" y1="0" x2="0" y2="7" stroke="#ffffff" stroke-width="2" opacity=".52"></line>
+        </pattern>
+      </defs>
+    `;
 
     const grid = ticks.map(tick => {
       const y = yFor(tick);
@@ -1106,9 +1126,11 @@ const MirSFlr = (() => {
       const h = Math.max(4, height - padBottom - y);
       const label = hourlyAvailabilityLabel(index, series.length);
       const color = hourlyAvailabilityColor(value);
+      const pattern = color.pattern ? `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="url(#${hourlyPatternId(metricLabel, color.pattern)})" opacity=".86"></rect>` : "";
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(value)}" aria-label="${label} ${metricLabel}: ${pct(value)}">
           <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="${color.fill}" stroke="${color.stroke}" stroke-width="2" opacity=".96"></rect>
+          ${pattern}
           <rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="${barRadius}" fill="rgba(255,255,255,.10)"></rect>
         </g>
       `;
@@ -1124,7 +1146,7 @@ const MirSFlr = (() => {
 
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.innerHTML = `${grid}${bars}${labels}`;
+    svg.innerHTML = `${defs}${grid}${bars}${labels}`;
 
     let tooltipTimer = 0;
     const showTooltip = target => {
