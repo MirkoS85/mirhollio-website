@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirsflr-shell-v130";
+const CACHE_NAME = "mirsflr-shell-v131";
 const APP_SHELL = [
   "/",
   "/ftso/",
@@ -15,10 +15,10 @@ const APP_SHELL = [
   "/assets/pwa.js?v=pwa-install-1",
   "/app.webmanifest",
   "/logo.png",
-  "/apple-touch-icon-flare.png",
+  "/apple-touch-icon-full.png",
   "/flare-icon.png",
-  "/app-icon-192.png",
-  "/app-icon-512.png",
+  "/app-icon-full-192.png",
+  "/app-icon-full-512.png",
   "/favicon-32x32.png",
   "/favicon-64x64.png",
   "/background.jpg",
