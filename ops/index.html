@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
-  <meta name="theme-color" content="#050506">
+  <meta name="theme-color" content="#0b0c0e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="MirSFlr OPS">
@@ -19,187 +19,242 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-3">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-6">
 </head>
 <body>
   <main class="ops-shell">
-    <header class="ops-top">
-      <div>
-        <p class="eyebrow">Private operator cockpit</p>
-        <h1>MirSFlr OPS</h1>
+    <header class="ops-header">
+      <a class="brand" href="./" aria-label="MirSFlr OPS">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <strong>MirSFlr <em>OPS</em></strong>
+      </a>
+
+      <nav class="ops-tabs" aria-label="OPS sections">
+        <a href="#overview" class="is-active">Overview</a>
+        <a href="#ftso">FTSO</a>
+        <a href="#validator">Validator</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#history">History</a>
+        <a href="#sources">Settings</a>
+      </nav>
+
+      <button class="icon-button mobile-settings" type="button" aria-label="Settings">⚙</button>
+
+      <div class="desktop-health" data-overall-state="loading">
+        <span class="health-pill"><i></i><b data-field="overallTitle">Checking</b></span>
+        <span>fresh <b data-field="freshness">-</b></span>
+        <span>auto 60s</span>
+        <button type="button" data-action="refresh" aria-label="Refresh operations data">↻</button>
       </div>
-      <button class="refresh-button" type="button" data-action="refresh" aria-label="Refresh operations data">
-        <span data-field="refreshIcon">↻</span>
-        <b data-field="refreshLabel">Refresh</b>
-      </button>
     </header>
 
-    <section class="hero-grid">
-      <article class="verdict-card" data-overall-state="loading">
-        <div class="verdict-row">
-          <span class="pulse"></span>
-          <p data-field="overallLabel">Loading</p>
-        </div>
-        <strong data-field="overallTitle">Checking infra</strong>
-        <div class="fresh-row">
-          <span>Fresh <b data-field="freshness">-</b></span>
-          <span>Auto 60s</span>
-        </div>
-      </article>
-
-      <div class="status-grid" aria-label="Core health">
-        <article class="status-tile" data-status="loading" data-card="ftsoStatus">
-          <span>FTSO</span>
-          <strong data-field="ftsoStatus">...</strong>
-          <small data-field="ftsoStatusMeta">provider</small>
-        </article>
-        <article class="status-tile" data-status="loading" data-card="fdcStatus">
-          <span>FDC</span>
-          <strong data-field="fdcStatus">...</strong>
-          <small data-field="fdcStatusMeta">attestation</small>
-        </article>
-        <article class="status-tile" data-status="loading" data-card="validatorStatus">
-          <span>Validator</span>
-          <strong data-field="validatorStatus">...</strong>
-          <small data-field="validatorStatusMeta">external</small>
-        </article>
-        <article class="status-tile" data-status="loading" data-card="nodeStatus">
-          <span>Node</span>
-          <strong data-field="nodeStatus">...</strong>
-          <small data-field="nodeStatusMeta">self health</small>
-        </article>
+    <section class="mobile-health" id="overview" data-overall-state="loading">
+      <div class="mobile-health-top">
+        <strong><span data-field="overallTitle">Checking</span><i></i></strong>
+        <span>fresh <b data-field="freshness">-</b></span>
+        <span>auto 60s</span>
+        <button type="button" data-action="refresh" aria-label="Refresh operations data">↻</button>
+      </div>
+      <div class="mobile-mini-grid">
+        <span>FTSO <b data-field="ftsoStatus">...</b><i data-dot="ftsoStatus"></i></span>
+        <span>FDC <b data-field="fdcStatus">...</b><i data-dot="fdcStatus"></i></span>
+        <span>VAL <b data-field="validatorStatus">...</b><i data-dot="validatorStatus"></i></span>
+        <span>NODE <b data-field="nodeStatus">...</b><i data-dot="nodeStatus"></i></span>
       </div>
     </section>
 
-    <section class="panel alert-panel" data-alert-state="loading">
-      <div class="panel-head">
-        <div>
-          <p class="eyebrow">Action queue</p>
-          <h2>Alerts</h2>
-        </div>
-        <span class="source-pill" data-field="alertCount">checking</span>
+    <section class="desktop-status-grid" aria-label="Core health">
+      <article class="status-tile" data-status="loading" data-card="ftsoStatus">
+        <span>FTSO</span>
+        <strong data-field="ftsoStatus">...</strong>
+        <small data-field="ftsoStatusMeta">provider</small>
+      </article>
+      <article class="status-tile" data-status="loading" data-card="fdcStatus">
+        <span>FDC</span>
+        <strong data-field="fdcStatus">...</strong>
+        <small data-field="fdcStatusMeta">attestation</small>
+      </article>
+      <article class="status-tile" data-status="loading" data-card="validatorStatus">
+        <span>Validator</span>
+        <strong data-field="validatorStatus">...</strong>
+        <small data-field="validatorStatusMeta">external</small>
+      </article>
+      <article class="status-tile" data-status="loading" data-card="nodeStatus">
+        <span>Node</span>
+        <strong data-field="nodeStatus">...</strong>
+        <small data-field="nodeStatusMeta">self health</small>
+      </article>
+    </section>
+
+    <section class="alerts-card" id="alerts" data-alert-state="loading">
+      <div class="alerts-head">
+        <span>Alerts</span>
+        <b data-field="alertCount">checking</b>
       </div>
       <div class="alert-list" data-render="alerts">
         <article class="alert-item muted"><b>Loading data</b><span>Waiting for live sources.</span></article>
       </div>
     </section>
 
-    <section class="ops-layout">
-      <div class="ops-column">
-        <section class="panel ftso-panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Provider execution</p>
-              <h2>FTSO + FDC</h2>
-            </div>
-            <span class="source-pill" data-field="latestEpoch">Epoch -</span>
-          </div>
+    <section class="ops-grid">
+      <section class="ops-column" id="ftso">
+        <h2>FTSO Provider</h2>
 
-          <div class="metric-grid">
-            <article class="metric-card"><span>Latest reward</span><strong data-field="latestReward">-</strong><small data-field="latestEligibility">Eligibility -</small></article>
-            <article class="metric-card"><span>Reward rate</span><strong data-field="rewardRate">-</strong><small>provider rate</small></article>
-            <article class="metric-card"><span>FTSO availability</span><strong data-field="ftsoAvailability">-</strong><small>last 24h</small></article>
-            <article class="metric-card"><span>FDC availability</span><strong data-field="fdcAvailability">-</strong><small>last 24h</small></article>
-            <article class="metric-card"><span>Conditions</span><strong data-field="conditionPasses">-</strong><small data-field="conditionsLabel">minimal checks</small></article>
-            <article class="metric-card"><span>Pre-registered</span><strong data-field="preRegistered">-</strong><small>reward readiness</small></article>
-          </div>
-
-          <div class="chart-grid">
-            <article class="chart-card large-chart">
-              <div class="chart-title"><span>FTSO rewards</span><b>last 20 epochs</b></div>
-              <svg class="chart" data-chart="ftsoRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="FTSO rewards chart"></svg>
-            </article>
-            <article class="chart-card">
-              <div class="chart-title"><span>FTSO availability</span><b>last 24h</b></div>
-              <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
-            </article>
-            <article class="chart-card">
-              <div class="chart-title"><span>FDC availability</span><b>last 24h</b></div>
-              <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
-            </article>
-            <article class="chart-card">
-              <div class="chart-title"><span>Performance bands</span><b>last 24h</b></div>
-              <svg class="chart" data-chart="ftsoPerformance" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO performance chart"></svg>
-            </article>
-            <article class="chart-card heatmap-card">
-              <div class="chart-title"><span>Minimal conditions</span><b>recent epochs</b></div>
-              <div class="heatmap" data-render="conditionHeatmap"></div>
-            </article>
-          </div>
-        </section>
-      </div>
-
-      <div class="ops-column">
-        <section class="panel validator-panel">
-          <div class="panel-head">
-            <div>
-              <p class="eyebrow">Validator + node</p>
-              <h2>Infrastructure</h2>
-            </div>
-            <span class="source-pill" data-field="validatorVersion">v-</span>
-          </div>
-
-          <div class="metric-grid">
-            <article class="metric-card"><span>Connection</span><strong data-field="validatorConnected">-</strong><small data-field="validatorLastSeen">last seen -</small></article>
-            <article class="metric-card"><span>Node health</span><strong data-field="nodeHealthy">-</strong><small data-field="nodePeers">peers -</small></article>
-            <article class="metric-card"><span>Uptime</span><strong data-field="validatorUptime">-</strong><small>external view</small></article>
-            <article class="metric-card"><span>APR</span><strong data-field="validatorApr">-</strong><small>estimated</small></article>
-            <article class="metric-card"><span>Stake</span><strong data-field="validatorStake">-</strong><small data-field="validatorStakeMeta">self + delegation</small></article>
-            <article class="metric-card"><span>Free space</span><strong data-field="freeSpace">-</strong><small>to cap</small></article>
-          </div>
-
-          <div class="node-meter">
-            <div>
-              <span>Stake capacity</span>
-              <strong data-field="capacityText">-</strong>
-            </div>
-            <div class="capacity-track"><i data-bar="stakeCapacity"></i></div>
-            <small data-field="capacityPct">-</small>
-          </div>
-
-          <div class="chart-grid">
-            <article class="chart-card large-chart">
-              <div class="chart-title"><span>Validator rewards</span><b>last 20 epochs</b></div>
-              <svg class="chart" data-chart="validatorRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="Validator rewards chart"></svg>
-            </article>
-            <article class="chart-card">
-              <div class="chart-title"><span>Recent uptime</span><b>external validator</b></div>
-              <div class="uptime-strip" data-render="uptimeStrip"></div>
-            </article>
-            <article class="chart-card telemetry-card">
-              <div class="chart-title"><span>Node telemetry</span><b>direct health</b></div>
-              <div class="telemetry-grid">
-                <div><span>Network</span><strong data-field="nodeNetwork">-</strong></div>
-                <div><span>Disk</span><strong data-field="nodeDisk">-</strong></div>
-                <div><span>Processing</span><strong data-field="nodeProcessing">-</strong></div>
-                <div><span>BLS</span><strong data-field="nodeBls">-</strong></div>
-              </div>
-            </article>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="panel source-panel">
-      <div class="panel-head">
-        <div>
-          <p class="eyebrow">Data consensus</p>
-          <h2>Sources</h2>
+        <div class="data-table ftso-table">
+          <article>
+            <span>Reward</span>
+            <strong data-field="latestReward">-</strong>
+            <small>FLR</small>
+          </article>
+          <article>
+            <span>Rate</span>
+            <strong data-field="rewardRate">-</strong>
+          </article>
+          <article>
+            <span>Availability</span>
+            <strong data-field="ftsoAvailability">-</strong>
+          </article>
+          <article>
+            <span>FDC</span>
+            <strong data-field="fdcAvailability">-</strong>
+          </article>
+          <article>
+            <span>Conditions</span>
+            <strong data-field="conditionPasses">-</strong>
+          </article>
+          <article>
+            <span>Pre-reg</span>
+            <strong data-field="preRegistered">-</strong>
+          </article>
         </div>
-        <span class="source-pill" data-field="sourceSummary">-</span>
-      </div>
-      <div class="source-grid">
-        <article class="source-card" data-source="oracle"><span>Oracle Daemon</span><strong data-field="oracleSource">-</strong><small data-field="oracleSourceMeta">providers + validators</small></article>
-        <article class="source-card" data-source="explorer"><span>Systems Explorer</span><strong data-field="explorerSource">-</strong><small data-field="explorerSourceMeta">entity policy</small></article>
-        <article class="source-card" data-source="node"><span>Direct node</span><strong data-field="nodeSource">-</strong><small data-field="nodeSourceMeta">self health</small></article>
-      </div>
-      <details class="raw-details">
-        <summary>Raw details</summary>
-        <pre data-render="rawDetails">Waiting for data.</pre>
-      </details>
+
+        <article class="chart-card reward-card">
+          <div class="chart-title"><span>FTSO Reward History <em>(per epoch)</em></span></div>
+          <div class="chart-with-summary">
+            <svg class="chart" data-chart="ftsoRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="FTSO rewards chart"></svg>
+            <aside class="chart-summary">
+              <span>Latest</span><strong data-field="ftsoRewardLatestFull">-</strong>
+              <span>Average</span><strong data-field="ftsoRewardAverageFull">-</strong>
+              <span>Range</span><strong data-field="ftsoRewardRangeFull">-</strong>
+            </aside>
+          </div>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title"><span>FTSO Availability <em>(24h)</em></span><b data-field="ftsoAvailability">-</b></div>
+          <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title"><span>FDC Availability <em>(24h)</em></span><b data-field="fdcAvailability">-</b></div>
+          <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title">
+            <span>FTSO Performance <em>(24h)</em></span>
+            <div class="legend"><i></i>Performance <i></i>Primary <i></i>Secondary</div>
+          </div>
+          <svg class="chart" data-chart="ftsoPerformance" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO performance chart"></svg>
+        </article>
+
+        <article class="chart-card condition-card" id="history">
+          <div class="chart-title"><span>FTSO Conditions <em>(per epoch)</em></span><b data-field="conditionPasses">-</b></div>
+          <div class="heatmap" data-render="conditionHeatmap"></div>
+        </article>
+      </section>
+
+      <section class="ops-column" id="validator">
+        <h2>Validator Node</h2>
+
+        <div class="data-table validator-table">
+          <article>
+            <span>Status</span>
+            <strong class="success" data-field="validatorConnected">-</strong>
+          </article>
+          <article>
+            <span>Uptime</span>
+            <strong data-field="validatorUptime">-</strong>
+          </article>
+          <article>
+            <span>Version</span>
+            <strong data-field="validatorVersion">v-</strong>
+          </article>
+          <article>
+            <span>Stake</span>
+            <strong data-field="validatorStake">-</strong>
+          </article>
+          <article>
+            <span>Free space</span>
+            <strong data-field="freeSpace">-</strong>
+          </article>
+          <article>
+            <span>Self-bond</span>
+            <strong data-field="selfBond">3M FLR</strong>
+          </article>
+          <article>
+            <span>Ends in</span>
+            <strong data-field="stakeEnds">-</strong>
+          </article>
+        </div>
+
+        <article class="chart-card reward-card">
+          <div class="chart-title"><span>Validator Reward History <em>(per epoch)</em></span></div>
+          <div class="chart-with-summary">
+            <svg class="chart" data-chart="validatorRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="Validator rewards chart"></svg>
+            <aside class="chart-summary">
+              <span>Latest</span><strong data-field="validatorRewardLatestFull">-</strong>
+              <span>Average</span><strong data-field="validatorRewardAverageFull">-</strong>
+              <span>Range</span><strong data-field="validatorRewardRangeFull">-</strong>
+            </aside>
+          </div>
+        </article>
+
+        <article class="stake-card">
+          <div class="stake-ring"><strong data-field="capacityPct">-</strong></div>
+          <div class="stake-lines">
+            <strong data-field="capacityText">-</strong>
+            <div class="capacity-track"><i data-bar="stakeCapacity"></i></div>
+            <div class="stake-breakdown">
+              <span>Self-bond <b data-field="selfBond">3M FLR</b></span>
+              <span>Delegated <b data-field="delegatedStake">-</b></span>
+              <span>Free <b data-field="freeSpace">-</b></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="node-card">
+          <div class="chart-title"><span>Node Health <em>(direct)</em></span></div>
+          <div class="node-health-grid">
+            <div><span>Disk</span><strong data-field="nodeDisk">-</strong></div>
+            <div><span>Peers</span><strong data-field="nodePeers">-</strong></div>
+            <div><span>Connection</span><strong data-field="nodeNetwork">-</strong></div>
+            <div><span>Processing</span><strong data-field="nodeProcessing">-</strong></div>
+            <div><span>BLS</span><strong data-field="nodeBls">-</strong></div>
+          </div>
+        </article>
+
+        <article class="chart-card uptime-card">
+          <div class="chart-title"><span>Recent Uptime</span><b data-field="validatorUptime">-</b></div>
+          <div class="uptime-strip" data-render="uptimeStrip"></div>
+        </article>
+
+        <section class="sources-card" id="sources">
+          <h2>Data Sources</h2>
+          <div class="source-grid">
+            <article class="source-card" data-source="oracle"><span>Oracle Daemon</span><strong data-field="oracleSource">-</strong><small data-field="oracleSourceMeta">providers + validators</small></article>
+            <article class="source-card" data-source="explorer"><span>Systems Explorer</span><strong data-field="explorerSource">-</strong><small data-field="explorerSourceMeta">entity policy</small></article>
+            <article class="source-card" data-source="node"><span>Node health</span><strong data-field="nodeSource">-</strong><small data-field="nodeSourceMeta">self health</small></article>
+          </div>
+          <details class="raw-details">
+            <summary>Raw details</summary>
+            <pre data-render="rawDetails">Waiting for data.</pre>
+          </details>
+        </section>
+      </section>
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-3"></script>
+  <script src="../assets/ops.js?v=ops-6"></script>
 </body>
 </html>

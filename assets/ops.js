@@ -59,6 +59,9 @@
   function setStatusCard(card, status, title, meta) {
     const el = $(`[data-card="${card}"]`);
     if (el) el.dataset.status = status;
+    $$(`[data-dot="${card}"]`).forEach(dot => {
+      dot.dataset.status = status;
+    });
     setText(card, title);
     setText(`${card}Meta`, meta);
   }
@@ -68,6 +71,14 @@
     const pct = Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
     $$(`[data-bar="${name}"]`).forEach(el => {
       el.style.width = `${pct}%`;
+    });
+  }
+
+  function setStakeAngle(value) {
+    const n = Number(value);
+    const pct = Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+    $$(".stake-ring").forEach(el => {
+      el.style.setProperty("--stake-angle", `${pct}%`);
     });
   }
 
@@ -99,6 +110,31 @@
     if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M${suffix}`;
     if (abs >= 1_000) return `${(n / 1_000).toFixed(2)}K${suffix}`;
     return `${fmtNum(n, 0)}${suffix}`;
+  }
+
+  function fmtAxis(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "";
+    const abs = Math.abs(n);
+    if (abs >= 1_000_000) return `${fmtNum(n / 1_000_000, 1)}m`;
+    if (abs >= 1_000) return `${fmtNum(n / 1_000, 0)}k`;
+    return fmtNum(n, 0);
+  }
+
+  function niceCeil(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return 1;
+    const power = 10 ** Math.floor(Math.log10(n));
+    const scaled = n / power;
+    const steps = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    const step = steps.find(item => scaled <= item) || 10;
+    return step * power;
+  }
+
+  function fmtFullFlr(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    return `${n.toLocaleString(undefined, { maximumFractionDigits: 2 })} FLR`;
   }
 
   function fmtWeight(value) {
@@ -222,6 +258,20 @@
       .slice(-20);
   }
 
+  function summarizeRewardSeries(series) {
+    const values = Array.isArray(series) ? series.map(item => Number(item.value)).filter(Number.isFinite) : [];
+    if (!values.length) return { latest: "-", average: "-", range: "-" };
+    const latest = values[values.length - 1];
+    const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    return {
+      latest: fmtFullFlr(latest),
+      average: fmtFullFlr(average),
+      range: `${fmtFullFlr(min).replace(" FLR", "")} - ${fmtFullFlr(max)}`
+    };
+  }
+
   function chartEmpty(svg, message) {
     if (!svg) return;
     svg.innerHTML = `<text class="empty-text" x="50%" y="52%" text-anchor="middle">${message}</text>`;
@@ -229,6 +279,23 @@
 
   function pointPath(points) {
     return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+  }
+
+  function smoothPath(points) {
+    if (!Array.isArray(points) || points.length < 3) return pointPath(points || []);
+    const commands = [`M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`];
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const p0 = points[index - 1] || points[index];
+      const p1 = points[index];
+      const p2 = points[index + 1];
+      const p3 = points[index + 2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      commands.push(`C ${cp1x.toFixed(2)} ${cp1y.toFixed(2)}, ${cp2x.toFixed(2)} ${cp2y.toFixed(2)}, ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`);
+    }
+    return commands.join(" ");
   }
 
   function renderLineChart(selector, input, options = {}) {
@@ -243,38 +310,56 @@
 
     const width = 640;
     const height = options.height || Number(svg.getAttribute("viewBox")?.split(" ")[3]) || 180;
-    const pad = { top: 20, right: 20, bottom: 28, left: 36 };
-    const minValue = options.min ?? Math.min(...values.map(item => Number(item.value)));
-    const maxValue = options.max ?? Math.max(...values.map(item => Number(item.value)));
+    const pad = { top: 18, right: 18, bottom: 26, left: 36 };
+    const rawMin = Math.min(...values.map(item => Number(item.value)));
+    const rawMax = Math.max(...values.map(item => Number(item.value)));
+    let minValue = options.min ?? rawMin;
+    let maxValue = options.max ?? rawMax;
+    if (options.zeroBase) {
+      minValue = options.min ?? 0;
+      maxValue = options.max ?? niceCeil(rawMax * 1.08);
+    } else if (options.min == null && options.max == null) {
+      const padding = Math.max(0.0001, rawMax - rawMin) * 0.12;
+      minValue = Math.max(0, rawMin - padding);
+      maxValue = rawMax + padding;
+    }
     const range = Math.max(0.0001, maxValue - minValue);
     const chartW = width - pad.left - pad.right;
     const chartH = height - pad.top - pad.bottom;
     const xFor = index => pad.left + (values.length === 1 ? 0 : (index / (values.length - 1)) * chartW);
     const yFor = value => pad.top + (1 - ((Number(value) - minValue) / range)) * chartH;
     const points = values.map((item, index) => ({ x: xFor(index), y: yFor(item.value), item }));
-    const line = pointPath(points);
+    const line = smoothPath(points);
     const fill = `${line} L ${points[points.length - 1].x.toFixed(2)} ${height - pad.bottom} L ${points[0].x.toFixed(2)} ${height - pad.bottom} Z`;
     const targetY = Number.isFinite(options.target) ? yFor(options.target) : null;
     const first = values[0];
     const last = values[values.length - 1];
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map(step => pad.top + step * chartH);
+    const lineClass = options.lineClass || "line-main";
 
     svg.innerHTML = `
       <defs>
         <linearGradient id="${selector}-area" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#ef2f84" stop-opacity=".48"/>
-          <stop offset="100%" stop-color="#ef2f84" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#ff66a5" stop-opacity=".34"/>
+          <stop offset="42%" stop-color="#e04a8a" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="#e04a8a" stop-opacity="0"/>
         </linearGradient>
+        <filter id="${selector}-glow" x="-12%" y="-35%" width="124%" height="170%">
+          <feGaussianBlur stdDeviation="3.4" result="blur"/>
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.95  0 1 0 0 0.18  0 0 1 0 0.48  0 0 0 .55 0"/>
+          <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
       </defs>
-      <line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${pad.top}" y2="${pad.top}"></line>
-      <line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${height - pad.bottom}" y2="${height - pad.bottom}"></line>
+      ${gridLines.map(y => `<line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${y.toFixed(2)}" y2="${y.toFixed(2)}"></line>`).join("")}
       ${targetY == null ? "" : `<line class="target-line" x1="${pad.left}" x2="${width - pad.right}" y1="${targetY}" y2="${targetY}"></line>`}
-      <path d="${fill}" fill="url(#${selector}-area)" opacity=".85"></path>
-      <path class="${options.lineClass || "line-main"}" d="${line}"></path>
-      ${points.map(point => `<circle class="dot" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${point === points[points.length - 1] ? 6 : 4}"></circle>`).join("")}
+      <path class="area-fill" d="${fill}" fill="url(#${selector}-area)"></path>
+      <path class="line-glow ${lineClass}" d="${line}" filter="url(#${selector}-glow)"></path>
+      <path class="${lineClass}" d="${line}"></path>
+      ${points.map(point => `<circle class="dot" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${point === points[points.length - 1] ? 4 : 2.8}"></circle>`).join("")}
       <text class="axis-label" x="${pad.left}" y="${height - 8}" text-anchor="middle">${first.epoch ?? options.firstLabel ?? ""}</text>
       <text class="axis-label" x="${width - pad.right}" y="${height - 8}" text-anchor="middle">${last.epoch ?? options.lastLabel ?? "now"}</text>
-      <text class="axis-label" x="${pad.left - 6}" y="${pad.top + 5}" text-anchor="end">${options.yTop ?? fmtNum(maxValue, 0)}</text>
-      <text class="axis-label" x="${pad.left - 6}" y="${height - pad.bottom + 5}" text-anchor="end">${options.yBottom ?? fmtNum(minValue, 0)}</text>
+      <text class="axis-label" x="${pad.left - 6}" y="${pad.top + 5}" text-anchor="end">${options.yTop ?? fmtAxis(maxValue)}</text>
+      <text class="axis-label" x="${pad.left - 6}" y="${height - pad.bottom + 5}" text-anchor="end">${options.yBottom ?? fmtAxis(minValue)}</text>
     `;
   }
 
@@ -296,11 +381,19 @@
     const chartH = height - pad.top - pad.bottom;
     const xFor = index => pad.left + (index / (len - 1)) * chartW;
     const yFor = value => pad.top + (1 - (value / 100)) * chartH;
-    const makePath = arr => arr.map((value, index) => `${index === 0 ? "M" : "L"} ${xFor(index).toFixed(2)} ${yFor(value).toFixed(2)}`).join(" ");
+    const makePoints = arr => arr.map((value, index) => ({ x: xFor(index), y: yFor(value), item: { value } }));
+    const makePath = arr => smoothPath(makePoints(arr));
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map(step => pad.top + step * chartH);
     svg.innerHTML = `
-      <line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${pad.top}" y2="${pad.top}"></line>
-      <line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${pad.top + chartH / 2}" y2="${pad.top + chartH / 2}"></line>
-      <line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${height - pad.bottom}" y2="${height - pad.bottom}"></line>
+      <defs>
+        <filter id="ftsoPerformance-glow" x="-12%" y="-35%" width="124%" height="170%">
+          <feGaussianBlur stdDeviation="2.8" result="blur"/>
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.95  0 1 0 0 0.18  0 0 1 0 0.48  0 0 0 .45 0"/>
+          <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      ${gridLines.map(y => `<line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${y.toFixed(2)}" y2="${y.toFixed(2)}"></line>`).join("")}
+      <path class="line-glow line-main" d="${makePath(perf)}" filter="url(#ftsoPerformance-glow)"></path>
       <path class="line-main" d="${makePath(perf)}"></path>
       <path class="line-soft" d="${makePath(primary)}"></path>
       <path class="line-amber" d="${makePath(secondary)}"></path>
@@ -454,7 +547,7 @@
     if (!alerts.length) {
       mount.innerHTML = `<article class="alert-item ok"><b>No active alerts</b><span>All primary checks are inside the configured thresholds.</span></article>`;
       setText("alertCount", "clear");
-      const panel = $(".alert-panel");
+      const panel = $(".alerts-card");
       if (panel) panel.dataset.alertState = "ok";
       return;
     }
@@ -465,7 +558,7 @@
       </article>
     `).join("");
     setText("alertCount", `${alerts.length} alert${alerts.length === 1 ? "" : "s"}`);
-    const panel = $(".alert-panel");
+    const panel = $(".alerts-card");
     if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
   }
 
@@ -511,8 +604,9 @@
     const node = getNode(validator);
     const levels = computeLevels(provider, latest, validator, nodeHealth);
     const overall = worstLevel([levels.ftso, levels.fdc, levels.validator, levels.node]);
-    const overallCard = $(".verdict-card");
-    if (overallCard) overallCard.dataset.overallState = overall;
+    $$(".mobile-health, .desktop-health").forEach(el => {
+      el.dataset.overallState = overall;
+    });
     setText("overallLabel", overall === "ok" ? "All systems nominal" : overall === "warn" ? "Watch required" : "Action required");
     setText("overallTitle", overall === "ok" ? "All good" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
@@ -530,7 +624,7 @@
       .filter(value => value === true).length;
 
     setText("latestEpoch", latest?.epoch ? `Epoch ${latest.epoch}` : "Epoch -");
-    setText("latestReward", Number.isFinite(reward) ? fmtCompact(reward, " FLR") : "-");
+    setText("latestReward", Number.isFinite(reward) ? fmtCompact(reward, "") : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "eligible" : latest?.eligibleForReward === false ? "not eligible" : "eligibility -");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
@@ -547,6 +641,8 @@
     const freeSpace = Number(validator?.m_dFreeDelegationSpace);
     const capacityMax = capacity + freeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : 0;
+    const selfBond = 3_000_000;
+    const delegatedStake = Number.isFinite(capacity) ? Math.max(0, capacity - selfBond) : null;
 
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
     setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "-");
@@ -558,9 +654,13 @@
     setText("validatorStake", validator?.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
     setText("validatorStakeMeta", timeLeft !== "-" ? `stake ends in ${timeLeft}` : "self + delegation");
     setText("freeSpace", validator?.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
+    setText("selfBond", "3M FLR");
+    setText("delegatedStake", delegatedStake != null ? fmtCompact(delegatedStake, " FLR") : "-");
+    setText("stakeEnds", Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d` : "-");
     setText("capacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
-    setText("capacityPct", `${fmtNum(capacityPct, 1)}% full`);
+    setText("capacityPct", `${fmtNum(capacityPct, 1)}%`);
     setBar("stakeCapacity", capacityPct);
+    setStakeAngle(capacityPct);
 
     const percentConnected = nodeHealth?.checks?.P?.message?.networking?.percentConnected;
     setText("nodeNetwork", percentConnected != null ? fmtPct(percentConnected) : "-");
@@ -584,12 +684,22 @@
     setText("sourceSummary", blockedSources ? `${liveSources}/3 live` : `${liveSources}/3 online`);
 
     renderAlerts(levels.alerts);
-    renderLineChart("ftsoRewards", rewardSeries(provider), { empty: "No reward data", yTop: "high", yBottom: "low" });
+    const ftsoRewards = rewardSeries(provider);
+    const validatorRewards = validatorRewardSeries(node);
+    const ftsoSummary = summarizeRewardSeries(ftsoRewards);
+    const validatorSummary = summarizeRewardSeries(validatorRewards);
+    setText("ftsoRewardLatestFull", ftsoSummary.latest);
+    setText("ftsoRewardAverageFull", ftsoSummary.average);
+    setText("ftsoRewardRangeFull", ftsoSummary.range);
+    setText("validatorRewardLatestFull", validatorSummary.latest);
+    setText("validatorRewardAverageFull", validatorSummary.average);
+    setText("validatorRewardRangeFull", validatorSummary.range);
+    renderLineChart("ftsoRewards", ftsoRewards, { empty: "No reward data", zeroBase: true, yBottom: "0" });
     renderLineChart("ftsoAvailability", seriesFrom(provider?.ftsoPerformance?.availability1h), { min: 90, max: 100, target: 98, empty: "No FTSO availability", yTop: "100%", yBottom: "90%" });
     renderLineChart("fdcAvailability", seriesFrom(provider?.fdcPerformance?.availability1h), { min: 90, max: 100, target: 98, empty: "No FDC availability", yTop: "100%", yBottom: "90%" });
     renderPerformanceChart(provider);
     renderConditionHeatmap(provider);
-    renderLineChart("validatorRewards", validatorRewardSeries(node), { empty: "No validator rewards", yTop: "high", yBottom: "low", lineClass: "line-green" });
+    renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
     renderUptimeStrip(uptimeValues);
     renderRaw(provider, latest, validator, nodeHealth, explorer);
   }
