@@ -1,6 +1,7 @@
-const CACHE_NAME = "mirsflr-shell-v131";
+const CACHE_NAME = "mirsflr-shell-v134";
 const APP_SHELL = [
   "/",
+  "/ops/",
   "/ftso/",
   "/validator/",
   "/epochs/",
@@ -12,8 +13,11 @@ const APP_SHELL = [
   "/assets/live-refresh.css?v=pre-reg-pill-size-1",
   "/assets/operator.js?v=pre-reg-pill-size-1",
   "/assets/live-refresh.js?v=pre-reg-pill-size-1",
+  "/assets/ops.css?v=ops-3",
+  "/assets/ops.js?v=ops-3",
   "/assets/pwa.js?v=pwa-install-1",
   "/app.webmanifest",
+  "/ops/app.webmanifest",
   "/logo.png",
   "/apple-touch-icon-full.png",
   "/flare-icon.png",
