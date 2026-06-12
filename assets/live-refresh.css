@@ -1225,16 +1225,16 @@ h1{
 .metric strong.pre-reg-value{
   display:flex;
   align-items:center;
-  min-height:24px;
+  min-height:14px;
 }
 
 .metric strong.pre-reg-value .pre-reg-pill{
-  width:82px;
-  height:24px;
+  width:38px;
+  height:14px;
   flex:0 0 auto;
   border-radius:999px;
   background:#d7d2d7;
-  box-shadow:0 0 0 8px rgba(217,63,132,.05);
+  box-shadow:0 0 0 6px rgba(217,63,132,.05);
 }
 
 .metric strong.pre-reg-value .pre-reg-pill.ok{
