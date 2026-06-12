@@ -558,7 +558,6 @@ const MirSFlr = (() => {
       el.classList.toggle("ok", value === "Yes");
       el.classList.toggle("bad", value === "No");
       el.classList.toggle("unknown", state === "unknown");
-      el.textContent = value === "Yes" ? "✓" : value === "No" ? "×" : "?";
       el.setAttribute("aria-label", `Pre-registered: ${value}`);
       el.removeAttribute("aria-hidden");
     });
@@ -1549,6 +1548,7 @@ const MirSFlr = (() => {
     setText("passes", `${provider.totalPasses ?? 0} / ${provider.totalStrikes ?? 0}`);
     const preReg = detectPreRegistration(provider);
     setText("preRegistered", preReg);
+    setText("preRegisteredLabel", `Pre-registered: ${preReg}`);
     setText("preRegisteredStatus", preReg === "Yes" ? "Pre-registered" : preReg === "No" ? "Not pre-registered" : "Pre-reg unknown");
     renderPreRegisteredState(preReg);
     setText("minimalConditions", minimalConditions(provider, latest));

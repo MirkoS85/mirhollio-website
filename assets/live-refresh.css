@@ -1225,36 +1225,28 @@ h1{
 .metric strong.pre-reg-value{
   display:flex;
   align-items:center;
-  gap:10px;
-  max-width:100%;
-  color:var(--ink);
-  font-size:clamp(21px, 2.25vw, 28px);
-  letter-spacing:-.035em;
-  line-height:1;
-  white-space:nowrap;
-  overflow-wrap:normal;
+  min-height:24px;
 }
 
-.metric strong.pre-reg-value em{
-  min-width:0;
-  font-style:normal;
-  font-weight:950;
-}
-
-.metric strong.pre-reg-value b{
-  color:inherit;
-  font:inherit;
-}
-
-.metric strong.pre-reg-value span{
-  color:var(--ink);
-}
-
-.metric strong.pre-reg-value .pre-reg-state{
-  width:28px;
-  height:28px;
+.metric strong.pre-reg-value .pre-reg-pill{
+  width:82px;
+  height:24px;
   flex:0 0 auto;
-  font-size:17px;
+  border-radius:999px;
+  background:#d7d2d7;
+  box-shadow:0 0 0 8px rgba(217,63,132,.05);
+}
+
+.metric strong.pre-reg-value .pre-reg-pill.ok{
+  background:linear-gradient(180deg, #56bc82, #41a76c);
+}
+
+.metric strong.pre-reg-value .pre-reg-pill.bad{
+  background:linear-gradient(180deg, #f07d95, #de5875);
+}
+
+.metric strong.pre-reg-value .pre-reg-pill.unknown{
+  background:#d7d2d7;
 }
 
 .card{
