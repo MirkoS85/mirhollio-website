@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-6">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-8">
 </head>
 <body>
   <main class="ops-shell">
@@ -35,7 +35,6 @@
         <a href="#validator">Validator</a>
         <a href="#alerts">Alerts</a>
         <a href="#history">History</a>
-        <a href="#sources">Settings</a>
       </nav>
 
       <button class="icon-button mobile-settings" type="button" aria-label="Settings">⚙</button>
@@ -102,21 +101,16 @@
 
         <div class="data-table ftso-table">
           <article>
-            <span>Reward</span>
-            <strong data-field="latestReward">-</strong>
-            <small>FLR</small>
-          </article>
-          <article>
-            <span>Rate</span>
-            <strong data-field="rewardRate">-</strong>
-          </article>
-          <article>
-            <span>Availability</span>
-            <strong data-field="ftsoAvailability">-</strong>
+            <span>Performance</span>
+            <strong data-field="ftsoPerformance">-</strong>
           </article>
           <article>
             <span>FDC</span>
             <strong data-field="fdcAvailability">-</strong>
+          </article>
+          <article>
+            <span>Availability</span>
+            <strong data-field="ftsoAvailability">-</strong>
           </article>
           <article>
             <span>Conditions</span>
@@ -126,7 +120,35 @@
             <span>Pre-reg</span>
             <strong data-field="preRegistered">-</strong>
           </article>
+          <article>
+            <span>Reward</span>
+            <strong data-field="latestReward">-</strong>
+            <small>FLR</small>
+          </article>
         </div>
+
+        <article class="chart-card">
+          <div class="chart-title">
+            <span>FTSO Performance <em>(24h)</em></span>
+            <div class="legend"><i></i>Performance <i></i>Primary <i></i>Secondary</div>
+          </div>
+          <svg class="chart" data-chart="ftsoPerformance" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO performance chart"></svg>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title"><span>FDC Availability <em>(24h)</em></span><b data-field="fdcAvailability">-</b></div>
+          <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title"><span>FTSO Availability <em>(24h)</em></span><b data-field="ftsoAvailability">-</b></div>
+          <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
+        </article>
+
+        <article class="chart-card condition-card" id="history">
+          <div class="chart-title"><span>FTSO Conditions <em>(per epoch)</em></span><b data-field="conditionPasses">-</b></div>
+          <div class="heatmap" data-render="conditionHeatmap"></div>
+        </article>
 
         <article class="chart-card reward-card">
           <div class="chart-title"><span>FTSO Reward History <em>(per epoch)</em></span></div>
@@ -138,29 +160,6 @@
               <span>Range</span><strong data-field="ftsoRewardRangeFull">-</strong>
             </aside>
           </div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-title"><span>FTSO Availability <em>(24h)</em></span><b data-field="ftsoAvailability">-</b></div>
-          <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-title"><span>FDC Availability <em>(24h)</em></span><b data-field="fdcAvailability">-</b></div>
-          <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-title">
-            <span>FTSO Performance <em>(24h)</em></span>
-            <div class="legend"><i></i>Performance <i></i>Primary <i></i>Secondary</div>
-          </div>
-          <svg class="chart" data-chart="ftsoPerformance" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO performance chart"></svg>
-        </article>
-
-        <article class="chart-card condition-card" id="history">
-          <div class="chart-title"><span>FTSO Conditions <em>(per epoch)</em></span><b data-field="conditionPasses">-</b></div>
-          <div class="heatmap" data-render="conditionHeatmap"></div>
         </article>
       </section>
 
@@ -238,23 +237,10 @@
           <div class="chart-title"><span>Recent Uptime</span><b data-field="validatorUptime">-</b></div>
           <div class="uptime-strip" data-render="uptimeStrip"></div>
         </article>
-
-        <section class="sources-card" id="sources">
-          <h2>Data Sources</h2>
-          <div class="source-grid">
-            <article class="source-card" data-source="oracle"><span>Oracle Daemon</span><strong data-field="oracleSource">-</strong><small data-field="oracleSourceMeta">providers + validators</small></article>
-            <article class="source-card" data-source="explorer"><span>Systems Explorer</span><strong data-field="explorerSource">-</strong><small data-field="explorerSourceMeta">entity policy</small></article>
-            <article class="source-card" data-source="node"><span>Node health</span><strong data-field="nodeSource">-</strong><small data-field="nodeSourceMeta">self health</small></article>
-          </div>
-          <details class="raw-details">
-            <summary>Raw details</summary>
-            <pre data-render="rawDetails">Waiting for data.</pre>
-          </details>
-        </section>
       </section>
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-6"></script>
+  <script src="../assets/ops.js?v=ops-8"></script>
 </body>
 </html>

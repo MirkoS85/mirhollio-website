@@ -102,6 +102,15 @@
     return n <= 1 ? n * 100 : n;
   }
 
+  function recentAverage(values, count = 3) {
+    const recent = (Array.isArray(values) ? values : [])
+      .map(pctNumber)
+      .filter(value => value != null)
+      .slice(-count);
+    if (!recent.length) return null;
+    return recent.reduce((sum, value) => sum + value, 0) / recent.length;
+  }
+
   function fmtCompact(value, suffix = "") {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -135,6 +144,22 @@
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
     return `${n.toLocaleString(undefined, { maximumFractionDigits: 2 })} FLR`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function availabilityZone(value) {
+    const pct = pctNumber(value);
+    if (pct == null) return { level: "unknown", label: "Unknown zone" };
+    if (pct >= 98) return { level: "ok", label: "OK zone" };
+    if (pct >= 95) return { level: "warn", label: "Watch zone" };
+    return { level: "down", label: "Critical zone" };
   }
 
   function fmtWeight(value) {
@@ -237,6 +262,16 @@
     return values.map(Number).filter(Number.isFinite).map(value => value <= 1 ? value * 100 : value);
   }
 
+  function hourlySeries(values) {
+    if (!Array.isArray(values)) return [];
+    return values
+      .map(Number)
+      .filter(Number.isFinite)
+      .slice(0, 24)
+      .reverse()
+      .map(value => value <= 1 ? value * 100 : value);
+  }
+
   function rewardSeries(provider, key = "totalRewardAmount") {
     const history = Array.isArray(provider?.epochData) ? provider.epochData : [];
     return history
@@ -298,10 +333,81 @@
     return commands.join(" ");
   }
 
+  function chartPointLabel(point, index, total, options) {
+    if (point?.item?.epoch != null) return `Epoch ${point.item.epoch}`;
+    if (index === total - 1) return options.lastLabel || "now";
+    if (index === 0) return options.firstLabel || `${Math.max(0, total - 1)}h ago`;
+    return `${Math.max(0, total - 1 - index)}h ago`;
+  }
+
+  function chartTooltipHtml(point, index, total, options) {
+    const label = chartPointLabel(point, index, total, options);
+    if (options.tooltip === "reward") {
+      return `<span>${escapeHtml(label)}</span><strong>${escapeHtml(fmtFullFlr(point.item.value))}</strong>`;
+    }
+    if (options.tooltip === "availability") {
+      const zone = availabilityZone(point.item.value);
+      return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} · ${escapeHtml(zone.label)}</em>`;
+    }
+    return `<span>${escapeHtml(label)}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong>`;
+  }
+
+  function ensureChartTooltip(svg) {
+    const card = svg.closest(".chart-card");
+    if (!card) return null;
+    let tooltip = card.querySelector(".ops-chart-tooltip");
+    if (!tooltip) {
+      tooltip = document.createElement("div");
+      tooltip.className = "ops-chart-tooltip";
+      card.appendChild(tooltip);
+    }
+    return tooltip;
+  }
+
+  function setupChartTooltip(svg, points, options, width, height) {
+    if (!options.tooltip) return;
+    const tooltip = ensureChartTooltip(svg);
+    const card = svg.closest(".chart-card");
+    if (!tooltip || !card) return;
+
+    function show(index) {
+      const point = points[index];
+      if (!point) return;
+      const svgRect = svg.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const x = svgRect.left - cardRect.left + (point.x / width) * svgRect.width;
+      const y = svgRect.top - cardRect.top + (point.y / height) * svgRect.height;
+      const minX = Math.min(92, Math.max(24, cardRect.width / 2));
+      const maxX = Math.max(minX, cardRect.width - minX);
+
+      tooltip.innerHTML = chartTooltipHtml(point, index, points.length, options);
+      tooltip.dataset.zone = options.tooltip === "availability" ? availabilityZone(point.item.value).level : "reward";
+      tooltip.style.left = `${Math.max(minX, Math.min(maxX, x))}px`;
+      tooltip.style.top = `${Math.max(44, y - 10)}px`;
+      tooltip.classList.add("is-visible");
+    }
+
+    function hide() {
+      tooltip.classList.remove("is-visible");
+    }
+
+    $$(".chart-hit", svg).forEach((hit, index) => {
+      hit.addEventListener("pointerenter", () => show(index));
+      hit.addEventListener("pointermove", () => show(index));
+      hit.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        show(index);
+      });
+      hit.addEventListener("focus", () => show(index));
+      hit.addEventListener("pointerleave", hide);
+      hit.addEventListener("blur", hide);
+    });
+  }
+
   function renderLineChart(selector, input, options = {}) {
     const svg = $(`[data-chart="${selector}"]`);
     if (!svg) return;
-    const values = input.map(item => typeof item === "number" ? { value: item } : item)
+    const values = (Array.isArray(input) ? input : []).map(item => typeof item === "number" ? { value: item } : item)
       .filter(item => Number.isFinite(Number(item.value)));
     if (values.length < 2) {
       chartEmpty(svg, options.empty || "No data");
@@ -336,6 +442,20 @@
     const last = values[values.length - 1];
     const gridLines = [0, 0.25, 0.5, 0.75, 1].map(step => pad.top + step * chartH);
     const lineClass = options.lineClass || "line-main";
+    const zoneRect = (from, to, cls) => {
+      const y1 = Math.max(pad.top, Math.min(height - pad.bottom, yFor(from)));
+      const y2 = Math.max(pad.top, Math.min(height - pad.bottom, yFor(to)));
+      return `<rect class="zone-band ${cls}" x="${pad.left}" y="${Math.min(y1, y2).toFixed(2)}" width="${chartW}" height="${Math.abs(y2 - y1).toFixed(2)}"></rect>`;
+    };
+    const zoneBands = options.zones === "availability"
+      ? [
+        zoneRect(maxValue, 98, "zone-ok"),
+        zoneRect(98, 95, "zone-watch"),
+        zoneRect(95, minValue, "zone-down")
+      ].join("")
+      : "";
+    const hitWidth = Math.min(chartW, Math.max(24, chartW / Math.max(1, values.length - 1)));
+    const hitX = point => Math.max(pad.left, Math.min(width - pad.right - hitWidth, point.x - hitWidth / 2));
 
     svg.innerHTML = `
       <defs>
@@ -350,25 +470,28 @@
           <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
+      ${zoneBands}
       ${gridLines.map(y => `<line class="grid-line" x1="${pad.left}" x2="${width - pad.right}" y1="${y.toFixed(2)}" y2="${y.toFixed(2)}"></line>`).join("")}
       ${targetY == null ? "" : `<line class="target-line" x1="${pad.left}" x2="${width - pad.right}" y1="${targetY}" y2="${targetY}"></line>`}
       <path class="area-fill" d="${fill}" fill="url(#${selector}-area)"></path>
       <path class="line-glow ${lineClass}" d="${line}" filter="url(#${selector}-glow)"></path>
       <path class="${lineClass}" d="${line}"></path>
       ${points.map(point => `<circle class="dot" cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="${point === points[points.length - 1] ? 4 : 2.8}"></circle>`).join("")}
+      ${options.tooltip ? points.map(point => `<rect class="chart-hit" tabindex="0" x="${hitX(point).toFixed(2)}" y="${pad.top}" width="${hitWidth.toFixed(2)}" height="${chartH}"></rect>`).join("") : ""}
       <text class="axis-label" x="${pad.left}" y="${height - 8}" text-anchor="middle">${first.epoch ?? options.firstLabel ?? ""}</text>
       <text class="axis-label" x="${width - pad.right}" y="${height - 8}" text-anchor="middle">${last.epoch ?? options.lastLabel ?? "now"}</text>
       <text class="axis-label" x="${pad.left - 6}" y="${pad.top + 5}" text-anchor="end">${options.yTop ?? fmtAxis(maxValue)}</text>
       <text class="axis-label" x="${pad.left - 6}" y="${height - pad.bottom + 5}" text-anchor="end">${options.yBottom ?? fmtAxis(minValue)}</text>
     `;
+    setupChartTooltip(svg, points, options, width, height);
   }
 
   function renderPerformanceChart(provider) {
     const svg = $('[data-chart="ftsoPerformance"]');
     if (!svg) return;
-    const perf = seriesFrom(provider?.ftsoPerformance?.performance1h);
-    const primary = seriesFrom(provider?.ftsoPerformance?.performance1_1h);
-    const secondary = seriesFrom(provider?.ftsoPerformance?.performance2_1h);
+    const perf = hourlySeries(provider?.ftsoPerformance?.performance1h);
+    const primary = hourlySeries(provider?.ftsoPerformance?.performance1_1h);
+    const secondary = hourlySeries(provider?.ftsoPerformance?.performance2_1h);
     const len = Math.max(perf.length, primary.length, secondary.length);
     if (len < 2) {
       chartEmpty(svg, "No performance data");
@@ -416,21 +539,25 @@
     const history = (Array.isArray(provider?.epochData) ? provider.epochData : [])
       .slice()
       .sort((a, b) => Number(a.epoch || 0) - Number(b.epoch || 0))
-      .slice(-10);
+      .slice(-8);
 
     if (!history.length) {
       mount.innerHTML = `<span class="label">No data</span>`;
       return;
     }
 
-    mount.innerHTML = rows.map(([label, getter]) => {
+    mount.style.setProperty("--condition-cols", String(history.length));
+    const header = `<span class="condition-corner">Epoch</span>${history.map(item => `<span class="condition-epoch">E${item.epoch ?? "-"}</span>`).join("")}`;
+    const body = rows.map(([label, getter]) => {
       const cells = history.map(item => {
         const value = getter(item);
         const cls = value === true ? "ok" : value === false ? "down" : "unknown";
-        return `<span class="${cls}" title="${label} epoch ${item.epoch || "-"}"></span>`;
+        const symbol = value === true ? "✓" : value === false ? "×" : "?";
+        return `<span class="condition-cell ${cls}" title="${label} epoch ${item.epoch || "-"}">${symbol}</span>`;
       }).join("");
       return `<span class="label">${label}</span>${cells}`;
     }).join("");
+    mount.innerHTML = header + body;
   }
 
   function renderUptimeStrip(values) {
@@ -441,10 +568,11 @@
       mount.innerHTML = `<span class="source-pill">No uptime data</span>`;
       return;
     }
-    mount.innerHTML = items.map(value => {
+    const recent = items.slice(-6);
+    mount.innerHTML = recent.map(value => {
       const pct = pctNumber(value);
       const cls = pct == null ? "down" : pct >= 99 ? "" : pct >= 95 ? "warn" : "down";
-      return `<span class="uptime-pill ${cls}" title="${fmtPct(value)}"></span>`;
+      return `<span class="uptime-pill ${cls}" title="${fmtPct(value)}"><strong>${fmtPct(value, 0)}</strong></span>`;
     }).join("");
   }
 
@@ -497,8 +625,8 @@
     if (!provider) {
       fdc = "down";
     } else {
-      if (fdcAvail != null && fdcAvail < 95) { fdc = "down"; add("down", "FDC availability critical", `${fmtPct(fdcAvail)} over recent window.`); }
-      else if (fdcAvail != null && fdcAvail < 98) { fdc = "warn"; add("warn", "FDC availability watch", `${fmtPct(fdcAvail)} over recent window.`); }
+      if (fdcAvail != null && fdcAvail < 90) { fdc = "down"; add("down", "FDC availability critical", `${fmtPct(fdcAvail)} over recent window.`); }
+      else if (fdcAvail != null && fdcAvail < 95) { fdc = "warn"; add("warn", "FDC availability watch", `${fmtPct(fdcAvail)} over recent window.`); }
       if (fdcCondition === false) { fdc = "down"; add("down", "FDC condition failed", "Latest FDC reward condition is false."); }
     }
 
@@ -612,7 +740,13 @@
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
-    setStatusCard("fdcStatus", levels.fdc, levels.fdc === "ok" ? "OK" : levels.fdc === "warn" ? "WARN" : "DOWN", fmtPct(provider?.fdcPerformance?.availability));
+    const fdcRecent = recentAverage(hourlySeries(provider?.fdcPerformance?.availability1h), 3);
+    const fdcStatusValue = fdcRecent != null
+      ? fmtPct(fdcRecent)
+      : provider?.fdcPerformance?.availability != null
+        ? fmtPct(provider.fdcPerformance.availability)
+        : levels.fdc === "down" ? "DOWN" : "-";
+    setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "latest FDC");
     setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : "offline");
     setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealth?.healthy ? "healthy" : "unhealthy");
 
@@ -627,6 +761,7 @@
     setText("latestReward", Number.isFinite(reward) ? fmtCompact(reward, "") : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "eligible" : latest?.eligibleForReward === false ? "not eligible" : "eligibility -");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
+    setText("ftsoPerformance", provider?.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
     setText("fdcAvailability", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
@@ -694,9 +829,9 @@
     setText("validatorRewardLatestFull", validatorSummary.latest);
     setText("validatorRewardAverageFull", validatorSummary.average);
     setText("validatorRewardRangeFull", validatorSummary.range);
-    renderLineChart("ftsoRewards", ftsoRewards, { empty: "No reward data", zeroBase: true, yBottom: "0" });
-    renderLineChart("ftsoAvailability", seriesFrom(provider?.ftsoPerformance?.availability1h), { min: 90, max: 100, target: 98, empty: "No FTSO availability", yTop: "100%", yBottom: "90%" });
-    renderLineChart("fdcAvailability", seriesFrom(provider?.fdcPerformance?.availability1h), { min: 90, max: 100, target: 98, empty: "No FDC availability", yTop: "100%", yBottom: "90%" });
+    renderLineChart("ftsoRewards", ftsoRewards, { empty: "No reward data", zeroBase: true, yBottom: "0", tooltip: "reward", metricLabel: "FTSO reward" });
+    renderLineChart("ftsoAvailability", hourlySeries(provider?.ftsoPerformance?.availability1h), { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FTSO availability", empty: "No FTSO availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
+    renderLineChart("fdcAvailability", hourlySeries(provider?.fdcPerformance?.availability1h), { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FDC availability", empty: "No FDC availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
     renderPerformanceChart(provider);
     renderConditionHeatmap(provider);
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
