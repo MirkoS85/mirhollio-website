@@ -6,7 +6,8 @@
     providersV1: "https://api.oracle-daemon.com/v1/flare/providers",
     validators: "https://api.oracle-daemon.com/v1/flare/validators",
     explorerEntity: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
-    nodeHealth: "https://node.mirhollio.com/flare/ext/health"
+    nodeHealth: "https://node.mirhollio.com/flare/ext/health",
+    daemonStatus: "https://node.mirhollio.com/ops/status.json"
   };
 
   const TARGET = {
@@ -25,13 +26,15 @@
       provider: "loading",
       validator: "loading",
       explorer: "loading",
-      node: "loading"
+      node: "loading",
+      daemon: "loading"
     },
     sourceLoadedAt: {
       provider: null,
       validator: null,
       explorer: null,
-      node: null
+      node: null,
+      daemon: null
     },
     data: {}
   };
@@ -75,6 +78,14 @@
   function setToneCard(card, tone) {
     $$(`[data-tone-card="${card}"]`).forEach(el => {
       el.dataset.tone = tone;
+    });
+  }
+
+  function setSignal(field, value, stateValue = "") {
+    setText(field, value);
+    $$(`[data-field="${field}"]`).forEach(el => {
+      if (stateValue) el.dataset.state = stateValue;
+      else delete el.dataset.state;
     });
   }
 
@@ -223,6 +234,93 @@
 
   function providerTimestamp(payload) {
     return payloadData(payload)?.m_xTimestamp || payload?.m_xTimestamp || null;
+  }
+
+  function nodeHealthTimestamps(nodeHealth) {
+    const checks = nodeHealth?.checks && typeof nodeHealth.checks === "object" ? Object.values(nodeHealth.checks) : [];
+    return checks
+      .map(check => new Date(check?.timestamp))
+      .filter(date => Number.isFinite(date.getTime()));
+  }
+
+  function nodeHealthTimestamp(nodeHealth, mode = "newest") {
+    const timestamps = nodeHealthTimestamps(nodeHealth);
+    if (!timestamps.length) return null;
+    const times = timestamps.map(date => date.getTime());
+    const selected = mode === "oldest" ? Math.min(...times) : Math.max(...times);
+    return new Date(selected);
+  }
+
+  function timestampAgeMs(value) {
+    const date = value instanceof Date ? value : new Date(value);
+    const time = date.getTime();
+    if (!Number.isFinite(time)) return null;
+    return Date.now() - time;
+  }
+
+  function firstPresent(...values) {
+    return values.find(value => value != null && value !== "");
+  }
+
+  function daemonInfo(payload) {
+    if (!payload || typeof payload !== "object") return null;
+    return payload.daemon || payload.ops || payload.status || payload;
+  }
+
+  function daemonTimestamp(payload, ...keys) {
+    const info = daemonInfo(payload);
+    if (!info) return null;
+    const value = firstPresent(...keys.map(key => info[key]));
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date : null;
+  }
+
+  function daemonSignalSummary(payload) {
+    const info = daemonInfo(payload);
+    if (!info) {
+      return {
+        wired: false,
+        level: "warn",
+        title: "Not wired",
+        meta: "/ops/status.json",
+        fdcLevel: "warn",
+        fdcTitle: "Not wired",
+        fdcMeta: "needs daemon feed"
+      };
+    }
+
+    const submit = daemonTimestamp(payload, "lastSubmitAt", "last_submit_at", "submitAt", "submit_at");
+    const reveal = daemonTimestamp(payload, "lastRevealAt", "last_reveal_at", "revealAt", "reveal_at");
+    const signature = daemonTimestamp(payload, "lastSignatureAt", "last_signature_at", "signatureAt", "signature_at");
+    const fdc = daemonTimestamp(payload, "lastFdcSignatureAt", "last_fdc_signature_at", "lastFDCSignatureAt", "fdcSignatureAt", "fdc_signature_at");
+    const daemonTimes = [submit, reveal, signature].filter(Boolean);
+    const freshestDaemon = daemonTimes.length ? new Date(Math.max(...daemonTimes.map(date => date.getTime()))) : null;
+    const daemonAge = freshestDaemon ? timestampAgeMs(freshestDaemon) : null;
+    const fdcAge = fdc ? timestampAgeMs(fdc) : null;
+    const healthy = info.healthy ?? info.ok ?? info.running;
+    let level = healthy === false ? "down" : "ok";
+    if (daemonAge == null) level = "warn";
+    else if (daemonAge > 30 * 60_000) level = "down";
+    else if (daemonAge > 10 * 60_000) level = "warn";
+    const fdcLevel = fdcAge == null ? "warn" : fdcAge > 60 * 60_000 ? "down" : fdcAge > 15 * 60_000 ? "warn" : "ok";
+    if (fdcLevel === "down") level = "down";
+    else if (fdcLevel === "warn" && level === "ok") level = "warn";
+
+    return {
+      wired: true,
+      level,
+      title: level === "ok" ? "OK" : level === "warn" ? "Watch" : "Down",
+      meta: daemonAge == null ? "missing event timestamps" : `latest ${fmtAge(freshestDaemon)} old`,
+      fdcLevel,
+      fdcTitle: fdcLevel === "ok" ? "OK" : fdcLevel === "warn" ? "Watch" : "Down",
+      fdcMeta: fdcAge == null ? "missing FDC signature" : `${fmtAge(fdc)} old`,
+      healthy,
+      submit,
+      reveal,
+      signature,
+      fdc
+    };
   }
 
   function parseDurationSeconds(value) {
@@ -707,7 +805,7 @@
     `).join("");
   }
 
-  function computeLevels(provider, latest, validator, nodeHealth) {
+  function computeLevels(provider, latest, validator, nodeHealth, daemonPayload) {
     const node = getNode(validator);
     const ftsoAvail = pctNumber(provider?.ftsoPerformance?.availability);
     const fdcAvail = pctNumber(provider?.fdcPerformance?.availability);
@@ -728,6 +826,7 @@
     const fastCondition = latest?.fastUpdates?.conditionMet;
     const stakeCondition = latest?.staking?.conditionMet;
     const preRegistered = provider?.isPreRegistered === true;
+    const daemonSummary = daemonSignalSummary(daemonPayload);
 
     const alerts = [];
     let ftso = "ok";
@@ -790,6 +889,10 @@
       if (processingBlocks > 5) { nodeLevel = nodeLevel === "down" ? nodeLevel : "warn"; add("warn", "Consensus backlog", `${processingBlocks} processing blocks.`); }
     }
 
+    if (daemonSummary.wired && daemonSummary.level !== "ok") {
+      add(daemonSummary.level, "Daemon feed liveness", daemonSummary.meta);
+    }
+
     return { ftso, fdc, validator: val, node: nodeLevel, alerts };
   }
 
@@ -821,7 +924,7 @@
     if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
   }
 
-  function renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload) {
+  function renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload, daemonPayload) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
     const node = getNode(validator);
@@ -868,6 +971,8 @@
       },
       nodeHealth: {
         healthy: nodeHealth?.healthy,
+        newestCheckTimestamp: nodeHealthTimestamp(nodeHealth)?.toISOString(),
+        oldestCheckTimestamp: nodeHealthTimestamp(nodeHealth, "oldest")?.toISOString(),
         peers: nodeHealth?.checks?.network?.message?.connectedPeers,
         percentConnected: nodeHealth?.checks?.P?.message?.networking?.percentConnected,
         lastMessageReceived: nodeHealth?.checks?.network?.message?.timeSinceLastMsgReceived,
@@ -879,14 +984,15 @@
           cChain: nodeHealth?.checks?.C?.message?.engine?.consensus?.processingBlocks
         }
       },
+      daemonFeed: daemonSignalSummary(daemonPayload),
       explorer: {
         rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
         normalizedWeight: explorer?.denormalizedsigningpolicy?.normalizedWeight ?? explorer?.denormalizedsigningpolicy?.normalized_weight,
         delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips
       },
       missingCriticalSignals: {
-        submitRevealSignatureLiveness: "not exposed by current browser APIs; wire a daemon event endpoint",
-        fdcSignatureTimestamps: "not exposed by current browser APIs; wire a daemon event endpoint",
+        submitRevealSignatureLiveness: daemonPayload ? "wired through /ops/status.json" : "not exposed by current browser APIs; wire /ops/status.json",
+        fdcSignatureTimestamps: daemonPayload ? "wired through /ops/status.json" : "not exposed by current browser APIs; wire /ops/status.json",
         cpuMemoryLoad: "not present in /flare/ext/health",
         feedLevelMisses: "Oracle payload detailed feed maps are not populated"
       }
@@ -894,12 +1000,14 @@
     mount.textContent = JSON.stringify(payload, null, 2);
   }
 
-  function applyData(provider, validator, explorer, nodeHealth, providerPayload) {
+  function applyData(provider, validator, explorer, nodeHealth, providerPayload, daemonPayload) {
     const latest = latestEpoch(provider);
     const node = getNode(validator);
     const network = networkInfo(providerPayload);
     const oracleTime = providerTimestamp(providerPayload);
-    const levels = computeLevels(provider, latest, validator, nodeHealth);
+    const levels = computeLevels(provider, latest, validator, nodeHealth, daemonPayload);
+    const nodeHealthTime = nodeHealthTimestamp(nodeHealth);
+    const daemonSummary = daemonSignalSummary(daemonPayload);
     const overall = worstLevel([levels.ftso, levels.fdc, levels.validator, levels.node]);
     $$(".mobile-health, .desktop-health").forEach(el => {
       el.dataset.overallState = overall;
@@ -912,13 +1020,14 @@
     setText("rewardEpochEnds", network?.m_xRewardEpochEndTime ? fmtUntil(network.m_xRewardEpochEndTime) : "-");
     const oracleAge = oracleTime ? fmtAge(new Date(oracleTime)) : null;
     setText("oraclePayloadAge", oracleAge ? `${oracleAge} old` : "-");
-    setText("nodeHealthAge", state.sourceLoadedAt.node ? `fetched ${fmtAge(state.sourceLoadedAt.node)}` : "-");
-    setText("daemonLiveness", "Not wired");
+    setText("nodeHealthAge", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : "-");
+    setText("daemonLiveness", daemonSummary.title);
     const oracleDate = oracleTime ? new Date(oracleTime) : null;
     const oracleAgeMs = oracleDate && Number.isFinite(oracleDate.getTime()) ? Date.now() - oracleDate.getTime() : null;
-    const nodeAgeMs = state.sourceLoadedAt.node ? Date.now() - state.sourceLoadedAt.node.getTime() : null;
+    const nodeAgeMs = nodeHealthTime ? timestampAgeMs(nodeHealthTime) : null;
     setToneCard("oracleFreshness", oracleAgeMs == null ? "watch" : oracleAgeMs > 5 * 60_000 ? "watch" : "ok");
-    setToneCard("nodeFreshness", state.sources.node !== "ok" ? "down" : nodeAgeMs != null && nodeAgeMs > 2 * 60_000 ? "watch" : "ok");
+    setToneCard("nodeFreshness", state.sources.node !== "ok" ? "down" : nodeAgeMs == null || nodeAgeMs > 2 * 60_000 ? "watch" : "ok");
+    setToneCard("daemonFreshness", daemonSummary.level);
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(hourlySeries(provider?.fdcPerformance?.availability1h), 3);
@@ -929,7 +1038,7 @@
         : levels.fdc === "down" ? "DOWN" : "-";
     setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "3h avg");
     setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : "offline");
-    setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealth?.healthy ? "healthy" : "unhealthy");
+    setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : nodeHealth?.healthy ? "healthy" : "unhealthy");
 
     const policy = explorer?.denormalizedsigningpolicy || {};
     const reward = Number(latest?.totalRewardAmount);
@@ -1009,6 +1118,12 @@
       + Number(nodeHealth?.checks?.C?.message?.engine?.consensus?.processingBlocks || 0);
     setText("nodeProcessing", `${processing} blocks`);
     setText("nodeBls", String(nodeHealth?.checks?.bls?.message || "").includes("correct") ? "OK" : "-");
+    setSignal("daemonSignalStatus", daemonSummary.title, daemonSummary.level);
+    setText("daemonSignalMeta", daemonSummary.meta);
+    setSignal("fdcSignalStatus", daemonSummary.fdcTitle, daemonSummary.fdcLevel);
+    setText("fdcSignalMeta", daemonSummary.fdcMeta);
+    setSignal("hostSignalStatus", "not exposed", "warn");
+    setSignal("feedSignalStatus", "not exposed", "warn");
 
     setText("oracleSource", state.sources.provider === "ok" && state.sources.validator === "ok" ? "OK" : state.sources.provider === "down" || state.sources.validator === "down" ? "DOWN" : "WARN");
     setText("oracleSourceMeta", "providers + validators");
@@ -1016,7 +1131,7 @@
     const policyEpoch = policy.reward_epoch ?? policy.rewardEpoch;
     setText("explorerSourceMeta", policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
     setText("nodeSource", state.sources.node === "ok" ? "OK" : "DOWN");
-    setText("nodeSourceMeta", nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
+    setText("nodeSourceMeta", nodeHealthTime ? `health ${fmtAge(nodeHealthTime)} old` : nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
     const oracleGroup = state.sources.provider === "ok" && state.sources.validator === "ok" ? "ok" : "down";
     const sourceGroups = [oracleGroup, state.sources.explorer, state.sources.node];
     const liveSources = sourceGroups.filter(value => value === "ok").length;
@@ -1042,7 +1157,7 @@
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
     renderUptimeStrip(uptimeValues);
     renderExpiryList(node);
-    renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload);
+    renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload, daemonPayload);
   }
 
   async function loadAll() {
@@ -1052,17 +1167,20 @@
       fetchJson(ENDPOINTS.providersV2),
       fetchJson(ENDPOINTS.validators),
       fetchJson(ENDPOINTS.explorerEntity),
-      fetchJson(ENDPOINTS.nodeHealth)
+      fetchJson(ENDPOINTS.nodeHealth),
+      fetchJson(ENDPOINTS.daemonStatus, 2_500)
     ]);
 
     let providerPayload = sourceResults[0].status === "fulfilled" ? sourceResults[0].value : null;
     let validatorPayload = sourceResults[1].status === "fulfilled" ? sourceResults[1].value : null;
     let explorer = sourceResults[2].status === "fulfilled" ? sourceResults[2].value : null;
     let nodeHealth = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
+    let daemonPayload = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
     state.sourceLoadedAt.explorer = explorer ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
+    state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
 
     if (!provider) {
@@ -1085,10 +1203,11 @@
     setSource("validator", validator ? "ok" : "down");
     setSource("explorer", explorer ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
+    setSource("daemon", daemonPayload ? "ok" : "warn");
 
     state.lastLoadedAt = new Date();
-    state.data = { provider, validator, explorer, nodeHealth, providerPayload };
-    applyData(provider, validator, explorer, nodeHealth, providerPayload);
+    state.data = { provider, validator, explorer, nodeHealth, providerPayload, daemonPayload };
+    applyData(provider, validator, explorer, nodeHealth, providerPayload, daemonPayload);
     setText("refreshLabel", "Refresh");
     document.body.classList.remove("is-refreshing");
   }

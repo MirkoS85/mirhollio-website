@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-11">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-12">
 </head>
 <body>
   <main class="ops-shell">
@@ -100,11 +100,11 @@
         <small>payload age</small>
       </article>
       <article class="truth-tile" data-tone-card="nodeFreshness">
-        <span>Node fetch</span>
+        <span>Node health</span>
         <strong data-field="nodeHealthAge">-</strong>
-        <small>endpoint fetch age</small>
+        <small>payload age</small>
       </article>
-      <article class="truth-tile truth-liveness">
+      <article class="truth-tile truth-liveness" data-tone-card="daemonFreshness">
         <span>Daemon feed</span>
         <strong data-field="daemonLiveness">Not wired</strong>
         <small>submit / reveal not wired</small>
@@ -303,10 +303,10 @@
     <section class="gaps-card">
       <h2>Missing Ops Signals</h2>
       <div class="gap-grid">
-        <span>Submit / reveal liveness <b>needs daemon feed</b></span>
-        <span>FDC signature timestamps <b>needs daemon feed</b></span>
-        <span>CPU / RAM / load <b>not in node health</b></span>
-        <span>Feed-level misses <b>not exposed by Oracle payload</b></span>
+        <span>Daemon events <b data-field="daemonSignalStatus">not wired</b><em data-field="daemonSignalMeta">/ops/status.json</em></span>
+        <span>FDC signature age <b data-field="fdcSignalStatus">not wired</b><em data-field="fdcSignalMeta">needs daemon feed</em></span>
+        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em>CPU / RAM / load</em></span>
+        <span>Feed-level misses <b data-field="feedSignalStatus">not exposed</b><em>Oracle payload limit</em></span>
       </div>
     </section>
 
@@ -319,6 +319,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-11"></script>
+  <script src="../assets/ops.js?v=ops-12"></script>
 </body>
 </html>

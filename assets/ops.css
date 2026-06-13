@@ -867,6 +867,25 @@ h2{
   color:var(--ink);
 }
 
+.gap-grid b{
+  display:block;
+  margin-top:4px;
+  color:var(--amber);
+  font-size:13px;
+}
+
+.gap-grid em{
+  display:block;
+  margin-top:3px;
+  color:var(--soft);
+  font-style:normal;
+  font-weight:760;
+}
+
+.gap-grid b[data-state="ok"]{color:var(--green)}
+.gap-grid b[data-state="warn"]{color:var(--amber)}
+.gap-grid b[data-state="down"]{color:var(--red)}
+
 .condition-detail em{
   display:block;
   margin-top:3px;
