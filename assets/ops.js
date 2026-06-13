@@ -27,6 +27,12 @@
       explorer: "loading",
       node: "loading"
     },
+    sourceLoadedAt: {
+      provider: null,
+      validator: null,
+      explorer: null,
+      node: null
+    },
     data: {}
   };
 
@@ -64,6 +70,12 @@
     });
     setText(card, title);
     setText(`${card}Meta`, meta);
+  }
+
+  function setToneCard(card, tone) {
+    $$(`[data-tone-card="${card}"]`).forEach(el => {
+      el.dataset.tone = tone;
+    });
   }
 
   function setBar(name, value) {
@@ -177,6 +189,40 @@
     if (ms < 60_000) return `${Math.max(1, Math.round(ms / 1000))}s`;
     if (ms < 3_600_000) return `${Math.round(ms / 60_000)}m`;
     return `${Math.round(ms / 3_600_000)}h`;
+  }
+
+  function fmtUntil(value) {
+    if (!value) return "-";
+    const date = value instanceof Date ? value : new Date(value);
+    const ms = date.getTime() - Date.now();
+    if (!Number.isFinite(ms)) return "-";
+    if (ms <= 0) return "ended";
+    const totalMinutes = Math.floor(ms / 60_000);
+    const days = Math.floor(totalMinutes / 1440);
+    const hours = Math.floor((totalMinutes % 1440) / 60);
+    const minutes = totalMinutes % 60;
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${Math.max(1, minutes)}m`;
+  }
+
+  function fmtShortDate(value) {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "-";
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  function payloadData(payload) {
+    return payload?.m_xData || payload?.data || payload || {};
+  }
+
+  function networkInfo(payload) {
+    return payloadData(payload)?.m_xNetworkInfo || payload?.m_xNetworkInfo || null;
+  }
+
+  function providerTimestamp(payload) {
+    return payloadData(payload)?.m_xTimestamp || payload?.m_xTimestamp || null;
   }
 
   function parseDurationSeconds(value) {
@@ -629,6 +675,38 @@
     }).join("");
   }
 
+  function renderExpiryList(node) {
+    const mount = $('[data-render="expiryList"]');
+    if (!mount) return;
+    const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
+    const delegations = (Array.isArray(node?.m_axDelegation) ? node.m_axDelegation : [])
+      .map(item => ({
+        label: "Delegation",
+        amount: Number(item.m_dAmount),
+        end: item.m_xTimeEnd
+      }))
+      .filter(item => Number.isFinite(item.amount) && item.end);
+    const items = [
+      stake ? { label: "Self stake", amount: Number(stake.m_dAmount), end: stake.m_xTimeEnd } : null,
+      ...delegations
+    ]
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.end).getTime() - new Date(b.end).getTime())
+      .slice(0, 5);
+
+    if (!items.length) {
+      mount.innerHTML = `<span><em>No expiry data</em><b>-</b></span>`;
+      return;
+    }
+
+    mount.innerHTML = items.map(item => `
+      <span>
+        <em>${escapeHtml(item.label)} · ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
+        <b>${escapeHtml(fmtUntil(item.end))} · ${escapeHtml(fmtShortDate(item.end))}</b>
+      </span>
+    `).join("");
+  }
+
   function computeLevels(provider, latest, validator, nodeHealth) {
     const node = getNode(validator);
     const ftsoAvail = pctNumber(provider?.ftsoPerformance?.availability);
@@ -743,16 +821,40 @@
     if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
   }
 
-  function renderRaw(provider, latest, validator, nodeHealth, explorer) {
+  function renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
     const node = getNode(validator);
+    const network = networkInfo(providerPayload);
     const payload = {
+      network: {
+        currentRewardEpoch: network?.m_iCurrentRewardEpoch,
+        rewardEpochEnd: network?.m_xRewardEpochEndTime,
+        oracleTimestamp: providerTimestamp(providerPayload),
+        rewardVotePowerBlock: network?.m_iRewardEpochVotePowerBlock,
+        previousVotePowerBlock: network?.m_iPrevRewardEpochVotePowerBlock
+      },
       provider: {
-        name: provider?.dataProviderName || "MirSFlr",
+        matchedBy: provider?.voterAddress === TARGET.voter ? "voterAddress" : provider?.delegationAddress === TARGET.delegation ? "delegationAddress" : "name",
+        topLevelName: provider?.dataProviderName,
+        latestEpochName: latest?.dataProviderName,
         voterAddress: provider?.voterAddress,
         delegationAddress: provider?.delegationAddress,
+        submitAddress: provider?.submitAddress,
+        submitAddressBalance: provider?.submitAddressBalance,
+        submitSignatureAddress: provider?.submitSignatureAddress,
+        submitSignatureAddressBalance: provider?.submitSignatureAddressBalance,
+        signingPolicyAddress: provider?.signingPolicyAddress,
+        signingPolicyAddressBalance: provider?.signingPolicyAddressBalance,
+        fastUpdatesAddresses: provider?.fastUpdatesAddresses,
         latestEpoch: latest?.epoch,
+        latestConditions: {
+          passes: latest?.passes,
+          ftsoHits: latest?.ftsoScaling,
+          fastUpdates: latest?.fastUpdates,
+          fdc: latest?.fdc,
+          staking: latest?.staking
+        },
         totalEpochs: provider?.totalEpochs,
         eligibleEpochs: provider?.eligibleEpochs
       },
@@ -768,21 +870,35 @@
         healthy: nodeHealth?.healthy,
         peers: nodeHealth?.checks?.network?.message?.connectedPeers,
         percentConnected: nodeHealth?.checks?.P?.message?.networking?.percentConnected,
+        lastMessageReceived: nodeHealth?.checks?.network?.message?.timeSinceLastMsgReceived,
+        sendFailRate: nodeHealth?.checks?.network?.message?.sendFailRate,
         bls: nodeHealth?.checks?.bls?.message,
-        diskBytes: nodeHealth?.checks?.diskspace?.message?.availableDiskBytes
+        diskBytes: nodeHealth?.checks?.diskspace?.message?.availableDiskBytes,
+        processingBlocks: {
+          pChain: nodeHealth?.checks?.P?.message?.engine?.consensus?.processingBlocks,
+          cChain: nodeHealth?.checks?.C?.message?.engine?.consensus?.processingBlocks
+        }
       },
       explorer: {
         rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
         normalizedWeight: explorer?.denormalizedsigningpolicy?.normalized_weight,
         delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegation_fee_bips
+      },
+      missingCriticalSignals: {
+        submitRevealSignatureLiveness: "not exposed by current browser APIs; wire a daemon event endpoint",
+        fdcSignatureTimestamps: "not exposed by current browser APIs; wire a daemon event endpoint",
+        cpuMemoryLoad: "not present in /flare/ext/health",
+        feedLevelMisses: "Oracle payload detailed feed maps are not populated"
       }
     };
     mount.textContent = JSON.stringify(payload, null, 2);
   }
 
-  function applyData(provider, validator, explorer, nodeHealth) {
+  function applyData(provider, validator, explorer, nodeHealth, providerPayload) {
     const latest = latestEpoch(provider);
     const node = getNode(validator);
+    const network = networkInfo(providerPayload);
+    const oracleTime = providerTimestamp(providerPayload);
     const levels = computeLevels(provider, latest, validator, nodeHealth);
     const overall = worstLevel([levels.ftso, levels.fdc, levels.validator, levels.node]);
     $$(".mobile-health, .desktop-health").forEach(el => {
@@ -791,6 +907,18 @@
     setText("overallLabel", overall === "ok" ? "All systems nominal" : overall === "warn" ? "Watch required" : "Action required");
     setText("overallTitle", overall === "ok" ? "All good" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
+    setText("currentRewardEpoch", network?.m_iCurrentRewardEpoch != null ? `E${network.m_iCurrentRewardEpoch}` : "-");
+    setText("latestCompletedEpoch", latest?.epoch != null ? `E${latest.epoch}` : "-");
+    setText("rewardEpochEnds", network?.m_xRewardEpochEndTime ? fmtUntil(network.m_xRewardEpochEndTime) : "-");
+    const oracleAge = oracleTime ? fmtAge(new Date(oracleTime)) : null;
+    setText("oraclePayloadAge", oracleAge ? `${oracleAge} old` : "-");
+    setText("nodeHealthAge", state.sourceLoadedAt.node ? `${fmtAge(state.sourceLoadedAt.node)} old` : "-");
+    setText("daemonLiveness", "Needs feed");
+    const oracleDate = oracleTime ? new Date(oracleTime) : null;
+    const oracleAgeMs = oracleDate && Number.isFinite(oracleDate.getTime()) ? Date.now() - oracleDate.getTime() : null;
+    const nodeAgeMs = state.sourceLoadedAt.node ? Date.now() - state.sourceLoadedAt.node.getTime() : null;
+    setToneCard("oracleFreshness", oracleAgeMs == null ? "watch" : oracleAgeMs > 5 * 60_000 ? "watch" : "ok");
+    setToneCard("nodeFreshness", state.sources.node !== "ok" ? "down" : nodeAgeMs != null && nodeAgeMs > 2 * 60_000 ? "watch" : "ok");
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(hourlySeries(provider?.fdcPerformance?.availability1h), 3);
@@ -815,11 +943,34 @@
     setText("latestEligibility", latest?.eligibleForReward === true ? "eligible" : latest?.eligibleForReward === false ? "not eligible" : "eligibility -");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
     setText("ftsoPerformance", provider?.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
+    setText("ftsoPrimary", provider?.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
+    setText("ftsoSecondary", provider?.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
     setText("fdcAvailability", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
+    setText("fdcParticipation", latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "-");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
     setText("conditionsLabel", `${conditionOk}/4 latest checks`);
     setText("preRegistered", provider?.isPreRegistered === true ? "Yes" : provider?.isPreRegistered === false ? "No" : "-");
+    setText("ftsoHits", latest?.ftsoScaling?.totalHits != null && latest?.ftsoScaling?.allPossibleHits != null ? `${fmtNum(latest.ftsoScaling.totalHits, 0)} / ${fmtNum(latest.ftsoScaling.allPossibleHits, 0)}` : "-");
+    setText("ftsoHitPct", latest?.ftsoScaling?.hitPercentage != null ? fmtPct(latest.ftsoScaling.hitPercentage) : "-");
+    setText("fastUpdates", latest?.fastUpdates?.updates != null && latest?.fastUpdates?.expectedUpdates != null ? `${fmtNum(latest.fastUpdates.updates, 0)} / ${fmtNum(latest.fastUpdates.expectedUpdates, 0)}` : "-");
+    setText("fdcRounds", latest?.fdc?.rewardedVotingRounds != null && latest?.fdc?.totalRewardedVotingRounds != null ? `${fmtNum(latest.fdc.rewardedVotingRounds, 0)} / ${fmtNum(latest.fdc.totalRewardedVotingRounds, 0)}` : "-");
+    setText("stakingCondition", latest?.staking?.conditionMet === true ? "OK" : latest?.staking?.conditionMet === false ? "Failed" : "-");
+
+    const balanceValues = [
+      provider?.submitAddressBalance,
+      provider?.submitSignatureAddressBalance,
+      provider?.signingPolicyAddressBalance,
+      ...(Array.isArray(provider?.fastUpdatesAddresses) ? provider.fastUpdatesAddresses.map(item => item.balance) : [])
+    ].map(Number).filter(Number.isFinite);
+    const minBalance = balanceValues.length ? Math.min(...balanceValues) : null;
+    const balanceTone = minBalance == null ? "watch" : minBalance < 250 ? "down" : minBalance < 500 ? "watch" : "ok";
+    setText("balanceStatus", minBalance == null ? "-" : balanceTone === "ok" ? "OK" : "LOW");
+    setText("submitBalance", provider?.submitAddressBalance != null ? fmtCompact(provider.submitAddressBalance, " FLR") : "-");
+    setText("signatureBalance", provider?.submitSignatureAddressBalance != null ? fmtCompact(provider.submitSignatureAddressBalance, " FLR") : "-");
+    setText("policyBalance", provider?.signingPolicyAddressBalance != null ? fmtCompact(provider.signingPolicyAddressBalance, " FLR") : "-");
+    setText("fastBalanceMin", minBalance != null ? fmtCompact(minBalance, " FLR") : "-");
+    $$(".balance-card").forEach(el => { el.dataset.tone = balanceTone; });
 
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
     const uptimeAvg = uptimeValues.length ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length : null;
@@ -835,6 +986,7 @@
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
     setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "-");
     setText("validatorLastSeen", node?.m_sLastSeen ? `last seen ${node.m_sLastSeen}` : "last seen -");
+    setText("validatorLastSeenShort", node?.m_sLastSeen ? node.m_sLastSeen.replace(/\.\d+$/, "") : "-");
     setText("nodeHealthy", nodeHealth?.healthy === true ? "Healthy" : nodeHealth ? "Unhealthy" : "-");
     setText("nodePeers", nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "peers -");
     setText("validatorUptime", Number.isFinite(uptimeAvg) ? fmtPct(uptimeAvg) : "-");
@@ -889,7 +1041,8 @@
     renderConditionHeatmap(provider);
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
     renderUptimeStrip(uptimeValues);
-    renderRaw(provider, latest, validator, nodeHealth, explorer);
+    renderExpiryList(node);
+    renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload);
   }
 
   async function loadAll() {
@@ -906,11 +1059,16 @@
     let validatorPayload = sourceResults[1].status === "fulfilled" ? sourceResults[1].value : null;
     let explorer = sourceResults[2].status === "fulfilled" ? sourceResults[2].value : null;
     let nodeHealth = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
+    state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
+    state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
+    state.sourceLoadedAt.explorer = explorer ? new Date() : null;
+    state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
 
     if (!provider) {
       try {
         providerPayload = await fetchJson(ENDPOINTS.providersV1);
+        state.sourceLoadedAt.provider = new Date();
         provider = findDeep(providerPayload, isMirProvider);
       } catch (_) {}
     }
@@ -929,8 +1087,8 @@
     setSource("node", nodeHealth ? "ok" : "down");
 
     state.lastLoadedAt = new Date();
-    state.data = { provider, validator, explorer, nodeHealth };
-    applyData(provider, validator, explorer, nodeHealth);
+    state.data = { provider, validator, explorer, nodeHealth, providerPayload };
+    applyData(provider, validator, explorer, nodeHealth, providerPayload);
     setText("refreshLabel", "Refresh");
     document.body.classList.remove("is-refreshing");
   }

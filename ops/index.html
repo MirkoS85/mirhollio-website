@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-9">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-10">
 </head>
 <body>
   <main class="ops-shell">
@@ -83,6 +83,34 @@
       </article>
     </section>
 
+    <section class="truth-panel" aria-label="Operational truth">
+      <article class="truth-tile">
+        <span>Reward epoch</span>
+        <strong data-field="currentRewardEpoch">-</strong>
+        <small>ends <b data-field="rewardEpochEnds">-</b></small>
+      </article>
+      <article class="truth-tile">
+        <span>Latest completed</span>
+        <strong data-field="latestCompletedEpoch">-</strong>
+        <small data-field="latestEligibility">eligibility -</small>
+      </article>
+      <article class="truth-tile" data-tone-card="oracleFreshness">
+        <span>Oracle data</span>
+        <strong data-field="oraclePayloadAge">-</strong>
+        <small>payload timestamp</small>
+      </article>
+      <article class="truth-tile" data-tone-card="nodeFreshness">
+        <span>Node health</span>
+        <strong data-field="nodeHealthAge">-</strong>
+        <small>direct endpoint</small>
+      </article>
+      <article class="truth-tile" data-tone="watch">
+        <span>Submit / reveal</span>
+        <strong data-field="daemonLiveness">Needs feed</strong>
+        <small>daemon event source missing</small>
+      </article>
+    </section>
+
     <section class="alerts-card" id="alerts" data-alert-state="loading">
       <div class="alerts-head">
         <span>Alerts</span>
@@ -103,12 +131,24 @@
             <strong data-field="ftsoPerformance">-</strong>
           </article>
           <article>
-            <span>FDC</span>
+            <span>Primary</span>
+            <strong data-field="ftsoPrimary">-</strong>
+          </article>
+          <article>
+            <span>Secondary</span>
+            <strong data-field="ftsoSecondary">-</strong>
+          </article>
+          <article>
+            <span>FTSO availability</span>
+            <strong data-field="ftsoAvailability">-</strong>
+          </article>
+          <article>
+            <span>FDC 24h</span>
             <strong data-field="fdcAvailability">-</strong>
           </article>
           <article>
-            <span>Availability</span>
-            <strong data-field="ftsoAvailability">-</strong>
+            <span>FDC epoch</span>
+            <strong data-field="fdcParticipation">-</strong>
           </article>
           <article>
             <span>Conditions</span>
@@ -146,6 +186,22 @@
         <article class="chart-card condition-card" id="history">
           <div class="chart-title"><span>FTSO Conditions <em>(per epoch)</em></span><b data-field="conditionPasses">-</b></div>
           <div class="heatmap" data-render="conditionHeatmap"></div>
+          <div class="condition-detail">
+            <span>FTSO hits <b data-field="ftsoHits">-</b> <em data-field="ftsoHitPct">-</em></span>
+            <span>Fast updates <b data-field="fastUpdates">-</b></span>
+            <span>FDC rounds <b data-field="fdcRounds">-</b> <em data-field="fdcParticipation">-</em></span>
+            <span>Staking <b data-field="stakingCondition">-</b></span>
+          </div>
+        </article>
+
+        <article class="balance-card">
+          <div class="chart-title"><span>Operational Balances</span><b data-field="balanceStatus">-</b></div>
+          <div class="balance-grid">
+            <span>Submit <b data-field="submitBalance">-</b></span>
+            <span>Signature <b data-field="signatureBalance">-</b></span>
+            <span>Policy <b data-field="policyBalance">-</b></span>
+            <span>Fast min <b data-field="fastBalanceMin">-</b></span>
+          </div>
         </article>
 
         <article class="chart-card reward-card">
@@ -195,18 +251,6 @@
           </article>
         </div>
 
-        <article class="chart-card reward-card">
-          <div class="chart-title"><span>Validator Reward History <em>(per epoch)</em></span></div>
-          <div class="chart-with-summary">
-            <svg class="chart" data-chart="validatorRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="Validator rewards chart"></svg>
-            <aside class="chart-summary">
-              <span>Latest</span><strong data-field="validatorRewardLatestFull">-</strong>
-              <span>Average</span><strong data-field="validatorRewardAverageFull">-</strong>
-              <span>Range</span><strong data-field="validatorRewardRangeFull">-</strong>
-            </aside>
-          </div>
-        </article>
-
         <article class="stake-card">
           <div class="stake-ring"><strong data-field="capacityPct">-</strong></div>
           <div class="stake-lines">
@@ -228,14 +272,42 @@
             <div><span>Connection</span><strong data-field="nodeNetwork">-</strong></div>
             <div><span>Processing</span><strong data-field="nodeProcessing">-</strong></div>
             <div><span>BLS</span><strong data-field="nodeBls">-</strong></div>
+            <div><span>Last seen</span><strong data-field="validatorLastSeenShort">-</strong></div>
           </div>
+        </article>
+
+        <article class="expiry-card">
+          <div class="chart-title"><span>Stake / Delegation Expiry</span><b data-field="stakeEnds">-</b></div>
+          <div class="expiry-list" data-render="expiryList"></div>
         </article>
 
         <article class="chart-card uptime-card">
           <div class="chart-title"><span>Recent Uptime</span><b data-field="validatorUptime">-</b></div>
           <div class="uptime-strip" data-render="uptimeStrip"></div>
         </article>
+
+        <article class="chart-card reward-card">
+          <div class="chart-title"><span>Validator Reward History <em>(per epoch)</em></span></div>
+          <div class="chart-with-summary">
+            <svg class="chart" data-chart="validatorRewards" viewBox="0 0 640 220" preserveAspectRatio="none" role="img" aria-label="Validator rewards chart"></svg>
+            <aside class="chart-summary">
+              <span>Latest</span><strong data-field="validatorRewardLatestFull">-</strong>
+              <span>Average</span><strong data-field="validatorRewardAverageFull">-</strong>
+              <span>Range</span><strong data-field="validatorRewardRangeFull">-</strong>
+            </aside>
+          </div>
+        </article>
       </section>
+    </section>
+
+    <section class="gaps-card">
+      <h2>Missing Ops Signals</h2>
+      <div class="gap-grid">
+        <span>Submit / reveal liveness <b>needs daemon feed</b></span>
+        <span>FDC signature timestamps <b>needs daemon feed</b></span>
+        <span>CPU / RAM / load <b>not in node health</b></span>
+        <span>Feed-level misses <b>not exposed by Oracle payload</b></span>
+      </div>
     </section>
 
     <section class="raw-card" id="raw">
@@ -247,6 +319,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-9"></script>
+  <script src="../assets/ops.js?v=ops-10"></script>
 </body>
 </html>
