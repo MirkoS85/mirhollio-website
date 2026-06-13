@@ -404,6 +404,54 @@
     });
   }
 
+  function setupPerformanceTooltip(svg, perf, primary, secondary, points, width, height) {
+    const tooltip = ensureChartTooltip(svg);
+    const card = svg.closest(".chart-card");
+    if (!tooltip || !card) return;
+
+    function show(index) {
+      const point = points[index];
+      if (!point) return;
+      const svgRect = svg.getBoundingClientRect();
+      const cardRect = card.getBoundingClientRect();
+      const x = svgRect.left - cardRect.left + (point.x / width) * svgRect.width;
+      const y = svgRect.top - cardRect.top + (point.y / height) * svgRect.height;
+      const minX = Math.min(104, Math.max(24, cardRect.width / 2));
+      const maxX = Math.max(minX, cardRect.width - minX);
+      const label = index === points.length - 1 ? "now" : `${Math.max(0, points.length - 1 - index)}h ago`;
+
+      tooltip.innerHTML = `
+        <span>FTSO performance</span>
+        <strong>${escapeHtml(fmtPct(perf[index]))}</strong>
+        <em>${escapeHtml(label)}</em>
+        <div class="tooltip-metrics">
+          <span>Primary band <b>${escapeHtml(fmtPct(primary[index]))}</b></span>
+          <span>Secondary <b>${escapeHtml(fmtPct(secondary[index]))}</b></span>
+        </div>
+      `;
+      tooltip.dataset.zone = "reward";
+      tooltip.style.left = `${Math.max(minX, Math.min(maxX, x))}px`;
+      tooltip.style.top = `${Math.max(44, y - 10)}px`;
+      tooltip.classList.add("is-visible");
+    }
+
+    function hide() {
+      tooltip.classList.remove("is-visible");
+    }
+
+    $$(".chart-hit", svg).forEach((hit, index) => {
+      hit.addEventListener("pointerenter", () => show(index));
+      hit.addEventListener("pointermove", () => show(index));
+      hit.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        show(index);
+      });
+      hit.addEventListener("focus", () => show(index));
+      hit.addEventListener("pointerleave", hide);
+      hit.addEventListener("blur", hide);
+    });
+  }
+
   function renderLineChart(selector, input, options = {}) {
     const svg = $(`[data-chart="${selector}"]`);
     if (!svg) return;
@@ -505,8 +553,11 @@
     const xFor = index => pad.left + (index / (len - 1)) * chartW;
     const yFor = value => pad.top + (1 - (value / 100)) * chartH;
     const makePoints = arr => arr.map((value, index) => ({ x: xFor(index), y: yFor(value), item: { value } }));
+    const perfPoints = makePoints(perf);
     const makePath = arr => smoothPath(makePoints(arr));
     const gridLines = [0, 0.25, 0.5, 0.75, 1].map(step => pad.top + step * chartH);
+    const hitWidth = Math.min(chartW, Math.max(24, chartW / Math.max(1, len - 1)));
+    const hitX = point => Math.max(pad.left, Math.min(width - pad.right - hitWidth, point.x - hitWidth / 2));
     svg.innerHTML = `
       <defs>
         <filter id="ftsoPerformance-glow" x="-12%" y="-35%" width="124%" height="170%">
@@ -520,11 +571,13 @@
       <path class="line-main" d="${makePath(perf)}"></path>
       <path class="line-soft" d="${makePath(primary)}"></path>
       <path class="line-amber" d="${makePath(secondary)}"></path>
+      ${perfPoints.map(point => `<rect class="chart-hit" tabindex="0" x="${hitX(point).toFixed(2)}" y="${pad.top}" width="${hitWidth.toFixed(2)}" height="${chartH}"></rect>`).join("")}
       <text class="axis-label" x="${pad.left - 6}" y="${pad.top + 5}" text-anchor="end">100%</text>
       <text class="axis-label" x="${pad.left - 6}" y="${height - pad.bottom + 5}" text-anchor="end">0%</text>
       <text class="axis-label" x="${pad.left}" y="${height - 8}" text-anchor="middle">23h</text>
       <text class="axis-label" x="${width - pad.right}" y="${height - 8}" text-anchor="middle">now</text>
     `;
+    setupPerformanceTooltip(svg, perf, primary, secondary, perfPoints, width, height);
   }
 
   function renderConditionHeatmap(provider) {

@@ -19,13 +19,13 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-8">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-9">
 </head>
 <body>
   <main class="ops-shell">
     <header class="ops-header">
       <a class="brand" href="./" aria-label="MirSFlr OPS">
-        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-logo" aria-hidden="true"><img src="../logo.png" alt=""></span>
         <strong>MirSFlr <em>OPS</em></strong>
       </a>
 
@@ -36,8 +36,6 @@
         <a href="#alerts">Alerts</a>
         <a href="#history">History</a>
       </nav>
-
-      <button class="icon-button mobile-settings" type="button" aria-label="Settings">⚙</button>
 
       <div class="desktop-health" data-overall-state="loading">
         <span class="health-pill"><i></i><b data-field="overallTitle">Checking</b></span>
@@ -239,8 +237,16 @@
         </article>
       </section>
     </section>
+
+    <section class="raw-card" id="raw">
+      <h2>Raw JSON</h2>
+      <details class="raw-details">
+        <summary>Show live payload</summary>
+        <pre data-render="rawDetails">Waiting for data.</pre>
+      </details>
+    </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-8"></script>
+  <script src="../assets/ops.js?v=ops-9"></script>
 </body>
 </html>

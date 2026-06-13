@@ -51,7 +51,7 @@ button{
 .ops-shell{
   width:min(1600px,100%);
   margin:0 auto;
-  padding:calc(env(safe-area-inset-top) + 18px) 14px 38px;
+  padding:max(calc(env(safe-area-inset-top) + 18px), 24px) 14px 38px;
 }
 
 .ops-header{
@@ -81,26 +81,24 @@ button{
   font-weight:650;
 }
 
-.brand-mark{
+.brand-logo{
+  width:32px;
+  height:32px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:8px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+}
+
+.brand-logo img{
   width:28px;
   height:28px;
-  position:relative;
-  display:inline-block;
-  color:var(--pink);
-}
-
-.brand-mark::before,
-.brand-mark::after{
-  content:"";
-  position:absolute;
-  inset:4px;
-  border:3px solid currentColor;
-  transform:rotate(45deg);
-}
-
-.brand-mark::after{
-  inset:9px;
-  opacity:.65;
+  display:block;
+  object-fit:contain;
 }
 
 .ops-tabs{
@@ -148,9 +146,7 @@ button{
 }
 
 .mobile-settings{
-  margin-left:auto;
-  color:var(--ink);
-  font-size:17px;
+  display:none;
 }
 
 .desktop-health{
@@ -309,7 +305,7 @@ button{
 .chart-card,
 .stake-card,
 .node-card,
-.sources-card,
+.raw-card,
 .source-card{
   border:1px solid var(--line);
   background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
@@ -533,14 +529,14 @@ h2{
 
 .chart-card,
 .stake-card,
-.node-card,
-.sources-card{
+.node-card{
   overflow:hidden;
   border-radius:4px;
 }
 
 .chart-card{
   position:relative;
+  overflow:visible;
 }
 
 .chart-title{
@@ -630,7 +626,7 @@ h2{
 
 .ops-chart-tooltip{
   position:absolute;
-  z-index:8;
+  z-index:80;
   min-width:142px;
   max-width:190px;
   padding:10px 12px;
@@ -665,6 +661,25 @@ h2{
   color:var(--ink);
   font-size:19px;
   line-height:1;
+}
+
+.tooltip-metrics{
+  display:grid;
+  gap:3px;
+  margin-top:7px;
+  padding-top:7px;
+  border-top:1px solid var(--line);
+}
+
+.tooltip-metrics span{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.tooltip-metrics b{
+  color:var(--ink);
 }
 
 .ops-chart-tooltip[data-zone="ok"]{border-color:rgba(115,213,119,.42)}
@@ -870,12 +885,10 @@ h2{
 .uptime-pill.warn{background:var(--amber)}
 .uptime-pill.down{background:var(--red)}
 
-.sources-card{
+.raw-card{
+  margin-top:14px;
   padding:12px;
-}
-
-.sources-card h2{
-  margin-bottom:10px;
+  border-radius:4px;
 }
 
 .source-grid{
@@ -937,15 +950,11 @@ h2{
   .ops-shell{
     padding-left:12px;
     padding-right:12px;
+    padding-top:max(calc(env(safe-area-inset-top) + 18px), 72px);
   }
 
   .brand strong{
     font-size:19px;
-  }
-
-  .brand-mark{
-    width:26px;
-    height:26px;
   }
 
   .desktop-status-grid{
@@ -974,14 +983,6 @@ h2{
 
   .node-health-grid div:nth-child(odd){
     border-left:0;
-  }
-
-  .source-grid{
-    grid-template-columns:1fr;
-  }
-
-  .sources-card{
-    display:none;
   }
 
   .alerts-head b{
@@ -1030,8 +1031,7 @@ h2{
     padding:28px 24px 54px;
   }
 
-  .mobile-health,
-  .mobile-settings{
+  .mobile-health{
     display:none;
   }
 
