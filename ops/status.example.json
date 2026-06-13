@@ -1,0 +1,25 @@
+{
+  "schema": "mirsflr-ops-status/v1",
+  "configured": true,
+  "generatedAt": "2026-06-13T18:00:00Z",
+  "daemon": {
+    "healthy": true,
+    "version": "oracle-daemon-vx.y.z",
+    "uptimeSeconds": 86400,
+    "lastSubmitAt": "2026-06-13T17:58:30Z",
+    "lastRevealAt": "2026-06-13T17:59:15Z",
+    "lastSignatureAt": "2026-06-13T17:59:45Z",
+    "lastFdcSignatureAt": "2026-06-13T17:57:20Z"
+  },
+  "host": {
+    "cpuPct": 21.4,
+    "memoryPct": 48.2,
+    "load1": 1.2,
+    "diskPct": 37.0
+  },
+  "feeds": {
+    "missesLastHour": 0,
+    "staleFeeds": 0,
+    "lateFeeds": 0
+  }
+}

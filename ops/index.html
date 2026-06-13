@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-12">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-13">
 </head>
 <body>
   <main class="ops-shell">
@@ -305,8 +305,8 @@
       <div class="gap-grid">
         <span>Daemon events <b data-field="daemonSignalStatus">not wired</b><em data-field="daemonSignalMeta">/ops/status.json</em></span>
         <span>FDC signature age <b data-field="fdcSignalStatus">not wired</b><em data-field="fdcSignalMeta">needs daemon feed</em></span>
-        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em>CPU / RAM / load</em></span>
-        <span>Feed-level misses <b data-field="feedSignalStatus">not exposed</b><em>Oracle payload limit</em></span>
+        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em data-field="hostSignalMeta">CPU / RAM / load</em></span>
+        <span>Feed-level misses <b data-field="feedSignalStatus">not exposed</b><em data-field="feedSignalMeta">Oracle payload limit</em></span>
       </div>
     </section>
 
@@ -319,6 +319,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-12"></script>
+  <script src="../assets/ops.js?v=ops-13"></script>
 </body>
 </html>

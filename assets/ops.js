@@ -258,8 +258,14 @@
     return Date.now() - time;
   }
 
-  function firstPresent(...values) {
-    return values.find(value => value != null && value !== "");
+  function firstField(sources, ...keys) {
+    for (const source of sources) {
+      if (!source || typeof source !== "object") continue;
+      for (const key of keys) {
+        if (source[key] != null && source[key] !== "") return source[key];
+      }
+    }
+    return null;
   }
 
   function daemonInfo(payload) {
@@ -267,18 +273,78 @@
     return payload.daemon || payload.ops || payload.status || payload;
   }
 
-  function daemonTimestamp(payload, ...keys) {
+  function daemonSources(payload) {
     const info = daemonInfo(payload);
-    if (!info) return null;
-    const value = firstPresent(...keys.map(key => info[key]));
+    return [info, info?.events, payload?.events].filter(item => item && typeof item === "object");
+  }
+
+  function daemonTimestamp(payload, ...keys) {
+    const value = firstField(daemonSources(payload), ...keys);
     if (!value) return null;
     const date = new Date(value);
     return Number.isFinite(date.getTime()) ? date : null;
   }
 
+  function hostInfo(payload) {
+    if (!payload || typeof payload !== "object") return null;
+    return payload.host || payload.system || payload.telemetry || payload.ops?.host || payload.daemon?.host || null;
+  }
+
+  function feedInfo(payload) {
+    if (!payload || typeof payload !== "object") return null;
+    return payload.feeds || payload.feedLevel || payload.feed_level || payload.ops?.feeds || payload.daemon?.feeds || null;
+  }
+
+  function signalTitle(level, missing = "Not exposed") {
+    if (level === "ok") return "OK";
+    if (level === "warn") return "Watch";
+    if (level === "down") return "Down";
+    return missing;
+  }
+
+  function hostSignalSummary(payload) {
+    const info = hostInfo(payload);
+    if (!info) return { level: "warn", title: "not exposed", meta: "CPU / RAM / load" };
+    const cpu = pctNumber(firstField([info], "cpuPct", "cpuPercent", "cpu_percent", "cpu"));
+    const memory = pctNumber(firstField([info], "memoryPct", "memoryPercent", "memory_percent", "ramPct", "ram_percent", "ram"));
+    const load = Number(firstField([info], "load1", "load_1", "loadAverage1m", "load_average_1m"));
+    let level = "ok";
+    if ((cpu != null && cpu >= 95) || (memory != null && memory >= 95) || (Number.isFinite(load) && load >= 12)) level = "down";
+    else if ((cpu != null && cpu >= 85) || (memory != null && memory >= 85) || (Number.isFinite(load) && load >= 8)) level = "warn";
+    const parts = [];
+    if (cpu != null) parts.push(`CPU ${fmtPct(cpu, 0)}`);
+    if (memory != null) parts.push(`RAM ${fmtPct(memory, 0)}`);
+    if (Number.isFinite(load)) parts.push(`load ${fmtNum(load, 1)}`);
+    return {
+      level,
+      title: signalTitle(level),
+      meta: parts.length ? parts.join(" · ") : "telemetry wired"
+    };
+  }
+
+  function feedSignalSummary(payload) {
+    const info = feedInfo(payload);
+    if (!info) return { level: "warn", title: "not exposed", meta: "Oracle payload limit" };
+    const misses = Number(firstField([info], "missesLastHour", "misses_last_hour", "misses24h", "misses_24h", "feedMisses"));
+    const stale = Number(firstField([info], "staleFeeds", "stale_feeds", "stale"));
+    const late = Number(firstField([info], "lateFeeds", "late_feeds", "late"));
+    let level = "ok";
+    if ((Number.isFinite(misses) && misses > 5) || (Number.isFinite(stale) && stale > 0)) level = "down";
+    else if ((Number.isFinite(misses) && misses > 0) || (Number.isFinite(late) && late > 0)) level = "warn";
+    const parts = [];
+    if (Number.isFinite(misses)) parts.push(`${misses} misses`);
+    if (Number.isFinite(stale)) parts.push(`${stale} stale`);
+    if (Number.isFinite(late)) parts.push(`${late} late`);
+    return {
+      level,
+      title: signalTitle(level),
+      meta: parts.length ? parts.join(" · ") : "feed checks wired"
+    };
+  }
+
   function daemonSignalSummary(payload) {
     const info = daemonInfo(payload);
-    if (!info) {
+    if (!info || payload?.configured === false || payload?.wired === false || info.configured === false || info.wired === false) {
       return {
         wired: false,
         level: "warn",
@@ -985,10 +1051,31 @@
         }
       },
       daemonFeed: daemonSignalSummary(daemonPayload),
+      hostTelemetry: hostSignalSummary(daemonPayload),
+      feedLevelMisses: feedSignalSummary(daemonPayload),
       explorer: {
         rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
         normalizedWeight: explorer?.denormalizedsigningpolicy?.normalizedWeight ?? explorer?.denormalizedsigningpolicy?.normalized_weight,
         delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips
+      },
+      expectedDaemonStatusEndpoint: {
+        url: ENDPOINTS.daemonStatus,
+        sampleFile: "/ops/status.example.json",
+        cors: "Access-Control-Allow-Origin must allow https://www.mirhollio.com",
+        requiredForFullOps: [
+          "daemon.lastSubmitAt",
+          "daemon.lastRevealAt",
+          "daemon.lastSignatureAt",
+          "daemon.lastFdcSignatureAt"
+        ],
+        optionalButUseful: [
+          "host.cpuPct",
+          "host.memoryPct",
+          "host.load1",
+          "feeds.missesLastHour",
+          "feeds.staleFeeds",
+          "feeds.lateFeeds"
+        ]
       },
       missingCriticalSignals: {
         submitRevealSignatureLiveness: daemonPayload ? "wired through /ops/status.json" : "not exposed by current browser APIs; wire /ops/status.json",
@@ -1008,6 +1095,8 @@
     const levels = computeLevels(provider, latest, validator, nodeHealth, daemonPayload);
     const nodeHealthTime = nodeHealthTimestamp(nodeHealth);
     const daemonSummary = daemonSignalSummary(daemonPayload);
+    const hostSummary = hostSignalSummary(daemonPayload);
+    const feedSummary = feedSignalSummary(daemonPayload);
     const overall = worstLevel([levels.ftso, levels.fdc, levels.validator, levels.node]);
     $$(".mobile-health, .desktop-health").forEach(el => {
       el.dataset.overallState = overall;
@@ -1122,8 +1211,10 @@
     setText("daemonSignalMeta", daemonSummary.meta);
     setSignal("fdcSignalStatus", daemonSummary.fdcTitle, daemonSummary.fdcLevel);
     setText("fdcSignalMeta", daemonSummary.fdcMeta);
-    setSignal("hostSignalStatus", "not exposed", "warn");
-    setSignal("feedSignalStatus", "not exposed", "warn");
+    setSignal("hostSignalStatus", hostSummary.title, hostSummary.level);
+    setText("hostSignalMeta", hostSummary.meta);
+    setSignal("feedSignalStatus", feedSummary.title, feedSummary.level);
+    setText("feedSignalMeta", feedSummary.meta);
 
     setText("oracleSource", state.sources.provider === "ok" && state.sources.validator === "ok" ? "OK" : state.sources.provider === "down" || state.sources.validator === "down" ? "DOWN" : "WARN");
     setText("oracleSourceMeta", "providers + validators");
