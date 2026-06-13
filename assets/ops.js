@@ -881,8 +881,8 @@
       },
       explorer: {
         rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
-        normalizedWeight: explorer?.denormalizedsigningpolicy?.normalized_weight,
-        delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegation_fee_bips
+        normalizedWeight: explorer?.denormalizedsigningpolicy?.normalizedWeight ?? explorer?.denormalizedsigningpolicy?.normalized_weight,
+        delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips
       },
       missingCriticalSignals: {
         submitRevealSignatureLiveness: "not exposed by current browser APIs; wire a daemon event endpoint",
@@ -904,16 +904,16 @@
     $$(".mobile-health, .desktop-health").forEach(el => {
       el.dataset.overallState = overall;
     });
-    setText("overallLabel", overall === "ok" ? "All systems nominal" : overall === "warn" ? "Watch required" : "Action required");
-    setText("overallTitle", overall === "ok" ? "All good" : overall === "warn" ? "Watch" : "Act now");
+    setText("overallLabel", overall === "ok" ? "Primary checks nominal" : overall === "warn" ? "Watch required" : "Action required");
+    setText("overallTitle", overall === "ok" ? "Primary OK" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
     setText("currentRewardEpoch", network?.m_iCurrentRewardEpoch != null ? `E${network.m_iCurrentRewardEpoch}` : "-");
     setText("latestCompletedEpoch", latest?.epoch != null ? `E${latest.epoch}` : "-");
     setText("rewardEpochEnds", network?.m_xRewardEpochEndTime ? fmtUntil(network.m_xRewardEpochEndTime) : "-");
     const oracleAge = oracleTime ? fmtAge(new Date(oracleTime)) : null;
     setText("oraclePayloadAge", oracleAge ? `${oracleAge} old` : "-");
-    setText("nodeHealthAge", state.sourceLoadedAt.node ? `${fmtAge(state.sourceLoadedAt.node)} old` : "-");
-    setText("daemonLiveness", "Needs feed");
+    setText("nodeHealthAge", state.sourceLoadedAt.node ? `fetched ${fmtAge(state.sourceLoadedAt.node)}` : "-");
+    setText("daemonLiveness", "Not wired");
     const oracleDate = oracleTime ? new Date(oracleTime) : null;
     const oracleAgeMs = oracleDate && Number.isFinite(oracleDate.getTime()) ? Date.now() - oracleDate.getTime() : null;
     const nodeAgeMs = state.sourceLoadedAt.node ? Date.now() - state.sourceLoadedAt.node.getTime() : null;
@@ -927,12 +927,11 @@
       : provider?.fdcPerformance?.availability != null
         ? fmtPct(provider.fdcPerformance.availability)
         : levels.fdc === "down" ? "DOWN" : "-";
-    setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "latest FDC");
+    setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "3h avg");
     setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : "offline");
     setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealth?.healthy ? "healthy" : "unhealthy");
 
     const policy = explorer?.denormalizedsigningpolicy || {};
-    const fee = policy.delegation_fee_bips ?? latest?.voterRegistration?.delegationFeeBIPS;
     const reward = Number(latest?.totalRewardAmount);
     const passes = Number(latest?.passes ?? latest?.newNumberOfPasses);
     const conditionOk = [latest?.ftsoScaling?.conditionMet, latest?.fastUpdates?.conditionMet, latest?.fdc?.conditionMet, latest?.staking?.conditionMet]
@@ -980,8 +979,8 @@
     const freeSpace = Number(validator?.m_dFreeDelegationSpace);
     const capacityMax = capacity + freeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : 0;
-    const selfBond = 3_000_000;
-    const delegatedStake = Number.isFinite(capacity) ? Math.max(0, capacity - selfBond) : null;
+    const selfBond = Number(validator?.m_dTotalStake ?? stake?.m_dAmount);
+    const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : null;
 
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
     setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "-");
@@ -994,7 +993,7 @@
     setText("validatorStake", validator?.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
     setText("validatorStakeMeta", timeLeft !== "-" ? `stake ends in ${timeLeft}` : "self + delegation");
     setText("freeSpace", validator?.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
-    setText("selfBond", "3M FLR");
+    setText("selfBond", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");
     setText("delegatedStake", delegatedStake != null ? fmtCompact(delegatedStake, " FLR") : "-");
     setText("stakeEnds", Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d` : "-");
     setText("capacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
@@ -1014,7 +1013,8 @@
     setText("oracleSource", state.sources.provider === "ok" && state.sources.validator === "ok" ? "OK" : state.sources.provider === "down" || state.sources.validator === "down" ? "DOWN" : "WARN");
     setText("oracleSourceMeta", "providers + validators");
     setText("explorerSource", state.sources.explorer === "ok" ? "OK" : state.sources.explorer === "warn" ? "BLOCKED" : "DOWN");
-    setText("explorerSourceMeta", policy.reward_epoch ? `policy E${policy.reward_epoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
+    const policyEpoch = policy.reward_epoch ?? policy.rewardEpoch;
+    setText("explorerSourceMeta", policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
     setText("nodeSource", state.sources.node === "ok" ? "OK" : "DOWN");
     setText("nodeSourceMeta", nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
     const oracleGroup = state.sources.provider === "ok" && state.sources.validator === "ok" ? "ok" : "down";

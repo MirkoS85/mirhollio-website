@@ -379,8 +379,8 @@ button{
 }
 
 .truth-tile{
-  min-height:74px;
-  padding:11px 12px;
+  min-height:58px;
+  padding:8px 10px;
   border-radius:4px;
   background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
 }
@@ -399,17 +399,17 @@ button{
 
 .truth-tile strong{
   display:block;
-  margin-top:5px;
+  margin-top:3px;
   color:var(--ink);
-  font-size:22px;
+  font-size:18px;
   line-height:1;
 }
 
 .truth-tile small{
   display:block;
-  margin-top:6px;
+  margin-top:4px;
   color:var(--soft);
-  font-size:10px;
+  font-size:9px;
   font-weight:800;
   text-transform:uppercase;
 }
@@ -425,10 +425,18 @@ button{
 .truth-tile[data-tone="down"] strong,
 .truth-tile[data-tone="down"] small b{color:var(--red)}
 
+.truth-liveness{
+  display:none;
+}
+
 .alerts-card{
   margin-top:10px;
   overflow:hidden;
   border-radius:4px;
+}
+
+.alerts-card[data-alert-state="ok"]{
+  display:none;
 }
 
 .alerts-head{
@@ -1211,6 +1219,10 @@ h2{
     margin-top:10px;
   }
 
+  .truth-liveness{
+    display:block;
+  }
+
   .truth-tile strong{
     font-size:20px;
   }
@@ -1238,7 +1250,7 @@ h2{
     border-left:0;
   }
 
-  .alerts-card{
+  .alerts-card[data-alert-state="ok"]{
     display:none;
   }
 

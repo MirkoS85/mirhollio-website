@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-10">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-11">
 </head>
 <body>
   <main class="ops-shell">
@@ -54,7 +54,7 @@
       </div>
       <div class="mobile-mini-grid">
         <span>FTSO <b data-field="ftsoStatus">...</b><i data-dot="ftsoStatus"></i></span>
-        <span>FDC <b data-field="fdcStatus">...</b><i data-dot="fdcStatus"></i></span>
+        <span>FDC 3h <b data-field="fdcStatus">...</b><i data-dot="fdcStatus"></i></span>
         <span>VAL <b data-field="validatorStatus">...</b><i data-dot="validatorStatus"></i></span>
         <span>NODE <b data-field="nodeStatus">...</b><i data-dot="nodeStatus"></i></span>
       </div>
@@ -67,7 +67,7 @@
         <small data-field="ftsoStatusMeta">provider</small>
       </article>
       <article class="status-tile" data-status="loading" data-card="fdcStatus">
-        <span>FDC</span>
+        <span>FDC 3h</span>
         <strong data-field="fdcStatus">...</strong>
         <small data-field="fdcStatusMeta">attestation</small>
       </article>
@@ -97,17 +97,17 @@
       <article class="truth-tile" data-tone-card="oracleFreshness">
         <span>Oracle data</span>
         <strong data-field="oraclePayloadAge">-</strong>
-        <small>payload timestamp</small>
+        <small>payload age</small>
       </article>
       <article class="truth-tile" data-tone-card="nodeFreshness">
-        <span>Node health</span>
+        <span>Node fetch</span>
         <strong data-field="nodeHealthAge">-</strong>
-        <small>direct endpoint</small>
+        <small>endpoint fetch age</small>
       </article>
-      <article class="truth-tile" data-tone="watch">
-        <span>Submit / reveal</span>
-        <strong data-field="daemonLiveness">Needs feed</strong>
-        <small>daemon event source missing</small>
+      <article class="truth-tile truth-liveness">
+        <span>Daemon feed</span>
+        <strong data-field="daemonLiveness">Not wired</strong>
+        <small>submit / reveal not wired</small>
       </article>
     </section>
 
@@ -319,6 +319,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-10"></script>
+  <script src="../assets/ops.js?v=ops-11"></script>
 </body>
 </html>
