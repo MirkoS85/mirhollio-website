@@ -7,6 +7,7 @@ const MirSFlr = (() => {
   const CACHE_PREFIX = "mirsflr_cache_";
   const CURRENCY_KEY = "mirsflr_currency";
   const DELEGATOR_SORT_KEY = "mirsflr_delegator_sort";
+  const OPS_NAV_KEY = "mirsflr_ops_nav";
   const CACHE_TTLS = {
     provider: 60_000,
     validator: 90_000,
@@ -170,6 +171,53 @@ const MirSFlr = (() => {
     try {
       storage.setItem(key, value);
     } catch (_) {}
+  }
+
+  function storageRemove(storage, key) {
+    if (!storage) return;
+    try {
+      storage.removeItem(key);
+    } catch (_) {}
+  }
+
+  function opsHref() {
+    return new URL("/ops/", window.location.origin).pathname;
+  }
+
+  function syncOpsNavPreference() {
+    const storage = getStorage("localStorage");
+    const params = new URLSearchParams(window.location.search || "");
+    const command = String(params.get("ops") || "").toLowerCase();
+    if (command === "unlock" || command === "on") storageSet(storage, OPS_NAV_KEY, "1");
+    if (command === "lock" || command === "off") storageRemove(storage, OPS_NAV_KEY);
+    return storageGet(storage, OPS_NAV_KEY) === "1";
+  }
+
+  function stripOpsCommandFromUrl() {
+    const params = new URLSearchParams(window.location.search || "");
+    if (!params.has("ops") || !window.history?.replaceState) return;
+    params.delete("ops");
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash || ""}`;
+    window.history.replaceState(null, "", cleanUrl);
+  }
+
+  function addOpsLink(nav, label) {
+    if (!nav || nav.querySelector("[data-private-ops-link]")) return;
+    const link = document.createElement("a");
+    link.href = opsHref();
+    link.textContent = label;
+    link.dataset.privateOpsLink = "true";
+    if (window.location.pathname.replace(/\/+$/, "") === "/ops") link.setAttribute("aria-current", "page");
+    nav.appendChild(link);
+  }
+
+  function initPrivateOpsNav() {
+    const enabled = syncOpsNavPreference();
+    stripOpsCommandFromUrl();
+    if (!enabled) return;
+    document.querySelectorAll(".nav").forEach(nav => addOpsLink(nav, "OPS dashboard"));
+    document.querySelectorAll(".mobile-links").forEach(nav => addOpsLink(nav, "OPS"));
   }
 
   function normalizeCurrency(currency) {
@@ -1792,6 +1840,7 @@ const MirSFlr = (() => {
   }
 
   function init() {
+    initPrivateOpsNav();
     bindCopy();
     enhanceTooltips();
     enhanceCopyButtons();
