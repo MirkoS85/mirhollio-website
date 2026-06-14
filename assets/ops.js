@@ -1158,8 +1158,9 @@
     setText("ftsoSecondary6h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 6)));
     setText("ftsoPrimary24h", fmtOptionalPct(recentAverage(ftsoPrimaryHours, 24)));
     setText("ftsoSecondary24h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 24)));
+    const fdcAvailability24h = recentAverage(fdcAvailabilityHours, 24);
     setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
-    setText("fdcAvailability", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
+    setText("fdcAvailability", fdcAvailability24h != null ? fmtPct(fdcAvailability24h) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcParticipation", latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "-");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
     setText("conditionsLabel", `${conditionOk}/4 latest checks`);
