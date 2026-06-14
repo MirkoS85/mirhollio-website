@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-15">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-16">
 </head>
 <body>
   <main class="ops-shell">
@@ -28,6 +28,7 @@
         <span class="brand-logo" aria-hidden="true"><img src="../logo.png" alt=""></span>
         <strong>MirSFlr <em>OPS</em></strong>
       </a>
+      <a class="ops-back" href="../">Dashboard</a>
 
       <nav class="ops-tabs" aria-label="OPS sections">
         <a href="#overview" class="is-active">Overview</a>
@@ -105,9 +106,9 @@
         <small>payload age</small>
       </article>
       <article class="truth-tile truth-liveness" data-tone-card="daemonFreshness">
-        <span>Daemon feed</span>
-        <strong data-field="daemonLiveness">Not wired</strong>
-        <small>submit / reveal not wired</small>
+        <span>Monitor mode</span>
+        <strong data-field="daemonLiveness">Public APIs</strong>
+        <small data-field="daemonLivenessMeta">no server agent</small>
       </article>
     </section>
 
@@ -145,20 +146,22 @@
           <article>
             <span>Avail 6h</span>
             <strong data-field="ftsoAvailability6h">-</strong>
+            <small data-field="ftso6hSource">FSE window</small>
           </article>
           <article>
             <span>Avail 24h</span>
             <strong data-field="ftsoAvailability24h">-</strong>
+            <small data-field="ftso24hSource">FSE window</small>
           </article>
           <article>
             <span>Success 6h</span>
             <strong class="split-value"><b data-field="ftsoPrimary6h">-</b><em>/</em><b data-field="ftsoSecondary6h">-</b></strong>
-            <small>primary / secondary</small>
+            <small><span data-field="ftso6hSource">FSE window</span> · primary / secondary</small>
           </article>
           <article>
             <span>Success 24h</span>
             <strong class="split-value"><b data-field="ftsoPrimary24h">-</b><em>/</em><b data-field="ftsoSecondary24h">-</b></strong>
-            <small>primary / secondary</small>
+            <small><span data-field="ftso24hSource">FSE window</span> · primary / secondary</small>
           </article>
           <article>
             <span>FDC 6h</span>
@@ -327,12 +330,12 @@
     </section>
 
     <section class="gaps-card">
-      <h2>Missing Ops Signals</h2>
+      <h2>Public-source limits</h2>
       <div class="gap-grid">
-        <span>Daemon events <b data-field="daemonSignalStatus">not wired</b><em data-field="daemonSignalMeta">/ops/status.json</em></span>
-        <span>FDC signature age <b data-field="fdcSignalStatus">not wired</b><em data-field="fdcSignalMeta">needs daemon feed</em></span>
-        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em data-field="hostSignalMeta">CPU / RAM / load</em></span>
-        <span>Feed-level misses <b data-field="feedSignalStatus">not exposed</b><em data-field="feedSignalMeta">Oracle payload limit</em></span>
+        <span>Submit / reveal liveness <b data-field="daemonSignalStatus">public only</b><em data-field="daemonSignalMeta">not exposed by public APIs</em></span>
+        <span>FDC signature age <b data-field="fdcSignalStatus">public only</b><em data-field="fdcSignalMeta">not exposed by public APIs</em></span>
+        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em data-field="hostSignalMeta">no node-side agent by design</em></span>
+        <span>Feed-level misses <b data-field="feedSignalStatus">aggregated</b><em data-field="feedSignalMeta">public APIs expose summary data</em></span>
       </div>
     </section>
 
@@ -345,6 +348,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-15"></script>
+  <script src="../assets/ops.js?v=ops-16"></script>
 </body>
 </html>

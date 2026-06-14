@@ -6,6 +6,7 @@
     providersV1: "https://api.oracle-daemon.com/v1/flare/providers",
     validators: "https://api.oracle-daemon.com/v1/flare/validators",
     explorerEntity: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
+    explorerFtso: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3/ftso",
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
     daemonStatus: "https://node.mirhollio.com/ops/status.json"
   };
@@ -26,6 +27,7 @@
       provider: "loading",
       validator: "loading",
       explorer: "loading",
+      explorerFtso: "loading",
       node: "loading",
       daemon: "loading"
     },
@@ -33,6 +35,7 @@
       provider: null,
       validator: null,
       explorer: null,
+      explorerFtso: null,
       node: null,
       daemon: null
     },
@@ -136,6 +139,15 @@
 
   function fmtOptionalPct(value, decimals = 2) {
     return value == null ? "-" : fmtPct(value, decimals);
+  }
+
+  function explorerFtsoMetric(payload, windowName, key) {
+    const value = payload?.[windowName]?.[key];
+    return pctNumber(value);
+  }
+
+  function metricWithFallback(primaryValue, fallbackValues, fallbackCount) {
+    return primaryValue != null ? primaryValue : recentAverage(fallbackValues, fallbackCount);
   }
 
   function fmtCompact(value, suffix = "") {
@@ -308,7 +320,7 @@
 
   function hostSignalSummary(payload) {
     const info = hostInfo(payload);
-    if (!info) return { level: "warn", title: "not exposed", meta: "CPU / RAM / load" };
+    if (!info) return { level: "ok", title: "Public only", meta: "no node-side agent by design" };
     const cpu = pctNumber(firstField([info], "cpuPct", "cpuPercent", "cpu_percent", "cpu"));
     const memory = pctNumber(firstField([info], "memoryPct", "memoryPercent", "memory_percent", "ramPct", "ram_percent", "ram"));
     const load = Number(firstField([info], "load1", "load_1", "loadAverage1m", "load_average_1m"));
@@ -328,7 +340,7 @@
 
   function feedSignalSummary(payload) {
     const info = feedInfo(payload);
-    if (!info) return { level: "warn", title: "not exposed", meta: "Oracle payload limit" };
+    if (!info) return { level: "ok", title: "Aggregated", meta: "public APIs expose summary data" };
     const misses = Number(firstField([info], "missesLastHour", "misses_last_hour", "misses24h", "misses_24h", "feedMisses"));
     const stale = Number(firstField([info], "staleFeeds", "stale_feeds", "stale"));
     const late = Number(firstField([info], "lateFeeds", "late_feeds", "late"));
@@ -351,12 +363,12 @@
     if (!info || payload?.configured === false || payload?.wired === false || info.configured === false || info.wired === false) {
       return {
         wired: false,
-        level: "warn",
-        title: "Not wired",
-        meta: "/ops/status.json",
-        fdcLevel: "warn",
-        fdcTitle: "Not wired",
-        fdcMeta: "needs daemon feed"
+        level: "ok",
+        title: "Public APIs",
+        meta: "no server agent",
+        fdcLevel: "ok",
+        fdcTitle: "Public only",
+        fdcMeta: "signature age is not public"
       };
     }
 
@@ -960,7 +972,7 @@
     }
 
     if (daemonSummary.wired && daemonSummary.level !== "ok") {
-      add(daemonSummary.level, "Daemon feed liveness", daemonSummary.meta);
+      add(daemonSummary.level, "Private liveness", daemonSummary.meta);
     }
 
     return { ftso, fdc, validator: val, node: nodeLevel, alerts };
@@ -994,7 +1006,7 @@
     if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
   }
 
-  function renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload, daemonPayload) {
+  function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
     const node = getNode(validator);
@@ -1060,38 +1072,41 @@
       explorer: {
         rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
         normalizedWeight: explorer?.denormalizedsigningpolicy?.normalizedWeight ?? explorer?.denormalizedsigningpolicy?.normalized_weight,
-        delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips
+        delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips,
+        ftsoWindows: {
+          source: explorerFtso ? "Flare System Explorer /entity/{identity}/ftso" : "Oracle Daemon hourly fallback",
+          last6h: explorerFtso?.last_6h,
+          last24h: explorerFtso?.last_24h,
+          perRewardEpoch: explorerFtso?.per_reward_epoch
+        }
       },
-      expectedDaemonStatusEndpoint: {
-        url: ENDPOINTS.daemonStatus,
-        sampleFile: "/ops/status.example.json",
-        cors: "Access-Control-Allow-Origin must allow https://www.mirhollio.com",
-        requiredForFullOps: [
-          "daemon.lastSubmitAt",
-          "daemon.lastRevealAt",
-          "daemon.lastSignatureAt",
-          "daemon.lastFdcSignatureAt"
+      publicOnlyMode: {
+        enabled: !daemonPayload,
+        reason: "No extra daemon or host agent is installed on the node server.",
+        optionalStatusEndpoint: ENDPOINTS.daemonStatus,
+        safeAlternatives: [
+          "Flare System Explorer for FTSO 6h/24h windows when CORS/proxy permits it.",
+          "Oracle Daemon public API for provider, FDC, rewards, and validator aggregates.",
+          "Existing node health endpoint for non-invasive self-health checks."
         ],
-        optionalButUseful: [
-          "host.cpuPct",
-          "host.memoryPct",
-          "host.load1",
-          "feeds.missesLastHour",
-          "feeds.staleFeeds",
-          "feeds.lateFeeds"
+        notReliablyPublic: [
+          "last submit timestamp",
+          "last reveal timestamp",
+          "last signature timestamp",
+          "host CPU/RAM/load"
         ]
       },
       missingCriticalSignals: {
-        submitRevealSignatureLiveness: daemonPayload ? "wired through /ops/status.json" : "not exposed by current browser APIs; wire /ops/status.json",
-        fdcSignatureTimestamps: daemonPayload ? "wired through /ops/status.json" : "not exposed by current browser APIs; wire /ops/status.json",
-        cpuMemoryLoad: "not present in /flare/ext/health",
-        feedLevelMisses: "Oracle payload detailed feed maps are not populated"
+        submitRevealSignatureLiveness: daemonPayload ? "wired through optional status endpoint" : "not exposed by current public browser APIs",
+        fdcSignatureTimestamps: daemonPayload ? "wired through optional status endpoint" : "not exposed by current public browser APIs",
+        cpuMemoryLoad: "not collected by design",
+        feedLevelMisses: "public APIs expose aggregate performance, not full local daemon internals"
       }
     };
     mount.textContent = JSON.stringify(payload, null, 2);
   }
 
-  function applyData(provider, validator, explorer, nodeHealth, providerPayload, daemonPayload) {
+  function applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload) {
     const latest = latestEpoch(provider);
     const node = getNode(validator);
     const network = networkInfo(providerPayload);
@@ -1115,6 +1130,7 @@
     setText("oraclePayloadAge", oracleAge ? `${oracleAge} old` : "-");
     setText("nodeHealthAge", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : "-");
     setText("daemonLiveness", daemonSummary.title);
+    setText("daemonLivenessMeta", daemonSummary.meta);
     const oracleDate = oracleTime ? new Date(oracleTime) : null;
     const oracleAgeMs = oracleDate && Number.isFinite(oracleDate.getTime()) ? Date.now() - oracleDate.getTime() : null;
     const nodeAgeMs = nodeHealthTime ? timestampAgeMs(nodeHealthTime) : null;
@@ -1126,6 +1142,14 @@
     const fdcAvailabilityHours = hourlySeries(provider?.fdcPerformance?.availability1h);
     const ftsoPrimaryHours = hourlySeries(provider?.ftsoPerformance?.performance1_1h);
     const ftsoSecondaryHours = hourlySeries(provider?.ftsoPerformance?.performance2_1h);
+    const fseAvailability6h = explorerFtsoMetric(explorerFtso, "last_6h", "availability");
+    const fseAvailability24h = explorerFtsoMetric(explorerFtso, "last_24h", "availability");
+    const fsePrimary6h = explorerFtsoMetric(explorerFtso, "last_6h", "primary");
+    const fseSecondary6h = explorerFtsoMetric(explorerFtso, "last_6h", "secondary");
+    const fsePrimary24h = explorerFtsoMetric(explorerFtso, "last_24h", "primary");
+    const fseSecondary24h = explorerFtsoMetric(explorerFtso, "last_24h", "secondary");
+    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null || fseSecondary6h != null ? "FSE window" : "Oracle fallback";
+    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null || fseSecondary24h != null ? "FSE window" : "Oracle fallback";
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
@@ -1152,12 +1176,14 @@
     setText("ftsoPrimary", provider?.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
     setText("ftsoSecondary", provider?.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
-    setText("ftsoAvailability6h", fmtOptionalPct(recentAverage(ftsoAvailabilityHours, 6)));
-    setText("ftsoAvailability24h", fmtOptionalPct(recentAverage(ftsoAvailabilityHours, 24)));
-    setText("ftsoPrimary6h", fmtOptionalPct(recentAverage(ftsoPrimaryHours, 6)));
-    setText("ftsoSecondary6h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 6)));
-    setText("ftsoPrimary24h", fmtOptionalPct(recentAverage(ftsoPrimaryHours, 24)));
-    setText("ftsoSecondary24h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 24)));
+    setText("ftsoAvailability6h", fmtOptionalPct(metricWithFallback(fseAvailability6h, ftsoAvailabilityHours, 6)));
+    setText("ftsoAvailability24h", fmtOptionalPct(metricWithFallback(fseAvailability24h, ftsoAvailabilityHours, 24)));
+    setText("ftsoPrimary6h", fmtOptionalPct(metricWithFallback(fsePrimary6h, ftsoPrimaryHours, 6)));
+    setText("ftsoSecondary6h", fmtOptionalPct(metricWithFallback(fseSecondary6h, ftsoSecondaryHours, 6)));
+    setText("ftsoPrimary24h", fmtOptionalPct(metricWithFallback(fsePrimary24h, ftsoPrimaryHours, 24)));
+    setText("ftsoSecondary24h", fmtOptionalPct(metricWithFallback(fseSecondary24h, ftsoSecondaryHours, 24)));
+    setText("ftso6hSource", ftsoSource6h);
+    setText("ftso24hSource", ftsoSource24h);
     const fdcAvailability24h = recentAverage(fdcAvailabilityHours, 24);
     setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
     setText("fdcAvailability", fdcAvailability24h != null ? fmtPct(fdcAvailability24h) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
@@ -1237,7 +1263,7 @@
     setText("oracleSourceMeta", "providers + validators");
     setText("explorerSource", state.sources.explorer === "ok" ? "OK" : state.sources.explorer === "warn" ? "BLOCKED" : "DOWN");
     const policyEpoch = policy.reward_epoch ?? policy.rewardEpoch;
-    setText("explorerSourceMeta", policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
+    setText("explorerSourceMeta", explorerFtso ? "FTSO 6h/24h windows" : policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
     setText("nodeSource", state.sources.node === "ok" ? "OK" : "DOWN");
     setText("nodeSourceMeta", nodeHealthTime ? `health ${fmtAge(nodeHealthTime)} old` : nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
     const oracleGroup = state.sources.provider === "ok" && state.sources.validator === "ok" ? "ok" : "down";
@@ -1265,7 +1291,7 @@
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
     renderUptimeStrip(uptimeValues);
     renderExpiryList(node);
-    renderRaw(provider, latest, validator, nodeHealth, explorer, providerPayload, daemonPayload);
+    renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload);
   }
 
   async function loadAll() {
@@ -1275,6 +1301,7 @@
       fetchJson(ENDPOINTS.providersV2),
       fetchJson(ENDPOINTS.validators),
       fetchJson(ENDPOINTS.explorerEntity),
+      fetchJson(ENDPOINTS.explorerFtso),
       fetchJson(ENDPOINTS.nodeHealth),
       fetchJson(ENDPOINTS.daemonStatus, 2_500)
     ]);
@@ -1282,11 +1309,13 @@
     let providerPayload = sourceResults[0].status === "fulfilled" ? sourceResults[0].value : null;
     let validatorPayload = sourceResults[1].status === "fulfilled" ? sourceResults[1].value : null;
     let explorer = sourceResults[2].status === "fulfilled" ? sourceResults[2].value : null;
-    let nodeHealth = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
-    let daemonPayload = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
+    let explorerFtso = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
+    let nodeHealth = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
+    let daemonPayload = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
     state.sourceLoadedAt.explorer = explorer ? new Date() : null;
+    state.sourceLoadedAt.explorerFtso = explorerFtso ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
     state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
@@ -1309,13 +1338,14 @@
 
     setSource("provider", provider ? "ok" : "down");
     setSource("validator", validator ? "ok" : "down");
-    setSource("explorer", explorer ? "ok" : "warn");
+    setSource("explorer", explorer || explorerFtso ? "ok" : "warn");
+    setSource("explorerFtso", explorerFtso ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
     setSource("daemon", daemonPayload ? "ok" : "warn");
 
     state.lastLoadedAt = new Date();
-    state.data = { provider, validator, explorer, nodeHealth, providerPayload, daemonPayload };
-    applyData(provider, validator, explorer, nodeHealth, providerPayload, daemonPayload);
+    state.data = { provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload };
+    applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
     setText("refreshLabel", "Refresh");
     document.body.classList.remove("is-refreshing");
   }
