@@ -134,6 +134,10 @@
     return recent.reduce((sum, value) => sum + value, 0) / recent.length;
   }
 
+  function fmtOptionalPct(value, decimals = 2) {
+    return value == null ? "-" : fmtPct(value, decimals);
+  }
+
   function fmtCompact(value, suffix = "") {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -1118,8 +1122,13 @@
     setToneCard("nodeFreshness", state.sources.node !== "ok" ? "down" : nodeAgeMs == null || nodeAgeMs > 2 * 60_000 ? "watch" : "ok");
     setToneCard("daemonFreshness", daemonSummary.level);
 
+    const ftsoAvailabilityHours = hourlySeries(provider?.ftsoPerformance?.availability1h);
+    const fdcAvailabilityHours = hourlySeries(provider?.fdcPerformance?.availability1h);
+    const ftsoPrimaryHours = hourlySeries(provider?.ftsoPerformance?.performance1_1h);
+    const ftsoSecondaryHours = hourlySeries(provider?.ftsoPerformance?.performance2_1h);
+
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
-    const fdcRecent = recentAverage(hourlySeries(provider?.fdcPerformance?.availability1h), 3);
+    const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
     const fdcStatusValue = fdcRecent != null
       ? fmtPct(fdcRecent)
       : provider?.fdcPerformance?.availability != null
@@ -1143,6 +1152,13 @@
     setText("ftsoPrimary", provider?.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
     setText("ftsoSecondary", provider?.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
+    setText("ftsoAvailability6h", fmtOptionalPct(recentAverage(ftsoAvailabilityHours, 6)));
+    setText("ftsoAvailability24h", fmtOptionalPct(recentAverage(ftsoAvailabilityHours, 24)));
+    setText("ftsoPrimary6h", fmtOptionalPct(recentAverage(ftsoPrimaryHours, 6)));
+    setText("ftsoSecondary6h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 6)));
+    setText("ftsoPrimary24h", fmtOptionalPct(recentAverage(ftsoPrimaryHours, 24)));
+    setText("ftsoSecondary24h", fmtOptionalPct(recentAverage(ftsoSecondaryHours, 24)));
+    setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
     setText("fdcAvailability", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcParticipation", latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "-");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
@@ -1241,8 +1257,8 @@
     setText("validatorRewardAverageFull", validatorSummary.average);
     setText("validatorRewardRangeFull", validatorSummary.range);
     renderLineChart("ftsoRewards", ftsoRewards, { empty: "No reward data", zeroBase: true, yBottom: "0", tooltip: "reward", metricLabel: "FTSO reward" });
-    renderLineChart("ftsoAvailability", hourlySeries(provider?.ftsoPerformance?.availability1h), { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FTSO availability", empty: "No FTSO availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
-    renderLineChart("fdcAvailability", hourlySeries(provider?.fdcPerformance?.availability1h), { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FDC availability", empty: "No FDC availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
+    renderLineChart("ftsoAvailability", ftsoAvailabilityHours, { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FTSO availability", empty: "No FTSO availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
+    renderLineChart("fdcAvailability", fdcAvailabilityHours, { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FDC availability", empty: "No FDC availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
     renderPerformanceChart(provider);
     renderConditionHeatmap(provider);
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });

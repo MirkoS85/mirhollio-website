@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-13">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-14">
 </head>
 <body>
   <main class="ops-shell">
@@ -131,16 +131,38 @@
             <strong data-field="ftsoPerformance">-</strong>
           </article>
           <article>
-            <span>Primary</span>
+            <span>Primary now</span>
             <strong data-field="ftsoPrimary">-</strong>
           </article>
           <article>
-            <span>Secondary</span>
+            <span>Secondary now</span>
             <strong data-field="ftsoSecondary">-</strong>
           </article>
           <article>
-            <span>FTSO availability</span>
+            <span>Avail now</span>
             <strong data-field="ftsoAvailability">-</strong>
+          </article>
+          <article>
+            <span>Avail 6h</span>
+            <strong data-field="ftsoAvailability6h">-</strong>
+          </article>
+          <article>
+            <span>Avail 24h</span>
+            <strong data-field="ftsoAvailability24h">-</strong>
+          </article>
+          <article>
+            <span>Success 6h</span>
+            <strong class="split-value"><b data-field="ftsoPrimary6h">-</b><em>/</em><b data-field="ftsoSecondary6h">-</b></strong>
+            <small>primary / secondary</small>
+          </article>
+          <article>
+            <span>Success 24h</span>
+            <strong class="split-value"><b data-field="ftsoPrimary24h">-</b><em>/</em><b data-field="ftsoSecondary24h">-</b></strong>
+            <small>primary / secondary</small>
+          </article>
+          <article>
+            <span>FDC 6h</span>
+            <strong data-field="fdcAvailability6h">-</strong>
           </article>
           <article>
             <span>FDC 24h</span>
@@ -157,6 +179,10 @@
           <article>
             <span>Pre-reg</span>
             <strong data-field="preRegistered">-</strong>
+          </article>
+          <article>
+            <span>Reward rate</span>
+            <strong data-field="rewardRate">-</strong>
           </article>
           <article>
             <span>Reward</span>
@@ -319,6 +345,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-13"></script>
+  <script src="../assets/ops.js?v=ops-14"></script>
 </body>
 </html>

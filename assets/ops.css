@@ -585,6 +585,24 @@ h2{
   white-space:nowrap;
 }
 
+.data-table strong.split-value{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  font-size:20px;
+}
+
+.data-table strong.split-value b,
+.data-table strong.split-value em{
+  color:inherit;
+  font:inherit;
+  font-style:normal;
+}
+
+.data-table strong.split-value em{
+  color:var(--muted);
+}
+
 .data-table small{
   color:var(--muted);
   font-size:10px;
@@ -1142,6 +1160,11 @@ h2{
 
   .data-table strong{
     font-size:20px;
+  }
+
+  .data-table strong.split-value{
+    gap:4px;
+    font-size:17px;
   }
 
   .chart-with-summary{
