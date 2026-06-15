@@ -21,7 +21,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-19">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-20">
 </head>
 <body>
   <main class="ops-shell">
@@ -201,35 +201,20 @@
           <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
         </article>
 
-        <article class="attestation-card">
+        <article class="my-fdc-card">
           <div class="chart-title">
-            <span>FDC Attestation Requests <em>(latest)</em></span>
-            <a href="https://flare-systems-explorer.flare.network/attestation-request" target="_blank" rel="noopener">FSE</a>
+            <span>My FDC Status <em>(provider)</em></span>
+            <b data-field="fdcConditionStatus">-</b>
           </div>
-          <div class="attestation-summary">
-            <span>Requests <strong data-field="fdcRequestCount24h">-</strong></span>
-            <span>Types <strong data-field="fdcRequestTypes">-</strong></span>
-            <span>Latest round <strong data-field="fdcLastRound">-</strong></span>
-            <span>Source <strong data-field="fdcRequestFreshness">-</strong></span>
+          <div class="my-fdc-grid">
+            <span>Availability now <strong data-field="fdcAvailabilityNow">-</strong></span>
+            <span>Availability 6h <strong data-field="fdcAvailability6h">-</strong></span>
+            <span>Availability 24h <strong data-field="fdcAvailability">-</strong></span>
+            <span>Epoch participation <strong data-field="fdcParticipation">-</strong></span>
+            <span>Rewarded rounds <strong data-field="fdcRounds">-</strong></span>
+            <span>Latest condition <strong data-field="fdcConditionStatus">-</strong></span>
           </div>
-          <div class="attestation-table-wrap">
-            <table class="attestation-table">
-              <thead>
-                <tr>
-                  <th scope="col">Time</th>
-                  <th scope="col">Round</th>
-                  <th scope="col">Attestation</th>
-                  <th scope="col">Source</th>
-                  <th scope="col">Fee</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Tx</th>
-                </tr>
-              </thead>
-              <tbody data-render="fdc-attestations">
-                <tr><td colspan="7">Loading latest public FDC requests...</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <p>Provider-specific public metrics for MirSFlr. Global FdcHub request traffic is only a reference feed below.</p>
         </article>
 
         <article class="chart-card">
@@ -366,6 +351,37 @@
 
     <section class="raw-card" id="raw">
       <h2>Raw JSON</h2>
+      <details class="raw-details fdc-reference-details">
+        <summary>Show global FDC request reference</summary>
+        <div class="attestation-reference-head">
+          <span>Not provider-specific</span>
+          <a href="https://flare-systems-explorer.flare.network/attestation-request" target="_blank" rel="noopener">Open FSE</a>
+        </div>
+        <div class="attestation-summary">
+          <span>Requests <strong data-field="fdcRequestCount24h">-</strong></span>
+          <span>Types <strong data-field="fdcRequestTypes">-</strong></span>
+          <span>Latest round <strong data-field="fdcLastRound">-</strong></span>
+          <span>Source <strong data-field="fdcRequestFreshness">-</strong></span>
+        </div>
+        <div class="attestation-table-wrap">
+          <table class="attestation-table">
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Round</th>
+                <th scope="col">Attestation</th>
+                <th scope="col">Source</th>
+                <th scope="col">Fee</th>
+                <th scope="col">Status</th>
+                <th scope="col">Tx</th>
+              </tr>
+            </thead>
+            <tbody data-render="fdc-attestations">
+              <tr><td colspan="7">Loading latest public FDC requests...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
       <details class="raw-details">
         <summary>Show live payload</summary>
         <pre data-render="rawDetails">Waiting for data.</pre>
@@ -374,6 +390,6 @@
   </main>
 
   <script src="../assets/fdc-attestations.js?v=fdc-2"></script>
-  <script src="../assets/ops.js?v=ops-19"></script>
+  <script src="../assets/ops.js?v=ops-20"></script>
 </body>
 </html>

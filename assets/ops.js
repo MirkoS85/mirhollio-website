@@ -1257,9 +1257,11 @@
     setText("ftso6hSource", ftsoSource6h);
     setText("ftso24hSource", ftsoSource24h);
     const fdcAvailability24h = recentAverage(fdcAvailabilityHours, 24);
+    setText("fdcAvailabilityNow", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
     setText("fdcAvailability", fdcAvailability24h != null ? fmtPct(fdcAvailability24h) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcParticipation", latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "-");
+    setText("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "OK" : latest?.fdc?.conditionMet === false ? "Failed" : "-");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
     setText("conditionsLabel", `${conditionOk}/4 latest checks`);
     setText("preRegistered", provider?.isPreRegistered === true ? "Yes" : provider?.isPreRegistered === false ? "No" : "-");
