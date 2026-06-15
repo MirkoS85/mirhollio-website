@@ -1006,6 +1006,78 @@
     if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
   }
 
+  function fmtDateTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "-";
+    return date.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function shortHash(value) {
+    const text = String(value || "");
+    return text.length > 14 ? `${text.slice(0, 7)}...${text.slice(-5)}` : text || "-";
+  }
+
+  function renderFdcAttestations(summary) {
+    setText("fdcRequestCount24h", summary?.totalRequests ?? summary?.total24h ?? "-");
+    setText("fdcRequestTypes", Array.isArray(summary?.uniqueTypes) ? summary.uniqueTypes.length : "-");
+    setText("fdcLastRound", summary?.lastRoundId != null ? summary.lastRoundId : "-");
+    setText("fdcRequestFreshness", summary?.rangeLabel || (summary?.fetchedAt ? `${fmtAge(new Date(summary.fetchedAt))} ago${summary.cached ? " cached" : ""}` : "-"));
+
+    const mount = $('[data-render="fdc-attestations"]');
+    if (!mount) return;
+    const rows = Array.isArray(summary?.requests) ? summary.requests : [];
+    if (!rows.length) {
+      mount.innerHTML = `<tr><td colspan="7">No public FDC requests loaded.</td></tr>`;
+      return;
+    }
+    mount.innerHTML = rows.map(item => {
+      const status = String(item.status || "Submitted");
+      const statusKey = status.toLowerCase();
+      const txUrl = item.txHash ? `https://flare-systems-explorer.flare.network/top-level-protocol/${encodeURIComponent(item.txHash)}` : "";
+      const detailUrl = item.detailUrl || txUrl;
+      return `
+        <tr>
+          <td>${escapeHtml(fmtDateTime(item.timestamp))}</td>
+          <td>${escapeHtml(item.votingRoundId ?? "-")}</td>
+          <td>${escapeHtml(item.attestationType || "-")}</td>
+          <td>${escapeHtml(item.sourceId || "-")}</td>
+          <td>${escapeHtml(item.fee || "-")} FLR</td>
+          <td><span class="attestation-status" data-status="${escapeHtml(statusKey)}">${escapeHtml(status)}</span></td>
+          <td>${detailUrl ? `<a href="${detailUrl}" target="_blank" rel="noopener">${escapeHtml(item.txHash ? shortHash(item.txHash) : "detail")}</a>` : "-"}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderFdcAttestationError() {
+    setText("fdcRequestCount24h", "-");
+    setText("fdcRequestTypes", "-");
+    setText("fdcLastRound", "-");
+    setText("fdcRequestFreshness", "unavailable");
+    const mount = $('[data-render="fdc-attestations"]');
+    if (mount) mount.innerHTML = `<tr><td colspan="7">Public Flare RPC is unavailable or rate-limited.</td></tr>`;
+  }
+
+  async function loadFdcAttestations() {
+    if (!window.MirFdcAttestations?.fetchFdcAttestations) {
+      renderFdcAttestationError();
+      return null;
+    }
+    try {
+      const summary = await window.MirFdcAttestations.fetchFdcAttestations();
+      renderFdcAttestations(summary);
+      return summary;
+    } catch (_) {
+      renderFdcAttestationError();
+      return null;
+    }
+  }
+
   function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
@@ -1346,6 +1418,7 @@
     state.lastLoadedAt = new Date();
     state.data = { provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload };
     applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
+    loadFdcAttestations();
     setText("refreshLabel", "Refresh");
     document.body.classList.remove("is-refreshing");
   }

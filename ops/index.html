@@ -13,13 +13,15 @@
   <link rel="dns-prefetch" href="//api.oracle-daemon.com">
   <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <link rel="preconnect" href="https://flare-api.flare.network">
+  <link rel="dns-prefetch" href="//flare-api.flare.network">
   <link rel="preconnect" href="https://node.mirhollio.com">
   <link rel="dns-prefetch" href="//node.mirhollio.com">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-16">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-18">
 </head>
 <body>
   <main class="ops-shell">
@@ -29,14 +31,6 @@
         <strong>MirSFlr <em>OPS</em></strong>
       </a>
       <a class="ops-back" href="../">Dashboard</a>
-
-      <nav class="ops-tabs" aria-label="OPS sections">
-        <a href="#overview" class="is-active">Overview</a>
-        <a href="#ftso">FTSO</a>
-        <a href="#validator">Validator</a>
-        <a href="#alerts">Alerts</a>
-        <a href="#history">History</a>
-      </nav>
 
       <div class="desktop-health" data-overall-state="loading">
         <span class="health-pill"><i></i><b data-field="overallTitle">Checking</b></span>
@@ -207,6 +201,37 @@
           <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
         </article>
 
+        <article class="attestation-card">
+          <div class="chart-title">
+            <span>FDC Attestation Requests <em>(latest)</em></span>
+            <a href="https://flare-systems-explorer.flare.network/attestation-request" target="_blank" rel="noopener">FSE</a>
+          </div>
+          <div class="attestation-summary">
+            <span>Requests <strong data-field="fdcRequestCount24h">-</strong></span>
+            <span>Types <strong data-field="fdcRequestTypes">-</strong></span>
+            <span>Latest round <strong data-field="fdcLastRound">-</strong></span>
+            <span>Source <strong data-field="fdcRequestFreshness">-</strong></span>
+          </div>
+          <div class="attestation-table-wrap">
+            <table class="attestation-table">
+              <thead>
+                <tr>
+                  <th scope="col">Time</th>
+                  <th scope="col">Round</th>
+                  <th scope="col">Attestation</th>
+                  <th scope="col">Source</th>
+                  <th scope="col">Fee</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Tx</th>
+                </tr>
+              </thead>
+              <tbody data-render="fdc-attestations">
+                <tr><td colspan="7">Loading latest public FDC requests...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
         <article class="chart-card">
           <div class="chart-title"><span>FTSO Availability <em>(24h)</em></span><b data-field="ftsoAvailability">-</b></div>
           <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
@@ -348,6 +373,7 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-16"></script>
+  <script src="../assets/fdc-attestations.js?v=fdc-2"></script>
+  <script src="../assets/ops.js?v=ops-18"></script>
 </body>
 </html>
