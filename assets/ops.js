@@ -1220,8 +1220,8 @@
     const fseSecondary6h = explorerFtsoMetric(explorerFtso, "last_6h", "secondary");
     const fsePrimary24h = explorerFtsoMetric(explorerFtso, "last_24h", "primary");
     const fseSecondary24h = explorerFtsoMetric(explorerFtso, "last_24h", "secondary");
-    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null || fseSecondary6h != null ? "FSE window" : "Oracle fallback";
-    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null || fseSecondary24h != null ? "FSE window" : "Oracle fallback";
+    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null || fseSecondary6h != null ? "FSE" : "Oracle";
+    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null || fseSecondary24h != null ? "FSE" : "Oracle";
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);

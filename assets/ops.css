@@ -1264,6 +1264,42 @@ h2{
     font-size:17px;
   }
 
+  .ftso-table{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .ftso-table article,
+  .ftso-table article:nth-child(-n+3),
+  .ftso-table article:nth-child(3n+1){
+    border-left:1px solid var(--line);
+    border-top:1px solid var(--line);
+  }
+
+  .ftso-table article:nth-child(-n+2){
+    border-top:0;
+  }
+
+  .ftso-table article:nth-child(2n+1){
+    border-left:0;
+  }
+
+  .ftso-table article:nth-child(7),
+  .ftso-table article:nth-child(8){
+    grid-column:1 / -1;
+  }
+
+  .ftso-table article:nth-child(7) strong.split-value,
+  .ftso-table article:nth-child(8) strong.split-value{
+    font-size:clamp(22px, 7vw, 28px);
+  }
+
+  .ftso-table article:nth-child(7) small,
+  .ftso-table article:nth-child(8) small{
+    margin-top:4px;
+    font-size:9px;
+    line-height:1.25;
+  }
+
   .chart-with-summary{
     grid-template-columns:minmax(0,1fr) 136px;
   }
