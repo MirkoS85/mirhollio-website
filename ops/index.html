@@ -21,7 +21,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-20">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-21">
 </head>
 <body>
   <main class="ops-shell">
@@ -36,7 +36,7 @@
         <span class="health-pill"><i></i><b data-field="overallTitle">Checking</b></span>
         <span>fresh <b data-field="freshness">-</b></span>
         <span>auto 60s</span>
-        <button type="button" data-action="refresh" aria-label="Refresh operations data">↻</button>
+        <button type="button" data-action="refresh" aria-label="Refresh operations data">â»</button>
       </div>
     </header>
 
@@ -45,7 +45,7 @@
         <strong><span data-field="overallTitle">Checking</span><i></i></strong>
         <span>fresh <b data-field="freshness">-</b></span>
         <span>auto 60s</span>
-        <button type="button" data-action="refresh" aria-label="Refresh operations data">↻</button>
+        <button type="button" data-action="refresh" aria-label="Refresh operations data">â»</button>
       </div>
       <div class="mobile-mini-grid">
         <span>FTSO <b data-field="ftsoStatus">...</b><i data-dot="ftsoStatus"></i></span>
@@ -150,12 +150,12 @@
           <article>
             <span>Success 6h</span>
             <strong class="split-value"><b data-field="ftsoPrimary6h">-</b><em>/</em><b data-field="ftsoSecondary6h">-</b></strong>
-            <small><span data-field="ftso6hSource">FSE</span> · primary / secondary</small>
+            <small><span data-field="ftso6hSource">FSE</span> Â· primary / secondary</small>
           </article>
           <article>
             <span>Success 24h</span>
             <strong class="split-value"><b data-field="ftsoPrimary24h">-</b><em>/</em><b data-field="ftsoSecondary24h">-</b></strong>
-            <small><span data-field="ftso24hSource">FSE</span> · primary / secondary</small>
+            <small><span data-field="ftso24hSource">FSE</span> Â· primary / secondary</small>
           </article>
           <article>
             <span>FDC 6h</span>
@@ -306,14 +306,12 @@
         <article class="node-card">
           <div class="chart-title"><span>Node Health <em>(direct)</em></span></div>
           <div class="node-health-grid">
-            <div><span>Disk</span><strong data-field="nodeDisk">-</strong></div>
-            <div><span>Peers</span><strong data-field="nodePeers">-</strong></div>
-            <div><span>Connection</span><strong data-field="nodeNetwork">-</strong></div>
-            <div><span>Processing</span><strong data-field="nodeProcessing">-</strong></div>
-            <div><span>BLS</span><strong data-field="nodeBls">-</strong></div>
-            <div><span>Last seen</span><strong data-field="validatorLastSeenShort">-</strong></div>
-          </div>
-        </article>
+<div><span>Peers</span><strong data-field="nodePeers">-</strong></div>
+<div><span>Connection</span><strong data-field="nodeNetwork">-</strong></div>
+<div><span>Disk</span><strong data-field="nodeDisk">-</strong></div>
+<div><span>Last seen</span><strong data-field="validatorLastSeenShort">-</strong></div>
+</div>
+</article>
 
         <article class="expiry-card">
           <div class="chart-title"><span>Stake / Delegation Expiry</span><b data-field="stakeEnds">-</b></div>
@@ -337,16 +335,6 @@
           </div>
         </article>
       </section>
-    </section>
-
-    <section class="gaps-card">
-      <h2>Public-source limits</h2>
-      <div class="gap-grid">
-        <span>Submit / reveal liveness <b data-field="daemonSignalStatus">public only</b><em data-field="daemonSignalMeta">not exposed by public APIs</em></span>
-        <span>FDC signature age <b data-field="fdcSignalStatus">public only</b><em data-field="fdcSignalMeta">not exposed by public APIs</em></span>
-        <span>Host telemetry <b data-field="hostSignalStatus">not exposed</b><em data-field="hostSignalMeta">no node-side agent by design</em></span>
-        <span>Feed-level misses <b data-field="feedSignalStatus">aggregated</b><em data-field="feedSignalMeta">public APIs expose summary data</em></span>
-      </div>
     </section>
 
     <section class="raw-card" id="raw">
@@ -390,6 +378,6 @@
   </main>
 
   <script src="../assets/fdc-attestations.js?v=fdc-2"></script>
-  <script src="../assets/ops.js?v=ops-20"></script>
+  <script src="../assets/ops.js?v=ops-21"></script>
 </body>
 </html>
