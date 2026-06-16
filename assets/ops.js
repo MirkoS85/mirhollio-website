@@ -374,7 +374,7 @@
     return {
       level,
       title: signalTitle(level),
-      meta: parts.length ? parts.join(" Â· ") : "telemetry wired"
+      meta: parts.length ? parts.join(" · ") : "telemetry wired"
     };
   }
 
@@ -394,7 +394,7 @@
     return {
       level,
       title: signalTitle(level),
-      meta: parts.length ? parts.join(" Â· ") : "feed checks wired"
+      meta: parts.length ? parts.join(" · ") : "feed checks wired"
     };
   }
 
@@ -751,7 +751,7 @@
     }
     if (options.tooltip === "availability") {
       const zone = availabilityZone(point.item.value);
-      return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} Â· ${escapeHtml(zone.label)}</em>`;
+      return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} · ${escapeHtml(zone.label)}</em>`;
     }
     return `<span>${escapeHtml(label)}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong>`;
   }
@@ -1006,8 +1006,8 @@
     if (!items.length) { mount.innerHTML = `<span><em>No expiry data</em><b>-</b></span>`; return; }
     mount.innerHTML = items.map(item => `
       <span>
-        <em>${escapeHtml(item.label)} Â· ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
-        <b>${escapeHtml(fmtUntil(item.end))} Â· ${escapeHtml(fmtShortDate(item.end))}</b>
+        <em>${escapeHtml(item.label)} · ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
+        <b>${escapeHtml(fmtUntil(item.end))} · ${escapeHtml(fmtShortDate(item.end))}</b>
       </span>
     `).join("");
   }
@@ -1374,7 +1374,7 @@
     const allBalances = [submitBal, sigBal, policyBal, ...fastBalances].filter(b => Number.isFinite(b) && b > 0);
     const minBalance = allBalances.length ? Math.min(...allBalances) : null;
     const balanceTone = minBalance == null ? "watch" : minBalance < BALANCE_DOWN_FLR ? "down" : minBalance < BALANCE_WARN_FLR ? "watch" : "ok";
-    const balanceSourceLabel = state.sources.rpc === "ok" ? ` Â· via ${state.walletBalances.source || "RPC"}` : "";
+    const balanceSourceLabel = state.sources.rpc === "ok" ? ` · via ${state.walletBalances.source || "RPC"}` : "";
     setText("balanceStatus", minBalance == null ? "-" : balanceTone === "ok" ? `OK${balanceSourceLabel}` : `LOW${balanceSourceLabel}`);
     setText("submitBalance", Number.isFinite(submitBal) ? fmtCompact(submitBal, " FLR") : "-");
     setText("signatureBalance", Number.isFinite(sigBal) ? fmtCompact(sigBal, " FLR") : "-");
