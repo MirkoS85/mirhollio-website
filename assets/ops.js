@@ -957,25 +957,28 @@
     const mount = $('[data-render="conditionHeatmap"]');
     if (!mount) return;
     const rows = [
-      ["FTSO", item => item.ftsoScaling?.conditionMet],
-      ["Fast", item => item.fastUpdates?.conditionMet],
-      ["FDC", item => item.fdc?.conditionMet],
-      ["Stake", item => item.staking?.conditionMet]
+      ["FTSO", function(item) { return item.ftsoScaling && item.ftsoScaling.conditionMet; }],
+      ["Fast", function(item) { return item.fastUpdates && item.fastUpdates.conditionMet; }],
+      ["FDC",  function(item) { return item.fdc && item.fdc.conditionMet; }],
+      ["Stake",function(item) { return item.staking && item.staking.conditionMet; }]
     ];
-    const history = (Array.isArray(provider?.epochData) ? provider.epochData : [])
-      .slice().sort((a, b) => Number(a.epoch || 0) - Number(b.epoch || 0)).slice(-8);
-    if (!history.length) { mount.innerHTML = `<span class="label">No data</span>`; return; }
+    const history = (Array.isArray(provider && provider.epochData) ? provider.epochData : [])
+      .slice().sort(function(a,b){ return Number(a.epoch||0)-Number(b.epoch||0); }).slice(-8);
+    if (!history.length) { mount.innerHTML = '<span class="label">No data</span>'; return; }
     mount.style.setProperty("--condition-cols", String(history.length));
-    const header = `<span class="condition-corner">Epoch</span>${history.map(item => `<span class="condition-epoch">E${item.epoch ?? "-"}</span>`).join("")}`;
-    const body = rows.map(([label, getter]) => {
-      const cells = history.map(item => {
-        const value = getter(item);
-        const cls = value === true ? "ok" : value === false ? "down" : "unknown";
-        const symbol = value === true ? "â" : value === false ? "Ã" : "?";
-        return `<span class="condition-cell ${cls}" title="${label} epoch ${item.epoch || "-"}">${symbol}</span>`;
-      }).join("");
-      return `<span class="label">${label}</span>${cells}`;
-    }).join("");
+    const header = '<span class="condition-corner">Epoch</span>' +
+      history.map(function(item){ return '<span class="condition-epoch">E'+(item.epoch||'-')+'</span>'; }).join('');
+    const body = rows.map(function(row) {
+      const label = row[0];
+      const getter = row[1];
+      const cells = history.map(function(item) {
+        const val = getter(item);
+        const cls = val === true ? 'ok' : val === false ? 'down' : 'unknown';
+        const sym = val === true ? 'OK' : val === false ? 'X' : '?';
+        return '<span class="condition-cell ' + cls + '" title="' + label + ' epoch ' + (item.epoch||'-') + '">' + sym + '</span>';
+      }).join('');
+      return '<span class="label">' + label + '</span>' + cells;
+    }).join('');
     mount.innerHTML = header + body;
   }
 
