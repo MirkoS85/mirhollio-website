@@ -1,25 +1,53 @@
 (function () {
   "use strict";
 
+  // ── ENDPOINTS ──────────────────────────────────────────────────────────────
+  // Primary sources: Oracle Daemon + Flare Systems Explorer (existing)
+  // Added: Official Flare RPC, Ankr RPC backup, Flare Metrics API,
+  //        Official Validator Tracker, Blockscout
   const ENDPOINTS = {
+    // Oracle Daemon (primary — existing)
     providersV2: "https://api.oracle-daemon.com/v2/flare/providers",
     providersV1: "https://api.oracle-daemon.com/v1/flare/providers",
     validators: "https://api.oracle-daemon.com/v1/flare/validators",
+    // Flare Systems Explorer (existing)
     explorerEntity: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
     explorerFtso: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3/ftso",
+    // Self (existing)
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
-    daemonStatus: "https://node.mirhollio.com/ops/status.json"
+    daemonStatus: "https://node.mirhollio.com/ops/status.json",
+    // ── NEW: Official Flare RPC endpoints (wallet balances + epoch) ──
+    flareRpcPrimary: "https://flare-api.flare.network/ext/C/rpc",
+    flareRpcBackup: "https://rpc.ankr.com/flare",
+    // ── NEW: Flare Metrics API (validator backup) ──
+    flareMetricsProvider: "https://flaremetrics.io/api/v1/ftso/providers?network=flare",
+    flareMetricsValidator: "https://flaremetrics.io/api/v1/validators?network=flare",
+    // ── NEW: Official Flare Validator Tracker ──
+    flareValidatorTracker: "https://flare-validators.flare.network/api/validators",
+    // ── NEW: Blockscout for on-chain tx verification ──
+    blockscoutAddress: "https://flare-explorer.flare.network/api/v2/addresses/"
   };
 
+  // ── TARGET ─────────────────────────────────────────────────────────────────
   const TARGET = {
     name: "mirsflr",
     voter: "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
     delegation: "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
-    nodeId: "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
+    nodeId: "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz",
+    // Operational wallet addresses for balance checks
+    submitAddress: null,       // populated from provider data on first load
+    signatureAddress: null,
+    policyAddress: null
   };
 
-  const SOURCE_TIMEOUT = 14_000;
+  // ── WALLET BALANCE THRESHOLDS (FLR) ───────────────────────────────────────
+  const BALANCE_WARN_FLR = 500;
+  const BALANCE_DOWN_FLR = 100;
+
+  const SOURCE_TIMEOUT = 16_000;
+  const RPC_TIMEOUT = 8_000;
   const AUTO_REFRESH_MS = 60_000;
+
   const state = {
     lastLoadedAt: null,
     refreshTimer: null,
@@ -29,7 +57,9 @@
       explorer: "loading",
       explorerFtso: "loading",
       node: "loading",
-      daemon: "loading"
+      daemon: "loading",
+      rpc: "loading",
+      flareMetrics: "loading"
     },
     sourceLoadedAt: {
       provider: null,
@@ -37,8 +67,18 @@
       explorer: null,
       explorerFtso: null,
       node: null,
-      daemon: null
+      daemon: null,
+      rpc: null,
+      flareMetrics: null
     },
+    walletBalances: {
+      submit: null,
+      signature: null,
+      policy: null,
+      source: null
+    },
+    epochFallback: null,
+    validatorFallback: null,
     data: {}
   };
 
@@ -371,7 +411,6 @@
         fdcMeta: "signature age is not public"
       };
     }
-
     const submit = daemonTimestamp(payload, "lastSubmitAt", "last_submit_at", "submitAt", "submit_at");
     const reveal = daemonTimestamp(payload, "lastRevealAt", "last_reveal_at", "revealAt", "reveal_at");
     const signature = daemonTimestamp(payload, "lastSignatureAt", "last_signature_at", "signatureAt", "signature_at");
@@ -388,7 +427,6 @@
     const fdcLevel = fdcAge == null ? "warn" : fdcAge > 60 * 60_000 ? "down" : fdcAge > 15 * 60_000 ? "warn" : "ok";
     if (fdcLevel === "down") level = "down";
     else if (fdcLevel === "warn" && level === "ok") level = "warn";
-
     return {
       wired: true,
       level,
@@ -397,11 +435,7 @@
       fdcLevel,
       fdcTitle: fdcLevel === "ok" ? "OK" : fdcLevel === "warn" ? "Watch" : "Down",
       fdcMeta: fdcAge == null ? "missing FDC signature" : `${fmtAge(fdc)} old`,
-      healthy,
-      submit,
-      reveal,
-      signature,
-      fdc
+      healthy, submit, reveal, signature, fdc
     };
   }
 
@@ -481,6 +515,150 @@
         return response.json();
       })
       .finally(() => clearTimeout(timer));
+  }
+
+  // ── NEW: JSON-RPC call helper ──────────────────────────────────────────────
+  function rpcCall(url, method, params, timeout = RPC_TIMEOUT) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      cache: "no-store",
+      body: JSON.stringify({ jsonrpc: "2.0", method, params, id: 1 })
+    })
+      .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
+      .then(data => { if (data.error) throw new Error(data.error.message); return data.result; })
+      .finally(() => clearTimeout(timer));
+  }
+
+  // ── NEW: Fetch one wallet balance via RPC with primary→backup fallback ─────
+  async function fetchBalanceFLR(address) {
+    if (!address) return null;
+    const hexAddress = address.startsWith("0x") ? address : `0x${address}`;
+    let result = null;
+    try {
+      result = await rpcCall(ENDPOINTS.flareRpcPrimary, "eth_getBalance", [hexAddress, "latest"]);
+      state.sources.rpc = "ok";
+      state.walletBalances.source = "flare-api.flare.network";
+    } catch (_) {
+      try {
+        result = await rpcCall(ENDPOINTS.flareRpcBackup, "eth_getBalance", [hexAddress, "latest"]);
+        state.sources.rpc = "ok";
+        state.walletBalances.source = "ankr";
+      } catch (__) {
+        state.sources.rpc = "down";
+        return null;
+      }
+    }
+    if (!result) return null;
+    // Convert hex wei → FLR (18 decimals)
+    const wei = BigInt(result);
+    return Number(wei) / 1e18;
+  }
+
+  // ── NEW: Fetch all operational wallet balances in parallel ─────────────────
+  async function fetchWalletBalances(provider) {
+    // Extract addresses from provider data on first load
+    const submitAddr = provider?.submitAddress || TARGET.submitAddress;
+    const sigAddr = provider?.submitSignatureAddress || TARGET.signatureAddress;
+    const policyAddr = provider?.signingPolicyAddress || TARGET.policyAddress;
+
+    if (!submitAddr && !sigAddr && !policyAddr) {
+      state.sources.rpc = "warn";
+      return;
+    }
+
+    // Cache addresses for next refresh
+    if (submitAddr) TARGET.submitAddress = submitAddr;
+    if (sigAddr) TARGET.signatureAddress = sigAddr;
+    if (policyAddr) TARGET.policyAddress = policyAddr;
+
+    const [submit, signature, policy] = await Promise.all([
+      fetchBalanceFLR(submitAddr),
+      fetchBalanceFLR(sigAddr),
+      fetchBalanceFLR(policyAddr)
+    ]);
+
+    state.walletBalances = { submit, signature, policy, source: state.walletBalances.source };
+    state.sourceLoadedAt.rpc = new Date();
+  }
+
+  // ── NEW: Fetch epoch data from Flare Metrics as fallback ───────────────────
+  async function fetchEpochFallback() {
+    try {
+      // Flare Metrics returns current epoch info
+      const data = await fetchJson("https://flaremetrics.io/api/v1/network?network=flare", 8_000);
+      if (data?.current_reward_epoch != null) {
+        state.epochFallback = {
+          currentEpoch: data.current_reward_epoch,
+          epochEndTime: data.reward_epoch_end_time || null,
+          source: "Flare Metrics"
+        };
+        state.sources.flareMetrics = "ok";
+        state.sourceLoadedAt.flareMetrics = new Date();
+      }
+    } catch (_) {
+      // Fallback: try computing from RPC block number
+      try {
+        const blockHex = await rpcCall(ENDPOINTS.flareRpcPrimary, "eth_blockNumber", []);
+        const block = parseInt(blockHex, 16);
+        // Flare epoch ~3.5 days = ~302,400 blocks at 1s/block
+        // Epoch 0 started at block 0, rough estimate
+        const estimatedEpoch = Math.floor(block / 302400);
+        state.epochFallback = { currentEpoch: estimatedEpoch, epochEndTime: null, source: "RPC estimate" };
+        state.sources.rpc = state.sources.rpc === "down" ? "warn" : state.sources.rpc;
+      } catch (__) {
+        state.sources.flareMetrics = "down";
+      }
+    }
+  }
+
+  // ── NEW: Fetch validator data from Flare Metrics / official tracker ─────────
+  async function fetchValidatorFallback() {
+    // Try Flare Metrics first
+    try {
+      const data = await fetchJson(ENDPOINTS.flareMetricsValidator, 10_000);
+      const validators = Array.isArray(data) ? data : data?.validators || [];
+      const match = validators.find(v => {
+        const nodeId = String(v.nodeId || v.node_id || "");
+        return nodeId === TARGET.nodeId;
+      });
+      if (match) {
+        state.validatorFallback = {
+          uptime: match.uptime_percentage ?? match.uptime ?? null,
+          stake: match.stake_amount ?? match.total_stake ?? null,
+          delegated: match.delegated_amount ?? null,
+          freeSpace: match.free_space ?? match.available_delegation ?? null,
+          endTime: match.end_time ?? match.stake_end ?? null,
+          source: "Flare Metrics"
+        };
+        state.sources.flareMetrics = "ok";
+        state.sourceLoadedAt.flareMetrics = new Date();
+        return;
+      }
+    } catch (_) {}
+
+    // Try official Flare validator tracker
+    try {
+      const data = await fetchJson(ENDPOINTS.flareValidatorTracker, 10_000);
+      const validators = Array.isArray(data) ? data : data?.validators || [];
+      const match = validators.find(v => {
+        const nodeId = String(v.nodeId || v.node_id || "");
+        return nodeId === TARGET.nodeId;
+      });
+      if (match) {
+        state.validatorFallback = {
+          uptime: match.uptime ?? match.uptimePercentage ?? null,
+          stake: match.stakeAmount ?? match.stake ?? null,
+          delegated: match.delegatedStake ?? null,
+          freeSpace: null,
+          endTime: match.endTime ?? match.stakeEndTime ?? null,
+          source: "Flare Validator Tracker"
+        };
+      }
+    } catch (__) {}
   }
 
   function seriesFrom(values) {
@@ -595,7 +773,6 @@
     const tooltip = ensureChartTooltip(svg);
     const card = svg.closest(".chart-card");
     if (!tooltip || !card) return;
-
     function show(index) {
       const point = points[index];
       if (!point) return;
@@ -605,25 +782,17 @@
       const y = svgRect.top - cardRect.top + (point.y / height) * svgRect.height;
       const minX = Math.min(92, Math.max(24, cardRect.width / 2));
       const maxX = Math.max(minX, cardRect.width - minX);
-
       tooltip.innerHTML = chartTooltipHtml(point, index, points.length, options);
       tooltip.dataset.zone = options.tooltip === "availability" ? availabilityZone(point.item.value).level : "reward";
       tooltip.style.left = `${Math.max(minX, Math.min(maxX, x))}px`;
       tooltip.style.top = `${Math.max(44, y - 10)}px`;
       tooltip.classList.add("is-visible");
     }
-
-    function hide() {
-      tooltip.classList.remove("is-visible");
-    }
-
+    function hide() { tooltip.classList.remove("is-visible"); }
     $$(".chart-hit", svg).forEach((hit, index) => {
       hit.addEventListener("pointerenter", () => show(index));
       hit.addEventListener("pointermove", () => show(index));
-      hit.addEventListener("pointerdown", event => {
-        event.preventDefault();
-        show(index);
-      });
+      hit.addEventListener("pointerdown", event => { event.preventDefault(); show(index); });
       hit.addEventListener("focus", () => show(index));
       hit.addEventListener("pointerleave", hide);
       hit.addEventListener("blur", hide);
@@ -634,7 +803,6 @@
     const tooltip = ensureChartTooltip(svg);
     const card = svg.closest(".chart-card");
     if (!tooltip || !card) return;
-
     function show(index) {
       const point = points[index];
       if (!point) return;
@@ -645,7 +813,6 @@
       const minX = Math.min(104, Math.max(24, cardRect.width / 2));
       const maxX = Math.max(minX, cardRect.width - minX);
       const label = index === points.length - 1 ? "now" : `${Math.max(0, points.length - 1 - index)}h ago`;
-
       tooltip.innerHTML = `
         <span>FTSO performance</span>
         <strong>${escapeHtml(fmtPct(perf[index]))}</strong>
@@ -660,18 +827,11 @@
       tooltip.style.top = `${Math.max(44, y - 10)}px`;
       tooltip.classList.add("is-visible");
     }
-
-    function hide() {
-      tooltip.classList.remove("is-visible");
-    }
-
+    function hide() { tooltip.classList.remove("is-visible"); }
     $$(".chart-hit", svg).forEach((hit, index) => {
       hit.addEventListener("pointerenter", () => show(index));
       hit.addEventListener("pointermove", () => show(index));
-      hit.addEventListener("pointerdown", event => {
-        event.preventDefault();
-        show(index);
-      });
+      hit.addEventListener("pointerdown", event => { event.preventDefault(); show(index); });
       hit.addEventListener("focus", () => show(index));
       hit.addEventListener("pointerleave", hide);
       hit.addEventListener("blur", hide);
@@ -683,11 +843,7 @@
     if (!svg) return;
     const values = (Array.isArray(input) ? input : []).map(item => typeof item === "number" ? { value: item } : item)
       .filter(item => Number.isFinite(Number(item.value)));
-    if (values.length < 2) {
-      chartEmpty(svg, options.empty || "No data");
-      return;
-    }
-
+    if (values.length < 2) { chartEmpty(svg, options.empty || "No data"); return; }
     const width = 640;
     const height = options.height || Number(svg.getAttribute("viewBox")?.split(" ")[3]) || 180;
     const pad = { top: 18, right: 18, bottom: 26, left: 36 };
@@ -722,15 +878,9 @@
       return `<rect class="zone-band ${cls}" x="${pad.left}" y="${Math.min(y1, y2).toFixed(2)}" width="${chartW}" height="${Math.abs(y2 - y1).toFixed(2)}"></rect>`;
     };
     const zoneBands = options.zones === "availability"
-      ? [
-        zoneRect(maxValue, 98, "zone-ok"),
-        zoneRect(98, 95, "zone-watch"),
-        zoneRect(95, minValue, "zone-down")
-      ].join("")
-      : "";
+      ? [zoneRect(maxValue, 98, "zone-ok"), zoneRect(98, 95, "zone-watch"), zoneRect(95, minValue, "zone-down")].join("") : "";
     const hitWidth = Math.min(chartW, Math.max(24, chartW / Math.max(1, values.length - 1)));
     const hitX = point => Math.max(pad.left, Math.min(width - pad.right - hitWidth, point.x - hitWidth / 2));
-
     svg.innerHTML = `
       <defs>
         <linearGradient id="${selector}-area" x1="0" y1="0" x2="0" y2="1">
@@ -767,10 +917,7 @@
     const primary = hourlySeries(provider?.ftsoPerformance?.performance1_1h);
     const secondary = hourlySeries(provider?.ftsoPerformance?.performance2_1h);
     const len = Math.max(perf.length, primary.length, secondary.length);
-    if (len < 2) {
-      chartEmpty(svg, "No performance data");
-      return;
-    }
+    if (len < 2) { chartEmpty(svg, "No performance data"); return; }
     const width = 640;
     const height = 170;
     const pad = { top: 22, right: 20, bottom: 28, left: 36 };
@@ -816,15 +963,8 @@
       ["Stake", item => item.staking?.conditionMet]
     ];
     const history = (Array.isArray(provider?.epochData) ? provider.epochData : [])
-      .slice()
-      .sort((a, b) => Number(a.epoch || 0) - Number(b.epoch || 0))
-      .slice(-8);
-
-    if (!history.length) {
-      mount.innerHTML = `<span class="label">No data</span>`;
-      return;
-    }
-
+      .slice().sort((a, b) => Number(a.epoch || 0) - Number(b.epoch || 0)).slice(-8);
+    if (!history.length) { mount.innerHTML = `<span class="label">No data</span>`; return; }
     mount.style.setProperty("--condition-cols", String(history.length));
     const header = `<span class="condition-corner">Epoch</span>${history.map(item => `<span class="condition-epoch">E${item.epoch ?? "-"}</span>`).join("")}`;
     const body = rows.map(([label, getter]) => {
@@ -843,10 +983,7 @@
     const mount = $('[data-render="uptimeStrip"]');
     if (!mount) return;
     const items = Array.isArray(values) && values.length ? values : [];
-    if (!items.length) {
-      mount.innerHTML = `<span class="source-pill">No uptime data</span>`;
-      return;
-    }
+    if (!items.length) { mount.innerHTML = `<span class="source-pill">No uptime data</span>`; return; }
     const recent = items.slice(-6);
     mount.innerHTML = recent.map(value => {
       const pct = pctNumber(value);
@@ -860,25 +997,13 @@
     if (!mount) return;
     const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
     const delegations = (Array.isArray(node?.m_axDelegation) ? node.m_axDelegation : [])
-      .map(item => ({
-        label: "Delegation",
-        amount: Number(item.m_dAmount),
-        end: item.m_xTimeEnd
-      }))
+      .map(item => ({ label: "Delegation", amount: Number(item.m_dAmount), end: item.m_xTimeEnd }))
       .filter(item => Number.isFinite(item.amount) && item.end);
     const items = [
       stake ? { label: "Self stake", amount: Number(stake.m_dAmount), end: stake.m_xTimeEnd } : null,
       ...delegations
-    ]
-      .filter(Boolean)
-      .sort((a, b) => new Date(a.end).getTime() - new Date(b.end).getTime())
-      .slice(0, 5);
-
-    if (!items.length) {
-      mount.innerHTML = `<span><em>No expiry data</em><b>-</b></span>`;
-      return;
-    }
-
+    ].filter(Boolean).sort((a, b) => new Date(a.end).getTime() - new Date(b.end).getTime()).slice(0, 5);
+    if (!items.length) { mount.innerHTML = `<span><em>No expiry data</em><b>-</b></span>`; return; }
     mount.innerHTML = items.map(item => `
       <span>
         <em>${escapeHtml(item.label)} · ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
@@ -910,14 +1035,29 @@
     const preRegistered = provider?.isPreRegistered === true;
     const daemonSummary = daemonSignalSummary(daemonPayload);
 
+    // ── NEW: Wallet balance alerts ────────────────────────────────────────────
+    const balances = [
+      state.walletBalances.submit,
+      state.walletBalances.signature,
+      state.walletBalances.policy
+    ].filter(b => b != null);
+
     const alerts = [];
     let ftso = "ok";
     let fdc = "ok";
     let val = "ok";
     let nodeLevel = "ok";
 
-    function add(level, title, text) {
-      alerts.push({ level, title, text });
+    function add(level, title, text) { alerts.push({ level, title, text }); }
+
+    // ── NEW: Alert on low balances (from RPC, independent of Oracle Daemon) ──
+    if (state.sources.rpc === "ok" && balances.length > 0) {
+      const minBal = Math.min(...balances);
+      if (minBal < BALANCE_DOWN_FLR) {
+        add("down", "Operational wallet critically low", `Minimum balance ${fmtNum(minBal, 1)} FLR — top up immediately.`);
+      } else if (minBal < BALANCE_WARN_FLR) {
+        add("warn", "Operational wallet low", `Minimum balance ${fmtNum(minBal, 1)} FLR — consider topping up.`);
+      }
     }
 
     if (!provider || !latest) {
@@ -943,8 +1083,16 @@
     }
 
     if (!validator || !node) {
-      val = "down";
-      add("down", "Validator data missing", "Oracle Daemon validator data did not load.");
+      // ── NEW: Use fallback validator data if Oracle Daemon missed ───────────
+      if (state.validatorFallback) {
+        const fbUptime = pctNumber(state.validatorFallback.uptime);
+        if (fbUptime != null && fbUptime < 95) { val = "down"; add("down", "Validator uptime critical", `${fmtPct(fbUptime)} (via ${state.validatorFallback.source}).`); }
+        else if (fbUptime != null && fbUptime < 99) { val = "warn"; add("warn", "Validator uptime watch", `${fmtPct(fbUptime)} (via ${state.validatorFallback.source}).`); }
+        else { add("warn", "Validator data partial", `Oracle Daemon down — using ${state.validatorFallback.source} fallback.`); }
+      } else {
+        val = "down";
+        add("down", "Validator data missing", "Oracle Daemon validator data did not load.");
+      }
     } else {
       if (!connected) { val = "down"; add("down", "Validator offline", "External validator status is not connected."); }
       if (uptime != null && uptime < 95) { val = "down"; add("down", "Validator uptime critical", `${fmtPct(uptime)} recent uptime.`); }
@@ -1009,12 +1157,7 @@
   function fmtDateTime(value) {
     const date = new Date(value);
     if (!Number.isFinite(date.getTime())) return "-";
-    return date.toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    return date.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   }
 
   function shortHash(value) {
@@ -1027,14 +1170,10 @@
     setText("fdcRequestTypes", Array.isArray(summary?.uniqueTypes) ? summary.uniqueTypes.length : "-");
     setText("fdcLastRound", summary?.lastRoundId != null ? summary.lastRoundId : "-");
     setText("fdcRequestFreshness", summary?.rangeLabel || (summary?.fetchedAt ? `${fmtAge(new Date(summary.fetchedAt))} ago${summary.cached ? " cached" : ""}` : "-"));
-
     const mount = $('[data-render="fdc-attestations"]');
     if (!mount) return;
     const rows = Array.isArray(summary?.requests) ? summary.requests : [];
-    if (!rows.length) {
-      mount.innerHTML = `<tr><td colspan="7">No public FDC requests loaded.</td></tr>`;
-      return;
-    }
+    if (!rows.length) { mount.innerHTML = `<tr><td colspan="7">No public FDC requests loaded.</td></tr>`; return; }
     mount.innerHTML = rows.map(item => {
       const status = String(item.status || "Submitted");
       const statusKey = status.toLowerCase();
@@ -1064,18 +1203,12 @@
   }
 
   async function loadFdcAttestations() {
-    if (!window.MirFdcAttestations?.fetchFdcAttestations) {
-      renderFdcAttestationError();
-      return null;
-    }
+    if (!window.MirFdcAttestations?.fetchFdcAttestations) { renderFdcAttestationError(); return null; }
     try {
       const summary = await window.MirFdcAttestations.fetchFdcAttestations();
       renderFdcAttestations(summary);
       return summary;
-    } catch (_) {
-      renderFdcAttestationError();
-      return null;
-    }
+    } catch (_) { renderFdcAttestationError(); return null; }
   }
 
   function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload) {
@@ -1085,33 +1218,28 @@
     const network = networkInfo(providerPayload);
     const payload = {
       network: {
-        currentRewardEpoch: network?.m_iCurrentRewardEpoch,
-        rewardEpochEnd: network?.m_xRewardEpochEndTime,
+        currentRewardEpoch: network?.m_iCurrentRewardEpoch ?? state.epochFallback?.currentEpoch,
+        rewardEpochEnd: network?.m_xRewardEpochEndTime ?? state.epochFallback?.epochEndTime,
+        epochSource: network ? "Oracle Daemon" : (state.epochFallback?.source || "unavailable"),
         oracleTimestamp: providerTimestamp(providerPayload),
-        rewardVotePowerBlock: network?.m_iRewardEpochVotePowerBlock,
-        previousVotePowerBlock: network?.m_iPrevRewardEpochVotePowerBlock
+        rewardVotePowerBlock: network?.m_iRewardEpochVotePowerBlock
       },
+      walletBalances: {
+        source: state.walletBalances.source || "not fetched",
+        rpcSource: state.sources.rpc,
+        submit: state.walletBalances.submit != null ? `${fmtNum(state.walletBalances.submit, 2)} FLR` : "unavailable",
+        signature: state.walletBalances.signature != null ? `${fmtNum(state.walletBalances.signature, 2)} FLR` : "unavailable",
+        policy: state.walletBalances.policy != null ? `${fmtNum(state.walletBalances.policy, 2)} FLR` : "unavailable"
+      },
+      validatorFallback: state.validatorFallback || null,
       provider: {
-        matchedBy: provider?.voterAddress === TARGET.voter ? "voterAddress" : provider?.delegationAddress === TARGET.delegation ? "delegationAddress" : "name",
+        matchedBy: provider?.voterAddress === TARGET.voter ? "voterAddress" : "name",
         topLevelName: provider?.dataProviderName,
-        latestEpochName: latest?.dataProviderName,
         voterAddress: provider?.voterAddress,
         delegationAddress: provider?.delegationAddress,
         submitAddress: provider?.submitAddress,
         submitAddressBalance: provider?.submitAddressBalance,
-        submitSignatureAddress: provider?.submitSignatureAddress,
-        submitSignatureAddressBalance: provider?.submitSignatureAddressBalance,
-        signingPolicyAddress: provider?.signingPolicyAddress,
-        signingPolicyAddressBalance: provider?.signingPolicyAddressBalance,
-        fastUpdatesAddresses: provider?.fastUpdatesAddresses,
         latestEpoch: latest?.epoch,
-        latestConditions: {
-          passes: latest?.passes,
-          ftsoHits: latest?.ftsoScaling,
-          fastUpdates: latest?.fastUpdates,
-          fdc: latest?.fdc,
-          staking: latest?.staking
-        },
         totalEpochs: provider?.totalEpochs,
         eligibleEpochs: provider?.eligibleEpochs
       },
@@ -1125,55 +1253,15 @@
       },
       nodeHealth: {
         healthy: nodeHealth?.healthy,
-        newestCheckTimestamp: nodeHealthTimestamp(nodeHealth)?.toISOString(),
-        oldestCheckTimestamp: nodeHealthTimestamp(nodeHealth, "oldest")?.toISOString(),
         peers: nodeHealth?.checks?.network?.message?.connectedPeers,
         percentConnected: nodeHealth?.checks?.P?.message?.networking?.percentConnected,
         lastMessageReceived: nodeHealth?.checks?.network?.message?.timeSinceLastMsgReceived,
-        sendFailRate: nodeHealth?.checks?.network?.message?.sendFailRate,
-        bls: nodeHealth?.checks?.bls?.message,
-        diskBytes: nodeHealth?.checks?.diskspace?.message?.availableDiskBytes,
-        processingBlocks: {
-          pChain: nodeHealth?.checks?.P?.message?.engine?.consensus?.processingBlocks,
-          cChain: nodeHealth?.checks?.C?.message?.engine?.consensus?.processingBlocks
-        }
+        diskBytes: nodeHealth?.checks?.diskspace?.message?.availableDiskBytes
       },
-      daemonFeed: daemonSignalSummary(daemonPayload),
-      hostTelemetry: hostSignalSummary(daemonPayload),
-      feedLevelMisses: feedSignalSummary(daemonPayload),
-      explorer: {
-        rewardEpoch: explorer?.denormalizedsigningpolicy?.reward_epoch,
-        normalizedWeight: explorer?.denormalizedsigningpolicy?.normalizedWeight ?? explorer?.denormalizedsigningpolicy?.normalized_weight,
-        delegationFeeBips: explorer?.denormalizedsigningpolicy?.delegationFeeBIPS ?? explorer?.denormalizedsigningpolicy?.delegation_fee_bips,
-        ftsoWindows: {
-          source: explorerFtso ? "Flare System Explorer /entity/{identity}/ftso" : "Oracle Daemon hourly fallback",
-          last6h: explorerFtso?.last_6h,
-          last24h: explorerFtso?.last_24h,
-          perRewardEpoch: explorerFtso?.per_reward_epoch
-        }
-      },
-      publicOnlyMode: {
-        enabled: !daemonPayload,
-        reason: "No extra daemon or host agent is installed on the node server.",
-        optionalStatusEndpoint: ENDPOINTS.daemonStatus,
-        safeAlternatives: [
-          "Flare System Explorer for FTSO 6h/24h windows when CORS/proxy permits it.",
-          "Oracle Daemon public API for provider, FDC, rewards, and validator aggregates.",
-          "Existing node health endpoint for non-invasive self-health checks."
-        ],
-        notReliablyPublic: [
-          "last submit timestamp",
-          "last reveal timestamp",
-          "last signature timestamp",
-          "host CPU/RAM/load"
-        ]
-      },
-      missingCriticalSignals: {
-        submitRevealSignatureLiveness: daemonPayload ? "wired through optional status endpoint" : "not exposed by current public browser APIs",
-        fdcSignatureTimestamps: daemonPayload ? "wired through optional status endpoint" : "not exposed by current public browser APIs",
-        cpuMemoryLoad: "not collected by design",
-        feedLevelMisses: "public APIs expose aggregate performance, not full local daemon internals"
-      }
+      sources: { ...state.sources },
+      sourceLoadedAt: Object.fromEntries(
+        Object.entries(state.sourceLoadedAt).map(([k, v]) => [k, v ? v.toISOString() : null])
+      )
     };
     mount.textContent = JSON.stringify(payload, null, 2);
   }
@@ -1189,20 +1277,25 @@
     const hostSummary = hostSignalSummary(daemonPayload);
     const feedSummary = feedSignalSummary(daemonPayload);
     const overall = worstLevel([levels.ftso, levels.fdc, levels.validator, levels.node]);
-    $$(".mobile-health, .desktop-health").forEach(el => {
-      el.dataset.overallState = overall;
-    });
+
+    $$(".mobile-health, .desktop-health").forEach(el => { el.dataset.overallState = overall; });
     setText("overallLabel", overall === "ok" ? "Primary checks nominal" : overall === "warn" ? "Watch required" : "Action required");
     setText("overallTitle", overall === "ok" ? "Primary OK" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
-    setText("currentRewardEpoch", network?.m_iCurrentRewardEpoch != null ? `E${network.m_iCurrentRewardEpoch}` : "-");
-    setText("latestCompletedEpoch", latest?.epoch != null ? `E${latest.epoch}` : "-");
-    setText("rewardEpochEnds", network?.m_xRewardEpochEndTime ? fmtUntil(network.m_xRewardEpochEndTime) : "-");
+
+    // ── Reward epoch: primary from Oracle Daemon, fallback from Flare Metrics/RPC
+    const currentEpoch = network?.m_iCurrentRewardEpoch ?? state.epochFallback?.currentEpoch;
+    const epochEnds = network?.m_xRewardEpochEndTime ?? state.epochFallback?.epochEndTime;
+    setText("currentRewardEpoch", currentEpoch != null ? `E${currentEpoch}` : "-");
+    setText("latestCompletedEpoch", latest?.epoch != null ? `E${latest.epoch}` : currentEpoch != null ? `E${currentEpoch - 1}` : "-");
+    setText("rewardEpochEnds", epochEnds ? fmtUntil(epochEnds) : "-");
+
     const oracleAge = oracleTime ? fmtAge(new Date(oracleTime)) : null;
     setText("oraclePayloadAge", oracleAge ? `${oracleAge} old` : "-");
     setText("nodeHealthAge", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : "-");
     setText("daemonLiveness", daemonSummary.title);
     setText("daemonLivenessMeta", daemonSummary.meta);
+
     const oracleDate = oracleTime ? new Date(oracleTime) : null;
     const oracleAgeMs = oracleDate && Number.isFinite(oracleDate.getTime()) ? Date.now() - oracleDate.getTime() : null;
     const nodeAgeMs = nodeHealthTime ? timestampAgeMs(nodeHealthTime) : null;
@@ -1220,25 +1313,20 @@
     const fseSecondary6h = explorerFtsoMetric(explorerFtso, "last_6h", "secondary");
     const fsePrimary24h = explorerFtsoMetric(explorerFtso, "last_24h", "primary");
     const fseSecondary24h = explorerFtsoMetric(explorerFtso, "last_24h", "secondary");
-    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null || fseSecondary6h != null ? "FSE" : "Oracle";
-    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null || fseSecondary24h != null ? "FSE" : "Oracle";
+    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null ? "FSE" : "Oracle";
+    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null ? "FSE" : "Oracle";
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
-    const fdcStatusValue = fdcRecent != null
-      ? fmtPct(fdcRecent)
-      : provider?.fdcPerformance?.availability != null
-        ? fmtPct(provider.fdcPerformance.availability)
-        : levels.fdc === "down" ? "DOWN" : "-";
+    const fdcStatusValue = fdcRecent != null ? fmtPct(fdcRecent) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : levels.fdc === "down" ? "DOWN" : "-";
     setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "3h avg");
-    setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : "offline");
+    setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : state.validatorFallback ? "fallback" : "offline");
     setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : nodeHealth?.healthy ? "healthy" : "unhealthy");
 
     const policy = explorer?.denormalizedsigningpolicy || {};
     const reward = Number(latest?.totalRewardAmount);
     const passes = Number(latest?.passes ?? latest?.newNumberOfPasses);
-    const conditionOk = [latest?.ftsoScaling?.conditionMet, latest?.fastUpdates?.conditionMet, latest?.fdc?.conditionMet, latest?.staking?.conditionMet]
-      .filter(value => value === true).length;
+    const conditionOk = [latest?.ftsoScaling?.conditionMet, latest?.fastUpdates?.conditionMet, latest?.fdc?.conditionMet, latest?.staking?.conditionMet].filter(value => value === true).length;
 
     setText("latestEpoch", latest?.epoch ? `Epoch ${latest.epoch}` : "Epoch -");
     setText("latestReward", Number.isFinite(reward) ? fmtCompact(reward, "") : "-");
@@ -1256,6 +1344,7 @@
     setText("ftsoSecondary24h", fmtOptionalPct(metricWithFallback(fseSecondary24h, ftsoSecondaryHours, 24)));
     setText("ftso6hSource", ftsoSource6h);
     setText("ftso24hSource", ftsoSource24h);
+
     const fdcAvailability24h = recentAverage(fdcAvailabilityHours, 24);
     setText("fdcAvailabilityNow", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
@@ -1271,46 +1360,56 @@
     setText("fdcRounds", latest?.fdc?.rewardedVotingRounds != null && latest?.fdc?.totalRewardedVotingRounds != null ? `${fmtNum(latest.fdc.rewardedVotingRounds, 0)} / ${fmtNum(latest.fdc.totalRewardedVotingRounds, 0)}` : "-");
     setText("stakingCondition", latest?.staking?.conditionMet === true ? "OK" : latest?.staking?.conditionMet === false ? "Failed" : "-");
 
-    const balanceValues = [
-      provider?.submitAddressBalance,
-      provider?.submitSignatureAddressBalance,
-      provider?.signingPolicyAddressBalance,
-      ...(Array.isArray(provider?.fastUpdatesAddresses) ? provider.fastUpdatesAddresses.map(item => item.balance) : [])
-    ].map(Number).filter(Number.isFinite);
-    const minBalance = balanceValues.length ? Math.min(...balanceValues) : null;
-    const balanceTone = minBalance == null ? "watch" : minBalance < 250 ? "down" : minBalance < 500 ? "watch" : "ok";
-    setText("balanceStatus", minBalance == null ? "-" : balanceTone === "ok" ? "OK" : "LOW");
-    setText("submitBalance", provider?.submitAddressBalance != null ? fmtCompact(provider.submitAddressBalance, " FLR") : "-");
-    setText("signatureBalance", provider?.submitSignatureAddressBalance != null ? fmtCompact(provider.submitSignatureAddressBalance, " FLR") : "-");
-    setText("policyBalance", provider?.signingPolicyAddressBalance != null ? fmtCompact(provider.signingPolicyAddressBalance, " FLR") : "-");
-    setText("fastBalanceMin", minBalance != null ? fmtCompact(minBalance, " FLR") : "-");
+    // ── Wallet balances: RPC-fetched live values (independent of Oracle Daemon)
+    const rpcSubmit = state.walletBalances.submit;
+    const rpcSignature = state.walletBalances.signature;
+    const rpcPolicy = state.walletBalances.policy;
+    // Fallback to Oracle Daemon values if RPC unavailable
+    const submitBal = rpcSubmit ?? Number(provider?.submitAddressBalance);
+    const sigBal = rpcSignature ?? Number(provider?.submitSignatureAddressBalance);
+    const policyBal = rpcPolicy ?? Number(provider?.signingPolicyAddressBalance);
+    const fastBalances = Array.isArray(provider?.fastUpdatesAddresses)
+      ? provider.fastUpdatesAddresses.map(item => Number(item.balance)).filter(Number.isFinite)
+      : [];
+    const allBalances = [submitBal, sigBal, policyBal, ...fastBalances].filter(b => Number.isFinite(b) && b > 0);
+    const minBalance = allBalances.length ? Math.min(...allBalances) : null;
+    const balanceTone = minBalance == null ? "watch" : minBalance < BALANCE_DOWN_FLR ? "down" : minBalance < BALANCE_WARN_FLR ? "watch" : "ok";
+    const balanceSourceLabel = state.sources.rpc === "ok" ? ` · via ${state.walletBalances.source || "RPC"}` : "";
+    setText("balanceStatus", minBalance == null ? "-" : balanceTone === "ok" ? `OK${balanceSourceLabel}` : `LOW${balanceSourceLabel}`);
+    setText("submitBalance", Number.isFinite(submitBal) ? fmtCompact(submitBal, " FLR") : "-");
+    setText("signatureBalance", Number.isFinite(sigBal) ? fmtCompact(sigBal, " FLR") : "-");
+    setText("policyBalance", Number.isFinite(policyBal) ? fmtCompact(policyBal, " FLR") : "-");
+    setText("fastBalanceMin", fastBalances.length ? fmtCompact(Math.min(...fastBalances), " FLR") : minBalance != null ? fmtCompact(minBalance, " FLR") : "-");
     $$(".balance-card").forEach(el => { el.dataset.tone = balanceTone; });
 
+    // ── Validator section: primary from Oracle Daemon, fallback from Flare Metrics
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
-    const uptimeAvg = uptimeValues.length ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length : null;
+    const uptimeAvg = uptimeValues.length
+      ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length
+      : pctNumber(state.validatorFallback?.uptime);
     const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h` : "-";
-    const capacity = Number(validator?.m_dTotal);
-    const freeSpace = Number(validator?.m_dFreeDelegationSpace);
+    const capacity = Number(validator?.m_dTotal ?? state.validatorFallback?.stake);
+    const freeSpace = Number(validator?.m_dFreeDelegationSpace ?? state.validatorFallback?.freeSpace);
     const capacityMax = capacity + freeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : 0;
     const selfBond = Number(validator?.m_dTotalStake ?? stake?.m_dAmount);
-    const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : null;
+    const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : pctNumber(state.validatorFallback?.delegated);
 
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
-    setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : "-");
+    setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : state.validatorFallback ? `via ${state.validatorFallback.source}` : "-");
     setText("validatorLastSeen", node?.m_sLastSeen ? `last seen ${node.m_sLastSeen}` : "last seen -");
     setText("validatorLastSeenShort", node?.m_sLastSeen ? node.m_sLastSeen.replace(/\.\d+$/, "") : "-");
     setText("nodeHealthy", nodeHealth?.healthy === true ? "Healthy" : nodeHealth ? "Unhealthy" : "-");
     setText("nodePeers", nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "peers -");
     setText("validatorUptime", Number.isFinite(uptimeAvg) ? fmtPct(uptimeAvg) : "-");
     setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
-    setText("validatorStake", validator?.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
+    setText("validatorStake", capacity > 0 ? fmtCompact(capacity, " FLR") : validator?.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
     setText("validatorStakeMeta", timeLeft !== "-" ? `stake ends in ${timeLeft}` : "self + delegation");
-    setText("freeSpace", validator?.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
-    setText("selfBond", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");
+    setText("freeSpace", freeSpace > 0 ? fmtCompact(freeSpace, " FLR") : validator?.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
+    setText("selfBond", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "3M FLR");
     setText("delegatedStake", delegatedStake != null ? fmtCompact(delegatedStake, " FLR") : "-");
-    setText("stakeEnds", Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d` : "-");
+    setText("stakeEnds", Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d` : state.validatorFallback?.endTime ? fmtUntil(state.validatorFallback.endTime) : "-");
     setText("capacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
     setText("capacityPct", `${fmtNum(capacityPct, 1)}%`);
     setBar("stakeCapacity", capacityPct);
@@ -1340,6 +1439,7 @@
     setText("explorerSourceMeta", explorerFtso ? "FTSO 6h/24h windows" : policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
     setText("nodeSource", state.sources.node === "ok" ? "OK" : "DOWN");
     setText("nodeSourceMeta", nodeHealthTime ? `health ${fmtAge(nodeHealthTime)} old` : nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
+
     const oracleGroup = state.sources.provider === "ok" && state.sources.validator === "ok" ? "ok" : "down";
     const sourceGroups = [oracleGroup, state.sources.explorer, state.sources.node];
     const liveSources = sourceGroups.filter(value => value === "ok").length;
@@ -1347,6 +1447,7 @@
     setText("sourceSummary", blockedSources ? `${liveSources}/3 live` : `${liveSources}/3 online`);
 
     renderAlerts(levels.alerts);
+
     const ftsoRewards = rewardSeries(provider);
     const validatorRewards = validatorRewardSeries(node);
     const ftsoSummary = summarizeRewardSeries(ftsoRewards);
@@ -1357,6 +1458,7 @@
     setText("validatorRewardLatestFull", validatorSummary.latest);
     setText("validatorRewardAverageFull", validatorSummary.average);
     setText("validatorRewardRangeFull", validatorSummary.range);
+
     renderLineChart("ftsoRewards", ftsoRewards, { empty: "No reward data", zeroBase: true, yBottom: "0", tooltip: "reward", metricLabel: "FTSO reward" });
     renderLineChart("ftsoAvailability", ftsoAvailabilityHours, { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FTSO availability", empty: "No FTSO availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
     renderLineChart("fdcAvailability", fdcAvailabilityHours, { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FDC availability", empty: "No FDC availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
@@ -1368,16 +1470,21 @@
     renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload);
   }
 
+  // ── MAIN LOAD ──────────────────────────────────────────────────────────────
   async function loadAll() {
     document.body.classList.add("is-refreshing");
     setText("refreshLabel", "Loading");
-    const sourceResults = await Promise.allSettled([
-      fetchJson(ENDPOINTS.providersV2),
-      fetchJson(ENDPOINTS.validators),
-      fetchJson(ENDPOINTS.explorerEntity),
-      fetchJson(ENDPOINTS.explorerFtso),
-      fetchJson(ENDPOINTS.nodeHealth),
-      fetchJson(ENDPOINTS.daemonStatus, 2_500)
+
+    // Fetch primary + fallback sources in parallel
+    const [sourceResults] = await Promise.all([
+      Promise.allSettled([
+        fetchJson(ENDPOINTS.providersV2),
+        fetchJson(ENDPOINTS.validators),
+        fetchJson(ENDPOINTS.explorerEntity),
+        fetchJson(ENDPOINTS.explorerFtso),
+        fetchJson(ENDPOINTS.nodeHealth),
+        fetchJson(ENDPOINTS.daemonStatus, 2_500)
+      ])
     ]);
 
     let providerPayload = sourceResults[0].status === "fulfilled" ? sourceResults[0].value : null;
@@ -1386,12 +1493,14 @@
     let explorerFtso = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
     let nodeHealth = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
     let daemonPayload = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
+
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
     state.sourceLoadedAt.explorer = explorer ? new Date() : null;
     state.sourceLoadedAt.explorerFtso = explorerFtso ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
     state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
+
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
 
     if (!provider) {
@@ -1417,6 +1526,17 @@
     setSource("node", nodeHealth ? "ok" : "down");
     setSource("daemon", daemonPayload ? "ok" : "warn");
 
+    // ── NEW: Fire supplementary fetches in parallel (non-blocking) ────────────
+    // These enrich the page but don't block the initial render
+    Promise.allSettled([
+      fetchWalletBalances(provider),
+      !networkInfo(providerPayload) ? fetchEpochFallback() : Promise.resolve(),
+      !validator ? fetchValidatorFallback() : Promise.resolve()
+    ]).then(() => {
+      // Re-render with enriched data once supplementary sources return
+      applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
+    });
+
     state.lastLoadedAt = new Date();
     state.data = { provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload };
     applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
@@ -1441,10 +1561,7 @@
     window.addEventListener("touchmove", event => {
       if (!armed || !event.touches.length) return;
       const distance = event.touches[0].clientY - startY;
-      if (distance > 90) {
-        armed = false;
-        loadAll();
-      }
+      if (distance > 90) { armed = false; loadAll(); }
     }, { passive: true });
     window.addEventListener("touchend", () => { armed = false; }, { passive: true });
   }
