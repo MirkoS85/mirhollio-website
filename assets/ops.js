@@ -1,12 +1,12 @@
 (function () {
   "use strict";
 
-  // ── ENDPOINTS ──────────────────────────────────────────────────────────────
+  // ââ ENDPOINTS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   // Primary sources: Oracle Daemon + Flare Systems Explorer (existing)
   // Added: Official Flare RPC, Ankr RPC backup, Flare Metrics API,
   //        Official Validator Tracker, Blockscout
   const ENDPOINTS = {
-    // Oracle Daemon (primary — existing)
+    // Oracle Daemon (primary â existing)
     providersV2: "https://api.oracle-daemon.com/v2/flare/providers",
     providersV1: "https://api.oracle-daemon.com/v1/flare/providers",
     validators: "https://api.oracle-daemon.com/v1/flare/validators",
@@ -16,19 +16,19 @@
     // Self (existing)
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
     daemonStatus: "https://node.mirhollio.com/ops/status.json",
-    // ── NEW: Official Flare RPC endpoints (wallet balances + epoch) ──
+    // ââ NEW: Official Flare RPC endpoints (wallet balances + epoch) ââ
     flareRpcPrimary: "https://flare-api.flare.network/ext/C/rpc",
     flareRpcBackup: "https://rpc.ankr.com/flare",
-    // ── NEW: Flare Metrics API (validator backup) ──
+    // ââ NEW: Flare Metrics API (validator backup) ââ
     flareMetricsProvider: "https://flaremetrics.io/api/v1/ftso/providers?network=flare",
     flareMetricsValidator: "https://flaremetrics.io/api/v1/validators?network=flare",
-    // ── NEW: Official Flare Validator Tracker ──
+    // ââ NEW: Official Flare Validator Tracker ââ
     flareValidatorTracker: "https://flare-validators.flare.network/api/validators",
-    // ── NEW: Blockscout for on-chain tx verification ──
+    // ââ NEW: Blockscout for on-chain tx verification ââ
     blockscoutAddress: "https://flare-explorer.flare.network/api/v2/addresses/"
   };
 
-  // ── TARGET ─────────────────────────────────────────────────────────────────
+  // ââ TARGET âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   const TARGET = {
     name: "mirsflr",
     voter: "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -40,7 +40,7 @@
     policyAddress: null
   };
 
-  // ── WALLET BALANCE THRESHOLDS (FLR) ───────────────────────────────────────
+  // ââ WALLET BALANCE THRESHOLDS (FLR) âââââââââââââââââââââââââââââââââââââââ
   const BALANCE_WARN_FLR = 500;
   const BALANCE_DOWN_FLR = 100;
 
@@ -374,7 +374,7 @@
     return {
       level,
       title: signalTitle(level),
-      meta: parts.length ? parts.join(" · ") : "telemetry wired"
+      meta: parts.length ? parts.join(" Â· ") : "telemetry wired"
     };
   }
 
@@ -394,7 +394,7 @@
     return {
       level,
       title: signalTitle(level),
-      meta: parts.length ? parts.join(" · ") : "feed checks wired"
+      meta: parts.length ? parts.join(" Â· ") : "feed checks wired"
     };
   }
 
@@ -446,10 +446,10 @@
     if (ms) return Number(ms[1]) / 1000;
     const hms = trimmed.match(/^(\d+):(\d+):(\d+(?:\.\d+)?)$/);
     if (hms) return Number(hms[1]) * 3600 + Number(hms[2]) * 60 + Number(hms[3]);
-    const unit = trimmed.match(/^(\d+(?:\.\d+)?)(ns|us|µs|ms|s|m|h)$/);
+    const unit = trimmed.match(/^(\d+(?:\.\d+)?)(ns|us|Âµs|ms|s|m|h)$/);
     if (unit) {
       const amount = Number(unit[1]);
-      const scale = { ns: 1e-9, us: 1e-6, "µs": 1e-6, ms: 1e-3, s: 1, m: 60, h: 3600 }[unit[2]];
+      const scale = { ns: 1e-9, us: 1e-6, "Âµs": 1e-6, ms: 1e-3, s: 1, m: 60, h: 3600 }[unit[2]];
       return amount * scale;
     }
     const parts = trimmed.match(/(?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?(?:(\d+(?:\.\d+)?)s)?/);
@@ -517,7 +517,7 @@
       .finally(() => clearTimeout(timer));
   }
 
-  // ── NEW: JSON-RPC call helper ──────────────────────────────────────────────
+  // ââ NEW: JSON-RPC call helper ââââââââââââââââââââââââââââââââââââââââââââââ
   function rpcCall(url, method, params, timeout = RPC_TIMEOUT) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
@@ -533,7 +533,7 @@
       .finally(() => clearTimeout(timer));
   }
 
-  // ── NEW: Fetch one wallet balance via RPC with primary→backup fallback ─────
+  // ââ NEW: Fetch one wallet balance via RPC with primaryâbackup fallback âââââ
   async function fetchBalanceFLR(address) {
     if (!address) return null;
     const hexAddress = address.startsWith("0x") ? address : `0x${address}`;
@@ -553,12 +553,12 @@
       }
     }
     if (!result) return null;
-    // Convert hex wei → FLR (18 decimals)
+    // Convert hex wei â FLR (18 decimals)
     const wei = BigInt(result);
     return Number(wei) / 1e18;
   }
 
-  // ── NEW: Fetch all operational wallet balances in parallel ─────────────────
+  // ââ NEW: Fetch all operational wallet balances in parallel âââââââââââââââââ
   async function fetchWalletBalances(provider) {
     // Extract addresses from provider data on first load
     const submitAddr = provider?.submitAddress || TARGET.submitAddress;
@@ -585,7 +585,7 @@
     state.sourceLoadedAt.rpc = new Date();
   }
 
-  // ── NEW: Fetch epoch data from Flare Metrics as fallback ───────────────────
+  // ââ NEW: Fetch epoch data from Flare Metrics as fallback âââââââââââââââââââ
   async function fetchEpochFallback() {
     try {
       // Flare Metrics returns current epoch info
@@ -615,7 +615,7 @@
     }
   }
 
-  // ── NEW: Fetch validator data from Flare Metrics / official tracker ─────────
+  // ââ NEW: Fetch validator data from Flare Metrics / official tracker âââââââââ
   async function fetchValidatorFallback() {
     // Try Flare Metrics first
     try {
@@ -751,7 +751,7 @@
     }
     if (options.tooltip === "availability") {
       const zone = availabilityZone(point.item.value);
-      return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} · ${escapeHtml(zone.label)}</em>`;
+      return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} Â· ${escapeHtml(zone.label)}</em>`;
     }
     return `<span>${escapeHtml(label)}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong>`;
   }
@@ -971,7 +971,7 @@
       const cells = history.map(item => {
         const value = getter(item);
         const cls = value === true ? "ok" : value === false ? "down" : "unknown";
-        const symbol = value === true ? "✓" : value === false ? "×" : "?";
+        const symbol = value === true ? "â" : value === false ? "Ã" : "?";
         return `<span class="condition-cell ${cls}" title="${label} epoch ${item.epoch || "-"}">${symbol}</span>`;
       }).join("");
       return `<span class="label">${label}</span>${cells}`;
@@ -1006,8 +1006,8 @@
     if (!items.length) { mount.innerHTML = `<span><em>No expiry data</em><b>-</b></span>`; return; }
     mount.innerHTML = items.map(item => `
       <span>
-        <em>${escapeHtml(item.label)} · ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
-        <b>${escapeHtml(fmtUntil(item.end))} · ${escapeHtml(fmtShortDate(item.end))}</b>
+        <em>${escapeHtml(item.label)} Â· ${escapeHtml(fmtCompact(item.amount, " FLR"))}</em>
+        <b>${escapeHtml(fmtUntil(item.end))} Â· ${escapeHtml(fmtShortDate(item.end))}</b>
       </span>
     `).join("");
   }
@@ -1035,7 +1035,7 @@
     const preRegistered = provider?.isPreRegistered === true;
     const daemonSummary = daemonSignalSummary(daemonPayload);
 
-    // ── NEW: Wallet balance alerts ────────────────────────────────────────────
+    // ââ NEW: Wallet balance alerts ââââââââââââââââââââââââââââââââââââââââââââ
     const balances = [
       state.walletBalances.submit,
       state.walletBalances.signature,
@@ -1050,13 +1050,13 @@
 
     function add(level, title, text) { alerts.push({ level, title, text }); }
 
-    // ── NEW: Alert on low balances (from RPC, independent of Oracle Daemon) ──
+    // ââ NEW: Alert on low balances (from RPC, independent of Oracle Daemon) ââ
     if (state.sources.rpc === "ok" && balances.length > 0) {
       const minBal = Math.min(...balances);
       if (minBal < BALANCE_DOWN_FLR) {
-        add("down", "Operational wallet critically low", `Minimum balance ${fmtNum(minBal, 1)} FLR — top up immediately.`);
+        add("down", "Operational wallet critically low", `Minimum balance ${fmtNum(minBal, 1)} FLR â top up immediately.`);
       } else if (minBal < BALANCE_WARN_FLR) {
-        add("warn", "Operational wallet low", `Minimum balance ${fmtNum(minBal, 1)} FLR — consider topping up.`);
+        add("warn", "Operational wallet low", `Minimum balance ${fmtNum(minBal, 1)} FLR â consider topping up.`);
       }
     }
 
@@ -1083,12 +1083,12 @@
     }
 
     if (!validator || !node) {
-      // ── NEW: Use fallback validator data if Oracle Daemon missed ───────────
+      // ââ NEW: Use fallback validator data if Oracle Daemon missed âââââââââââ
       if (state.validatorFallback) {
         const fbUptime = pctNumber(state.validatorFallback.uptime);
         if (fbUptime != null && fbUptime < 95) { val = "down"; add("down", "Validator uptime critical", `${fmtPct(fbUptime)} (via ${state.validatorFallback.source}).`); }
         else if (fbUptime != null && fbUptime < 99) { val = "warn"; add("warn", "Validator uptime watch", `${fmtPct(fbUptime)} (via ${state.validatorFallback.source}).`); }
-        else { add("warn", "Validator data partial", `Oracle Daemon down — using ${state.validatorFallback.source} fallback.`); }
+        else { add("warn", "Validator data partial", `Oracle Daemon down â using ${state.validatorFallback.source} fallback.`); }
       } else {
         val = "down";
         add("down", "Validator data missing", "Oracle Daemon validator data did not load.");
@@ -1283,7 +1283,7 @@
     setText("overallTitle", overall === "ok" ? "Primary OK" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
 
-    // ── Reward epoch: primary from Oracle Daemon, fallback from Flare Metrics/RPC
+    // ââ Reward epoch: primary from Oracle Daemon, fallback from Flare Metrics/RPC
     const currentEpoch = network?.m_iCurrentRewardEpoch ?? state.epochFallback?.currentEpoch;
     const epochEnds = network?.m_xRewardEpochEndTime ?? state.epochFallback?.epochEndTime;
     setText("currentRewardEpoch", currentEpoch != null ? `E${currentEpoch}` : "-");
@@ -1360,7 +1360,7 @@
     setText("fdcRounds", latest?.fdc?.rewardedVotingRounds != null && latest?.fdc?.totalRewardedVotingRounds != null ? `${fmtNum(latest.fdc.rewardedVotingRounds, 0)} / ${fmtNum(latest.fdc.totalRewardedVotingRounds, 0)}` : "-");
     setText("stakingCondition", latest?.staking?.conditionMet === true ? "OK" : latest?.staking?.conditionMet === false ? "Failed" : "-");
 
-    // ── Wallet balances: RPC-fetched live values (independent of Oracle Daemon)
+    // ââ Wallet balances: RPC-fetched live values (independent of Oracle Daemon)
     const rpcSubmit = state.walletBalances.submit;
     const rpcSignature = state.walletBalances.signature;
     const rpcPolicy = state.walletBalances.policy;
@@ -1374,7 +1374,7 @@
     const allBalances = [submitBal, sigBal, policyBal, ...fastBalances].filter(b => Number.isFinite(b) && b > 0);
     const minBalance = allBalances.length ? Math.min(...allBalances) : null;
     const balanceTone = minBalance == null ? "watch" : minBalance < BALANCE_DOWN_FLR ? "down" : minBalance < BALANCE_WARN_FLR ? "watch" : "ok";
-    const balanceSourceLabel = state.sources.rpc === "ok" ? ` · via ${state.walletBalances.source || "RPC"}` : "";
+    const balanceSourceLabel = state.sources.rpc === "ok" ? ` Â· via ${state.walletBalances.source || "RPC"}` : "";
     setText("balanceStatus", minBalance == null ? "-" : balanceTone === "ok" ? `OK${balanceSourceLabel}` : `LOW${balanceSourceLabel}`);
     setText("submitBalance", Number.isFinite(submitBal) ? fmtCompact(submitBal, " FLR") : "-");
     setText("signatureBalance", Number.isFinite(sigBal) ? fmtCompact(sigBal, " FLR") : "-");
@@ -1382,7 +1382,7 @@
     setText("fastBalanceMin", fastBalances.length ? fmtCompact(Math.min(...fastBalances), " FLR") : minBalance != null ? fmtCompact(minBalance, " FLR") : "-");
     $$(".balance-card").forEach(el => { el.dataset.tone = balanceTone; });
 
-    // ── Validator section: primary from Oracle Daemon, fallback from Flare Metrics
+    // ââ Validator section: primary from Oracle Daemon, fallback from Flare Metrics
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
     const uptimeAvg = uptimeValues.length
       ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length
@@ -1470,7 +1470,7 @@
     renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload);
   }
 
-  // ── MAIN LOAD ──────────────────────────────────────────────────────────────
+  // ââ MAIN LOAD ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
   async function loadAll() {
     document.body.classList.add("is-refreshing");
     setText("refreshLabel", "Loading");
@@ -1526,7 +1526,7 @@
     setSource("node", nodeHealth ? "ok" : "down");
     setSource("daemon", daemonPayload ? "ok" : "warn");
 
-    // ── NEW: Fire supplementary fetches in parallel (non-blocking) ────────────
+    // ââ NEW: Fire supplementary fetches in parallel (non-blocking) ââââââââââââ
     // These enrich the page but don't block the initial render
     Promise.allSettled([
       fetchWalletBalances(provider),
@@ -1540,6 +1540,21 @@
     state.lastLoadedAt = new Date();
     state.data = { provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload };
     applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
+    // Show per-source error state if any source failed after 10s
+    if (!provider || !validator || !nodeHealth) {
+      const mount = document.querySelector('[data-render="alerts"]');
+      const sources = [
+        !provider ? '⚠ Oracle Daemon provider unavailable' : null,
+        !validator ? '⚠ Oracle Daemon validator unavailable' : null,
+        !nodeHealth ? '⚠ Node health endpoint unavailable' : null
+      ].filter(Boolean);
+      if (mount && sources.length) {
+        const existing = mount.querySelector('.alert-item.down, .alert-item.warn');
+        if (!existing) {
+          mount.innerHTML = sources.map(s => `<article class="alert-item warn"><b>Source error</b><span>${s}</span></article>`).join('') + mount.innerHTML;
+        }
+      }
+    }
     loadFdcAttestations();
     setText("refreshLabel", "Refresh");
     document.body.classList.remove("is-refreshing");
