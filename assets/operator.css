@@ -425,6 +425,128 @@ h1{
   text-transform:none;
 }
 
+.role-guide{
+  margin-top:14px;
+  border:1px solid var(--dark-line);
+  border-radius:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,247,251,.72));
+  overflow:hidden;
+}
+
+.role-guide summary{
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 16px;
+  color:var(--ink);
+  cursor:pointer;
+  font-size:15px;
+  font-weight:950;
+  list-style:none;
+}
+
+.role-guide summary::-webkit-details-marker{
+  display:none;
+}
+
+.role-guide summary::after{
+  content:">";
+  width:26px;
+  height:26px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--dark-line);
+  border-radius:999px;
+  color:var(--pink);
+  background:#fff;
+  font-size:18px;
+  line-height:1;
+  transition:transform .18s ease;
+}
+
+.role-guide[open] summary{
+  border-bottom:1px solid var(--dark-line);
+}
+
+.role-guide[open] summary::after{
+  transform:rotate(90deg);
+}
+
+.role-guide ol{
+  display:grid;
+  gap:0;
+  margin:0;
+  padding:0;
+  list-style:none;
+  counter-reset:guide-step;
+}
+
+.role-guide li{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:12px;
+  padding:13px 16px;
+  border-bottom:1px solid rgba(226,210,219,.7);
+  counter-increment:guide-step;
+}
+
+.role-guide li::before{
+  content:counter(guide-step) ".";
+  color:var(--pink);
+  font-size:15px;
+  font-weight:950;
+  line-height:1.2;
+}
+
+.role-guide li strong{
+  grid-column:2;
+  display:block;
+  color:var(--ink);
+  font-size:14px;
+  line-height:1.2;
+}
+
+.role-guide li span{
+  grid-column:2;
+  display:block;
+  margin-top:4px;
+  color:#66706d;
+  font-size:13px;
+  font-weight:700;
+  line-height:1.35;
+}
+
+.role-guide-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  padding:12px;
+}
+
+.role-guide-actions a{
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 10px;
+  border:1px solid var(--dark-line);
+  border-radius:8px;
+  color:var(--ink);
+  background:#fff;
+  font-size:13px;
+  font-weight:900;
+  text-align:center;
+  text-decoration:none;
+}
+
+.role-guide-actions a:first-child{
+  border-color:var(--pink);
+  color:#fff;
+  background:var(--pink);
+}
+
 .metric .info-tip{
   top:10px;
   right:10px;

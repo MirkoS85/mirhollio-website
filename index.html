@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=provider-only-1" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=guide-flow-2" />
 </head>
 <body>
   <div class="mobile-top">
@@ -124,6 +124,19 @@
                 <div class="snap-metric"><span>Fee</span><strong data-field="ftsoFeeSnapshot">-</strong></div>
                 <div class="snap-metric"><span>Status</span><strong data-field="preRegisteredStatus">-</strong></div>
               </div>
+              <details class="role-guide">
+                <summary>How to delegate WFLR</summary>
+                <ol>
+                  <li><strong>Check provider data</strong><span>Review reward rate, availability, fee, and pre-registration.</span></li>
+                  <li><strong>Verify address</strong><span>Use the official MirSFlr delegation address before signing.</span></li>
+                  <li><strong>Delegate WFLR</strong><span>Select MirSFlr in your wallet or paste the verified delegation address.</span></li>
+                  <li><strong>Wait one epoch</strong><span>Delegation changes normally apply from the next reward epoch.</span></li>
+                </ol>
+                <div class="role-guide-actions">
+                  <a href="addresses/">Verify address</a>
+                  <a href="epochs/">Check epochs</a>
+                </div>
+              </details>
               <div class="home-snap-actions"><a class="btn decision-btn" href="ftso/">View FTSO metrics</a></div>
             </article>
             <article class="card role-choice role-choice-validator">
@@ -137,6 +150,19 @@
                 <div class="snap-metric"><span>Free space</span><strong data-field="freeDelegationSpace">-</strong></div>
                 <div class="snap-metric"><span>Status</span><strong data-field="validatorConnected">-</strong></div>
               </div>
+              <details class="role-guide">
+                <summary>How to stake FLR</summary>
+                <ol>
+                  <li><strong>Check validator data</strong><span>Review APR, uptime, free space, and current validator status.</span></li>
+                  <li><strong>Verify node</strong><span>Open validator metrics and confirm you are staking to MirSFlr.</span></li>
+                  <li><strong>Stake FLR</strong><span>Choose the amount, confirm the validator, and sign in your wallet.</span></li>
+                  <li><strong>Track the period</strong><span>Rewards and capacity depend on the active staking period.</span></li>
+                </ol>
+                <div class="role-guide-actions">
+                  <a href="validator/">Open validator</a>
+                  <a href="addresses/">Verify identity</a>
+                </div>
+              </details>
               <div class="home-snap-actions"><a class="btn decision-btn" href="validator/">View validator metrics</a></div>
             </article>
           </div>
@@ -146,14 +172,9 @@
       <section class="section light delegate-section">
         <div class="inner">
           <div class="section-title">
-            <h2>Delegate safely.</h2>
-            <p>Use the FTSO and Validator pages for performance, then verify the address before any wallet action.</p>
+            <h2>Before you confirm.</h2>
+            <p>Use official wallet screens only, verify the MirSFlr identity, and never trust support DMs or seed phrase requests.</p>
           </div>
-          <ol class="delegate-list">
-            <li><strong>Check live data</strong><p>Review FTSO or Validator metrics before committing.</p></li>
-            <li><strong>Verify address</strong><p>Cross-check on the Addresses page before any wallet action.</p></li>
-            <li><strong>Wait for epoch</strong><p>Delegation needs one full epoch before results show.</p></li>
-          </ol>
           <div class="actions secondary-actions">
             <a class="btn primary" href="addresses/">Verify addresses</a>
             <a class="btn ghost" href="epochs/">Check epochs</a>
