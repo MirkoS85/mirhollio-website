@@ -13,8 +13,6 @@
   <link rel="dns-prefetch" href="//api.oracle-daemon.com">
   <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
-  <link rel="preconnect" href="https://flare-api.flare.network">
-  <link rel="dns-prefetch" href="//flare-api.flare.network">
   <link rel="preconnect" href="https://node.mirhollio.com">
   <link rel="dns-prefetch" href="//node.mirhollio.com">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -64,7 +62,7 @@
       <article class="status-tile" data-status="loading" data-card="fdcStatus">
         <span>FDC 3h</span>
         <strong data-field="fdcStatus">...</strong>
-        <small data-field="fdcStatusMeta">attestation</small>
+        <small data-field="fdcStatusMeta">provider</small>
       </article>
       <article class="status-tile" data-status="loading" data-card="validatorStatus">
         <span>Validator</span>
@@ -214,7 +212,6 @@
             <span>Rewarded rounds <strong data-field="fdcRounds">-</strong></span>
             <span>Latest condition <strong data-field="fdcConditionStatus">-</strong></span>
           </div>
-          <p>Provider-specific public metrics for MirSFlr. Global FdcHub request traffic is only a reference feed below.</p>
         </article>
 
         <article class="chart-card">
@@ -339,37 +336,6 @@
 
     <section class="raw-card" id="raw">
       <h2>Raw JSON</h2>
-      <details class="raw-details fdc-reference-details">
-        <summary>Show global FDC request reference</summary>
-        <div class="attestation-reference-head">
-          <span>Not provider-specific</span>
-          <a href="https://flare-systems-explorer.flare.network/attestation-request" target="_blank" rel="noopener">Open FSE</a>
-        </div>
-        <div class="attestation-summary">
-          <span>Requests <strong data-field="fdcRequestCount24h">-</strong></span>
-          <span>Types <strong data-field="fdcRequestTypes">-</strong></span>
-          <span>Latest round <strong data-field="fdcLastRound">-</strong></span>
-          <span>Source <strong data-field="fdcRequestFreshness">-</strong></span>
-        </div>
-        <div class="attestation-table-wrap">
-          <table class="attestation-table">
-            <thead>
-              <tr>
-                <th scope="col">Time</th>
-                <th scope="col">Round</th>
-                <th scope="col">Attestation</th>
-                <th scope="col">Source</th>
-                <th scope="col">Fee</th>
-                <th scope="col">Status</th>
-                <th scope="col">Tx</th>
-              </tr>
-            </thead>
-            <tbody data-render="fdc-attestations">
-              <tr><td colspan="7">Loading latest public FDC requests...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </details>
       <details class="raw-details">
         <summary>Show live payload</summary>
         <pre data-render="rawDetails">Waiting for data.</pre>
@@ -377,7 +343,6 @@
     </section>
   </main>
 
-  <script src="../assets/fdc-attestations.js?v=fdc-2"></script>
   <script src="../assets/ops.js?v=ops-22"></script>
 </body>
 </html>

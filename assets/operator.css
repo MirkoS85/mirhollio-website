@@ -601,52 +601,6 @@ h1{
   text-transform:none;
 }
 
-.fdc-attestation-widget{
-  min-height:auto;
-}
-
-.fdc-attestation-row{
-  display:grid;
-  grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(0,1fr));
-  gap:10px;
-  align-items:center;
-  margin-top:12px;
-}
-
-.fdc-attestation-row > div{
-  min-height:64px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:rgba(238,242,237,.05);
-}
-
-.light .fdc-attestation-row > div{
-  border-color:var(--dark-line);
-  background:#eef1ec;
-}
-
-.fdc-attestation-row b{
-  display:block;
-  color:var(--text);
-  font-size:24px;
-  line-height:1;
-}
-
-.fdc-attestation-row em{
-  display:block;
-  margin-top:6px;
-  color:var(--muted);
-  font-size:11px;
-  font-style:normal;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.fdc-attestation-widget p{
-  margin-top:12px;
-}
-
 .proof-cards{
   grid-template-columns:repeat(3,minmax(0,1fr));
 }
@@ -1190,7 +1144,6 @@ tr:last-child td{border-bottom:0}
   .validator-head h3{font-size:32px}
   .validator-row{padding:14px; gap:14px}
   .validator-id{grid-column:auto}
-  .fdc-attestation-row{grid-template-columns:1fr}
   .reward-chart{height:170px}
   .chart-panel{padding:14px}
   .chart-panel .panel-head{margin:-14px -14px 12px}

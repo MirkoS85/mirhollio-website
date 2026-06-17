@@ -298,7 +298,6 @@ button{
 .truth-tile,
 .data-table,
 .chart-card,
-.attestation-card,
 .my-fdc-card,
 .stake-card,
 .node-card,
@@ -614,7 +613,6 @@ h2{
 }
 
 .chart-card,
-.attestation-card,
 .my-fdc-card,
 .stake-card,
 .node-card,
@@ -627,13 +625,6 @@ h2{
 .chart-card{
   position:relative;
   overflow:visible;
-}
-
-.attestation-card .chart-title a{
-  color:var(--pink-2);
-  text-decoration:none;
-  font-size:12px;
-  font-weight:900;
 }
 
 .my-fdc-grid{
@@ -670,128 +661,6 @@ h2{
   line-height:1;
   text-transform:none;
   white-space:nowrap;
-}
-
-.my-fdc-card p{
-  margin:0;
-  padding:10px 12px;
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:12px;
-  font-weight:700;
-  line-height:1.4;
-}
-
-.attestation-reference-head{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:10px 0;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:850;
-  text-transform:uppercase;
-}
-
-.attestation-reference-head a{
-  color:var(--pink-2);
-  text-decoration:none;
-  font-weight:900;
-}
-
-.attestation-summary{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  border-top:1px solid var(--line);
-}
-
-.attestation-summary span{
-  min-height:52px;
-  padding:10px 12px;
-  border-left:1px solid var(--line);
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:11px;
-  font-weight:850;
-  text-transform:uppercase;
-}
-
-.attestation-summary span:nth-child(-n+2){
-  border-top:0;
-}
-
-.attestation-summary span:nth-child(2n+1){
-  border-left:0;
-}
-
-.attestation-summary strong{
-  display:block;
-  margin-top:4px;
-  color:var(--ink);
-  font-size:20px;
-  line-height:1;
-  text-transform:none;
-}
-
-.attestation-table-wrap{
-  overflow:auto;
-  border-top:1px solid var(--line);
-}
-
-.attestation-table{
-  width:100%;
-  min-width:740px;
-  border-collapse:collapse;
-}
-
-.attestation-table th,
-.attestation-table td{
-  padding:9px 10px;
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:12px;
-  font-weight:780;
-  text-align:left;
-  white-space:nowrap;
-}
-
-.attestation-table thead th{
-  border-top:0;
-  color:var(--soft);
-  font-size:10px;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.attestation-table td:nth-child(3),
-.attestation-table td:nth-child(7){
-  color:var(--pink-2);
-}
-
-.attestation-table a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.attestation-status{
-  display:inline-flex;
-  align-items:center;
-  gap:5px;
-  min-height:20px;
-  padding:0 8px;
-  border:1px solid rgba(115,213,119,.25);
-  border-radius:999px;
-  color:var(--green);
-  background:rgba(115,213,119,.08);
-  font-size:10px;
-  font-weight:900;
-  text-transform:uppercase;
-}
-
-.attestation-status[data-status="pending"]{
-  border-color:rgba(239,184,78,.25);
-  color:var(--amber);
-  background:rgba(239,184,78,.08);
 }
 
 .chart-title{
@@ -1473,10 +1342,6 @@ h2{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
 
-  .attestation-summary{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-  }
-
   .my-fdc-grid{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
@@ -1493,17 +1358,6 @@ h2{
   }
 
   .my-fdc-grid span:nth-child(3n+1){
-    border-left:0;
-  }
-
-  .attestation-summary span,
-  .attestation-summary span:nth-child(-n+2),
-  .attestation-summary span:nth-child(2n+1){
-    border-top:0;
-    border-left:1px solid var(--line);
-  }
-
-  .attestation-summary span:first-child{
     border-left:0;
   }
 

@@ -1796,24 +1796,6 @@ const MirSFlr = (() => {
     }
   }
 
-  async function loadFdcAttestationSummary() {
-    if (!window.MirFdcAttestations?.fetchFdcAttestations) {
-      setText("fdcAttestationStatus", "Unavailable");
-      setText("fdcAttestationFreshness", "Public RPC unavailable");
-      return;
-    }
-    try {
-      const summary = await window.MirFdcAttestations.fetchFdcAttestations();
-      setText("fdcAttestationStatus", summary?.totalRequests > 0 ? "Active" : "No recent requests");
-      setText("fdcAttestationCount24h", summary?.totalRequests ?? summary?.total24h ?? "-");
-      setText("fdcAttestationLastRound", summary?.lastRoundId != null ? `#${summary.lastRoundId}` : "-");
-      setText("fdcAttestationFreshness", summary?.rangeLabel || (summary?.fetchedAt ? `${formatRelativeTime(new Date(summary.fetchedAt))}${summary.cached ? " cached" : ""}` : "Public RPC"));
-    } catch (_) {
-      setText("fdcAttestationStatus", "Unavailable");
-      setText("fdcAttestationFreshness", "Public RPC unavailable");
-    }
-  }
-
   async function loadProviderV2() {
     try {
       applyProviderV2Data(await fetchJsonWithCache(PROVIDERS_V2_URL, CACHE_TTLS.provider));
@@ -1842,7 +1824,6 @@ const MirSFlr = (() => {
       loadFtsoExplorer();
       loadFtsoEntity();
       loadPrice();
-      loadFdcAttestationSummary();
     });
 
     document.addEventListener("click", event => {
@@ -1872,7 +1853,6 @@ const MirSFlr = (() => {
     loadFtsoExplorer();
     loadFtsoEntity();
     loadPrice();
-    loadFdcAttestationSummary();
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       window.clearTimeout(resizeTimer);

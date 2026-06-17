@@ -12,8 +12,6 @@
   <link rel="dns-prefetch" href="//api.coinbase.com">
   <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
-  <link rel="preconnect" href="https://flare-api.flare.network">
-  <link rel="dns-prefetch" href="//flare-api.flare.network">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MirSFlr" />
@@ -35,7 +33,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=fdc-attestation-2" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=provider-only-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -81,15 +79,6 @@
               <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
               <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
             </div>
-            <article class="card panel-wide-card fdc-attestation-widget">
-              <div class="panel-head"><strong>FDC Attestation</strong><span class="mini-label" data-field="fdcAttestationFreshness">Public RPC</span></div>
-              <div class="fdc-attestation-row">
-                <span class="status-dot" data-field="fdcAttestationStatus">Loading</span>
-                <div><b data-field="fdcAttestationCount24h">-</b><em>Latest requests</em></div>
-                <div><b data-field="fdcAttestationLastRound">-</b><em>Latest round</em></div>
-              </div>
-              <p>Public FdcHub request feed, same signal as Flare Systems Explorer attestation requests.</p>
-            </article>
             <article class="card panel-wide-card delegation-summary-card">
               <div class="panel-head"><strong>Delegation summary</strong></div>
               <div class="delegator-summary">
@@ -111,8 +100,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/fdc-attestations.js?v=fdc-2"></script>
-  <script src="../assets/operator.js?v=fdc-attestation-2"></script>
+  <script src="../assets/operator.js?v=provider-only-1"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>
