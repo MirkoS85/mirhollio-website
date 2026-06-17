@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-22">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-23">
 </head>
 <body>
   <main class="ops-shell">
@@ -47,7 +47,7 @@
       </div>
       <div class="mobile-mini-grid">
         <span>FTSO <b data-field="ftsoStatus">...</b><i data-dot="ftsoStatus"></i></span>
-        <span>FDC 3h <b data-field="fdcStatus">...</b><i data-dot="fdcStatus"></i></span>
+        <span>FDC <b data-field="fdcStatus">...</b><i data-dot="fdcStatus"></i></span>
         <span>VAL <b data-field="validatorStatus">...</b><i data-dot="validatorStatus"></i></span>
         <span>NODE <b data-field="nodeStatus">...</b><i data-dot="nodeStatus"></i></span>
       </div>
@@ -60,7 +60,7 @@
         <small data-field="ftsoStatusMeta">provider</small>
       </article>
       <article class="status-tile" data-status="loading" data-card="fdcStatus">
-        <span>FDC 3h</span>
+        <span>FDC</span>
         <strong data-field="fdcStatus">...</strong>
         <small data-field="fdcStatusMeta">provider</small>
       </article>
@@ -145,25 +145,25 @@
             <strong data-field="ftsoAvailability24h">-</strong>
             <small data-field="ftso24hSource">FSE</small>
           </article>
-          <article>
+          <article class="stat-split">
             <span>Success 6h</span>
             <strong class="split-value"><b data-field="ftsoPrimary6h">-</b><em>/</em><b data-field="ftsoSecondary6h">-</b></strong>
             <small><span data-field="ftso6hSource">FSE</span> prim/sec</small>
           </article>
-          <article>
+          <article class="stat-split">
             <span>Success 24h</span>
             <strong class="split-value"><b data-field="ftsoPrimary24h">-</b><em>/</em><b data-field="ftsoSecondary24h">-</b></strong>
             <small><span data-field="ftso24hSource">FSE</span> prim/sec</small>
           </article>
-          <article>
+          <article class="stat-compact">
             <span>FDC 6h</span>
             <strong data-field="fdcAvailability6h">-</strong>
           </article>
-          <article>
+          <article class="stat-compact">
             <span>FDC 24h</span>
             <strong data-field="fdcAvailability">-</strong>
           </article>
-          <article>
+          <article class="stat-compact">
             <span>FDC epoch</span>
             <strong data-field="fdcParticipation">-</strong>
           </article>
@@ -343,6 +343,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-22"></script>
+  <script src="../assets/ops.js?v=ops-23"></script>
 </body>
 </html>
