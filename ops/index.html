@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-23">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-25">
 </head>
 <body>
   <main class="ops-shell">
@@ -98,9 +98,9 @@
         <small>payload age</small>
       </article>
       <article class="truth-tile truth-liveness" data-tone-card="daemonFreshness">
-        <span>Monitor mode</span>
-        <strong data-field="daemonLiveness">Public APIs</strong>
-        <small data-field="daemonLivenessMeta">no server agent</small>
+        <span>Daemon liveness</span>
+        <strong data-field="daemonLiveness">Public-only</strong>
+        <small data-field="daemonLivenessMeta">no server install</small>
       </article>
     </section>
 
@@ -158,14 +158,17 @@
           <article class="stat-compact">
             <span>FDC 6h</span>
             <strong data-field="fdcAvailability6h">-</strong>
+            <small data-field="fdc6hSource">Oracle avg</small>
           </article>
           <article class="stat-compact">
             <span>FDC 24h</span>
             <strong data-field="fdcAvailability">-</strong>
+            <small data-field="fdc24hSource">Oracle avg</small>
           </article>
           <article class="stat-compact">
             <span>FDC epoch</span>
             <strong data-field="fdcParticipation">-</strong>
+            <small data-field="fdcEpochSource">latest epoch</small>
           </article>
           <article>
             <span>Conditions</span>
@@ -195,8 +198,19 @@
         </article>
 
         <article class="chart-card">
-          <div class="chart-title"><span>FDC Availability <em>(24h)</em></span><b data-field="fdcAvailability">-</b></div>
+          <div class="chart-title">
+            <span>FDC Availability <em>(24h)</em><small class="chart-source" data-field="fdc24hSource">Oracle avg</small></span>
+            <b data-field="fdcAvailability">-</b>
+          </div>
           <svg class="chart" data-chart="fdcAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FDC availability chart"></svg>
+        </article>
+
+        <article class="chart-card">
+          <div class="chart-title">
+            <span>FTSO Availability <em>(24h)</em><small class="chart-source" data-field="ftso24hSource">FSE</small></span>
+            <b data-field="ftsoAvailability">-</b>
+          </div>
+          <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
         </article>
 
         <article class="my-fdc-card">
@@ -205,18 +219,13 @@
             <b data-field="fdcConditionStatus">-</b>
           </div>
           <div class="my-fdc-grid">
-            <span>Availability now <strong data-field="fdcAvailabilityNow">-</strong></span>
-            <span>Availability 6h <strong data-field="fdcAvailability6h">-</strong></span>
-            <span>Availability 24h <strong data-field="fdcAvailability">-</strong></span>
-            <span>Epoch participation <strong data-field="fdcParticipation">-</strong></span>
-            <span>Rewarded rounds <strong data-field="fdcRounds">-</strong></span>
-            <span>Latest condition <strong data-field="fdcConditionStatus">-</strong></span>
+            <span>Avail now <strong data-field="fdcAvailabilityNow">-</strong><small>Oracle current</small></span>
+            <span>Avail 6h <strong data-field="fdcAvailability6h">-</strong><small data-field="fdc6hSource">Oracle avg</small></span>
+            <span>Avail 24h <strong data-field="fdcAvailability">-</strong><small data-field="fdc24hSource">Oracle avg</small></span>
+            <span>Epoch participation <strong data-field="fdcParticipation">-</strong><small data-field="fdcEpochSource">latest epoch</small></span>
+            <span>Rewarded rounds <strong data-field="fdcRounds">-</strong><small>provider only</small></span>
+            <span>Latest condition <strong data-field="fdcConditionStatus">-</strong><small>reward rule</small></span>
           </div>
-        </article>
-
-        <article class="chart-card">
-          <div class="chart-title"><span>FTSO Availability <em>(24h)</em></span><b data-field="ftsoAvailability">-</b></div>
-          <svg class="chart" data-chart="ftsoAvailability" viewBox="0 0 640 170" preserveAspectRatio="none" role="img" aria-label="FTSO availability chart"></svg>
         </article>
 
         <article class="chart-card condition-card" id="history">
@@ -343,6 +352,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-23"></script>
+  <script src="../assets/ops.js?v=ops-25"></script>
 </body>
 </html>

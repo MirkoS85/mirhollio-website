@@ -190,6 +190,19 @@
     return primaryValue != null ? primaryValue : recentAverage(fallbackValues, fallbackCount);
   }
 
+  function windowSourceLabel(primaryCount, expectedCount, hours) {
+    if (primaryCount >= expectedCount) return "FSE";
+    if (primaryCount > 0) return "FSE / Oracle";
+    return `Oracle ${hours}h avg`;
+  }
+
+  function oracleAverageSource(values, hours) {
+    const count = Array.isArray(values) ? Math.min(hours, values.length) : 0;
+    if (count >= hours) return `Oracle ${hours}h avg`;
+    if (count > 1) return `Oracle ${count}h avg`;
+    return "Oracle current";
+  }
+
   function fmtCompact(value, suffix = "") {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
@@ -404,11 +417,11 @@
       return {
         wired: false,
         level: "ok",
-        title: "Public APIs",
-        meta: "no server agent",
+        title: "Public-only",
+        meta: "no server install",
         fdcLevel: "ok",
-        fdcTitle: "Public only",
-        fdcMeta: "signature age is not public"
+        fdcTitle: "Provider metrics",
+        fdcMeta: "Oracle provider summary"
       };
     }
     const submit = daemonTimestamp(payload, "lastSubmitAt", "last_submit_at", "submitAt", "submit_at");
@@ -1162,6 +1175,9 @@
     if (!mount) return;
     const node = getNode(validator);
     const network = networkInfo(providerPayload);
+    const fdcHours = hourlySeries(provider?.fdcPerformance?.availability1h);
+    const fdc24h = recentAverage(fdcHours, 24);
+    const fdc6h = recentAverage(fdcHours, 6);
     const payload = {
       network: {
         currentRewardEpoch: network?.m_iCurrentRewardEpoch ?? state.epochFallback?.currentEpoch,
@@ -1188,6 +1204,18 @@
         latestEpoch: latest?.epoch,
         totalEpochs: provider?.totalEpochs,
         eligibleEpochs: provider?.eligibleEpochs
+      },
+      fdcProviderOnly: {
+        source: "Oracle Daemon provider payload",
+        availabilityNow: provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "unavailable",
+        availability6h: fdc6h != null ? fmtPct(fdc6h) : "unavailable",
+        availability24h: fdc24h != null ? fmtPct(fdc24h) : "unavailable",
+        latestEpoch: latest?.epoch,
+        latestCondition: latest?.fdc?.conditionMet,
+        epochParticipation: latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "unavailable",
+        rewardedRounds: latest?.fdc?.rewardedVotingRounds != null && latest?.fdc?.totalRewardedVotingRounds != null
+          ? `${fmtNum(latest.fdc.rewardedVotingRounds, 0)} / ${fmtNum(latest.fdc.totalRewardedVotingRounds, 0)}`
+          : "unavailable"
       },
       validator: {
         nodeId: node?.m_sNodeID,
@@ -1259,8 +1287,10 @@
     const fseSecondary6h = explorerFtsoMetric(explorerFtso, "last_6h", "secondary");
     const fsePrimary24h = explorerFtsoMetric(explorerFtso, "last_24h", "primary");
     const fseSecondary24h = explorerFtsoMetric(explorerFtso, "last_24h", "secondary");
-    const ftsoSource6h = fseAvailability6h != null || fsePrimary6h != null ? "FSE" : "Oracle";
-    const ftsoSource24h = fseAvailability24h != null || fsePrimary24h != null ? "FSE" : "Oracle";
+    const fse6Count = [fseAvailability6h, fsePrimary6h, fseSecondary6h].filter(value => value != null).length;
+    const fse24Count = [fseAvailability24h, fsePrimary24h, fseSecondary24h].filter(value => value != null).length;
+    const ftsoSource6h = windowSourceLabel(fse6Count, 3, 6);
+    const ftsoSource24h = windowSourceLabel(fse24Count, 3, 24);
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
@@ -1291,12 +1321,18 @@
     setText("ftso6hSource", ftsoSource6h);
     setText("ftso24hSource", ftsoSource24h);
 
+    const fdcAvailability6h = recentAverage(fdcAvailabilityHours, 6);
     const fdcAvailability24h = recentAverage(fdcAvailabilityHours, 24);
+    const fdcSource6h = oracleAverageSource(fdcAvailabilityHours, 6);
+    const fdcSource24h = oracleAverageSource(fdcAvailabilityHours, 24);
     setText("fdcAvailabilityNow", provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
-    setText("fdcAvailability6h", fmtOptionalPct(recentAverage(fdcAvailabilityHours, 6)));
+    setText("fdcAvailability6h", fmtOptionalPct(fdcAvailability6h));
     setText("fdcAvailability", fdcAvailability24h != null ? fmtPct(fdcAvailability24h) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : "-");
     setText("fdcParticipation", latest?.fdc?.participationPercentage != null ? fmtPct(latest.fdc.participationPercentage) : "-");
     setText("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "OK" : latest?.fdc?.conditionMet === false ? "Failed" : "-");
+    setText("fdc6hSource", fdcSource6h);
+    setText("fdc24hSource", fdcAvailability24h != null ? fdcSource24h : "Oracle current");
+    setText("fdcEpochSource", latest?.epoch != null ? `E${latest.epoch}` : "latest epoch");
     setText("conditionPasses", Number.isFinite(passes) ? `${passes}/3` : `${conditionOk}/4`);
     setText("conditionsLabel", `${conditionOk}/4 latest checks`);
     setText("preRegistered", provider?.isPreRegistered === true ? "Yes" : provider?.isPreRegistered === false ? "No" : "-");
@@ -1470,7 +1506,7 @@
     setSource("explorer", explorer || explorerFtso ? "ok" : "warn");
     setSource("explorerFtso", explorerFtso ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
-    setSource("daemon", daemonPayload ? "ok" : "warn");
+    setSource("daemon", daemonPayload ? "ok" : "public-only");
 
     // ââ NEW: Fire supplementary fetches in parallel (non-blocking) ââââââââââââ
     // These enrich the page but don't block the initial render

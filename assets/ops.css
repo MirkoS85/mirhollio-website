@@ -631,6 +631,13 @@ h2{
   font-size:clamp(18px,2.1vw,20px);
 }
 
+.data-table article.stat-compact small{
+  display:block;
+  margin-top:5px;
+  font-size:9px;
+  line-height:1.15;
+}
+
 .data-table .success,
 .source-card strong{
   color:var(--green);
@@ -687,6 +694,16 @@ h2{
   white-space:nowrap;
 }
 
+.my-fdc-grid small{
+  display:block;
+  margin-top:6px;
+  color:var(--soft);
+  font-size:9px;
+  font-weight:900;
+  line-height:1.15;
+  letter-spacing:.02em;
+}
+
 .chart-title{
   min-height:36px;
   display:flex;
@@ -704,6 +721,16 @@ h2{
   color:var(--muted);
   font-style:normal;
   font-weight:700;
+}
+
+.chart-title .chart-source{
+  display:block;
+  margin-top:2px;
+  color:var(--soft);
+  font-size:9px;
+  font-weight:900;
+  line-height:1.1;
+  text-transform:uppercase;
 }
 
 .chart-title b{
@@ -1246,6 +1273,10 @@ h2{
 
   .ftso-table article:nth-child(7),
   .ftso-table article:nth-child(8){
+    grid-column:1 / -1;
+  }
+
+  .ftso-table article:nth-child(15){
     grid-column:1 / -1;
   }
 
