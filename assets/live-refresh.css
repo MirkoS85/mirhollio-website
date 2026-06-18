@@ -811,6 +811,38 @@ h1{
   text-transform:none;
 }
 
+.contact-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  min-height:0;
+  padding:24px 28px;
+}
+
+.contact-card-copy{
+  display:grid;
+  gap:7px;
+  min-width:0;
+}
+
+.contact-card-copy strong{
+  font-size:24px;
+  line-height:1.05;
+  letter-spacing:0;
+}
+
+.contact-card-copy span{
+  color:#72646d;
+  font-size:14px;
+  line-height:1.45;
+}
+
+.contact-card .btn{
+  flex:0 0 auto;
+  min-width:170px;
+}
+
 @media (min-width:1180px){
   .home-hero-section{
     padding-top:28px;
@@ -2920,6 +2952,12 @@ tbody tr:hover td{
     padding:14px;
   }
 
+  .contact-section .contact-card{
+    align-items:stretch;
+    flex-direction:column;
+    gap:14px;
+  }
+
   .contact-section .card b{
     font-size:11px !important;
     line-height:1.15;
@@ -2937,10 +2975,26 @@ tbody tr:hover td{
     margin-top:10px;
   }
 
+  .contact-section .contact-card-copy strong{
+    margin-top:0;
+    font-size:18px;
+    overflow-wrap:normal;
+  }
+
+  .contact-section .contact-card-copy span{
+    font-size:12px;
+    line-height:1.4;
+  }
+
   .contact-section .card .btn{
     min-height:40px;
     padding:9px 12px;
     font-size:12px;
+  }
+
+  .contact-section .contact-card .btn{
+    width:100%;
+    min-width:0;
   }
 
   .delegator-panel-head{

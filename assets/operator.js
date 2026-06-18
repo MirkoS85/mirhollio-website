@@ -35,7 +35,6 @@ const MirSFlr = (() => {
     { reward_epoch_id: 395, availability: 1.0 }
   ];
   const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
-  const CONTACT_EMAIL = "mirsven@icloud.com";
   let providerData = null;
   let validatorData = null;
   let latestData = null;
@@ -1563,7 +1562,6 @@ const MirSFlr = (() => {
       const key = button.getAttribute("data-copy");
       const label = key === "delegation" ? "delegation address"
         : key === "identity" ? "provider identity"
-        : key === "email" ? "email address"
         : "value";
       button.setAttribute("aria-label", `Copy ${label}`);
     });
@@ -1611,7 +1609,6 @@ const MirSFlr = (() => {
     setText("providerIdentity", voter);
     setText("shortDelegation", shortAddr(delegation));
     setText("shortIdentity", shortAddr(voter));
-    setText("contactEmail", CONTACT_EMAIL);
     setBar("availability", provider.ftsoPerformance?.availability);
     setBar("performance", provider.ftsoPerformance?.performance);
     setBar("performance1", provider.ftsoPerformance?.performance1);
@@ -1809,7 +1806,6 @@ const MirSFlr = (() => {
       const key = btn.getAttribute("data-copy");
       const value = key === "delegation" ? (providerData?.delegationAddress || TARGET_DELEGATION)
         : key === "identity" ? (providerData?.voterAddress || TARGET_VOTER)
-        : key === "email" ? CONTACT_EMAIL
         : key;
       copyFromButton(value, btn);
     });
