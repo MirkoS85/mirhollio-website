@@ -881,6 +881,11 @@ h2{
 .ops-chart-tooltip[data-zone="down"]{border-color:rgba(255,95,120,.5)}
 .ops-chart-tooltip[data-zone="reward"]{border-color:rgba(224,74,138,.46)}
 
+.ops-chart-tooltip[data-type="validatorReward"]{
+  min-width:220px;
+  max-width:244px;
+}
+
 .legend{
   display:none;
   align-items:center;

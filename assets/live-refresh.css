@@ -2168,6 +2168,39 @@ tbody tr:hover td{
   letter-spacing:.02em;
 }
 
+.chart-tooltip.validator-reward-tooltip{
+  min-width:210px;
+  max-width:230px;
+}
+
+.chart-tooltip.validator-reward-tooltip > strong{
+  margin-top:5px;
+}
+
+.chart-tooltip.validator-reward-tooltip > b{
+  font-size:12px;
+  line-height:1.2;
+}
+
+.chart-tooltip.validator-reward-tooltip span{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.chart-tooltip.validator-reward-tooltip span b{
+  display:inline;
+  font-size:11px;
+  line-height:inherit;
+}
+
+.chart-definition{
+  margin:-4px 0 12px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
+
 .chart-summary{
   margin-top:14px;
   padding-top:14px;
@@ -3588,6 +3621,15 @@ tbody tr:hover td{
   .chart-tooltip span,
   .chart-tooltip small{
     margin-top:4px;
+    font-size:10px;
+  }
+
+  .chart-tooltip.validator-reward-tooltip{
+    min-width:196px;
+    max-width:210px;
+  }
+
+  .chart-tooltip.validator-reward-tooltip span b{
     font-size:10px;
   }
 

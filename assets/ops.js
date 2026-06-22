@@ -737,11 +737,23 @@
 
   function validatorRewardSeries(node) {
     const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
+    const fee = Number(node?.m_dFee);
     return history
-      .map(item => ({
-        epoch: Number(item.m_dRewardEpoch),
-        value: Number(item.m_dValidatorReward ?? item.m_dNodeReward ?? 0)
-      }))
+      .map(item => {
+        const nodeReward = Number(item.m_dNodeReward);
+        const validatorReward = Number(item.m_dValidatorReward);
+        const gross = (Number.isFinite(nodeReward) ? nodeReward : 0)
+          + (Number.isFinite(validatorReward) ? validatorReward : 0);
+        const feePct = Number.isFinite(fee) ? fee : 0;
+        return {
+          epoch: Number(item.m_dRewardEpoch),
+          value: gross * (1 - feePct / 100),
+          gross,
+          nodeReward,
+          validatorReward,
+          feePct
+        };
+      })
       .filter(item => Number.isFinite(item.epoch) && Number.isFinite(item.value))
       .sort((a, b) => a.epoch - b.epoch)
       .slice(-20);
@@ -799,6 +811,19 @@
     if (options.tooltip === "reward") {
       return `<span>${escapeHtml(label)}</span><strong>${escapeHtml(fmtFullFlr(point.item.value))}</strong>`;
     }
+    if (options.tooltip === "validatorReward") {
+      return `
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(fmtFullFlr(point.item.value))}</strong>
+        <em>Oracle display estimate</em>
+        <div class="tooltip-metrics">
+          <span>Gross <b>${escapeHtml(fmtFullFlr(point.item.gross))}</b></span>
+          <span>Node API <b>${escapeHtml(fmtFullFlr(point.item.nodeReward))}</b></span>
+          <span>Validator API <b>${escapeHtml(fmtFullFlr(point.item.validatorReward))}</b></span>
+          <span>Fee <b>${escapeHtml(fmtPct(point.item.feePct))}</b></span>
+        </div>
+      `;
+    }
     if (options.tooltip === "availability") {
       const zone = availabilityZone(point.item.value);
       return `<span>${escapeHtml(options.metricLabel || "Availability")}</span><strong>${escapeHtml(fmtPct(point.item.value))}</strong><em>${escapeHtml(label)} - ${escapeHtml(zone.label)}</em>`;
@@ -830,10 +855,12 @@
       const cardRect = card.getBoundingClientRect();
       const x = svgRect.left - cardRect.left + (point.x / width) * svgRect.width;
       const y = svgRect.top - cardRect.top + (point.y / height) * svgRect.height;
-      const minX = Math.min(92, Math.max(24, cardRect.width / 2));
+      const tooltipHalfWidth = options.tooltip === "validatorReward" ? 122 : 92;
+      const minX = Math.min(tooltipHalfWidth, Math.max(24, cardRect.width / 2));
       const maxX = Math.max(minX, cardRect.width - minX);
       tooltip.innerHTML = chartTooltipHtml(point, index, points.length, options);
       tooltip.dataset.zone = options.tooltip === "availability" ? availabilityZone(point.item.value).level : "reward";
+      tooltip.dataset.type = options.tooltip;
       tooltip.style.left = `${Math.max(minX, Math.min(maxX, x))}px`;
       tooltip.style.top = `${Math.max(44, y - 10)}px`;
       tooltip.classList.add("is-visible");
@@ -1556,7 +1583,7 @@
     renderLineChart("fdcAvailability", fdcAvailabilityHours, { min: 90, max: 100, target: 98, zones: "availability", tooltip: "availability", metricLabel: "FDC availability", empty: "No FDC availability", yTop: "100%", yBottom: "90%", firstLabel: "23h ago", lastLabel: "now" });
     renderPerformanceChart(provider);
     renderConditionHeatmap(provider);
-    renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green" });
+    renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green", tooltip: "validatorReward" });
     renderUptimeStrip(uptimeValues);
     renderExpiryList(node);
     renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload);

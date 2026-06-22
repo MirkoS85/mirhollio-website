@@ -33,7 +33,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=guide-flow-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=validator-payout-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -75,7 +75,7 @@
           <button class="btn decision-btn" type="button" data-panel-toggle="validator-epochs-panel" data-open-label="Open validator epochs" data-close-label="Hide validator epochs" aria-controls="validator-epochs-panel" aria-expanded="false">Open validator epochs</button>
           <div class="validator-panel table-panel" id="validator-epochs-panel" data-accordion-panel hidden>
             <div class="panel-head"><strong>Validator reward history</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div>
-            <div class="table-wrap table-wrap-compact"><table class="validator-epoch-table"><caption>Validator reward history by epoch</caption><thead><tr><th scope="col">Validator epoch</th><th scope="col">Validator reward</th><th scope="col">Node reward</th><th scope="col">Fee</th></tr></thead><tbody data-render="validator-epoch-table" data-limit="10"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+            <div class="table-wrap table-wrap-compact"><table class="validator-epoch-table"><caption>Validator payout estimate and API components by epoch</caption><thead><tr><th scope="col">Validator epoch</th><th scope="col">Oracle estimate</th><th scope="col">Gross reward</th><th scope="col">Node API</th><th scope="col">Validator API</th><th scope="col">Fee</th></tr></thead><tbody data-render="validator-epoch-table" data-limit="10"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
           </div>
         </div>
       </section>
@@ -88,7 +88,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=provider-only-1"></script>
+  <script src="../assets/operator.js?v=validator-payout-1"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>

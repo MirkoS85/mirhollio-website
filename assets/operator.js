@@ -830,16 +830,17 @@ const MirSFlr = (() => {
       }
 
       const labels = tableLabels(tbody);
-      const fee = node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-";
+      const fee = Number(node?.m_dFee);
       tbody.innerHTML = history.map(item => {
-        const validatorReward = Number(item.m_dValidatorReward ?? item.m_dNodeReward);
-        const nodeReward = Number(item.m_dNodeReward);
+        const breakdown = validatorRewardBreakdown(item, fee);
         return `
           <tr>
             <th scope="row" data-label="${labels[0] || "Validator epoch"}">${item.m_dRewardEpoch ?? "-"}</th>
-            <td data-label="${labels[1] || "Validator reward"}">${Number.isFinite(validatorReward) ? fmtNum(validatorReward, 2) : "-"}</td>
-            <td data-label="${labels[2] || "Node reward"}">${Number.isFinite(nodeReward) ? fmtNum(nodeReward, 2) : "-"}</td>
-            <td data-label="${labels[3] || "Fee"}">${fee}</td>
+            <td data-label="${labels[1] || "Oracle estimate"}">${fmtNum(breakdown.netEstimate, 2)}</td>
+            <td data-label="${labels[2] || "Gross reward"}">${fmtNum(breakdown.gross, 2)}</td>
+            <td data-label="${labels[3] || "Node API"}">${fmtNum(breakdown.nodeReward, 2)}</td>
+            <td data-label="${labels[4] || "Validator API"}">${fmtNum(breakdown.validatorReward, 2)}</td>
+            <td data-label="${labels[5] || "Fee"}">${fmtNum(breakdown.fee, 2)}%</td>
           </tr>
         `;
       }).join("");
@@ -929,7 +930,22 @@ const MirSFlr = (() => {
     return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR<br><small>${fmtFiat(minReward)} - ${fmtFiat(maxReward)}</small>`;
   }
 
-  function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId }) {
+  function validatorRewardBreakdown(item, feePct) {
+    const nodeReward = Number(item?.m_dNodeReward);
+    const validatorReward = Number(item?.m_dValidatorReward);
+    const gross = (Number.isFinite(nodeReward) ? nodeReward : 0)
+      + (Number.isFinite(validatorReward) ? validatorReward : 0);
+    const fee = Number.isFinite(Number(feePct)) ? Number(feePct) : 0;
+    return {
+      nodeReward,
+      validatorReward,
+      gross,
+      fee,
+      netEstimate: gross * (1 - fee / 100)
+    };
+  }
+
+  function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }) {
     if (!svg) return;
 
     if (!series.length) {
@@ -1000,7 +1016,10 @@ const MirSFlr = (() => {
         const svgRect = svg.getBoundingClientRect();
         const anchorLeft = (point.x / width) * svgRect.width + (svgRect.left - wrapRect.left) + wrap.scrollLeft;
         const anchorTop = (point.y / height) * svgRect.height + (svgRect.top - wrapRect.top) + wrap.scrollTop;
-        tooltip.innerHTML = `Epoch ${point.epoch}<br>${rewardWithFiat(point.reward)}`;
+        tooltip.innerHTML = typeof tooltipHtml === "function"
+          ? tooltipHtml(point)
+          : `Epoch ${point.epoch}<br>${rewardWithFiat(point.reward)}`;
+        tooltip.classList.toggle("validator-reward-tooltip", typeof tooltipHtml === "function");
         tooltip.style.display = "block";
         const tooltipWidth = tooltip.offsetWidth || 140;
         const tooltipHeight = tooltip.offsetHeight || 74;
@@ -1062,13 +1081,18 @@ const MirSFlr = (() => {
   }
 
   function renderValidatorRewardChart(node) {
+    const fee = Number(node?.m_dFee);
     const series = [...(node?.m_axReward || [])]
       .sort((a, b) => Number(a.m_dRewardEpoch) - Number(b.m_dRewardEpoch))
       .slice(-20)
-      .map(item => ({
-        epoch: item.m_dRewardEpoch,
-        reward: Number(item.m_dValidatorReward ?? item.m_dNodeReward ?? 0)
-      }));
+      .map(item => {
+        const breakdown = validatorRewardBreakdown(item, fee);
+        return {
+          epoch: item.m_dRewardEpoch,
+          reward: breakdown.netEstimate,
+          ...breakdown
+        };
+      });
 
     renderRewardSeries({
       svg: document.querySelector("[data-render='validator-reward-chart']"),
@@ -1076,7 +1100,16 @@ const MirSFlr = (() => {
       summary: document.querySelector("[data-render='validator-reward-summary']"),
       series,
       emptyMessage: "Validator reward history unavailable",
-      gradientId: "validatorReward"
+      gradientId: "validatorReward",
+      tooltipHtml: point => `
+        <b>Epoch ${point.epoch}</b>
+        <strong>${fmtNum(point.netEstimate, 2)} FLR</strong>
+        <small>Oracle display estimate</small>
+        <span>Gross <b>${fmtNum(point.gross, 2)} FLR</b></span>
+        <span>Node API <b>${fmtNum(point.nodeReward, 2)} FLR</b></span>
+        <span>Validator API <b>${fmtNum(point.validatorReward, 2)} FLR</b></span>
+        <small>Fee ${fmtNum(point.fee, 2)}%</small>
+      `
     });
   }
 

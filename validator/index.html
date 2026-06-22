@@ -33,7 +33,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=guide-flow-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=validator-payout-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -89,7 +89,7 @@
               </div>
             </article>
             <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
-            <div class="chart-panel"><div class="panel-head"><strong>Validator Rewards per epoch</strong><span class="mini-label">Latest 20</span></div><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator rewards per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
+            <div class="chart-panel"><div class="panel-head"><strong>Validator payout estimate per epoch</strong><span class="mini-label">Oracle estimate · Latest 20</span></div><p class="chart-definition">Matches Oracle Daemon: (Node API + Validator API) × (1 − fee).</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator payout estimate per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
             <div class="validator-panel delegator-panel" id="delegation-details-panel">
               <div class="panel-head delegator-panel-head"><div><strong>Delegation details</strong><span class="mini-label">Current validator stake</span></div><label class="delegator-sort-control" for="delegator-sort"><span>Sort</span><select id="delegator-sort" data-delegator-sort aria-label="Sort delegation details"><option value="amount-desc">Amount high to low</option><option value="amount-asc">Amount low to high</option><option value="start-asc">Start date old to new</option><option value="start-desc">Start date new to old</option><option value="end-asc">End date earliest first</option><option value="end-desc">End date latest first</option></select></label></div>
               <div class="table-wrap table-wrap-compact"><table class="delegator-table"><caption>Current validator delegators</caption><thead><tr><th scope="col">#</th><th scope="col">Address</th><th scope="col">Amount</th><th scope="col">Share</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Time left</th></tr></thead><tbody data-render="validator-delegator-table"><tr><td colspan="7">Loading...</td></tr></tbody></table></div>
@@ -100,7 +100,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=provider-only-1"></script>
+  <script src="../assets/operator.js?v=validator-payout-1"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>
