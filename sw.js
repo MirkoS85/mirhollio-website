@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirsflr-shell-v163";
+const CACHE_NAME = "mirsflr-shell-v164";
 const APP_SHELL = [
   "/",
   "/ops/",
