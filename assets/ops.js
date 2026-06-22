@@ -132,6 +132,43 @@
     });
   }
 
+  function setMetricTone(field, tone, hint = "") {
+    $$(`[data-field="${field}"]`).forEach(el => {
+      if (tone) el.dataset.metricTone = tone;
+      else delete el.dataset.metricTone;
+      if (hint) el.title = hint;
+      else el.removeAttribute("title");
+    });
+  }
+
+  function higherIsBetterTone(value, okAt, warnAt) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "";
+    if (n >= okAt) return "ok";
+    if (n >= warnAt) return "warn";
+    return "down";
+  }
+
+  function lowerIsBetterTone(value, okAt, warnAt) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "";
+    if (n <= okAt) return "ok";
+    if (n <= warnAt) return "warn";
+    return "down";
+  }
+
+  function median(values) {
+    const sorted = (Array.isArray(values) ? values : [])
+      .map(Number)
+      .filter(Number.isFinite)
+      .sort((a, b) => a - b);
+    if (!sorted.length) return null;
+    const middle = Math.floor(sorted.length / 2);
+    return sorted.length % 2
+      ? sorted[middle]
+      : (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+
   function setBar(name, value) {
     const n = Number(value);
     const pct = Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
@@ -1279,6 +1316,7 @@
 
     const ftsoAvailabilityHours = hourlySeries(provider?.ftsoPerformance?.availability1h);
     const fdcAvailabilityHours = hourlySeries(provider?.fdcPerformance?.availability1h);
+    const ftsoPerformanceHours = hourlySeries(provider?.ftsoPerformance?.performance1h);
     const ftsoPrimaryHours = hourlySeries(provider?.ftsoPerformance?.performance1_1h);
     const ftsoSecondaryHours = hourlySeries(provider?.ftsoPerformance?.performance2_1h);
     const fseAvailability6h = explorerFtsoMetric(explorerFtso, "last_6h", "availability");
@@ -1291,6 +1329,12 @@
     const fse24Count = [fseAvailability24h, fsePrimary24h, fseSecondary24h].filter(value => value != null).length;
     const ftsoSource6h = windowSourceLabel(fse6Count, 3, 6);
     const ftsoSource24h = windowSourceLabel(fse24Count, 3, 24);
+    const ftsoAvailability6h = metricWithFallback(fseAvailability6h, ftsoAvailabilityHours, 6);
+    const ftsoAvailability24h = metricWithFallback(fseAvailability24h, ftsoAvailabilityHours, 24);
+    const ftsoPrimary6h = metricWithFallback(fsePrimary6h, ftsoPrimaryHours, 6);
+    const ftsoSecondary6h = metricWithFallback(fseSecondary6h, ftsoSecondaryHours, 6);
+    const ftsoPrimary24h = metricWithFallback(fsePrimary24h, ftsoPrimaryHours, 24);
+    const ftsoSecondary24h = metricWithFallback(fseSecondary24h, ftsoSecondaryHours, 24);
 
     setStatusCard("ftsoStatus", levels.ftso, levels.ftso === "ok" ? "OK" : levels.ftso === "warn" ? "WARN" : "DOWN", latest ? `E${latest.epoch || "-"}` : "missing");
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
@@ -1312,12 +1356,12 @@
     setText("ftsoPrimary", provider?.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
     setText("ftsoSecondary", provider?.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
     setText("ftsoAvailability", provider?.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
-    setText("ftsoAvailability6h", fmtOptionalPct(metricWithFallback(fseAvailability6h, ftsoAvailabilityHours, 6)));
-    setText("ftsoAvailability24h", fmtOptionalPct(metricWithFallback(fseAvailability24h, ftsoAvailabilityHours, 24)));
-    setText("ftsoPrimary6h", fmtOptionalPct(metricWithFallback(fsePrimary6h, ftsoPrimaryHours, 6)));
-    setText("ftsoSecondary6h", fmtOptionalPct(metricWithFallback(fseSecondary6h, ftsoSecondaryHours, 6)));
-    setText("ftsoPrimary24h", fmtOptionalPct(metricWithFallback(fsePrimary24h, ftsoPrimaryHours, 24)));
-    setText("ftsoSecondary24h", fmtOptionalPct(metricWithFallback(fseSecondary24h, ftsoSecondaryHours, 24)));
+    setText("ftsoAvailability6h", fmtOptionalPct(ftsoAvailability6h));
+    setText("ftsoAvailability24h", fmtOptionalPct(ftsoAvailability24h));
+    setText("ftsoPrimary6h", fmtOptionalPct(ftsoPrimary6h));
+    setText("ftsoSecondary6h", fmtOptionalPct(ftsoSecondary6h));
+    setText("ftsoPrimary24h", fmtOptionalPct(ftsoPrimary24h));
+    setText("ftsoSecondary24h", fmtOptionalPct(ftsoSecondary24h));
     setText("ftso6hSource", ftsoSource6h);
     setText("ftso24hSource", ftsoSource24h);
 
@@ -1341,6 +1385,57 @@
     setText("fastUpdates", latest?.fastUpdates?.updates != null && latest?.fastUpdates?.expectedUpdates != null ? `${fmtNum(latest.fastUpdates.updates, 0)} / ${fmtNum(latest.fastUpdates.expectedUpdates, 0)}` : "-");
     setText("fdcRounds", latest?.fdc?.rewardedVotingRounds != null && latest?.fdc?.totalRewardedVotingRounds != null ? `${fmtNum(latest.fdc.rewardedVotingRounds, 0)} / ${fmtNum(latest.fdc.totalRewardedVotingRounds, 0)}` : "-");
     setText("stakingCondition", latest?.staking?.conditionMet === true ? "OK" : latest?.staking?.conditionMet === false ? "Failed" : "-");
+
+    // Adaptive health colours: rolling metrics use their 24h baseline, while
+    // epoch metrics use up to the latest 52 epochs (roughly six months).
+    const epochHistory = (Array.isArray(provider?.epochData) ? provider.epochData : [])
+      .slice()
+      .sort((a, b) => Number(a?.epoch || 0) - Number(b?.epoch || 0))
+      .slice(-52);
+    const recentEpochs = epochHistory.slice(-12);
+    const performanceMedian24h = median(ftsoPerformanceHours);
+    const primaryMedian24h = median(ftsoPrimaryHours);
+    const secondaryMedian24h = median(ftsoSecondaryHours);
+    const rewardRateMedian12 = median(recentEpochs.map(item => item?.m_dRewardRate));
+    const rewardMedian12 = median(recentEpochs.map(item => item?.totalRewardAmount));
+    const fdcMedian6m = median(epochHistory.map(item => item?.fdc?.participationPercentage));
+    const hitMedian6m = median(epochHistory.map(item => item?.ftsoScaling?.hitPercentage));
+
+    const performanceOk = Math.max(55, (performanceMedian24h ?? 65) * 0.9);
+    const performanceWarn = Math.max(40, (performanceMedian24h ?? 65) * 0.7);
+    const primaryOk = Math.max(18, (primaryMedian24h ?? 25) * 0.85);
+    const primaryWarn = Math.max(10, (primaryMedian24h ?? 25) * 0.55);
+    const secondaryOk = Math.max(82, (secondaryMedian24h ?? 90) * 0.92);
+    const secondaryWarn = Math.max(70, (secondaryMedian24h ?? 90) * 0.78);
+    const rewardRateOk = Math.max(3, (rewardRateMedian12 ?? 3.75) * 0.8);
+    const rewardRateWarn = Math.max(2, (rewardRateMedian12 ?? 3.75) * 0.55);
+    const rewardOk = (rewardMedian12 ?? 45_000) * 0.75;
+    const rewardWarn = (rewardMedian12 ?? 45_000) * 0.4;
+    const fdcEpochOk = Math.max(88, (fdcMedian6m ?? 91) * 0.95);
+    const fdcEpochWarn = Math.max(75, (fdcMedian6m ?? 91) * 0.8);
+    const hitOk = Math.max(99, (hitMedian6m ?? 99.7) - 0.5);
+
+    setMetricTone("ftsoPerformance", higherIsBetterTone(pctNumber(provider?.ftsoPerformance?.performance), performanceOk, performanceWarn), `Normal >= ${fmtPct(performanceOk)}`);
+    setMetricTone("ftsoPrimary", higherIsBetterTone(pctNumber(provider?.ftsoPerformance?.performance1), primaryOk, primaryWarn), `Normal >= ${fmtPct(primaryOk)}`);
+    setMetricTone("ftsoSecondary", higherIsBetterTone(pctNumber(provider?.ftsoPerformance?.performance2), secondaryOk, secondaryWarn), `Normal >= ${fmtPct(secondaryOk)}`);
+    setMetricTone("ftsoAvailability", higherIsBetterTone(pctNumber(provider?.ftsoPerformance?.availability), 98, 95), "Normal >= 98%");
+    setMetricTone("ftsoAvailability6h", higherIsBetterTone(ftsoAvailability6h, 98, 95), "Normal >= 98%");
+    setMetricTone("ftsoAvailability24h", higherIsBetterTone(ftsoAvailability24h, 98, 95), "Normal >= 98%");
+    setMetricTone("ftsoPrimary6h", higherIsBetterTone(ftsoPrimary6h, primaryOk, primaryWarn), `Normal >= ${fmtPct(primaryOk)}`);
+    setMetricTone("ftsoSecondary6h", higherIsBetterTone(ftsoSecondary6h, secondaryOk, secondaryWarn), `Normal >= ${fmtPct(secondaryOk)}`);
+    setMetricTone("ftsoPrimary24h", higherIsBetterTone(ftsoPrimary24h, primaryOk, primaryWarn), `Normal >= ${fmtPct(primaryOk)}`);
+    setMetricTone("ftsoSecondary24h", higherIsBetterTone(ftsoSecondary24h, secondaryOk, secondaryWarn), `Normal >= ${fmtPct(secondaryOk)}`);
+    setMetricTone("fdcAvailabilityNow", higherIsBetterTone(pctNumber(provider?.fdcPerformance?.availability), 97, 90), "Normal >= 97%");
+    setMetricTone("fdcAvailability6h", higherIsBetterTone(fdcAvailability6h, 97, 90), "Normal >= 97%");
+    setMetricTone("fdcAvailability", higherIsBetterTone(fdcAvailability24h ?? pctNumber(provider?.fdcPerformance?.availability), 97, 90), "Normal >= 97%");
+    setMetricTone("fdcParticipation", higherIsBetterTone(pctNumber(latest?.fdc?.participationPercentage), fdcEpochOk, fdcEpochWarn), `Six-month median ${fmtPct(fdcMedian6m)}`);
+    setMetricTone("conditionPasses", Number.isFinite(passes) ? higherIsBetterTone(passes, 3, 2) : higherIsBetterTone(conditionOk, 4, 3), "All required conditions should pass");
+    setMetricTone("preRegistered", provider?.isPreRegistered === true ? "ok" : provider?.isPreRegistered === false ? "down" : "warn");
+    setMetricTone("rewardRate", higherIsBetterTone(latest?.m_dRewardRate, rewardRateOk, rewardRateWarn), `Recent 12-epoch median ${fmtPct(rewardRateMedian12)}`);
+    setMetricTone("latestReward", higherIsBetterTone(reward, rewardOk, rewardWarn), `Recent 12-epoch median ${fmtCompact(rewardMedian12, " FLR")}`);
+    setMetricTone("ftsoHitPct", higherIsBetterTone(pctNumber(latest?.ftsoScaling?.hitPercentage), hitOk, 97), `Six-month median ${fmtPct(hitMedian6m)}`);
+    setMetricTone("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "ok" : latest?.fdc?.conditionMet === false ? "down" : "warn");
+    setMetricTone("stakingCondition", latest?.staking?.conditionMet === true ? "ok" : latest?.staking?.conditionMet === false ? "down" : "warn");
 
     // ââ Wallet balances: RPC-fetched live values (independent of Oracle Daemon)
     const rpcSubmit = state.walletBalances.submit;
@@ -1405,6 +1500,21 @@
       + Number(nodeHealth?.checks?.C?.message?.engine?.consensus?.processingBlocks || 0);
     setText("nodeProcessing", `${processing} blocks`);
     setText("nodeBls", String(nodeHealth?.checks?.bls?.message || "").includes("correct") ? "OK" : "-");
+    const daysLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? Number(stake.m_aiTimeLeftDHM[0]) : null;
+    const lastSeenSeconds = parseDurationSeconds(node?.m_sLastSeen);
+    const capacityTone = lowerIsBetterTone(capacityPct, 80, 95);
+    setMetricTone("validatorConnected", node?.m_bConnected === true ? "ok" : node?.m_bConnected === false ? "down" : "warn");
+    setMetricTone("validatorUptime", higherIsBetterTone(uptimeAvg, 99, 95), "Normal >= 99%");
+    setMetricTone("stakeEnds", daysLeft == null ? "" : higherIsBetterTone(daysLeft, 14, 7), "Green >= 14 days remaining");
+    setMetricTone("capacityPct", capacityTone, "Green below 80% capacity");
+    setMetricTone("validatorStake", capacityTone, "Colour follows validator capacity");
+    setMetricTone("delegatedStake", capacityTone, "Colour follows validator capacity");
+    setMetricTone("freeSpace", capacityTone, "Colour follows validator capacity");
+    setMetricTone("capacityText", capacityTone, "Green below 80% capacity");
+    setMetricTone("nodePeers", higherIsBetterTone(nodeHealth?.checks?.network?.message?.connectedPeers, 100, 50), "Normal >= 100 peers");
+    setMetricTone("nodeNetwork", higherIsBetterTone(pctNumber(percentConnected), 98, 95), "Normal >= 98%");
+    setMetricTone("nodeDisk", Number.isFinite(diskBytes) ? higherIsBetterTone(diskBytes / 1024 ** 3, 100, 50) : "", "Green >= 100 GB free");
+    setMetricTone("validatorLastSeenShort", lastSeenSeconds == null ? "" : lowerIsBetterTone(lastSeenSeconds, 60, 180), "Green <= 60 seconds");
     setSignal("daemonSignalStatus", daemonSummary.title, daemonSummary.level);
     setText("daemonSignalMeta", daemonSummary.meta);
     setSignal("fdcSignalStatus", daemonSummary.fdcTitle, daemonSummary.fdcLevel);

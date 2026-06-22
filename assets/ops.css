@@ -581,6 +581,25 @@ h2{
   white-space:nowrap;
 }
 
+[data-metric-tone="ok"]{
+  color:var(--green) !important;
+}
+
+[data-metric-tone="warn"]{
+  color:var(--amber) !important;
+}
+
+[data-metric-tone="down"]{
+  color:var(--red) !important;
+}
+
+.data-table [data-metric-tone],
+.node-health-grid [data-metric-tone],
+.chart-title [data-metric-tone],
+.stake-ring [data-metric-tone]{
+  text-shadow:0 0 18px color-mix(in srgb, currentColor 20%, transparent);
+}
+
 .data-table strong.split-value{
   display:flex;
   align-items:baseline;
