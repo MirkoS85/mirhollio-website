@@ -1163,8 +1163,8 @@
       add("down", "Direct node health missing", "node.mirhollio.com health endpoint did not load.");
     } else {
       if (nodeHealth.healthy !== true) { nodeLevel = "down"; add("down", "Node self-health failed", "Direct health endpoint reports unhealthy."); }
-      if (nodePercent != null && nodePercent < 95) { nodeLevel = "down"; add("down", "Node peer connectivity critical", `${fmtPct(nodePercent)} connected.`); }
-      else if (nodePercent != null && nodePercent < 98) { nodeLevel = nodeLevel === "down" ? nodeLevel : "warn"; add("warn", "Node peer connectivity watch", `${fmtPct(nodePercent)} connected.`); }
+      if (nodePercent != null && nodePercent < 90) { nodeLevel = "down"; add("down", "Validator reach critical", `${fmtPct(nodePercent)} of validator weight reachable.`); }
+      else if (nodePercent != null && nodePercent < 95) { nodeLevel = nodeLevel === "down" ? nodeLevel : "warn"; add("warn", "Validator reach watch", `${fmtPct(nodePercent)} of validator weight reachable.`); }
       if (Number.isFinite(nodePeers) && nodePeers < 100) { nodeLevel = nodeLevel === "down" ? nodeLevel : "warn"; add("warn", "Low node peer count", `${nodePeers} connected peers.`); }
       if (Number.isFinite(nodeDisk) && nodeDisk < 50 * 1024 ** 3) { nodeLevel = "down"; add("down", "Disk space critical", `${fmtCompact(nodeDisk / 1024 ** 3, " GB")} available.`); }
       else if (Number.isFinite(nodeDisk) && nodeDisk < 100 * 1024 ** 3) { nodeLevel = nodeLevel === "down" ? nodeLevel : "warn"; add("warn", "Disk space watch", `${fmtCompact(nodeDisk / 1024 ** 3, " GB")} available.`); }
@@ -1512,7 +1512,7 @@
     setMetricTone("freeSpace", capacityTone, "Colour follows validator capacity");
     setMetricTone("capacityText", capacityTone, "Green below 80% capacity");
     setMetricTone("nodePeers", higherIsBetterTone(nodeHealth?.checks?.network?.message?.connectedPeers, 100, 50), "Normal >= 100 peers");
-    setMetricTone("nodeNetwork", higherIsBetterTone(pctNumber(percentConnected), 98, 95), "Normal >= 98%");
+    setMetricTone("nodeNetwork", higherIsBetterTone(pctNumber(percentConnected), 95, 90), "Validator-weight reach: green >= 95%, watch >= 90%");
     setMetricTone("nodeDisk", Number.isFinite(diskBytes) ? higherIsBetterTone(diskBytes / 1024 ** 3, 100, 50) : "", "Green >= 100 GB free");
     setMetricTone("validatorLastSeenShort", lastSeenSeconds == null ? "" : lowerIsBetterTone(lastSeenSeconds, 60, 180), "Green <= 60 seconds");
     setSignal("daemonSignalStatus", daemonSummary.title, daemonSummary.level);
