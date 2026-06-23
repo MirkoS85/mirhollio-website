@@ -1113,10 +1113,10 @@ const MirSFlr = (() => {
     });
   }
 
-  function hourlyAvailabilityDomain(series) {
+  function hourlyAvailabilityDomain(series, target = 0.98) {
     const low = Math.min(...series);
-    if (low >= 0.9) return { min: 0.9, ticks: [1, 0.98, 0.95, 0.9] };
-    if (low >= 0.8) return { min: 0.8, ticks: [1, 0.98, 0.9, 0.8] };
+    if (low >= 0.9) return { min: 0.9, ticks: [1, target, 0.95, 0.9] };
+    if (low >= 0.8) return { min: 0.8, ticks: [1, target, 0.9, 0.8] };
     if (low >= 0.5) return { min: 0.5, ticks: [1, 0.8, 0.5] };
     return { min: 0, ticks: [1, 0.5, 0] };
   }
@@ -1149,7 +1149,7 @@ const MirSFlr = (() => {
       .reverse();
   }
 
-  function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage }) {
+  function renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage, target = 0.98 }) {
     if (!svg) return;
     const series = hourlySeries(values);
 
@@ -1175,14 +1175,14 @@ const MirSFlr = (() => {
     const avg = series.reduce((sum, value) => sum + value, 0) / series.length;
     const low = Math.min(...series);
     const latest = series[series.length - 1];
-    const domain = hourlyAvailabilityDomain(series);
+    const domain = hourlyAvailabilityDomain(series, target);
     const domainMax = 1;
     const domainMin = domain.min;
     const domainRange = Math.max(0.01, domainMax - domainMin);
     const xFor = index => padLeft + (series.length === 1 ? chartW / 2 : (chartW / (series.length - 1)) * index);
 
     const grid = domain.ticks.map(tick => {
-      const isTarget = Math.abs(tick - 0.98) < 0.001;
+      const isTarget = Math.abs(tick - target) < 0.001;
       const y = padTop + ((domainMax - tick) / domainRange) * chartH;
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
@@ -1286,7 +1286,8 @@ const MirSFlr = (() => {
       summary: document.querySelector("[data-render='fdc-hourly-summary']"),
       values: provider?.fdcPerformance?.availability1h,
       metricLabel: "FDC availability",
-      emptyMessage: "FDC hourly data unavailable"
+      emptyMessage: "FDC hourly data unavailable",
+      target: 0.97
     });
   }
 
@@ -1707,7 +1708,7 @@ const MirSFlr = (() => {
     setText("validatorCapacityPct", Number.isFinite(capacityPct) ? `${fmtNum(capacityPct, 1)}% full` : "-");
     setText("validatorTimeLeftPct", Number.isFinite(leftPct) ? `${fmtNum(leftPct, 1)}% of staking period left` : "-");
     setBar("validatorStakeCapacity", capacityPct);
-    setBar("validatorTimeLeft", leftPct);
+    setBar("validatorTimeLeft", Number.isFinite(leftPct) ? 100 - leftPct : null);
     if (!latestData?.staking?.stakeWithUptime && validator.m_dTotalStake != null) setText("stakedFlr", fmtCompact(validator.m_dTotalStake, " FLR"));
     setText("stakeEnd", stakeEnd);
     setText("stakeTimeLeft", timeLeft);
