@@ -914,8 +914,10 @@ h1{
   }
 
   .home-snapshot-grid .home-snap-metrics{
+    min-height:218px;
     gap:12px;
     margin:2px 0 0;
+    grid-template-rows:repeat(2, minmax(0, 1fr));
   }
 
   .home-snapshot-grid .snap-metric{
@@ -2951,6 +2953,8 @@ tbody tr:hover td{
 @media (max-width:420px){
   .home-snap-metrics{
     grid-template-columns:1fr;
+    min-height:0;
+    grid-template-rows:none;
   }
 }
 
