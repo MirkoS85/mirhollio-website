@@ -35,7 +35,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-1" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-3" />
 </head>
 <body>
   <div class="mobile-top">
@@ -83,6 +83,21 @@
               <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
               <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
             </div>
+            <div class="chart-panel ftso-delegation-chart-panel">
+              <div class="panel-head">
+                <strong>Vote power history</strong>
+                <span class="mini-label">Last 180d</span>
+              </div>
+              <div class="reward-chart-wrap ftso-delegation-chart-wrap">
+                <svg class="reward-chart ftso-delegation-chart" data-render="ftso-delegation-chart" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet" aria-label="FTSO delegated vote power history chart"></svg>
+                <div class="chart-tooltip" data-render="ftso-delegation-tooltip"></div>
+              </div>
+              <div class="chart-summary" data-render="ftso-delegation-chart-summary">
+                <span>Delegated <strong>-</strong></span>
+                <span>Biggest drop <strong>-</strong></span>
+                <span>Delegators <strong>-</strong></span>
+              </div>
+            </div>
             <details class="card panel-wide-card ftso-delegation-card">
               <summary class="ftso-delegation-toggle">
                 <span><strong>Delegation summary</strong><small>Reward-epoch vote power and delegator snapshot.</small></span>
@@ -128,7 +143,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=ftso-delegation-summary-1"></script>
+  <script src="../assets/operator.js?v=ftso-delegation-summary-3"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>

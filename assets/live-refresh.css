@@ -2306,6 +2306,10 @@ tbody tr:hover td{
   white-space:normal;
 }
 
+.chart-tooltip.show{
+  display:block;
+}
+
 .chart-tooltip strong,
 .chart-tooltip b{
   display:block;
@@ -2373,6 +2377,21 @@ tbody tr:hover td{
 
 .chart-summary strong{
   color:var(--ink);
+}
+
+.ftso-delegation-chart-panel{
+  margin-top:18px;
+  margin-bottom:18px;
+}
+
+.ftso-delegation-chart-wrap{
+  background:
+    radial-gradient(circle at top, rgba(233,22,124,.10), transparent 54%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,247,251,.84));
+}
+
+.ftso-delegation-chart{
+  height:340px;
 }
 
 .availability-scale{

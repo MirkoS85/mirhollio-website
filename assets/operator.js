@@ -1061,11 +1061,156 @@ const MirSFlr = (() => {
     });
   }
 
+  function formatChartMonth(ms) {
+    const date = new Date(Number(ms));
+    if (!Number.isFinite(date.getTime())) return "";
+    return date.toLocaleDateString(undefined, { month: "short", year: "2-digit" });
+  }
+
+  function renderFtsoDelegationChart(rows) {
+    const svg = document.querySelector("[data-render='ftso-delegation-chart']");
+    const tooltip = document.querySelector("[data-render='ftso-delegation-tooltip']");
+    const summary = document.querySelector("[data-render='ftso-delegation-chart-summary']");
+    if (!svg) return;
+
+    if (!rows.length) {
+      svg.innerHTML = `<text x="40" y="48" fill="#7a6b74" font-size="18" font-weight="850">Delegation history unavailable.</text>`;
+      if (summary) summary.innerHTML = `<span class="empty-state">Delegation history unavailable.</span>`;
+      return;
+    }
+
+    const width = 1000;
+    const height = 320;
+    const padLeft = 78;
+    const padRight = 72;
+    const padTop = 34;
+    const padBottom = 48;
+    const plotW = width - padLeft - padRight;
+    const plotH = height - padTop - padBottom;
+    const delegatedValues = rows.map(row => Number(row.delegated)).filter(Number.isFinite);
+    const delegatorValues = rows.map(row => Number(row.delegators)).filter(Number.isFinite);
+    const minDelegatedRaw = Math.min(...delegatedValues);
+    const maxDelegatedRaw = Math.max(...delegatedValues);
+    const delegatedPadding = Math.max((maxDelegatedRaw - minDelegatedRaw) * 0.18, 20_000_000);
+    const minDelegated = Math.max(0, minDelegatedRaw - delegatedPadding);
+    const maxDelegated = maxDelegatedRaw + delegatedPadding;
+    const minDelegators = Math.max(0, Math.min(...delegatorValues) - 1);
+    const maxDelegators = Math.max(...delegatorValues) + 1;
+    const delegatedRange = Math.max(maxDelegated - minDelegated, 1);
+    const delegatorRange = Math.max(maxDelegators - minDelegators, 1);
+    const stepX = plotW / Math.max(rows.length - 1, 1);
+    const points = rows.map((row, index) => {
+      const x = padLeft + index * stepX;
+      const delegatedY = padTop + (1 - ((Number(row.delegated) - minDelegated) / delegatedRange)) * plotH;
+      const delegatorsY = padTop + (1 - ((Number(row.delegators) - minDelegators) / delegatorRange)) * plotH;
+      return { ...row, x, delegatedY, delegatorsY };
+    });
+    const voteLine = points.map(point => `${point.x},${point.delegatedY}`).join(" ");
+    const delegatorLine = points.map(point => `${point.x},${point.delegatorsY}`).join(" ");
+    const area = [`${points[0].x},${height - padBottom}`, ...points.map(point => `${point.x},${point.delegatedY}`), `${points[points.length - 1].x},${height - padBottom}`].join(" ");
+    const latest = rows[rows.length - 1];
+    const grid = [0, .25, .5, .75, 1].map(tick => {
+      const y = padTop + plotH * tick;
+      return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(137,96,116,.16)" />`;
+    }).join("");
+    const leftLabels = [maxDelegated, (maxDelegated + minDelegated) / 2, minDelegated].map((value, index) => {
+      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom + 4;
+      return `<text x="${padLeft - 14}" y="${y}" text-anchor="end" fill="#7a6b74" font-size="13" font-weight="850">${fmtCompact(value)}</text>`;
+    }).join("");
+    const rightLabels = [maxDelegators, Math.round((maxDelegators + minDelegators) / 2), minDelegators].map((value, index) => {
+      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom + 4;
+      return `<text x="${width - padRight + 14}" y="${y}" text-anchor="start" fill="#7a6b74" font-size="13" font-weight="850">${fmtNum(value, 0)}</text>`;
+    }).join("");
+    const labelIndexes = [...new Set([0, Math.floor((points.length - 1) / 3), Math.floor((points.length - 1) * 2 / 3), points.length - 1])];
+    const xLabels = labelIndexes.map(index => {
+      const point = points[index];
+      return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#7a6b74" font-size="13" font-weight="850">${formatChartMonth(point.timestamp)}</text>`;
+    }).join("");
+    const markers = points.map((point, index) => `
+      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#e9167c" : "#f7fbff"}" stroke="#d93f84" stroke-width="2"></circle>
+      <circle cx="${point.x}" cy="${point.delegatorsY}" r="3.5" fill="#26a56c"></circle>
+      <circle cx="${point.x}" cy="${Math.min(point.delegatedY, point.delegatorsY)}" r="18" fill="transparent" data-delegation-index="${index}" style="cursor:pointer"></circle>
+    `).join("");
+
+    svg.innerHTML = `
+      <defs>
+        <linearGradient id="ftsoDelegationFill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="rgba(233,22,124,.22)" />
+          <stop offset="100%" stop-color="rgba(233,22,124,.02)" />
+        </linearGradient>
+      </defs>
+      ${grid}
+      ${leftLabels}
+      ${rightLabels}
+      <polygon points="${area}" fill="url(#ftsoDelegationFill)"></polygon>
+      <polyline points="${voteLine}" fill="none" stroke="#e9167c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <polyline points="${delegatorLine}" fill="none" stroke="#26a56c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
+      ${markers}
+      ${xLabels}
+      <g transform="translate(${padLeft},14)">
+        <circle cx="0" cy="0" r="5" fill="#e9167c"></circle>
+        <text x="12" y="5" fill="#7a6b74" font-size="13" font-weight="900">Vote power</text>
+        <circle cx="122" cy="0" r="5" fill="#26a56c"></circle>
+        <text x="134" y="5" fill="#7a6b74" font-size="13" font-weight="900">Delegators</text>
+      </g>
+    `;
+
+    if (summary) {
+      const biggestDrop = rows.reduce((lowest, row) => {
+        if (row.delta == null || Number(row.delta) >= 0) return lowest;
+        return !lowest || Number(row.delta) < Number(lowest.delta) ? row : lowest;
+      }, null);
+      summary.innerHTML = `
+        <span>Delegated <strong>${fmtCompact(latest.delegated, " WFLR")}</strong></span>
+        <span>Biggest drop <strong class="delegation-delta-negative">${biggestDrop ? `#${biggestDrop.epoch} ${fmtSignedCompact(biggestDrop.delta, " WFLR")}` : "-"}</strong></span>
+        <span>Delegators <strong>${fmtNum(latest.delegators, 0)}</strong></span>
+      `;
+    }
+
+    const showTooltip = target => {
+      if (!tooltip) return;
+      const point = points[Number(target.getAttribute("data-delegation-index"))];
+      if (!point) return;
+      const wrap = svg.parentElement;
+      if (!wrap) return;
+      const wrapRect = wrap.getBoundingClientRect();
+      const svgRect = svg.getBoundingClientRect();
+      const x = ((point.x / width) * svgRect.width) + (svgRect.left - wrapRect.left);
+      const y = ((point.delegatedY / height) * svgRect.height) + (svgRect.top - wrapRect.top);
+      tooltip.innerHTML = `
+        <strong>#${escapeHtml(point.epoch)}</strong>
+        <span>${fmtNum(point.delegated, 0)} WFLR</span>
+        <span class="${Number(point.delta) < 0 ? "delegation-delta-negative" : "delegation-delta-positive"}">${point.delta == null ? "First point" : fmtSignedCompact(point.delta, " WFLR")}</span>
+        <small>${fmtNum(point.delegators, 0)} delegators · ${formatShortDate(point.timestamp)}</small>
+      `;
+      tooltip.style.left = `${Math.max(8, Math.min(wrapRect.width - 190, x - 92))}px`;
+      tooltip.style.top = `${Math.max(8, y - 92)}px`;
+      tooltip.classList.add("show");
+    };
+    const hideTooltip = () => tooltip?.classList.remove("show");
+    svg.querySelectorAll("[data-delegation-index]").forEach(marker => {
+      marker.addEventListener("mouseenter", () => showTooltip(marker));
+      marker.addEventListener("focus", () => showTooltip(marker));
+      marker.addEventListener("mouseleave", hideTooltip);
+      marker.addEventListener("blur", hideTooltip);
+      marker.addEventListener("touchstart", event => {
+        event.preventDefault();
+        showTooltip(marker);
+      }, { passive: false });
+    });
+    const wrap = svg.parentElement;
+    if (wrap && wrap.scrollWidth > wrap.clientWidth) {
+      requestAnimationFrame(() => {
+        wrap.scrollLeft = wrap.scrollWidth;
+      });
+    }
+  }
+
   function renderFtsoDelegationSummary(historyRows, delegatorRows, source = "live") {
     const rows = withDelegationDeltas(normalizeVotePowerRows(historyRows));
     const latest = rows[rows.length - 1];
-    const previous = rows[rows.length - 2];
     const delegates = normalizeDelegatorSnapshotRows(delegatorRows);
+    renderFtsoDelegationChart(rows);
 
     setText("ftsoDelegationSnapshotEpoch", latest ? `#${latest.epoch}` : "-");
     setText("ftsoDelegationSnapshotPower", latest ? fmtCompact(latest.delegated, " WFLR") : "-");
