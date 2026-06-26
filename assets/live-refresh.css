@@ -1640,6 +1640,79 @@ h1{
   margin-left:.22em;
 }
 
+.delegation-flow-card{
+  overflow:hidden;
+}
+
+.delegation-flow-card .panel-head{
+  align-items:center;
+}
+
+.panel-link,
+.table-link{
+  color:#8c2d5b;
+  font-weight:900;
+  text-decoration:none;
+}
+
+.panel-link{
+  flex:0 0 auto;
+  padding:9px 12px;
+  border:1px solid rgba(217,63,132,.22);
+  border-radius:999px;
+  background:rgba(255,255,255,.62);
+  font-size:12px;
+}
+
+.panel-link:hover,
+.table-link:hover{
+  color:#d93f84;
+}
+
+.delegation-flow-summary{
+  min-width:0;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  padding:16px;
+  border-bottom:1px solid var(--line);
+}
+
+.delegation-flow-summary span{
+  display:grid;
+  gap:4px;
+  min-height:62px;
+  align-content:center;
+  padding:10px 12px;
+  border:1px solid rgba(137,96,116,.12);
+  border-radius:16px;
+  background:rgba(255,255,255,.62);
+  color:#7a6b74;
+  font-size:13px;
+  font-weight:760;
+}
+
+.delegation-flow-summary strong{
+  color:var(--ink);
+  font-size:18px;
+  letter-spacing:0;
+}
+
+.delegation-flow-card .chart-definition{
+  margin:0;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+}
+
+.delegation-flow-table{
+  min-width:820px;
+}
+
+.delegation-flow-zero{
+  color:#9c667d;
+  font-weight:900;
+}
+
 .delegator-table{
   min-width:980px;
   width:100%;
@@ -2562,6 +2635,7 @@ tbody tr:hover td{
   .panel-mini-grid,
   .split-metrics,
   .hourly-chart-grid,
+  .delegation-flow-summary,
   .delegator-summary{
     grid-template-columns:1fr;
   }
@@ -2579,6 +2653,10 @@ tbody tr:hover td{
   }
 
   .delegator-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .delegation-flow-summary{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 

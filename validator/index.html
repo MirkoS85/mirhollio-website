@@ -12,6 +12,10 @@
   <link rel="dns-prefetch" href="//api.coinbase.com">
   <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <link rel="preconnect" href="https://flare-api.flare.network">
+  <link rel="dns-prefetch" href="//flare-api.flare.network">
+  <link rel="preconnect" href="https://flare-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-explorer.flare.network">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MirSFlr" />
@@ -33,7 +37,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=validator-payout-1" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=delegation-flow-3" />
 </head>
 <body>
   <div class="mobile-top">
@@ -88,6 +92,26 @@
                 <span>Ending (next 5 days) <strong data-field="validatorDelegatorEnding">-</strong></span>
               </div>
             </article>
+            <article class="card panel-wide-card delegation-flow-card">
+              <div class="panel-head">
+                <div><strong>Delegation flow</strong><span class="mini-label">MirSFlr FTSO vote-power changes · latest 14d</span></div>
+                <a class="panel-link" href="https://flare-base.io/flare/delegations/search?to=0xad9105bef5e5df2eacbe2de9037a96695b00cade" target="_blank" rel="noopener">Cross-check Flare Base</a>
+              </div>
+              <div class="delegation-flow-summary">
+                <span>Events <strong data-field="delegationFlowEvents">-</strong></span>
+                <span>Changed wallets <strong data-field="delegationFlowWallets">-</strong></span>
+                <span>Changed power <strong data-field="delegationFlowVolume">-</strong></span>
+                <span>Net change <strong data-field="delegationFlowRemoved">-</strong></span>
+              </div>
+              <p class="chart-definition" data-field="delegationFlowSource">Loading public Flare Explorer Delegate events.</p>
+              <div class="table-wrap table-wrap-compact">
+                <table class="delegator-table delegation-flow-table">
+                  <caption>Recent MirSFlr FTSO vote-power changes</caption>
+                  <thead><tr><th scope="col">Date</th><th scope="col">Wallet</th><th scope="col">Change</th><th scope="col">New power</th><th scope="col">Tx</th></tr></thead>
+                  <tbody data-render="delegation-flow-table"><tr><td colspan="5">Loading...</td></tr></tbody>
+                </table>
+              </div>
+            </article>
             <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
             <div class="chart-panel"><div class="panel-head"><strong>Validator payout estimate per epoch</strong><span class="mini-label">Oracle estimate · Latest 20</span></div><p class="chart-definition">Matches Oracle Daemon: (Node API + Validator API) × (1 − fee).</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator payout estimate per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
             <div class="validator-panel delegator-panel" id="delegation-details-panel">
@@ -100,7 +124,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=fdc-target-time-bar-1"></script>
+  <script src="../assets/operator.js?v=delegation-flow-3"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>

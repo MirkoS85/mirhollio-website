@@ -4,6 +4,13 @@ const MirSFlr = (() => {
   const PROVIDERS_V2_URL = "https://api.oracle-daemon.com/v2/flare/providers";
   const FLR_PRICE_URL = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
+  const FLARE_RPC_URL = "https://flare-api.flare.network/ext/C/rpc";
+  const FLARE_EXPLORER_LOGS_URL = "https://flare-explorer.flare.network/api";
+  const FLARE_BASE_UI_URL = "https://flare-base.io/flare/delegations/search?to=0xad9105bef5e5df2eacbe2de9037a96695b00cade";
+  const WNAT_VOTE_POWER_CONTRACT = "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c";
+  const WNAT_DELEGATE_TOPIC = "0x500599802164a08023e87ffc3eed0ba3ae60697b3083ba81d046683679d81c6b";
+  const DELEGATION_FLOW_DAYS = 14;
+  const FLARE_BLOCK_SECONDS_APPROX = 2;
   const CACHE_PREFIX = "mirsflr_cache_";
   const CURRENCY_KEY = "mirsflr_currency";
   const DELEGATOR_SORT_KEY = "mirsflr_delegator_sort";
@@ -12,6 +19,7 @@ const MirSFlr = (() => {
     provider: 60_000,
     validator: 90_000,
     explorer: 90_000,
+    delegationFlow: 5 * 60_000,
     price: 5 * 60_000
   };
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
@@ -35,6 +43,7 @@ const MirSFlr = (() => {
     { reward_epoch_id: 395, availability: 1.0 }
   ];
   const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
+  const TARGET_DELEGATION_TOPIC = "0x000000000000000000000000ad9105bef5e5df2eacbe2de9037a96695b00cade";
   let providerData = null;
   let validatorData = null;
   let latestData = null;
@@ -115,6 +124,15 @@ const MirSFlr = (() => {
     if (!addr) return "-";
     const s = String(addr);
     return `${s.slice(0, 6)}...${s.slice(-4)}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function isZeroAddress(addr) {
@@ -285,7 +303,7 @@ const MirSFlr = (() => {
       if (!raw || raw === "-") el.textContent = "Loading";
     });
 
-    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table'], [data-render='validator-delegator-table'], [data-render='entity-address-table']").forEach(tbody => {
+    document.querySelectorAll("[data-render='epoch-table'], [data-render='validator-epoch-table'], [data-render='validator-delegator-table'], [data-render='entity-address-table'], [data-render='delegation-flow-table']").forEach(tbody => {
       renderTableLoading(tbody);
     });
   }
@@ -920,6 +938,163 @@ const MirSFlr = (() => {
         `;
       }).join("");
     });
+  }
+
+  async function rpcCall(method, params = []) {
+    const res = await fetch(FLARE_RPC_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+    });
+    if (!res.ok) throw new Error(`RPC request failed: ${method}`);
+    const payload = await res.json();
+    if (payload.error) throw new Error(payload.error.message || `RPC error: ${method}`);
+    return payload.result;
+  }
+
+  function topicToAddress(topic) {
+    const raw = String(topic || "").replace(/^0x/, "");
+    if (raw.length < 40) return "";
+    return `0x${raw.slice(-40)}`;
+  }
+
+  function hexToBigInt(value) {
+    try {
+      const text = String(value || "0x0");
+      return BigInt(text === "0x" ? "0x0" : text);
+    } catch (_) {
+      return 0n;
+    }
+  }
+
+  function dataWords(data) {
+    return String(data || "0x").replace(/^0x/, "").match(/.{1,64}/g) || [];
+  }
+
+  function chainUnitsToNumber(value) {
+    const whole = value / 1_000_000_000_000_000_000n;
+    const frac = value % 1_000_000_000_000_000_000n;
+    return Number(whole) + Number(frac) / 1e18;
+  }
+
+  function fmtSignedCompact(value, unit = " WFLR") {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "-";
+    if (Math.abs(n) < 0.000001) return `0${unit}`;
+    return `${n > 0 ? "+" : "-"}${fmtCompact(Math.abs(n), unit)}`;
+  }
+
+  function delegationLogsUrl(fromBlock) {
+    const params = new URLSearchParams({
+      module: "logs",
+      action: "getLogs",
+      address: WNAT_VOTE_POWER_CONTRACT,
+      topic0: WNAT_DELEGATE_TOPIC,
+      topic2: TARGET_DELEGATION_TOPIC,
+      topic0_2_opr: "and",
+      fromBlock: String(Math.max(0, Number(fromBlock) || 0)),
+      toBlock: "latest",
+      page: "1",
+      offset: "200"
+    });
+    return `${FLARE_EXPLORER_LOGS_URL}?${params.toString()}`;
+  }
+
+  function parseDelegateLog(log) {
+    const words = dataWords(log?.data);
+    const prior = hexToBigInt(`0x${words[0] || "0"}`);
+    const next = hexToBigInt(`0x${words[1] || "0"}`);
+    const timestamp = Number.parseInt(String(log?.timeStamp || "0"), 16) * 1000;
+    const priorPower = chainUnitsToNumber(prior);
+    const newPower = chainUnitsToNumber(next);
+    return {
+      from: topicToAddress(log?.topics?.[1]),
+      to: topicToAddress(log?.topics?.[2]),
+      priorPower,
+      newPower,
+      delta: newPower - priorPower,
+      timestamp,
+      blockNumber: Number.parseInt(String(log?.blockNumber || "0"), 16),
+      txHash: String(log?.transactionHash || "")
+    };
+  }
+
+  function formatDelegationEventDate(ms) {
+    const date = new Date(Number(ms));
+    if (!Number.isFinite(date.getTime())) return "-";
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  function renderDelegationFlow(rows) {
+    const target = TARGET_DELEGATION.toLowerCase();
+    const events = rows
+      .filter(row => String(row.to || "").toLowerCase() === target)
+      .sort((a, b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+    const wallets = new Set(events.map(row => String(row.from || "").toLowerCase()).filter(Boolean));
+    const latestByWallet = new Map();
+    events.forEach(row => {
+      const wallet = String(row.from || "").toLowerCase();
+      if (wallet && !latestByWallet.has(wallet)) latestByWallet.set(wallet, row);
+    });
+    const latestChanged = Array.from(latestByWallet.values());
+    const observedPower = latestChanged.reduce((sum, row) => sum + Number(row.newPower || 0), 0);
+    const netChange = events.reduce((sum, row) => sum + Number(row.delta || 0), 0);
+
+    setText("delegationFlowEvents", fmtNum(events.length, 0));
+    setText("delegationFlowWallets", fmtNum(wallets.size, 0));
+    setText("delegationFlowVolume", fmtCompact(observedPower, " WFLR"));
+    setText("delegationFlowRemoved", fmtSignedCompact(netChange, " WFLR"));
+    setText("delegationFlowSource", "Public Flare Explorer VPContract Delegate events. This is a recent change feed for MirSFlr, not a full private-wallet balance list.");
+
+    document.querySelectorAll("[data-render='delegation-flow-table']").forEach(tbody => {
+      if (!events.length) {
+        renderTableEmpty(tbody, "No MirSFlr delegation changes were returned for the recent window.");
+        return;
+      }
+
+      const labels = tableLabels(tbody);
+      tbody.innerHTML = events.slice(0, 12).map(row => {
+        const delta = Number(row.delta);
+        const isRemoval = Number(row.newPower) <= 0;
+        const isDecrease = Number.isFinite(delta) && delta < 0;
+        const tx = String(row.txHash || "");
+        const txUrl = tx ? `https://flare-explorer.flare.network/tx/${encodeURIComponent(tx)}` : "";
+        return `
+          <tr>
+            <td data-label="${labels[0] || "Date"}">${formatDelegationEventDate(row.timestamp)}</td>
+            <td data-label="${labels[1] || "Wallet"}"><span class="delegator-address" title="${escapeHtml(row.from)}">${escapeHtml(shortAddr(row.from))}</span></td>
+            <td data-label="${labels[2] || "Change"}"><span class="${isRemoval || isDecrease ? "delegation-flow-zero" : ""}">${isRemoval ? "Removed" : fmtSignedCompact(delta, " WFLR")}</span></td>
+            <td data-label="${labels[3] || "New power"}">${fmtCompact(row.newPower, " WFLR")}</td>
+            <td data-label="${labels[4] || "Tx"}">${txUrl ? `<a class="table-link" href="${txUrl}" target="_blank" rel="noopener">${escapeHtml(shortAddr(tx))}</a>` : "-"}</td>
+          </tr>
+        `;
+      }).join("");
+    });
+  }
+
+  function renderDelegationFlowUnavailable() {
+    setText("delegationFlowEvents", "-");
+    setText("delegationFlowWallets", "-");
+    setText("delegationFlowVolume", "-");
+    setText("delegationFlowRemoved", "-");
+    setText("delegationFlowSource", "Could not load public Flare Explorer Delegate events. Use Flare Base as a manual deep-history cross-check.");
+    document.querySelectorAll("[data-render='delegation-flow-table']").forEach(tbody => {
+      renderTableEmpty(tbody, `<a class="table-link" href="${FLARE_BASE_UI_URL}" target="_blank" rel="noopener">Open MirSFlr delegation history on Flare Base</a>`);
+    });
+  }
+
+  async function loadDelegationFlow() {
+    if (!document.querySelector("[data-render='delegation-flow-table']")) return;
+    try {
+      const latestBlock = Number.parseInt(await rpcCall("eth_blockNumber"), 16);
+      const fromBlock = latestBlock - Math.floor((DELEGATION_FLOW_DAYS * 24 * 60 * 60) / FLARE_BLOCK_SECONDS_APPROX);
+      const payload = await fetchJsonWithCache(delegationLogsUrl(fromBlock), CACHE_TTLS.delegationFlow);
+      if (payload?.status !== "1" || !Array.isArray(payload.result)) throw new Error(payload?.message || "Delegation logs unavailable.");
+      renderDelegationFlow(payload.result.map(parseDelegateLog));
+    } catch (_) {
+      renderDelegationFlowUnavailable();
+    }
   }
 
   function rewardWithFiat(value) {
@@ -1853,6 +2028,7 @@ const MirSFlr = (() => {
       loadValidator();
       loadFtsoExplorer();
       loadFtsoEntity();
+      loadDelegationFlow();
       loadPrice();
     });
 
@@ -1882,6 +2058,7 @@ const MirSFlr = (() => {
     loadValidator();
     loadFtsoExplorer();
     loadFtsoEntity();
+    loadDelegationFlow();
     loadPrice();
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
