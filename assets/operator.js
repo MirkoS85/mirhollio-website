@@ -1199,7 +1199,10 @@ const MirSFlr = (() => {
       }, { passive: false });
     });
     const wrap = svg.parentElement;
-    if (wrap && wrap.scrollWidth > wrap.clientWidth) {
+    const shouldAutoScroll = wrap
+      && wrap.scrollWidth > wrap.clientWidth
+      && !window.matchMedia("(max-width: 700px)").matches;
+    if (shouldAutoScroll) {
       requestAnimationFrame(() => {
         wrap.scrollLeft = wrap.scrollWidth;
       });

@@ -3361,6 +3361,38 @@ tbody tr:hover td{
     width:720px;
   }
 
+  .ftso-delegation-chart{
+    width:100%;
+    min-width:0;
+    height:250px;
+  }
+
+  .delegator-table.ftso-delegation-table,
+  .delegator-table.ftso-delegator-table{
+    min-width:0 !important;
+    width:100% !important;
+  }
+
+  .ftso-delegation-table th,
+  .ftso-delegation-table td,
+  .ftso-delegator-table th,
+  .ftso-delegator-table td{
+    display:flex !important;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-width:0;
+    padding:9px 0;
+    text-align:right;
+  }
+
+  .ftso-delegation-table th::before,
+  .ftso-delegation-table td::before,
+  .ftso-delegator-table th::before,
+  .ftso-delegator-table td::before{
+    max-width:42%;
+  }
+
   .hourly-chart{
     height:210px;
   }
@@ -3787,6 +3819,19 @@ tbody tr:hover td{
   .hourly-chart,
   .performance-hourly-chart{
     max-width:none;
+  }
+
+  .ftso-delegation-chart{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:238px;
+  }
+
+  .delegator-table.ftso-delegation-table,
+  .delegator-table.ftso-delegator-table{
+    min-width:0 !important;
+    width:100% !important;
   }
 
   .hourly-chart{
