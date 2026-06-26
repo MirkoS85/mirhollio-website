@@ -1640,11 +1640,73 @@ h1{
   margin-left:.22em;
 }
 
-.delegation-flow-card{
+.ftso-delegation-card{
   overflow:hidden;
+  padding:0;
 }
 
-.delegation-flow-card .panel-head{
+.ftso-delegation-card[open] .ftso-delegation-toggle{
+  border-bottom-color:var(--line);
+}
+
+.ftso-delegation-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  min-height:74px;
+  padding:18px 20px;
+  border-bottom:1px solid transparent;
+  cursor:pointer;
+  list-style:none;
+}
+
+.ftso-delegation-toggle::-webkit-details-marker{
+  display:none;
+}
+
+.ftso-delegation-toggle span{
+  display:grid;
+  gap:4px;
+}
+
+.ftso-delegation-toggle strong{
+  color:var(--ink);
+  font-size:20px;
+  line-height:1.05;
+}
+
+.ftso-delegation-toggle small{
+  color:#7a6b74;
+  font-size:13px;
+  font-weight:760;
+}
+
+.ftso-delegation-toggle i{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(217,63,132,.22);
+  border-radius:999px;
+  color:#d93f84;
+  background:rgba(255,255,255,.62);
+  font-style:normal;
+  font-size:30px;
+  font-weight:900;
+  line-height:1;
+  transition:transform .18s ease;
+}
+
+.ftso-delegation-card[open] .ftso-delegation-toggle i{
+  transform:rotate(90deg);
+}
+
+.ftso-delegation-content{
+  display:grid;
+}
+
+.ftso-delegation-card .panel-head{
   align-items:center;
 }
 
@@ -1698,14 +1760,22 @@ h1{
   letter-spacing:0;
 }
 
-.delegation-flow-card .chart-definition{
+.ftso-delegation-card .chart-definition{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
   margin:0;
   padding:12px 16px;
   border-bottom:1px solid var(--line);
 }
 
-.delegation-flow-table{
+.ftso-delegation-table{
   min-width:820px;
+}
+
+.ftso-delegator-table{
+  min-width:760px;
 }
 
 .delegation-flow-zero{
@@ -1713,9 +1783,27 @@ h1{
   font-weight:900;
 }
 
+.delegation-delta-positive{
+  color:#26a56c;
+  font-weight:950;
+}
+
+.delegation-delta-negative{
+  color:#d93f84;
+  font-weight:950;
+}
+
 .delegator-table{
   min-width:980px;
   width:100%;
+}
+
+.delegator-table.ftso-delegation-table{
+  min-width:820px;
+}
+
+.delegator-table.ftso-delegator-table{
+  min-width:760px;
 }
 
 .entity-address-panel{
@@ -2658,6 +2746,11 @@ tbody tr:hover td{
 
   .delegation-flow-summary{
     grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .ftso-delegation-card .chart-definition{
+    align-items:flex-start;
+    flex-direction:column;
   }
 
   .metric-grid{

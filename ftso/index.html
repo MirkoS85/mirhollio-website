@@ -12,6 +12,8 @@
   <link rel="dns-prefetch" href="//api.coinbase.com">
   <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <link rel="preconnect" href="https://flare-base.io">
+  <link rel="dns-prefetch" href="//flare-base.io">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="MirSFlr" />
@@ -33,7 +35,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=delegation-flow-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -81,6 +83,38 @@
               <article class="card compact-stat"><b>Latest reward</b><strong data-field="latestReward">-</strong><p>Latest eligibility: <span data-field="latestEligibility">-</span></p></article>
               <article class="card compact-stat"><b>Eligible history</b><strong data-field="eligible">-</strong><p>Recent reward-eligibility window.</p></article>
             </div>
+            <details class="card panel-wide-card ftso-delegation-card">
+              <summary class="ftso-delegation-toggle">
+                <span><strong>Delegation summary</strong><small>Reward-epoch vote power and delegator snapshot.</small></span>
+                <i aria-hidden="true">›</i>
+              </summary>
+              <div class="ftso-delegation-content">
+                <div class="delegation-flow-summary ftso-delegation-summary">
+                  <span>Epoch <strong data-field="ftsoDelegationSnapshotEpoch">-</strong></span>
+                  <span>Delegated <strong data-field="ftsoDelegationSnapshotPower">-</strong></span>
+                  <span>Epoch delta <strong data-field="ftsoDelegationSnapshotDelta">-</strong></span>
+                  <span>Delegators <strong data-field="ftsoDelegationSnapshotDelegators">-</strong></span>
+                </div>
+                <p class="chart-definition">
+                  <span data-field="ftsoDelegationSnapshotSource">Loading Flare Base vote-power snapshot.</span>
+                  <a class="table-link" href="https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&amp;range=last-180d" target="_blank" rel="noopener">Open Flare Base</a>
+                </p>
+                <div class="table-wrap table-wrap-compact">
+                  <table class="delegator-table ftso-delegation-table">
+                    <caption>MirSFlr FTSO delegated vote power by reward epoch</caption>
+                    <thead><tr><th scope="col">Epoch</th><th scope="col">Date</th><th scope="col">Delegated</th><th scope="col">Delta</th><th scope="col">%</th><th scope="col">Delegators</th></tr></thead>
+                    <tbody data-render="ftso-delegation-epoch-table"><tr><td colspan="6">Loading...</td></tr></tbody>
+                  </table>
+                </div>
+                <div class="table-wrap table-wrap-compact">
+                  <table class="delegator-table ftso-delegator-table">
+                    <caption>Delegators at latest reward epoch snapshot</caption>
+                    <thead><tr><th scope="col">#</th><th scope="col">Delegator</th><th scope="col">Amount</th><th scope="col">Epoch</th><th scope="col">Date</th></tr></thead>
+                    <tbody data-render="ftso-delegator-snapshot-table"><tr><td colspan="5">Loading...</td></tr></tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
             <div class="hourly-chart-grid">
               <div class="chart-panel hourly-chart-panel"><div class="panel-head"><strong>FTSO Availability (per hour)</strong><span class="mini-label">Last 24h</span></div><div class="reward-chart-wrap hourly-chart-wrap"><svg class="hourly-chart" data-render="ftso-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" aria-label="FTSO availability per hour chart"></svg><div class="chart-tooltip" data-render="ftso-hourly-tooltip"></div></div><div class="chart-summary" data-render="ftso-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div></div>
               <div class="chart-panel hourly-chart-panel"><div class="panel-head"><strong>FDC Availability (per hour)</strong><span class="mini-label">Last 24h</span></div><div class="reward-chart-wrap hourly-chart-wrap"><svg class="hourly-chart" data-render="fdc-hourly-chart" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" aria-label="FDC availability per hour chart"></svg><div class="chart-tooltip" data-render="fdc-hourly-tooltip"></div></div><div class="chart-summary" data-render="fdc-hourly-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span></div><div class="availability-scale" aria-label="Oracle Daemon availability chart guide"><span><i class="scale-line"></i>Availability line</span><span><i class="scale-target"></i>97% target</span><span><i class="scale-latest"></i>Latest point</span></div></div>
@@ -94,7 +128,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=delegation-flow-3"></script>
+  <script src="../assets/operator.js?v=ftso-delegation-summary-1"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>
