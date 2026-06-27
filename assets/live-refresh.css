@@ -3393,6 +3393,86 @@ tbody tr:hover td{
     max-width:42%;
   }
 
+  .ftso-delegator-table tbody{
+    gap:8px;
+  }
+
+  .ftso-delegator-table tbody tr{
+    display:grid;
+    grid-template-columns:36px minmax(0,1fr) auto;
+    grid-template-areas:
+      "rank wallet amount"
+      "rank epoch date";
+    align-items:center;
+    gap:4px 10px;
+    padding:12px 14px;
+  }
+
+  .ftso-delegator-table th[data-label="#"]{
+    grid-area:rank;
+    width:32px;
+    height:32px;
+    display:grid !important;
+    place-items:center;
+    align-self:center;
+    padding:0;
+    border:0;
+    border-radius:999px;
+    background:rgba(217,63,132,.11);
+    color:#d93f84;
+    font-size:14px;
+    font-weight:950;
+  }
+
+  .ftso-delegator-table td[data-label="Delegator"]{
+    grid-area:wallet;
+    justify-content:flex-start;
+    padding:0;
+    border:0;
+    min-width:0;
+  }
+
+  .ftso-delegator-table td[data-label="Amount"]{
+    grid-area:amount;
+    justify-content:flex-end;
+    padding:0;
+    border:0;
+    color:var(--ink);
+    font-size:15px;
+    font-weight:950;
+    white-space:nowrap;
+  }
+
+  .ftso-delegator-table td[data-label="Epoch"]{
+    grid-area:epoch;
+  }
+
+  .ftso-delegator-table td[data-label="Date"]{
+    grid-area:date;
+    justify-content:flex-end;
+  }
+
+  .ftso-delegator-table td[data-label="Epoch"],
+  .ftso-delegator-table td[data-label="Date"]{
+    padding:0;
+    border:0;
+    color:#7a6b74;
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .ftso-delegator-table th::before,
+  .ftso-delegator-table td::before{
+    content:none !important;
+  }
+
+  .ftso-delegator-table .delegator-address{
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
   .hourly-chart{
     height:210px;
   }
@@ -3832,6 +3912,21 @@ tbody tr:hover td{
   .delegator-table.ftso-delegator-table{
     min-width:0 !important;
     width:100% !important;
+  }
+
+  .ftso-delegator-table tbody tr{
+    grid-template-columns:32px minmax(0,1fr) auto;
+    padding:11px 12px;
+  }
+
+  .ftso-delegator-table th[data-label="#"]{
+    width:30px;
+    height:30px;
+    font-size:13px;
+  }
+
+  .ftso-delegator-table td[data-label="Amount"]{
+    font-size:14px;
   }
 
   .hourly-chart{
