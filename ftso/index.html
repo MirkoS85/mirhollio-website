@@ -35,7 +35,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-5" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-6" />
 </head>
 <body>
   <div class="mobile-top">
@@ -100,7 +100,7 @@
             </div>
             <details class="card panel-wide-card ftso-delegation-card">
               <summary class="ftso-delegation-toggle">
-                <span><strong>Delegation summary</strong><small>Reward-epoch vote power and delegator snapshot.</small></span>
+                <span><strong>Delegation summary</strong><small>MirSFlr FTSO vote power and delegator snapshot.</small></span>
                 <i aria-hidden="true">›</i>
               </summary>
               <div class="ftso-delegation-content">
@@ -114,12 +114,20 @@
                   <span data-field="ftsoDelegationSnapshotSource">Loading Flare Base vote-power snapshot.</span>
                   <a class="table-link" href="https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&amp;range=last-180d" target="_blank" rel="noopener">Open Flare Base</a>
                 </p>
+                <div class="table-section-head">
+                  <strong>Reward-epoch vote power history</strong>
+                  <span>How much WFLR was delegated to MirSFlr at each reward epoch snapshot.</span>
+                </div>
                 <div class="table-wrap table-wrap-compact">
                   <table class="delegator-table ftso-delegation-table">
                     <caption>MirSFlr FTSO delegated vote power by reward epoch</caption>
                     <thead><tr><th scope="col">Epoch</th><th scope="col">Date</th><th scope="col">Delegated</th><th scope="col">Delta</th><th scope="col">%</th><th scope="col">Delegators</th></tr></thead>
                     <tbody data-render="ftso-delegation-epoch-table"><tr><td colspan="6">Loading...</td></tr></tbody>
                   </table>
+                </div>
+                <div class="table-section-head">
+                  <strong>Delegators at latest visible snapshot</strong>
+                  <span>Wallets currently visible in the Flare Base reward-epoch snapshot. Click an address to inspect it on Flare Explorer.</span>
                 </div>
                 <div class="table-wrap table-wrap-compact">
                   <table class="delegator-table ftso-delegator-table">
@@ -143,7 +151,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=ftso-delegation-summary-5"></script>
+  <script src="../assets/operator.js?v=ftso-delegation-summary-6"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
   <script src="../assets/pwa.js?v=pwa-install-1"></script>
 </body>

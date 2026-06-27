@@ -1770,6 +1770,30 @@ h1{
   border-bottom:1px solid var(--line);
 }
 
+.table-section-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  margin:22px 0 10px;
+}
+
+.table-section-head strong{
+  color:var(--ink);
+  font-size:18px;
+  line-height:1.12;
+  font-weight:950;
+}
+
+.table-section-head span{
+  max-width:560px;
+  color:#7a6b74;
+  font-size:13px;
+  font-weight:750;
+  line-height:1.35;
+  text-align:right;
+}
+
 .ftso-delegation-table{
   min-width:820px;
 }
@@ -1840,6 +1864,17 @@ h1{
   color:#8c2d5b;
   font-size:13px;
   font-weight:850;
+}
+
+.delegator-address-link{
+  text-decoration:none;
+  border-bottom:1px solid rgba(217,63,132,.28);
+}
+
+.delegator-address-link:hover,
+.delegator-address-link:focus-visible{
+  color:#d93f84;
+  border-bottom-color:#d93f84;
 }
 
 .detail-toggle{
@@ -3391,6 +3426,24 @@ tbody tr:hover td{
   .ftso-delegator-table th::before,
   .ftso-delegator-table td::before{
     max-width:42%;
+  }
+
+  .table-section-head{
+    display:block;
+    margin:18px 0 10px;
+  }
+
+  .table-section-head strong{
+    display:block;
+    font-size:17px;
+  }
+
+  .table-section-head span{
+    display:block;
+    max-width:none;
+    margin-top:5px;
+    text-align:left;
+    font-size:12px;
   }
 
   .ftso-delegator-table tbody{

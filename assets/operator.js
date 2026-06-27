@@ -7,6 +7,7 @@ const MirSFlr = (() => {
   const FLARE_BASE_VOTE_POWER_URL = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
   const FLARE_BASE_DELEGATORS_URL = "https://flare-base.io/api/delegations/getDelegatorsAt/flare";
   const FLARE_BASE_UI_URL = "https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&range=last-180d";
+  const FLARE_EXPLORER_ADDRESS_URL = "https://flare-explorer.flare.network/address/";
   const CACHE_PREFIX = "mirsflr_cache_";
   const CURRENCY_KEY = "mirsflr_currency";
   const DELEGATOR_SORT_KEY = "mirsflr_delegator_sort";
@@ -165,6 +166,11 @@ const MirSFlr = (() => {
     if (!addr) return "-";
     const s = String(addr);
     return `${s.slice(0, 6)}...${s.slice(-4)}`;
+  }
+
+  function flareAddressUrl(address) {
+    const normalized = String(address || "").trim();
+    return normalized ? `${FLARE_EXPLORER_ADDRESS_URL}${encodeURIComponent(normalized)}` : "#";
   }
 
   function escapeHtml(value) {
@@ -1254,7 +1260,7 @@ const MirSFlr = (() => {
       tbody.innerHTML = delegates.map((row, index) => `
         <tr>
           <th scope="row" data-label="${labels[0] || "#"}">${index + 1}</th>
-          <td data-label="${labels[1] || "Delegator"}"><span class="delegator-address" title="${escapeHtml(row.from)}">${escapeHtml(shortAddr(row.from))}</span></td>
+          <td data-label="${labels[1] || "Delegator"}"><a class="delegator-address delegator-address-link" href="${escapeHtml(flareAddressUrl(row.from))}" target="_blank" rel="noopener" title="Open ${escapeHtml(row.from)} on Flare Explorer">${escapeHtml(shortAddr(row.from))}</a></td>
           <td data-label="${labels[2] || "Amount"}">${fmtNum(row.amount, 2)}</td>
           <td data-label="${labels[3] || "Epoch"}">#${escapeHtml(row.rewardEpochId || latest?.epoch || "-")}</td>
           <td data-label="${labels[4] || "Date"}">${formatShortDate(row.timestamp)}</td>
