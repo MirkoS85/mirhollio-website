@@ -35,7 +35,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-7" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-risk-1" />
 </head>
 <body>
   <div class="mobile-top">
@@ -111,12 +111,16 @@
                   <span>Delegators <strong data-field="ftsoDelegationSnapshotDelegators">-</strong></span>
                 </div>
                 <p class="chart-definition">
-                  <span data-field="ftsoDelegationSnapshotSource">Loading Flare Base vote-power snapshot.</span>
                   <a class="table-link" href="https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&amp;range=last-180d" target="_blank" rel="noopener">Open Flare Base</a>
                 </p>
                 <div class="delegation-context">
                   <strong>What this shows</strong>
-                  <span>This is not a raw transaction log. It is a Flare Base reward-epoch snapshot: delegated WFLR captured per epoch, the epoch-to-epoch change, and the wallets visible in the latest snapshot.</span>
+                  <span>This is not a raw transaction log. It is a Flare Base reward-epoch view: delegated WFLR captured per epoch, epoch-to-epoch changes, and the latest visible entry for each delegator wallet in the available snapshot history.</span>
+                </div>
+                <div class="delegation-insights" aria-label="Delegation risk insights">
+                  <span data-risk="neutral"><small>Whale concentration</small><strong data-field="ftsoWhaleInsight">-</strong><em data-field="ftsoWhaleDetail">Largest visible wallet share.</em></span>
+                  <span data-risk="neutral"><small>Cap impact</small><strong data-field="ftsoCapImpact">-</strong><em data-field="ftsoCapDetail">Delegation weight vs capped weight.</em></span>
+                  <span data-risk="neutral"><small>Largest move</small><strong data-field="ftsoLargestMove">-</strong><em data-field="ftsoLargestMoveDetail">Biggest epoch-to-epoch vote-power change.</em></span>
                 </div>
                 <div class="table-section-head">
                   <strong>Vote power by reward epoch</strong>
@@ -130,14 +134,14 @@
                   </table>
                 </div>
                 <div class="table-section-head">
-                  <strong>Delegator concentration</strong>
-                  <span>Wallets visible in the latest snapshot. Click an address to inspect it on Flare Explorer.</span>
+                  <strong>Visible delegator wallets</strong>
+                  <span>Latest known visible entry per wallet from the Flare Base reward-epoch history. Click an address to inspect it on Flare Explorer.</span>
                 </div>
                 <div class="table-wrap table-wrap-compact">
                   <table class="delegator-table ftso-delegator-table">
-                    <caption>Delegators at latest reward epoch snapshot</caption>
-                    <thead><tr><th scope="col">#</th><th scope="col">Delegator</th><th scope="col">Amount</th><th scope="col">Share</th><th scope="col">Epoch</th><th scope="col">Date</th></tr></thead>
-                    <tbody data-render="ftso-delegator-snapshot-table"><tr><td colspan="6">Loading...</td></tr></tbody>
+                    <caption>Latest visible MirSFlr delegator wallet entries</caption>
+                    <thead><tr><th scope="col">#</th><th scope="col">Delegator</th><th scope="col">Amount</th><th scope="col">Share</th><th scope="col">First seen</th><th scope="col">Last seen</th><th scope="col">Known delta</th></tr></thead>
+                    <tbody data-render="ftso-delegator-snapshot-table"><tr><td colspan="7">Loading...</td></tr></tbody>
                   </table>
                 </div>
               </div>
@@ -155,8 +159,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=ftso-delegation-summary-7"></script>
+  <script src="../assets/operator.js?v=ftso-delegation-risk-1"></script>
   <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
-  <script src="../assets/pwa.js?v=pwa-install-1"></script>
+  <script src="../assets/pwa.js?v=pwa-install-2"></script>
 </body>
 </html>

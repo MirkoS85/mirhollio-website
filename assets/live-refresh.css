@@ -1763,7 +1763,7 @@ h1{
 .ftso-delegation-card .chart-definition{
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  justify-content:flex-end;
   gap:12px;
   margin:0;
   padding:12px 18px;
@@ -1795,6 +1795,75 @@ h1{
   font-size:14px;
   font-weight:700;
   line-height:1.45;
+}
+
+.delegation-insights{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin:0 18px 20px;
+}
+
+.delegation-insights span{
+  display:grid;
+  gap:5px;
+  min-height:108px;
+  align-content:center;
+  padding:16px;
+  border:1px solid rgba(217,63,132,.13);
+  border-radius:18px;
+  background:rgba(255,255,255,.76);
+  box-shadow:0 14px 30px rgba(124,67,93,.05);
+}
+
+.delegation-insights small{
+  color:#7a6b74;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+}
+
+.delegation-insights strong{
+  color:var(--ink);
+  font-size:25px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:0;
+}
+
+.delegation-insights em{
+  color:#6f7a74;
+  font-size:12px;
+  font-style:normal;
+  font-weight:750;
+  line-height:1.28;
+}
+
+.delegation-insights [data-risk="ok"]{
+  border-color:rgba(38,165,108,.22);
+}
+
+.delegation-insights [data-risk="ok"] strong{
+  color:#26a56c;
+}
+
+.delegation-insights [data-risk="watch"]{
+  border-color:rgba(214,151,35,.28);
+  background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,250,238,.72));
+}
+
+.delegation-insights [data-risk="watch"] strong{
+  color:#b98212;
+}
+
+.delegation-insights [data-risk="warn"]{
+  border-color:rgba(217,63,132,.28);
+  background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,241,248,.78));
+}
+
+.delegation-insights [data-risk="warn"] strong{
+  color:#d93f84;
 }
 
 .table-section-head{
@@ -1853,6 +1922,14 @@ h1{
 .ftso-delegation-card .delegator-table tbody td{
   border-bottom:1px solid rgba(217,63,132,.09);
   font-size:15px;
+  font-weight:760;
+}
+
+.ftso-delegation-card .delegator-table td small{
+  display:block;
+  margin-top:2px;
+  color:#95858f;
+  font-size:11px;
   font-weight:760;
 }
 
@@ -3532,6 +3609,22 @@ tbody tr:hover td{
     font-size:13px;
   }
 
+  .delegation-insights{
+    grid-template-columns:1fr;
+    gap:8px;
+    margin:0 14px 18px;
+  }
+
+  .delegation-insights span{
+    min-height:0;
+    padding:13px 14px;
+    border-radius:16px;
+  }
+
+  .delegation-insights strong{
+    font-size:21px;
+  }
+
   .ftso-delegation-card .chart-definition{
     padding:10px 14px;
     font-size:12px;
@@ -3567,7 +3660,8 @@ tbody tr:hover td{
     grid-template-areas:
       "rank wallet amount"
       "rank share amount"
-      "rank epoch date";
+      "rank first delta"
+      "rank last delta";
     align-items:center;
     gap:4px 10px;
     padding:13px 14px;
@@ -3627,22 +3721,36 @@ tbody tr:hover td{
     font-weight:800;
   }
 
-  .ftso-delegator-table td[data-label="Epoch"]{
-    grid-area:epoch;
+  .ftso-delegator-table td[data-label="First seen"]{
+    grid-area:first;
+    justify-content:flex-start;
   }
 
-  .ftso-delegator-table td[data-label="Date"]{
-    grid-area:date;
+  .ftso-delegator-table td[data-label="Last seen"]{
+    grid-area:last;
+    justify-content:flex-start;
+  }
+
+  .ftso-delegator-table td[data-label="Known delta"]{
+    grid-area:delta;
     justify-content:flex-end;
   }
 
-  .ftso-delegator-table td[data-label="Epoch"],
-  .ftso-delegator-table td[data-label="Date"]{
+  .ftso-delegator-table td[data-label="First seen"],
+  .ftso-delegator-table td[data-label="Last seen"],
+  .ftso-delegator-table td[data-label="Known delta"]{
     padding:0;
     border:0;
     color:#7a6b74;
     font-size:12px;
     font-weight:800;
+  }
+
+  .ftso-delegator-table td[data-label="First seen"] small,
+  .ftso-delegator-table td[data-label="Last seen"] small{
+    display:inline;
+    margin:0 0 0 5px;
+    font-size:11px;
   }
 
   .ftso-delegator-table th::before,
@@ -4100,6 +4208,11 @@ tbody tr:hover td{
 
   .ftso-delegator-table tbody tr{
     grid-template-columns:32px minmax(0,1fr) auto;
+    grid-template-areas:
+      "rank wallet amount"
+      "rank share amount"
+      "rank first delta"
+      "rank last delta";
     padding:11px 12px;
   }
 

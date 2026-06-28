@@ -1057,6 +1057,94 @@ const MirSFlr = (() => {
       .sort((a, b) => Number(b.amount) - Number(a.amount));
   }
 
+  function summarizeDelegatorSnapshots(rows) {
+    const groups = new Map();
+    rows.forEach(row => {
+      const key = String(row.from || "").toLowerCase();
+      if (!key) return;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(row);
+    });
+
+    return [...groups.values()].map(entries => {
+      const sorted = entries
+        .filter(row => Number.isFinite(Number(row.amount)))
+        .sort((a, b) => {
+          const epochDelta = Number(a.rewardEpochId || 0) - Number(b.rewardEpochId || 0);
+          if (epochDelta) return epochDelta;
+          return Number(a.timestamp || 0) - Number(b.timestamp || 0);
+        });
+      const first = sorted[0];
+      const latest = sorted[sorted.length - 1];
+      const previous = sorted.length > 1 ? sorted[sorted.length - 2] : null;
+      const delta = previous ? Number(latest.amount) - Number(previous.amount) : null;
+      return {
+        from: latest?.from || first?.from || "",
+        amount: Number(latest?.amount),
+        firstSeen: Number(first?.timestamp),
+        lastSeen: Number(latest?.timestamp),
+        firstEpoch: Number(first?.rewardEpochId),
+        lastEpoch: Number(latest?.rewardEpochId),
+        delta,
+        hasPriorSnapshot: !!previous
+      };
+    })
+      .filter(row => row.from && Number.isFinite(row.amount))
+      .sort((a, b) => Number(b.amount) - Number(a.amount));
+  }
+
+  function ftsoDelegationCap() {
+    const policy = ftsoEntityData?.denormalizedsigningpolicy || FTSO_ENTITY_SNAPSHOT.denormalizedsigningpolicy || {};
+    const capped = normalizedWeight(policy.w_nat_capped_weight);
+    return Number.isFinite(capped) ? capped : null;
+  }
+
+  function setRiskField(key, risk) {
+    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+      const card = el.closest("[data-risk]");
+      if (card) card.dataset.risk = risk || "neutral";
+    });
+  }
+
+  function renderDelegationInsights(rows, delegates) {
+    const latest = rows[rows.length - 1];
+    const cap = ftsoDelegationCap();
+    const largestWallet = delegates[0];
+    const snapshotTotal = delegates.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+    const whaleShare = snapshotTotal && largestWallet ? (Number(largestWallet.amount) / snapshotTotal) * 100 : null;
+    const largestMove = rows.reduce((best, row) => {
+      if (!Number.isFinite(Number(row.delta))) return best;
+      if (!best || Math.abs(Number(row.delta)) > Math.abs(Number(best.delta))) return row;
+      return best;
+    }, null);
+
+    setText("ftsoWhaleInsight", Number.isFinite(whaleShare) ? `${fmtNum(whaleShare, 1)}%` : "-");
+    setText("ftsoWhaleDetail", largestWallet
+      ? `${shortAddr(largestWallet.from)} is the largest visible wallet.`
+      : "Largest visible wallet share.");
+    setRiskField("ftsoWhaleInsight", whaleShare >= 50 ? "warn" : whaleShare >= 30 ? "watch" : "ok");
+
+    if (Number.isFinite(cap) && latest) {
+      const capPct = (Number(latest.delegated) / cap) * 100;
+      const headroom = cap - Number(latest.delegated);
+      setText("ftsoCapImpact", `${fmtNum(capPct, 1)}%`);
+      setText("ftsoCapDetail", headroom >= 0
+        ? `${fmtCompact(headroom, " WFLR")} below cap.`
+        : `${fmtCompact(Math.abs(headroom), " WFLR")} above cap.`);
+      setRiskField("ftsoCapImpact", capPct >= 100 ? "warn" : capPct >= 85 ? "watch" : "ok");
+    } else {
+      setText("ftsoCapImpact", "-");
+      setText("ftsoCapDetail", "Delegation cap unavailable.");
+      setRiskField("ftsoCapImpact", "neutral");
+    }
+
+    setText("ftsoLargestMove", largestMove ? `#${largestMove.epoch} ${fmtSignedCompact(largestMove.delta, " WFLR")}` : "-");
+    setText("ftsoLargestMoveDetail", largestMove
+      ? `${largestMove.pct == null ? "" : `${largestMove.pct >= 0 ? "+" : ""}${fmtNum(largestMove.pct, 2)}% `}epoch change.`
+      : "Biggest epoch-to-epoch vote-power change.");
+    setRiskField("ftsoLargestMove", largestMove && Math.abs(Number(largestMove.pct || 0)) >= 20 ? "warn" : "ok");
+  }
+
   function withDelegationDeltas(rows) {
     return rows.map((row, index) => {
       const prev = rows[index - 1];
@@ -1219,7 +1307,9 @@ const MirSFlr = (() => {
     const rows = withDelegationDeltas(normalizeVotePowerRows(historyRows));
     const latest = rows[rows.length - 1];
     const delegates = normalizeDelegatorSnapshotRows(delegatorRows);
+    const delegateSummaries = summarizeDelegatorSnapshots(delegates);
     renderFtsoDelegationChart(rows);
+    renderDelegationInsights(rows, delegateSummaries);
 
     setText("ftsoDelegationSnapshotEpoch", latest ? `#${latest.epoch}` : "-");
     setText("ftsoDelegationSnapshotPower", latest ? fmtCompact(latest.delegated, " WFLR") : "-");
@@ -1250,22 +1340,32 @@ const MirSFlr = (() => {
     });
 
     document.querySelectorAll("[data-render='ftso-delegator-snapshot-table']").forEach(tbody => {
-      if (!delegates.length) {
+      if (!delegateSummaries.length) {
         renderTableEmpty(tbody, "Delegator snapshot could not be loaded.");
         return;
       }
       const labels = tableLabels(tbody);
-      const snapshotTotal = delegates.reduce((sum, row) => sum + Number(row.amount || 0), 0) || Number(latest?.delegated || 0);
-      tbody.innerHTML = delegates.map((row, index) => `
+      const snapshotTotal = delegateSummaries.reduce((sum, row) => sum + Number(row.amount || 0), 0) || Number(latest?.delegated || 0);
+      tbody.innerHTML = delegateSummaries.map((row, index) => {
+        const share = snapshotTotal ? (Number(row.amount || 0) / snapshotTotal) * 100 : null;
+        const deltaText = row.hasPriorSnapshot
+          ? fmtSignedCompact(row.delta || 0, " WFLR")
+          : "No prior snapshot";
+        const deltaClass = row.hasPriorSnapshot
+          ? Number(row.delta) < 0 ? "delegation-delta-negative" : "delegation-delta-positive"
+          : "delegation-flow-zero";
+        return `
         <tr>
           <th scope="row" data-label="${labels[0] || "#"}">${index + 1}</th>
           <td data-label="${labels[1] || "Delegator"}"><a class="delegator-address delegator-address-link" href="${escapeHtml(flareAddressUrl(row.from))}" target="_blank" rel="noopener" title="Open ${escapeHtml(row.from)} on Flare Explorer">${escapeHtml(shortAddr(row.from))}</a></td>
           <td data-label="${labels[2] || "Amount"}">${fmtNum(row.amount, 2)}</td>
-          <td data-label="${labels[3] || "Share"}"><span class="mobile-field-label">Share</span>${snapshotTotal ? `${fmtNum((Number(row.amount || 0) / snapshotTotal) * 100, 2)}%` : "-"}</td>
-          <td data-label="${labels[4] || "Epoch"}">#${escapeHtml(row.rewardEpochId || latest?.epoch || "-")}</td>
-          <td data-label="${labels[5] || "Date"}">${formatShortDate(row.timestamp)}</td>
+          <td data-label="${labels[3] || "Share"}"><span class="mobile-field-label">Share</span>${Number.isFinite(share) ? `${fmtNum(share, 2)}%` : "-"}</td>
+          <td data-label="${labels[4] || "First seen"}"><span class="mobile-field-label">First</span>#${escapeHtml(Number.isFinite(row.firstEpoch) ? row.firstEpoch : "-")}<small>${formatShortDate(row.firstSeen)}</small></td>
+          <td data-label="${labels[5] || "Last seen"}"><span class="mobile-field-label">Last</span>#${escapeHtml(Number.isFinite(row.lastEpoch) ? row.lastEpoch : "-")}<small>${formatShortDate(row.lastSeen)}</small></td>
+          <td data-label="${labels[6] || "Known delta"}"><span class="mobile-field-label">Delta</span><span class="${deltaClass}">${escapeHtml(deltaText)}</span></td>
         </tr>
-      `).join("");
+      `;
+      }).join("");
     });
   }
 
