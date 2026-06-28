@@ -1225,9 +1225,7 @@ const MirSFlr = (() => {
     setText("ftsoDelegationSnapshotPower", latest ? fmtCompact(latest.delegated, " WFLR") : "-");
     setText("ftsoDelegationSnapshotDelta", latest?.delta != null ? fmtSignedCompact(latest.delta, " WFLR") : "-");
     setText("ftsoDelegationSnapshotDelegators", latest ? fmtNum(latest.delegators, 0) : "-");
-    setText("ftsoDelegationSnapshotSource", source === "live"
-      ? "Flare Base live snapshot. Reward-epoch vote-power history, not raw transaction flow."
-      : "Verified Flare Base fallback snapshot. Browser direct API access may be blocked by CORS.");
+    setText("ftsoDelegationSnapshotSource", "Source: Flare Base reward-epoch snapshots.");
 
     document.querySelectorAll("[data-render='ftso-delegation-epoch-table']").forEach(tbody => {
       if (!rows.length) {
@@ -1257,13 +1255,15 @@ const MirSFlr = (() => {
         return;
       }
       const labels = tableLabels(tbody);
+      const snapshotTotal = delegates.reduce((sum, row) => sum + Number(row.amount || 0), 0) || Number(latest?.delegated || 0);
       tbody.innerHTML = delegates.map((row, index) => `
         <tr>
           <th scope="row" data-label="${labels[0] || "#"}">${index + 1}</th>
           <td data-label="${labels[1] || "Delegator"}"><a class="delegator-address delegator-address-link" href="${escapeHtml(flareAddressUrl(row.from))}" target="_blank" rel="noopener" title="Open ${escapeHtml(row.from)} on Flare Explorer">${escapeHtml(shortAddr(row.from))}</a></td>
           <td data-label="${labels[2] || "Amount"}">${fmtNum(row.amount, 2)}</td>
-          <td data-label="${labels[3] || "Epoch"}">#${escapeHtml(row.rewardEpochId || latest?.epoch || "-")}</td>
-          <td data-label="${labels[4] || "Date"}">${formatShortDate(row.timestamp)}</td>
+          <td data-label="${labels[3] || "Share"}"><span class="mobile-field-label">Share</span>${snapshotTotal ? `${fmtNum((Number(row.amount || 0) / snapshotTotal) * 100, 2)}%` : "-"}</td>
+          <td data-label="${labels[4] || "Epoch"}">#${escapeHtml(row.rewardEpochId || latest?.epoch || "-")}</td>
+          <td data-label="${labels[5] || "Date"}">${formatShortDate(row.timestamp)}</td>
         </tr>
       `).join("");
     });
