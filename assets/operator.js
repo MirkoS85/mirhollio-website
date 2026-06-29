@@ -1094,8 +1094,12 @@ const MirSFlr = (() => {
   }
 
   function ftsoDelegationCap() {
-    const policy = ftsoEntityData?.denormalizedsigningpolicy || FTSO_ENTITY_SNAPSHOT.denormalizedsigningpolicy || {};
-    const capped = normalizedWeight(policy.w_nat_capped_weight);
+    const policy = ftsoEntityData?.denormalizedsigningpolicy || {};
+    const capped = normalizedWeight(
+      policy.w_nat_capped_weight
+      ?? latestData?.voterRegistration?.wNatCappedWeight
+      ?? latestData?.m_dDelegationWeight
+    );
     return Number.isFinite(capped) ? capped : null;
   }
 
@@ -2086,14 +2090,12 @@ const MirSFlr = (() => {
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "MirSFlr");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
     setText("rewardRateSnapshot", latest?.m_dRewardRate != null ? fmtSnapshotPct(latest.m_dRewardRate) : "-");
-    if (!ftsoEntityData) {
-      setWeightText("votePower", latest?.m_dTotalWeight);
-      setWeightText("ftsoWeight", latest?.m_dTotalWeight);
-      setWeightText("delegationWeight", latest?.m_dDelegationWeight);
-      setWeightText("stakeWeight", latest?.m_dStakeWeight);
-      setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
-      setText("ftsoFeeSnapshot", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
-    }
+    setWeightText("votePower", latest?.m_dTotalWeight);
+    setWeightText("ftsoWeight", latest?.m_dTotalWeight);
+    setWeightText("delegationWeight", latest?.m_dDelegationWeight);
+    setWeightText("stakeWeight", latest?.m_dStakeWeight);
+    setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
+    setText("ftsoFeeSnapshot", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
     setText("averageReward", provider.averageRewardPerEpoch != null ? fmtCompact(provider.averageRewardPerEpoch, " FLR") : "-");
     setText("availability", provider.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
@@ -2300,9 +2302,7 @@ const MirSFlr = (() => {
   async function loadFtsoEntity() {
     try {
       applyFtsoEntityData(await fetchJsonWithCache(FTSO_ENTITY_URL, CACHE_TTLS.explorer));
-    } catch (_) {
-      applyFtsoEntityData(FTSO_ENTITY_SNAPSHOT);
-    }
+    } catch (_) {}
   }
 
   async function loadProviderV2() {
@@ -2356,7 +2356,6 @@ const MirSFlr = (() => {
     restoreCurrencyPreference();
     restoreDelegatorSortPreference();
     setLoadingState();
-    applyFtsoEntityData(FTSO_ENTITY_SNAPSHOT);
     load();
     loadValidator();
     loadFtsoExplorer();
