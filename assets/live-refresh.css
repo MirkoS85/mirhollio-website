@@ -2422,6 +2422,25 @@ tbody tr:hover td{
   height:330px;
 }
 
+.ftso-reward-history-panel .reward-chart-wrap{
+  max-width:1040px;
+  margin:0 auto;
+  padding:18px 22px 14px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(224,84,141,.10), transparent 46%),
+    linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,247,251,.84));
+}
+
+.ftso-reward-history-panel .reward-chart{
+  height:270px;
+}
+
+.ftso-reward-history-panel .chart-summary{
+  max-width:1040px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
 .hourly-chart-grid{
   display:grid;
   grid-template-columns:1fr;
@@ -3042,6 +3061,15 @@ tbody tr:hover td{
 
   .reward-chart{
     height:180px;
+  }
+
+  .ftso-reward-history-panel .reward-chart-wrap{
+    max-width:none;
+    padding:10px;
+  }
+
+  .ftso-reward-history-panel .reward-chart{
+    height:190px;
   }
 
   .hourly-chart{

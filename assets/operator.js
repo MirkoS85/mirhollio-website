@@ -1427,6 +1427,17 @@ const MirSFlr = (() => {
     };
   }
 
+  function smoothLinePath(points) {
+    if (!points.length) return "";
+    if (points.length === 1) return `M${points[0].x} ${points[0].y}`;
+    return points.reduce((path, point, index) => {
+      if (index === 0) return `M${point.x} ${point.y}`;
+      const previous = points[index - 1];
+      const cpX = previous.x + (point.x - previous.x) / 2;
+      return `${path} C${cpX} ${previous.y}, ${cpX} ${point.y}, ${point.x} ${point.y}`;
+    }, "");
+  }
+
   function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }) {
     if (!svg) return;
 
@@ -1452,8 +1463,8 @@ const MirSFlr = (() => {
       const y = height - padBottom - ((item.reward - minReward) / range) * plotH;
       return { ...item, x, y };
     });
-    const line = points.map(point => `${point.x},${point.y}`).join(" ");
-    const area = [`${points[0].x},${height - padBottom}`, ...points.map(point => `${point.x},${point.y}`), `${points[points.length - 1].x},${height - padBottom}`].join(" ");
+    const linePath = smoothLinePath(points);
+    const areaPath = `M${points[0].x} ${height - padBottom} ${linePath.replace(/^M/, "L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
     const last = series[series.length - 1];
     const avgY = height - padBottom - ((avgReward - minReward) / range) * plotH;
     const grid = [0, 1, 2, 3].map(i => {
@@ -1464,10 +1475,12 @@ const MirSFlr = (() => {
       <text x="${point.x}" y="${height - 6}" text-anchor="middle" fill="#b8c1bd" font-size="12" font-weight="700">${point.epoch}</text>
     `).join("");
     const circles = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#e9167c" : "#f4f6f2"}"></circle>
+      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#e9167c" : "#fffdfd"}" stroke="rgba(217,63,132,.35)" stroke-width="1.5"></circle>
       <circle cx="${point.x}" cy="${point.y}" r="15" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>
     `).join("");
 
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `
       <defs>
         <linearGradient id="${gradientId}LineGrad" x1="0" x2="1" y1="0" y2="0">
@@ -1483,8 +1496,8 @@ const MirSFlr = (() => {
       <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(maxReward, 0)}</text>
       <text x="8" y="${height - padBottom}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(minReward, 0)}</text>
       <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(233,22,124,.48)" stroke-dasharray="6 6" />
-      <polygon points="${area}" fill="url(#${gradientId}FillGrad)"></polygon>
-      <polyline points="${line}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <path d="${areaPath}" fill="url(#${gradientId}FillGrad)"></path>
+      <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"></path>
       ${circles}
       ${labels}
     `;
