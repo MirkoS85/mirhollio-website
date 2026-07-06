@@ -76,14 +76,16 @@ const MirSFlr = (() => {
     { epoch: 407, timestamp: 1781284530000, delegated: 500104478.874742, delegators: 9 },
     { epoch: 408, timestamp: 1781549291000, delegated: 500139389.693575, delegators: 10 },
     { epoch: 409, timestamp: 1781899454000, delegated: 235184042.379804, delegators: 6 },
-    { epoch: 410, timestamp: 1782357188000, delegated: 235184068.303321, delegators: 6 }
+    { epoch: 410, timestamp: 1782357188000, delegated: 235184068.303321, delegators: 6 },
+    { epoch: 411, timestamp: 1782569352000, delegated: 235149213.192462, delegators: 5 },
+    { epoch: 412, timestamp: 1782832427000, delegated: 235070124.100809, delegators: 5 },
+    { epoch: 413, timestamp: 1783308175000, delegated: 235118282.77656, delegators: 5 }
   ];
   const FTSO_DELEGATORS_FALLBACK = [
-    { from: "0x2306757c2a67904b7526b35c5cc9a53e0692c964", amount: 235000000, rewardEpochId: 409, timestamp: 1781626818000 },
-    { from: "0xa7fd33f85cf752919213c836a144f22906823869", amount: 79116.65878241032, rewardEpochId: 409, timestamp: 1781745257000 },
-    { from: "0x9b3173b90dd9db94ffecb9ada2108db47f9309af", amount: 61089.41226377042, rewardEpochId: 410, timestamp: 1782156704000 },
-    { from: "0xcda31790def73df1591b1fdeb08b6e3d4c20512e", amount: 34883.26779544061, rewardEpochId: 408, timestamp: 1781348923000 },
-    { from: "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457", amount: 8528.96447924601, rewardEpochId: 409, timestamp: 1781867139000 },
+    { from: "0x2306757c2a67904b7526b35c5cc9a53e0692c964", amount: 235000000, rewardEpochId: 411, timestamp: 1781626818000 },
+    { from: "0x9b3173b90dd9db94ffecb9ada2108db47f9309af", amount: 61173.346361868935, rewardEpochId: 413, timestamp: 1783104178000 },
+    { from: "0xa7fd33f85cf752919213c836a144f22906823869", amount: 40237.454362188924, rewardEpochId: 413, timestamp: 1782918766000 },
+    { from: "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457", amount: 16421.975835453813, rewardEpochId: 413, timestamp: 1782917959000 },
     { from: "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a", amount: 450, rewardEpochId: 325, timestamp: 1756463057000 }
   ];
   let providerData = null;
@@ -1037,12 +1039,37 @@ const MirSFlr = (() => {
     return rows
       .map(row => ({
         epoch: Number(row.rewardEpochId ?? row.epoch),
-        timestamp: Number(row.timestamp),
+        timestamp: row.timestamp == null || row.timestamp === "" ? null : Number(row.timestamp),
         delegated: Number(row.delegatedAmount ?? row.delegated ?? row.amount),
         delegators: Number(row.delegators ?? row.activeDelegators)
       }))
       .filter(row => Number.isFinite(row.epoch) && Number.isFinite(row.delegated))
       .sort((a, b) => Number(a.epoch) - Number(b.epoch));
+  }
+
+  function providerDelegationHistoryRows() {
+    const history = Array.isArray(providerData?.epochData) ? providerData.epochData : [];
+    const fallbackRows = normalizeVotePowerRows(FTSO_DELEGATION_HISTORY_FALLBACK);
+    const fallbackByEpoch = new Map(fallbackRows.map(row => [Number(row.epoch), row]));
+    const lastFallback = fallbackRows[fallbackRows.length - 1];
+    return normalizeVotePowerRows(history.map(item => ({
+      epoch: item?.epoch,
+      timestamp: item?.m_xTimestamp
+        ?? item?.timestamp
+        ?? fallbackByEpoch.get(Number(item?.epoch))?.timestamp
+        ?? (lastFallback ? Number(lastFallback.timestamp) + ((Number(item?.epoch) - Number(lastFallback.epoch)) * 3.5 * 24 * 60 * 60 * 1000) : null),
+      delegated: item?.m_dDelegationWeight,
+      delegators: item?.delegators
+    })));
+  }
+
+  function bestDelegationHistoryRows(liveRows = []) {
+    const fallbackRows = normalizeVotePowerRows(FTSO_DELEGATION_HISTORY_FALLBACK);
+    const oracleRows = providerDelegationHistoryRows();
+    return [liveRows, oracleRows, fallbackRows]
+      .map(normalizeVotePowerRows)
+      .filter(rows => rows.length)
+      .sort((a, b) => Number(b[b.length - 1]?.epoch || 0) - Number(a[a.length - 1]?.epoch || 0))[0] || [];
   }
 
   function normalizeDelegatorSnapshotRows(rows) {
@@ -1377,6 +1404,8 @@ const MirSFlr = (() => {
     if (!document.querySelector("[data-render='ftso-delegation-epoch-table']")) return;
     const now = Date.now();
     const start = now - 180 * 24 * 60 * 60 * 1000;
+    let historyRows = [];
+    let delegatorRows = [];
     try {
       const historyText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_VOTE_POWER_URL, {
         address: TARGET_DELEGATION,
@@ -1387,9 +1416,18 @@ const MirSFlr = (() => {
         sortField: "timestamp",
         sortOrder: "asc"
       }), CACHE_TTLS.delegationSnapshot);
-      const historyRows = normalizeVotePowerRows(parseSemicolonRows(historyText));
-      const fallbackLatest = FTSO_DELEGATION_HISTORY_FALLBACK[FTSO_DELEGATION_HISTORY_FALLBACK.length - 1];
-      const epoch = historyRows[historyRows.length - 1]?.epoch || fallbackLatest?.epoch || 410;
+      historyRows = normalizeVotePowerRows(parseSemicolonRows(historyText));
+      if (!historyRows.length) throw new Error("Empty Flare Base vote-power response");
+    } catch (_) {
+      historyRows = bestDelegationHistoryRows();
+    }
+
+    historyRows = bestDelegationHistoryRows(historyRows);
+    const epoch = historyRows[historyRows.length - 1]?.epoch
+      || FTSO_DELEGATION_HISTORY_FALLBACK[FTSO_DELEGATION_HISTORY_FALLBACK.length - 1]?.epoch
+      || 410;
+
+    try {
       const delegatorsText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_DELEGATORS_URL, {
         address: TARGET_DELEGATION,
         epochId: epoch,
@@ -1398,10 +1436,13 @@ const MirSFlr = (() => {
         sortField: "amount",
         sortOrder: "desc"
       }), CACHE_TTLS.delegationSnapshot);
-      renderFtsoDelegationSummary(historyRows, parseSemicolonRows(delegatorsText), "live");
+      delegatorRows = parseSemicolonRows(delegatorsText);
+      if (!delegatorRows.length) throw new Error("Empty Flare Base delegator response");
     } catch (_) {
-      renderFtsoDelegationSummary(FTSO_DELEGATION_HISTORY_FALLBACK, FTSO_DELEGATORS_FALLBACK, "fallback");
+      delegatorRows = FTSO_DELEGATORS_FALLBACK;
     }
+
+    renderFtsoDelegationSummary(historyRows, delegatorRows, "live");
   }
 
   function rewardWithFiat(value) {

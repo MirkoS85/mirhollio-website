@@ -4572,3 +4572,169 @@ tbody tr:hover td{
     overscroll-behavior-y:none;
   }
 }
+
+@media (max-width:700px){
+  .ftso-delegation-card .table-wrap-compact{
+    overflow:visible;
+  }
+
+  .delegator-table.ftso-delegation-table thead,
+  .delegator-table.ftso-delegator-table thead{
+    display:none;
+  }
+
+  .ftso-delegation-table tbody,
+  .ftso-delegator-table tbody{
+    display:grid;
+    gap:10px;
+  }
+
+  .ftso-delegation-table tbody tr,
+  .ftso-delegator-table tbody tr{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-areas:none !important;
+    gap:0;
+    padding:15px 16px !important;
+    border:1px solid rgba(217,63,132,.13);
+    border-radius:18px;
+    background:rgba(255,255,255,.82);
+    box-shadow:0 12px 26px rgba(124,67,93,.05);
+  }
+
+  .ftso-delegation-table th,
+  .ftso-delegation-table td,
+  .ftso-delegator-table th,
+  .ftso-delegator-table td{
+    display:grid !important;
+    grid-template-columns:minmax(92px, .58fr) minmax(0, 1fr);
+    align-items:center;
+    justify-content:stretch;
+    gap:12px;
+    width:100% !important;
+    min-width:0;
+    height:auto !important;
+    padding:9px 0 !important;
+    border:0 !important;
+    border-bottom:1px solid rgba(137,96,116,.11) !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:var(--ink);
+    text-align:right;
+    white-space:normal;
+  }
+
+  .ftso-delegation-table th:last-child,
+  .ftso-delegation-table td:last-child,
+  .ftso-delegator-table th:last-child,
+  .ftso-delegator-table td:last-child{
+    border-bottom:0 !important;
+  }
+
+  .ftso-delegation-table th::before,
+  .ftso-delegation-table td::before,
+  .ftso-delegator-table th::before,
+  .ftso-delegator-table td::before{
+    content:attr(data-label) !important;
+    display:block;
+    max-width:none;
+    color:#8b7a84;
+    font-size:13px;
+    font-weight:650;
+    text-align:left;
+  }
+
+  .ftso-delegation-table th[data-label="Epoch"],
+  .ftso-delegator-table th[data-label="#"]{
+    color:#d93f84;
+    font-size:24px;
+    font-weight:950;
+  }
+
+  .ftso-delegation-table th[data-label="Epoch"]::before,
+  .ftso-delegator-table th[data-label="#"]::before{
+    color:#8b7a84;
+    font-size:13px;
+    font-weight:650;
+  }
+
+  .ftso-delegator-table td[data-label="Delegator"],
+  .ftso-delegator-table td[data-label="Amount"],
+  .ftso-delegator-table td[data-label="Share"],
+  .ftso-delegator-table td[data-label="First seen"],
+  .ftso-delegator-table td[data-label="Last seen"],
+  .ftso-delegator-table td[data-label="Known delta"]{
+    grid-area:auto !important;
+    justify-content:stretch;
+    color:var(--ink);
+    font-size:15px;
+    font-weight:850;
+  }
+
+  .ftso-delegator-table .delegator-address{
+    justify-self:end;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .ftso-delegator-table .mobile-field-label{
+    display:none;
+  }
+
+  .ftso-delegator-table td[data-label="First seen"] small,
+  .ftso-delegator-table td[data-label="Last seen"] small{
+    display:block;
+    margin:2px 0 0;
+    color:#9a8992;
+    font-size:11px;
+  }
+
+  .ftso-delegation-table tbody tr,
+  .ftso-delegator-table tbody tr{
+    display:block !important;
+  }
+
+  .ftso-delegation-table th,
+  .ftso-delegation-table td,
+  .ftso-delegator-table th,
+  .ftso-delegator-table td,
+  .ftso-delegator-table th[data-label="#"]{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:flex-start !important;
+    gap:14px !important;
+    grid-area:auto !important;
+    width:auto !important;
+    min-width:0 !important;
+    text-align:right !important;
+  }
+
+  .ftso-delegator-table th[data-label="#"]{
+    height:auto !important;
+    color:#d93f84;
+    font-size:22px;
+    line-height:1.1;
+  }
+
+  .ftso-delegator-table td[data-label="Delegator"],
+  .ftso-delegator-table td[data-label="Amount"],
+  .ftso-delegator-table td[data-label="Share"],
+  .ftso-delegator-table td[data-label="First seen"],
+  .ftso-delegator-table td[data-label="Last seen"],
+  .ftso-delegator-table td[data-label="Known delta"]{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:flex-start !important;
+    gap:14px !important;
+  }
+
+  .ftso-delegation-table th > *,
+  .ftso-delegation-table td > *,
+  .ftso-delegator-table th > *,
+  .ftso-delegator-table td > *{
+    min-width:0;
+  }
+}

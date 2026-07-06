@@ -1423,8 +1423,6 @@
     const performanceMedian24h = median(ftsoPerformanceHours);
     const primaryMedian24h = median(ftsoPrimaryHours);
     const secondaryMedian24h = median(ftsoSecondaryHours);
-    const rewardRateMedian12 = median(recentEpochs.map(item => item?.m_dRewardRate));
-    const rewardMedian12 = median(recentEpochs.map(item => item?.totalRewardAmount));
     const fdcMedian6m = median(epochHistory.map(item => item?.fdc?.participationPercentage));
     const hitMedian6m = median(epochHistory.map(item => item?.ftsoScaling?.hitPercentage));
 
@@ -1434,10 +1432,6 @@
     const primaryWarn = Math.max(10, (primaryMedian24h ?? 25) * 0.55);
     const secondaryOk = Math.max(82, (secondaryMedian24h ?? 90) * 0.92);
     const secondaryWarn = Math.max(70, (secondaryMedian24h ?? 90) * 0.78);
-    const rewardRateOk = Math.max(3, (rewardRateMedian12 ?? 3.75) * 0.8);
-    const rewardRateWarn = Math.max(2, (rewardRateMedian12 ?? 3.75) * 0.55);
-    const rewardOk = (rewardMedian12 ?? 45_000) * 0.75;
-    const rewardWarn = (rewardMedian12 ?? 45_000) * 0.4;
     const fdcEpochOk = Math.max(88, (fdcMedian6m ?? 91) * 0.95);
     const fdcEpochWarn = Math.max(75, (fdcMedian6m ?? 91) * 0.8);
     const hitOk = Math.max(99, (hitMedian6m ?? 99.7) - 0.5);
@@ -1458,8 +1452,8 @@
     setMetricTone("fdcParticipation", higherIsBetterTone(pctNumber(latest?.fdc?.participationPercentage), fdcEpochOk, fdcEpochWarn), `Six-month median ${fmtPct(fdcMedian6m)}`);
     setMetricTone("conditionPasses", Number.isFinite(passes) ? higherIsBetterTone(passes, 3, 2) : higherIsBetterTone(conditionOk, 4, 3), "All required conditions should pass");
     setMetricTone("preRegistered", provider?.isPreRegistered === true ? "ok" : provider?.isPreRegistered === false ? "down" : "warn");
-    setMetricTone("rewardRate", higherIsBetterTone(latest?.m_dRewardRate, rewardRateOk, rewardRateWarn), `Recent 12-epoch median ${fmtPct(rewardRateMedian12)}`);
-    setMetricTone("latestReward", higherIsBetterTone(reward, rewardOk, rewardWarn), `Recent 12-epoch median ${fmtCompact(rewardMedian12, " FLR")}`);
+    setMetricTone("rewardRate", "", "Informational yield metric; lower rewards are not an operator health alarm.");
+    setMetricTone("latestReward", "", "Informational payout metric; delegation loss is tracked in the FTSO delegation section.");
     setMetricTone("ftsoHitPct", higherIsBetterTone(pctNumber(latest?.ftsoScaling?.hitPercentage), hitOk, 97), `Six-month median ${fmtPct(hitMedian6m)}`);
     setMetricTone("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "ok" : latest?.fdc?.conditionMet === false ? "down" : "warn");
     setMetricTone("stakingCondition", latest?.staking?.conditionMet === true ? "ok" : latest?.staking?.conditionMet === false ? "down" : "warn");
