@@ -299,6 +299,19 @@
     return fmtCompact(normalized, " FLR");
   }
 
+  function chainAmountNumber(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return Math.abs(n) > 1_000_000_000_000 ? n / 1_000_000_000 : n;
+  }
+
+  function validatorCapacityStake(latest) {
+    return chainAmountNumber(latest?.staking?.stakeWithUptime)
+      ?? chainAmountNumber(latest?.staking?.stake)
+      ?? chainAmountNumber(latest?.staking?.nodes?.[0]?.totalStakeAmount)
+      ?? null;
+  }
+
   function fmtAge(date) {
     if (!date) return "-";
     const ms = Date.now() - date.getTime();
@@ -1509,9 +1522,15 @@
       : pctNumber(state.validatorFallback?.uptime);
     const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h` : "-";
-    const capacity = Number(validator?.m_dTotal ?? state.validatorFallback?.stake);
-    const freeSpace = Number(validator?.m_dFreeDelegationSpace ?? state.validatorFallback?.freeSpace);
-    const capacityMax = capacity + freeSpace;
+    const validatorApiTotal = Number(validator?.m_dTotal ?? state.validatorFallback?.stake);
+    const validatorApiFreeSpace = Number(validator?.m_dFreeDelegationSpace ?? state.validatorFallback?.freeSpace);
+    const apiCapacityMax = Number.isFinite(validatorApiTotal) && Number.isFinite(validatorApiFreeSpace)
+      ? validatorApiTotal + validatorApiFreeSpace
+      : null;
+    const liveCapacity = validatorCapacityStake(latest);
+    const capacity = Number.isFinite(liveCapacity) && liveCapacity > 0 ? liveCapacity : validatorApiTotal;
+    const capacityMax = Number.isFinite(apiCapacityMax) && apiCapacityMax > 0 ? apiCapacityMax : 45_000_000;
+    const freeSpace = Number.isFinite(capacityMax) && Number.isFinite(capacity) ? Math.max(0, capacityMax - capacity) : validatorApiFreeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : 0;
     const selfBond = Number(validator?.m_dTotalStake ?? stake?.m_dAmount);
     const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : pctNumber(state.validatorFallback?.delegated);

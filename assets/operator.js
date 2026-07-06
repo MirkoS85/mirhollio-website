@@ -165,6 +165,18 @@ const MirSFlr = (() => {
     return fmtCompact(normalized, suffix);
   }
 
+  function chainAmountNumber(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return Math.abs(n) > 1_000_000_000_000 ? n / 1_000_000_000 : n;
+  }
+
+  function latestValidatorCapacityStake() {
+    return chainAmountNumber(latestData?.staking?.stakeWithUptime)
+      ?? chainAmountNumber(latestData?.staking?.stake)
+      ?? normalizedWeight(latestData?.m_dStakeWeight);
+  }
+
   function shortAddr(addr) {
     if (!addr) return "-";
     const s = String(addr);
@@ -2260,9 +2272,21 @@ const MirSFlr = (() => {
       ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h ${stake.m_aiTimeLeftDHM[2]}m left`
       : "-";
     const stakeEnd = stake?.m_xTimeEnd ? new Date(stake.m_xTimeEnd).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "-";
-    const capacity = Number(validator.m_dTotal);
-    const freeSpace = Number(validator.m_dFreeDelegationSpace);
-    const capacityMax = capacity + freeSpace;
+    const validatorApiTotal = Number(validator.m_dTotal);
+    const validatorApiFreeSpace = Number(validator.m_dFreeDelegationSpace);
+    const apiCapacityMax = Number.isFinite(validatorApiTotal) && Number.isFinite(validatorApiFreeSpace)
+      ? validatorApiTotal + validatorApiFreeSpace
+      : null;
+    const liveCapacity = latestValidatorCapacityStake();
+    const capacity = Number.isFinite(liveCapacity) && liveCapacity > 0
+      ? liveCapacity
+      : validatorApiTotal;
+    const capacityMax = Number.isFinite(apiCapacityMax) && apiCapacityMax > 0
+      ? apiCapacityMax
+      : 45_000_000;
+    const freeSpace = Number.isFinite(capacityMax) && Number.isFinite(capacity)
+      ? Math.max(0, capacityMax - capacity)
+      : validatorApiFreeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : null;
     const leftPct = timeLeftPct(stake);
 
@@ -2278,7 +2302,7 @@ const MirSFlr = (() => {
     monthlyRewards.validator = estimateValidatorMonthlyReward(node);
     renderMonthlyRewards();
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
-    setText("validatorTotal", validator.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
+    setText("validatorTotal", Number.isFinite(capacity) ? fmtCompact(capacity, " FLR") : "-");
     setText("validatorStake", validator.m_dTotalStake != null ? fmtCompact(validator.m_dTotalStake, " FLR") : "-");
     setText("validatorDelegation", validator.m_dTotalDelegation != null ? fmtCompact(validator.m_dTotalDelegation, " FLR") : "-");
     setText("freeDelegationSpace", validator.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
@@ -2371,6 +2395,7 @@ const MirSFlr = (() => {
       providerData = provider;
       latestData = latestEpoch(provider);
       applyData(providerData, latestData);
+      if (validatorData) applyValidatorData(validatorData);
       if (!lastUpdatedSet) setText("lastUpdated", formatRelativeTime(new Date()));
       clearLiveErrors();
     } catch (error) {
