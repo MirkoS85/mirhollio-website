@@ -1181,8 +1181,8 @@
       if (lastSeen != null && lastSeen > 180) { val = val === "down" ? val : "warn"; add("warn", "Validator last seen delayed", `${node.m_sLastSeen} since last seen.`); }
       const stake = Array.isArray(node.m_axStake) ? node.m_axStake[0] : null;
       const daysLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? Number(stake.m_aiTimeLeftDHM[0]) : null;
-      if (daysLeft != null && daysLeft < 7) { add("warn", "Stake renewal due soon", `${daysLeft} days left on validator stake. Validator health remains OK while uptime, connection, and node health are normal.`); }
-      else if (daysLeft != null && daysLeft < 14) { add("warn", "Stake renewal window", `${daysLeft} days left on validator stake. This is a planning reminder, not a validator fault.`); }
+      if (daysLeft != null && daysLeft < 7) { add("info", "Stake renewal due soon", `${daysLeft} days left on validator stake. Validator health remains OK while uptime, connection, and node health are normal.`); }
+      else if (daysLeft != null && daysLeft < 14) { add("info", "Stake renewal window", `${daysLeft} days left on validator stake. This is a planning reminder, not a validator fault.`); }
     }
 
     if (!nodeHealth) {
@@ -1229,9 +1229,13 @@
         <span>${item.text}</span>
       </article>
     `).join("");
-    setText("alertCount", `${alerts.length} alert${alerts.length === 1 ? "" : "s"}`);
+    const actionable = alerts.filter(item => item.level === "warn" || item.level === "down");
+    const reminders = alerts.length - actionable.length;
+    setText("alertCount", actionable.length
+      ? `${actionable.length} alert${actionable.length === 1 ? "" : "s"}`
+      : `${reminders} reminder${reminders === 1 ? "" : "s"}`);
     const panel = $(".alerts-card");
-    if (panel) panel.dataset.alertState = worstLevel(alerts.map(item => item.level));
+    if (panel) panel.dataset.alertState = actionable.length ? worstLevel(actionable.map(item => item.level)) : "ok";
   }
 
   function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload) {

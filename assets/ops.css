@@ -495,8 +495,10 @@ button{
 
 .alert-item.warn b{color:var(--amber)}
 .alert-item.down b{color:var(--red)}
+.alert-item.info b{color:var(--green)}
 .alert-item.warn b::before{content:"!"}
 .alert-item.down b::before{content:"×"}
+.alert-item.info b::before{content:"i"}
 
 .alert-item::after{
   content:"›";
