@@ -1181,8 +1181,8 @@
       if (lastSeen != null && lastSeen > 180) { val = val === "down" ? val : "warn"; add("warn", "Validator last seen delayed", `${node.m_sLastSeen} since last seen.`); }
       const stake = Array.isArray(node.m_axStake) ? node.m_axStake[0] : null;
       const daysLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? Number(stake.m_aiTimeLeftDHM[0]) : null;
-      if (daysLeft != null && daysLeft < 7) { val = "down"; add("down", "Stake period near end", `${daysLeft} days left on validator stake.`); }
-      else if (daysLeft != null && daysLeft < 14) { val = val === "down" ? val : "warn"; add("warn", "Stake renewal window", `${daysLeft} days left on validator stake.`); }
+      if (daysLeft != null && daysLeft < 7) { add("warn", "Stake renewal due soon", `${daysLeft} days left on validator stake. Validator health remains OK while uptime, connection, and node health are normal.`); }
+      else if (daysLeft != null && daysLeft < 14) { add("warn", "Stake renewal window", `${daysLeft} days left on validator stake. This is a planning reminder, not a validator fault.`); }
     }
 
     if (!nodeHealth) {
@@ -1526,7 +1526,7 @@
     const capacityTone = lowerIsBetterTone(capacityPct, 80, 95);
     setMetricTone("validatorConnected", node?.m_bConnected === true ? "ok" : node?.m_bConnected === false ? "down" : "warn");
     setMetricTone("validatorUptime", higherIsBetterTone(uptimeAvg, 99, 95), "Normal >= 99%");
-    setMetricTone("stakeEnds", daysLeft == null ? "" : higherIsBetterTone(daysLeft, 14, 7), "Green >= 14 days remaining");
+    setMetricTone("stakeEnds", "", "Planning reminder only; it does not affect validator health while the node is operating normally.");
     setMetricTone("capacityPct", capacityTone, "Green below 80% capacity");
     setMetricTone("validatorStake", capacityTone, "Colour follows validator capacity");
     setMetricTone("delegatedStake", capacityTone, "Colour follows validator capacity");
