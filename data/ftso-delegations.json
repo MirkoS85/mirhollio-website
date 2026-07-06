@@ -1,54 +1,355 @@
 {
-  "generatedAt": "2026-07-06T00:00:00.000Z",
+  "generatedAt": "2026-07-06T13:59:24.487Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
-    "history": "seed-snapshot",
-    "delegators": "seed-snapshot"
+    "history": "flare-base",
+    "delegators": "flare-base"
   },
-  "warnings": [
-    "Seed snapshot. GitHub Action refreshes this file from Flare Base."
-  ],
+  "warnings": [],
   "failedDelegatorEpochs": [],
   "insights": {
     "latestEpoch": 413,
-    "latestDelegated": 235118282.77656,
-    "latestDelta": 48158.675751,
+    "latestDelegated": 235118282.7765595,
+    "latestDelta": 48158.67575070262,
     "latestDelegators": 5,
-    "whaleConcentrationPct": 99.94971997152276,
+    "whaleConcentrationPct": 99.94969222505257,
     "largestWallet": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
     "largestMove": {
       "epoch": 409,
-      "delta": -264955347.313771,
-      "pct": -52.97630615287767
+      "delta": -264955347.31377077,
+      "pct": -52.97630076209423
     }
   },
   "history": [
-    { "epoch": 399, "timestamp": 1778861721000, "delegated": 300132266.872437, "delegators": 9 },
-    { "epoch": 400, "timestamp": 1779255255000, "delegated": 300132310.474625, "delegators": 9 },
-    { "epoch": 401, "timestamp": 1779544794000, "delegated": 300064331.141805, "delegators": 9 },
-    { "epoch": 402, "timestamp": 1779877562000, "delegated": 300064402.207034, "delegators": 9 },
-    { "epoch": 403, "timestamp": 1780248361000, "delegated": 500064431.770537, "delegators": 9 },
-    { "epoch": 404, "timestamp": 1780362107000, "delegated": 500064460.36205, "delegators": 9 },
-    { "epoch": 405, "timestamp": 1780767550000, "delegated": 500103412.859684, "delegators": 9 },
-    { "epoch": 406, "timestamp": 1780960210000, "delegated": 500103440.91734, "delegators": 9 },
-    { "epoch": 407, "timestamp": 1781284530000, "delegated": 500104478.874742, "delegators": 9 },
-    { "epoch": 408, "timestamp": 1781549291000, "delegated": 500139389.693575, "delegators": 10 },
-    { "epoch": 409, "timestamp": 1781899454000, "delegated": 235184042.379804, "delegators": 6 },
-    { "epoch": 410, "timestamp": 1782357188000, "delegated": 235184068.303321, "delegators": 6 },
-    { "epoch": 411, "timestamp": 1782569352000, "delegated": 235149213.192462, "delegators": 5 },
-    { "epoch": 412, "timestamp": 1782832427000, "delegated": 235070124.100809, "delegators": 5 },
-    { "epoch": 413, "timestamp": 1783308175000, "delegated": 235118282.77656, "delegators": 5 }
+    {
+      "epoch": 361,
+      "timestamp": 1767365085000,
+      "delegated": 489986256.8014343,
+      "delegators": 7
+    },
+    {
+      "epoch": 362,
+      "timestamp": 1767678523000,
+      "delegated": 489986256.8014343,
+      "delegators": 7
+    },
+    {
+      "epoch": 363,
+      "timestamp": 1768060851000,
+      "delegated": 489986256.8014343,
+      "delegators": 7
+    },
+    {
+      "epoch": 364,
+      "timestamp": 1768494691000,
+      "delegated": 490020274.53104806,
+      "delegators": 7
+    },
+    {
+      "epoch": 365,
+      "timestamp": 1768639672000,
+      "delegated": 490020274.53104806,
+      "delegators": 7
+    },
+    {
+      "epoch": 366,
+      "timestamp": 1768801808000,
+      "delegated": 490020274.53104806,
+      "delegators": 7
+    },
+    {
+      "epoch": 367,
+      "timestamp": 1769174602000,
+      "delegated": 490020274.53104806,
+      "delegators": 7
+    },
+    {
+      "epoch": 368,
+      "timestamp": 1769556593000,
+      "delegated": 490020274.53104806,
+      "delegators": 7
+    },
+    {
+      "epoch": 369,
+      "timestamp": 1769768627000,
+      "delegated": 489750505.00499064,
+      "delegators": 7
+    },
+    {
+      "epoch": 370,
+      "timestamp": 1770262116000,
+      "delegated": 487548633.63455915,
+      "delegators": 7
+    },
+    {
+      "epoch": 371,
+      "timestamp": 1770547447000,
+      "delegated": 487548633.63455915,
+      "delegators": 7
+    },
+    {
+      "epoch": 372,
+      "timestamp": 1770888008000,
+      "delegated": 487575437.9599281,
+      "delegators": 7
+    },
+    {
+      "epoch": 373,
+      "timestamp": 1771027615000,
+      "delegated": 487575437.9599281,
+      "delegators": 7
+    },
+    {
+      "epoch": 374,
+      "timestamp": 1771292916000,
+      "delegated": 487575437.9599281,
+      "delegators": 7
+    },
+    {
+      "epoch": 375,
+      "timestamp": 1771631831000,
+      "delegated": 350075437.9599281,
+      "delegators": 7
+    },
+    {
+      "epoch": 376,
+      "timestamp": 1771934747000,
+      "delegated": 350075437.9599281,
+      "delegators": 7
+    },
+    {
+      "epoch": 377,
+      "timestamp": 1772358437000,
+      "delegated": 350154723.7314024,
+      "delegators": 7
+    },
+    {
+      "epoch": 378,
+      "timestamp": 1772703917000,
+      "delegated": 350000687.26793784,
+      "delegators": 7
+    },
+    {
+      "epoch": 379,
+      "timestamp": 1772973073000,
+      "delegated": 350000687.26793784,
+      "delegators": 7
+    },
+    {
+      "epoch": 380,
+      "timestamp": 1773035485000,
+      "delegated": 350000687.26793784,
+      "delegators": 7
+    },
+    {
+      "epoch": 381,
+      "timestamp": 1773478348000,
+      "delegated": 350077389.20654404,
+      "delegators": 8
+    },
+    {
+      "epoch": 382,
+      "timestamp": 1773718004000,
+      "delegated": 350077389.20654404,
+      "delegators": 8
+    },
+    {
+      "epoch": 383,
+      "timestamp": 1774101456000,
+      "delegated": 350077389.20654404,
+      "delegators": 8
+    },
+    {
+      "epoch": 384,
+      "timestamp": 1774406838000,
+      "delegated": 350077493.652125,
+      "delegators": 8
+    },
+    {
+      "epoch": 385,
+      "timestamp": 1774653575000,
+      "delegated": 350153214.8875158,
+      "delegators": 8
+    },
+    {
+      "epoch": 386,
+      "timestamp": 1774856575000,
+      "delegated": 350153248.6002873,
+      "delegators": 8
+    },
+    {
+      "epoch": 387,
+      "timestamp": 1775397172000,
+      "delegated": 300001293.64028734,
+      "delegators": 8
+    },
+    {
+      "epoch": 388,
+      "timestamp": 1775675965000,
+      "delegated": 300074317.80796844,
+      "delegators": 8
+    },
+    {
+      "epoch": 389,
+      "timestamp": 1775777241000,
+      "delegated": 300074317.80796844,
+      "delegators": 8
+    },
+    {
+      "epoch": 390,
+      "timestamp": 1776187831000,
+      "delegated": 300074743.67886317,
+      "delegators": 8
+    },
+    {
+      "epoch": 391,
+      "timestamp": 1776421585000,
+      "delegated": 300074743.67886317,
+      "delegators": 8
+    },
+    {
+      "epoch": 392,
+      "timestamp": 1776880693000,
+      "delegated": 300135437.64558566,
+      "delegators": 9
+    },
+    {
+      "epoch": 393,
+      "timestamp": 1777235516000,
+      "delegated": 300135821.09845364,
+      "delegators": 9
+    },
+    {
+      "epoch": 394,
+      "timestamp": 1777527602000,
+      "delegated": 300135863.1000637,
+      "delegators": 9
+    },
+    {
+      "epoch": 395,
+      "timestamp": 1777821560000,
+      "delegated": 300135906.27520263,
+      "delegators": 9
+    },
+    {
+      "epoch": 396,
+      "timestamp": 1777872058000,
+      "delegated": 300135906.27520263,
+      "delegators": 9
+    },
+    {
+      "epoch": 397,
+      "timestamp": 1778461474000,
+      "delegated": 300132141.5628091,
+      "delegators": 9
+    },
+    {
+      "epoch": 398,
+      "timestamp": 1778777717000,
+      "delegated": 300132223.03204066,
+      "delegators": 9
+    },
+    {
+      "epoch": 399,
+      "timestamp": 1778861721000,
+      "delegated": 300132266.87243694,
+      "delegators": 9
+    },
+    {
+      "epoch": 400,
+      "timestamp": 1779255255000,
+      "delegated": 300132310.47462493,
+      "delegators": 9
+    },
+    {
+      "epoch": 401,
+      "timestamp": 1779544794000,
+      "delegated": 300064331.14180464,
+      "delegators": 9
+    },
+    {
+      "epoch": 402,
+      "timestamp": 1779877562000,
+      "delegated": 300064402.2070337,
+      "delegators": 9
+    },
+    {
+      "epoch": 403,
+      "timestamp": 1780248361000,
+      "delegated": 500064431.7705375,
+      "delegators": 9
+    },
+    {
+      "epoch": 404,
+      "timestamp": 1780362107000,
+      "delegated": 500064460.36204976,
+      "delegators": 9
+    },
+    {
+      "epoch": 405,
+      "timestamp": 1780767550000,
+      "delegated": 500103412.8596844,
+      "delegators": 9
+    },
+    {
+      "epoch": 406,
+      "timestamp": 1780960210000,
+      "delegated": 500103440.91734,
+      "delegators": 9
+    },
+    {
+      "epoch": 407,
+      "timestamp": 1781284530000,
+      "delegated": 500104478.8747417,
+      "delegators": 9
+    },
+    {
+      "epoch": 408,
+      "timestamp": 1781549291000,
+      "delegated": 500139389.69357497,
+      "delegators": 10
+    },
+    {
+      "epoch": 409,
+      "timestamp": 1781899454000,
+      "delegated": 235184042.3798042,
+      "delegators": 6
+    },
+    {
+      "epoch": 410,
+      "timestamp": 1782357188000,
+      "delegated": 235184068.30332085,
+      "delegators": 6
+    },
+    {
+      "epoch": 411,
+      "timestamp": 1782569352000,
+      "delegated": 235149213.1924621,
+      "delegators": 5
+    },
+    {
+      "epoch": 412,
+      "timestamp": 1782832427000,
+      "delegated": 235070124.1008088,
+      "delegators": 5
+    },
+    {
+      "epoch": 413,
+      "timestamp": 1783308175000,
+      "delegated": 235118282.7765595,
+      "delegators": 5
+    }
   ],
   "delegators": [
     {
       "from": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
       "amount": 235000000,
-      "share": 99.94971997152276,
-      "firstSeen": 1781626818000,
+      "share": 99.94969222505257,
+      "firstSeen": 1767351280000,
       "lastSeen": 1781626818000,
-      "firstEpoch": 411,
+      "firstEpoch": 361,
       "lastEpoch": 413,
       "eventEpoch": 411,
       "delta": 0,
@@ -57,46 +358,46 @@
     {
       "from": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
       "amount": 61173.346361868935,
-      "share": 0.02601740373841,
-      "firstSeen": 1783104178000,
+      "share": 0.02601811549466102,
+      "firstSeen": 1776878866000,
       "lastSeen": 1783104178000,
-      "firstEpoch": 413,
+      "firstEpoch": 392,
       "lastEpoch": 413,
       "eventEpoch": 413,
-      "delta": null,
-      "hasPriorSnapshot": false
+      "delta": 28.218814720101363,
+      "hasPriorSnapshot": true
     },
     {
       "from": "0xa7fd33f85cf752919213c836a144f22906823869",
       "amount": 40237.454362188924,
-      "share": 0.01711418457712,
-      "firstSeen": 1782918766000,
+      "share": 0.01711370714646971,
+      "firstSeen": 1767194647000,
       "lastSeen": 1782918766000,
-      "firstEpoch": 413,
+      "firstEpoch": 361,
       "lastEpoch": 413,
       "eventEpoch": 413,
-      "delta": null,
-      "hasPriorSnapshot": false
+      "delta": 40237.44557977861,
+      "hasPriorSnapshot": true
     },
     {
       "from": "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457",
       "amount": 16421.975835453813,
-      "share": 0.0069845296335,
-      "firstSeen": 1782917959000,
+      "share": 0.006984559278641954,
+      "firstSeen": 1772638918000,
       "lastSeen": 1782917959000,
-      "firstEpoch": 413,
+      "firstEpoch": 378,
       "lastEpoch": 413,
       "eventEpoch": 413,
-      "delta": null,
-      "hasPriorSnapshot": false
+      "delta": 7893.011356207804,
+      "hasPriorSnapshot": true
     },
     {
       "from": "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a",
       "amount": 450,
-      "share": 0.00019139239117,
+      "share": 0.00019139302766499428,
       "firstSeen": 1756463057000,
       "lastSeen": 1756463057000,
-      "firstEpoch": 325,
+      "firstEpoch": 361,
       "lastEpoch": 413,
       "eventEpoch": 325,
       "delta": 0,
