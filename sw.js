@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirsflr-shell-v182";
+const CACHE_NAME = "mirsflr-shell-v183";
 const APP_SHELL = [
   "/",
   "/ops/",
@@ -9,12 +9,13 @@ const APP_SHELL = [
   "/stats/",
   "/performance/",
   "/assets/operator.css?v=guide-flow-3",
-  "/assets/live-refresh.css?v=delegation-refresh-2",
-  "/assets/operator.js?v=delegation-refresh-2",
+  "/assets/live-refresh.css?v=delegation-refresh-3",
+  "/assets/operator.js?v=delegation-refresh-3",
   "/assets/live-refresh.js?v=pre-reg-pill-size-1",
   "/assets/ops.css?v=ops-30",
   "/assets/ops.js?v=ops-30",
   "/ops/status.example.json",
+  "/data/ftso-delegations.json",
   "/assets/pwa.js?v=pwa-install-2",
   "/app.webmanifest",
   "/ops/app.webmanifest",
@@ -70,6 +71,21 @@ self.addEventListener("fetch", event => {
             (await caches.match(url.pathname, { ignoreSearch: true })) ||
             caches.match("/")
           );
+        })
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/data/")) {
+    event.respondWith(
+      fetch(request, { cache: "no-store" })
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+          return response;
+        })
+        .catch(async () => {
+          return (await caches.match(request, { ignoreSearch: true })) || caches.match(url.pathname, { ignoreSearch: true });
         })
     );
     return;

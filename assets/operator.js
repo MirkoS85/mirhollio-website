@@ -7,6 +7,7 @@ const MirSFlr = (() => {
   const FLARE_BASE_VOTE_POWER_URL = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
   const FLARE_BASE_DELEGATORS_URL = "https://flare-base.io/api/delegations/getDelegatorsAt/flare";
   const FLARE_BASE_UI_URL = "https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&range=last-180d";
+  const FTSO_DELEGATION_SNAPSHOT_URL = "/data/ftso-delegations.json?v=delegation-data-1";
   const FLARE_EXPLORER_ADDRESS_URL = "https://flare-explorer.flare.network/address/";
   const CACHE_PREFIX = "mirsflr_cache_";
   const CURRENCY_KEY = "mirsflr_currency";
@@ -1078,15 +1079,40 @@ const MirSFlr = (() => {
         from: String(row.from || ""),
         amount: Number(row.amount),
         rewardEpochId: Number(row.rewardEpochId),
-        timestamp: Number(row.timestamp)
+        timestamp: Number(row.timestamp),
+        firstSeen: row.firstSeen == null ? null : Number(row.firstSeen),
+        lastSeen: row.lastSeen == null ? null : Number(row.lastSeen),
+        firstEpoch: row.firstEpoch == null ? null : Number(row.firstEpoch),
+        lastEpoch: row.lastEpoch == null ? null : Number(row.lastEpoch),
+        delta: row.delta == null ? null : Number(row.delta),
+        hasPriorSnapshot: Boolean(row.hasPriorSnapshot)
       }))
       .filter(row => row.from && Number.isFinite(row.amount))
       .sort((a, b) => Number(b.amount) - Number(a.amount));
   }
 
   function summarizeDelegatorSnapshots(rows) {
+    const normalized = rows.filter(row => row.from && Number.isFinite(Number(row.amount)));
+    const summarized = normalized.filter(row =>
+      row.firstSeen != null || row.lastSeen != null || row.firstEpoch != null || row.lastEpoch != null
+    );
+    if (summarized.length) {
+      return summarized.map(row => ({
+        from: row.from,
+        amount: Number(row.amount),
+        firstSeen: Number.isFinite(row.firstSeen) ? row.firstSeen : Number(row.timestamp),
+        lastSeen: Number.isFinite(row.lastSeen) ? row.lastSeen : Number(row.timestamp),
+        firstEpoch: Number.isFinite(row.firstEpoch) ? row.firstEpoch : Number(row.rewardEpochId),
+        lastEpoch: Number.isFinite(row.lastEpoch) ? row.lastEpoch : Number(row.rewardEpochId),
+        delta: Number.isFinite(row.delta) ? row.delta : null,
+        hasPriorSnapshot: Boolean(row.hasPriorSnapshot)
+      }))
+        .filter(row => row.from && Number.isFinite(row.amount))
+        .sort((a, b) => Number(b.amount) - Number(a.amount));
+    }
+
     const groups = new Map();
-    rows.forEach(row => {
+    normalized.forEach(row => {
       const key = String(row.from || "").toLowerCase();
       if (!key) return;
       if (!groups.has(key)) groups.set(key, []);
@@ -1346,7 +1372,11 @@ const MirSFlr = (() => {
     setText("ftsoDelegationSnapshotPower", latest ? fmtCompact(latest.delegated, " WFLR") : "-");
     setText("ftsoDelegationSnapshotDelta", latest?.delta != null ? fmtSignedCompact(latest.delta, " WFLR") : "-");
     setText("ftsoDelegationSnapshotDelegators", latest ? fmtNum(latest.delegators, 0) : "-");
-    setText("ftsoDelegationSnapshotSource", "Source: Flare Base reward-epoch snapshots.");
+    const sourceLabel = typeof source === "object"
+      ? `Source: ${source.history || "delegation snapshot"}`
+      : source === "static" ? "Source: auto-refreshed delegation snapshot."
+      : "Source: Flare Base reward-epoch snapshots.";
+    setText("ftsoDelegationSnapshotSource", sourceLabel);
 
     document.querySelectorAll("[data-render='ftso-delegation-epoch-table']").forEach(tbody => {
       if (!rows.length) {
@@ -1406,18 +1436,31 @@ const MirSFlr = (() => {
     const start = now - 180 * 24 * 60 * 60 * 1000;
     let historyRows = [];
     let delegatorRows = [];
+    let source = "live";
     try {
-      const historyText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_VOTE_POWER_URL, {
-        address: TARGET_DELEGATION,
-        startTime: start,
-        endTime: now,
-        page: 1,
-        pageSize: 200,
-        sortField: "timestamp",
-        sortOrder: "asc"
-      }), CACHE_TTLS.delegationSnapshot);
-      historyRows = normalizeVotePowerRows(parseSemicolonRows(historyText));
-      if (!historyRows.length) throw new Error("Empty Flare Base vote-power response");
+      const snapshot = await fetchJsonWithCache(FTSO_DELEGATION_SNAPSHOT_URL, CACHE_TTLS.delegationSnapshot);
+      historyRows = normalizeVotePowerRows(Array.isArray(snapshot?.history) ? snapshot.history : []);
+      delegatorRows = Array.isArray(snapshot?.delegators) ? snapshot.delegators : [];
+      if (historyRows.length || delegatorRows.length) {
+        source = snapshot?.source || "static";
+      }
+    } catch (_) {}
+
+    try {
+      if (!historyRows.length) {
+        const historyText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_VOTE_POWER_URL, {
+          address: TARGET_DELEGATION,
+          startTime: start,
+          endTime: now,
+          page: 1,
+          pageSize: 200,
+          sortField: "timestamp",
+          sortOrder: "asc"
+        }), CACHE_TTLS.delegationSnapshot);
+        historyRows = normalizeVotePowerRows(parseSemicolonRows(historyText));
+        if (!historyRows.length) throw new Error("Empty Flare Base vote-power response");
+        source = "live";
+      }
     } catch (_) {
       historyRows = bestDelegationHistoryRows();
     }
@@ -1428,21 +1471,23 @@ const MirSFlr = (() => {
       || 410;
 
     try {
-      const delegatorsText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_DELEGATORS_URL, {
-        address: TARGET_DELEGATION,
-        epochId: epoch,
-        page: 1,
-        pageSize: 25,
-        sortField: "amount",
-        sortOrder: "desc"
-      }), CACHE_TTLS.delegationSnapshot);
-      delegatorRows = parseSemicolonRows(delegatorsText);
-      if (!delegatorRows.length) throw new Error("Empty Flare Base delegator response");
+      if (!delegatorRows.length) {
+        const delegatorsText = await fetchTextWithCache(flareBaseUrl(FLARE_BASE_DELEGATORS_URL, {
+          address: TARGET_DELEGATION,
+          epochId: epoch,
+          page: 1,
+          pageSize: 25,
+          sortField: "amount",
+          sortOrder: "desc"
+        }), CACHE_TTLS.delegationSnapshot);
+        delegatorRows = parseSemicolonRows(delegatorsText);
+        if (!delegatorRows.length) throw new Error("Empty Flare Base delegator response");
+      }
     } catch (_) {
       delegatorRows = FTSO_DELEGATORS_FALLBACK;
     }
 
-    renderFtsoDelegationSummary(historyRows, delegatorRows, "live");
+    renderFtsoDelegationSummary(historyRows, delegatorRows, source);
   }
 
   function rewardWithFiat(value) {

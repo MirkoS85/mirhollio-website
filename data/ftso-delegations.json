@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-07-06T00:00:00.000Z",
+  "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
+  "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
+  "rangeDays": 180,
+  "source": {
+    "history": "seed-snapshot",
+    "delegators": "seed-snapshot"
+  },
+  "warnings": [
+    "Seed snapshot. GitHub Action refreshes this file from Flare Base."
+  ],
+  "failedDelegatorEpochs": [],
+  "insights": {
+    "latestEpoch": 413,
+    "latestDelegated": 235118282.77656,
+    "latestDelta": 48158.675751,
+    "latestDelegators": 5,
+    "whaleConcentrationPct": 99.94971997152276,
+    "largestWallet": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
+    "largestMove": {
+      "epoch": 409,
+      "delta": -264955347.313771,
+      "pct": -52.97630615287767
+    }
+  },
+  "history": [
+    { "epoch": 399, "timestamp": 1778861721000, "delegated": 300132266.872437, "delegators": 9 },
+    { "epoch": 400, "timestamp": 1779255255000, "delegated": 300132310.474625, "delegators": 9 },
+    { "epoch": 401, "timestamp": 1779544794000, "delegated": 300064331.141805, "delegators": 9 },
+    { "epoch": 402, "timestamp": 1779877562000, "delegated": 300064402.207034, "delegators": 9 },
+    { "epoch": 403, "timestamp": 1780248361000, "delegated": 500064431.770537, "delegators": 9 },
+    { "epoch": 404, "timestamp": 1780362107000, "delegated": 500064460.36205, "delegators": 9 },
+    { "epoch": 405, "timestamp": 1780767550000, "delegated": 500103412.859684, "delegators": 9 },
+    { "epoch": 406, "timestamp": 1780960210000, "delegated": 500103440.91734, "delegators": 9 },
+    { "epoch": 407, "timestamp": 1781284530000, "delegated": 500104478.874742, "delegators": 9 },
+    { "epoch": 408, "timestamp": 1781549291000, "delegated": 500139389.693575, "delegators": 10 },
+    { "epoch": 409, "timestamp": 1781899454000, "delegated": 235184042.379804, "delegators": 6 },
+    { "epoch": 410, "timestamp": 1782357188000, "delegated": 235184068.303321, "delegators": 6 },
+    { "epoch": 411, "timestamp": 1782569352000, "delegated": 235149213.192462, "delegators": 5 },
+    { "epoch": 412, "timestamp": 1782832427000, "delegated": 235070124.100809, "delegators": 5 },
+    { "epoch": 413, "timestamp": 1783308175000, "delegated": 235118282.77656, "delegators": 5 }
+  ],
+  "delegators": [
+    {
+      "from": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
+      "amount": 235000000,
+      "share": 99.94971997152276,
+      "firstSeen": 1781626818000,
+      "lastSeen": 1781626818000,
+      "firstEpoch": 411,
+      "lastEpoch": 413,
+      "eventEpoch": 411,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
+      "amount": 61173.346361868935,
+      "share": 0.02601740373841,
+      "firstSeen": 1783104178000,
+      "lastSeen": 1783104178000,
+      "firstEpoch": 413,
+      "lastEpoch": 413,
+      "eventEpoch": 413,
+      "delta": null,
+      "hasPriorSnapshot": false
+    },
+    {
+      "from": "0xa7fd33f85cf752919213c836a144f22906823869",
+      "amount": 40237.454362188924,
+      "share": 0.01711418457712,
+      "firstSeen": 1782918766000,
+      "lastSeen": 1782918766000,
+      "firstEpoch": 413,
+      "lastEpoch": 413,
+      "eventEpoch": 413,
+      "delta": null,
+      "hasPriorSnapshot": false
+    },
+    {
+      "from": "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457",
+      "amount": 16421.975835453813,
+      "share": 0.0069845296335,
+      "firstSeen": 1782917959000,
+      "lastSeen": 1782917959000,
+      "firstEpoch": 413,
+      "lastEpoch": 413,
+      "eventEpoch": 413,
+      "delta": null,
+      "hasPriorSnapshot": false
+    },
+    {
+      "from": "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a",
+      "amount": 450,
+      "share": 0.00019139239117,
+      "firstSeen": 1756463057000,
+      "lastSeen": 1756463057000,
+      "firstEpoch": 325,
+      "lastEpoch": 413,
+      "eventEpoch": 325,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    }
+  ]
+}
