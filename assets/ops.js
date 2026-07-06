@@ -1098,6 +1098,13 @@
     const fdcAvail = pctNumber(provider?.fdcPerformance?.availability);
     const perf = pctNumber(provider?.ftsoPerformance?.performance);
     const connected = node?.m_bConnected === true;
+    const directNodeHealthy = nodeHealth?.healthy === true;
+    const stakeRows = Array.isArray(node?.m_axStake) ? node.m_axStake : [];
+    const selfStakeAmount = Number(validator?.m_dTotalStake ?? stakeRows[0]?.m_dAmount);
+    const validatorTotal = Number(validator?.m_dTotal);
+    const freeDelegationSpace = Number(validator?.m_dFreeDelegationSpace);
+    const hasValidatorStake = [selfStakeAmount, validatorTotal].some(value => Number.isFinite(value) && value > 0);
+    const hasValidatorCapacity = [validatorTotal, freeDelegationSpace].some(value => Number.isFinite(value) && value > 0);
     const uptimeValues = Array.isArray(node?.m_adUptime) ? node.m_adUptime : [];
     const uptime = uptimeValues.length ? uptimeValues.reduce((sum, value) => sum + Number(value || 0), 0) / uptimeValues.length : null;
     const passes = Number(latest?.passes ?? latest?.newNumberOfPasses);
@@ -1174,7 +1181,16 @@
         add("down", "Validator data missing", "Oracle Daemon validator data did not load.");
       }
     } else {
-      if (!connected) { val = "down"; add("down", "Validator offline", "External validator status is not connected."); }
+      if (node.m_bConnected === false && !(directNodeHealthy && hasValidatorStake)) {
+        val = "down";
+        add("down", "Validator offline", "External validator status is not connected.");
+      } else if (node.m_bConnected === false && directNodeHealthy && hasValidatorStake) {
+        add("info", "Validator external status lag", "Direct node health and stake are present, so the top validator status stays OK.");
+      }
+      if (!connected && node.m_bConnected !== false && !(directNodeHealthy && hasValidatorCapacity)) {
+        val = "warn";
+        add("warn", "Validator connection unclear", "External validator connection flag is missing.");
+      }
       if (uptime != null && uptime < 95) { val = "down"; add("down", "Validator uptime critical", `${fmtPct(uptime)} recent uptime.`); }
       else if (uptime != null && uptime < 99) { val = val === "down" ? val : "warn"; add("warn", "Validator uptime watch", `${fmtPct(uptime)} recent uptime.`); }
       const lastSeen = parseDurationSeconds(node.m_sLastSeen);
@@ -1371,7 +1387,9 @@
     const fdcRecent = recentAverage(fdcAvailabilityHours, 3);
     const fdcStatusValue = fdcRecent != null ? fmtPct(fdcRecent) : provider?.fdcPerformance?.availability != null ? fmtPct(provider.fdcPerformance.availability) : levels.fdc === "down" ? "DOWN" : "-";
     setStatusCard("fdcStatus", levels.fdc, fdcStatusValue, "3h avg");
-    setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", node?.m_bConnected === true ? "connected" : state.validatorFallback ? "fallback" : "offline");
+    const directNodeHealthy = nodeHealth?.healthy === true;
+    const validatorLooksConnected = node?.m_bConnected === true || (directNodeHealthy && Number(validator?.m_dTotalStake ?? state.validatorFallback?.stake) > 0);
+    setStatusCard("validatorStatus", levels.validator, levels.validator === "ok" ? "OK" : levels.validator === "warn" ? "WARN" : "DOWN", validatorLooksConnected ? "connected" : state.validatorFallback ? "fallback" : "offline");
     setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : nodeHealth?.healthy ? "healthy" : "unhealthy");
 
     const policy = explorer?.denormalizedsigningpolicy || {};
@@ -1499,7 +1517,7 @@
     const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : pctNumber(state.validatorFallback?.delegated);
 
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
-    setText("validatorConnected", node?.m_bConnected === true ? "Connected" : node?.m_bConnected === false ? "Offline" : state.validatorFallback ? `via ${state.validatorFallback.source}` : "-");
+    setText("validatorConnected", validatorLooksConnected ? "Connected" : node?.m_bConnected === false ? "Offline" : state.validatorFallback ? `via ${state.validatorFallback.source}` : "-");
     setText("validatorLastSeen", node?.m_sLastSeen ? `last seen ${node.m_sLastSeen}` : "last seen -");
     setText("validatorLastSeenShort", node?.m_sLastSeen ? node.m_sLastSeen.replace(/\.\d+$/, "") : "-");
     setText("nodeHealthy", nodeHealth?.healthy === true ? "Healthy" : nodeHealth ? "Unhealthy" : "-");
@@ -1528,7 +1546,7 @@
     const daysLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? Number(stake.m_aiTimeLeftDHM[0]) : null;
     const lastSeenSeconds = parseDurationSeconds(node?.m_sLastSeen);
     const capacityTone = lowerIsBetterTone(capacityPct, 80, 95);
-    setMetricTone("validatorConnected", node?.m_bConnected === true ? "ok" : node?.m_bConnected === false ? "down" : "warn");
+    setMetricTone("validatorConnected", validatorLooksConnected ? "ok" : node?.m_bConnected === false ? "down" : "warn");
     setMetricTone("validatorUptime", higherIsBetterTone(uptimeAvg, 99, 95), "Normal >= 99%");
     setMetricTone("stakeEnds", "", "Planning reminder only; it does not affect validator health while the node is operating normally.");
     setMetricTone("capacityPct", capacityTone, "Green below 80% capacity");
