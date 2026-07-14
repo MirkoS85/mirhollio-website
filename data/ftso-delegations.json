@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-14T17:36:37.328Z",
+  "generatedAt": "2026-07-14T21:17:38.154Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -23,12 +23,6 @@
     }
   },
   "history": [
-    {
-      "epoch": 363,
-      "timestamp": 1768060851000,
-      "delegated": 489986256.8014343,
-      "delegators": 7
-    },
     {
       "epoch": 364,
       "timestamp": 1768494691000,
@@ -349,7 +343,7 @@
       "share": 99.96648152441264,
       "firstSeen": 1767351280000,
       "lastSeen": 1781626818000,
-      "firstEpoch": 363,
+      "firstEpoch": 364,
       "lastEpoch": 415,
       "eventEpoch": 411,
       "delta": 0,
@@ -385,7 +379,7 @@
       "share": 0.00019142517738717315,
       "firstSeen": 1756463057000,
       "lastSeen": 1756463057000,
-      "firstEpoch": 363,
+      "firstEpoch": 364,
       "lastEpoch": 415,
       "eventEpoch": 325,
       "delta": 0,
@@ -395,9 +389,9 @@
       "from": "0xa7fd33f85cf752919213c836a144f22906823869",
       "amount": 0.00436218892390319,
       "share": 1.855628419010067e-9,
-      "firstSeen": 1767194647000,
+      "firstSeen": 1768407972000,
       "lastSeen": 1783349703000,
-      "firstEpoch": 363,
+      "firstEpoch": 364,
       "lastEpoch": 415,
       "eventEpoch": 414,
       "delta": 0,
