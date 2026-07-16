@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-16T03:42:31.017Z",
+  "generatedAt": "2026-07-16T06:34:51.380Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -8,7 +8,7 @@
     "delegators": "unavailable"
   },
   "warnings": [
-    "Flare Base history failed: Request failed 503: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1768621351018&endTime=1784173351018&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
+    "Flare Base history failed: Request failed 503: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1768631691380&endTime=1784183691380&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
     "75 delegator epoch snapshots failed"
   ],
   "failedDelegatorEpochs": [
