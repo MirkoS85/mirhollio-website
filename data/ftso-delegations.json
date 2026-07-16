@@ -1,325 +1,21 @@
 {
-  "generatedAt": "2026-07-16T06:34:51.380Z",
+  "generatedAt": "2026-07-16T10:22:05.321Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
-    "history": "oracle-daemon",
-    "delegators": "unavailable"
+    "history": "flare-base",
+    "delegators": "flare-base"
   },
-  "warnings": [
-    "Flare Base history failed: Request failed 503: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1768631691380&endTime=1784183691380&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
-    "75 delegator epoch snapshots failed"
-  ],
-  "failedDelegatorEpochs": [
-    {
-      "epoch": 340,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=340&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 341,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=341&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 342,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=342&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 343,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=343&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 344,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=344&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 345,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=345&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 346,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=346&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 347,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=347&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 348,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=348&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 349,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=349&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 350,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=350&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 351,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=351&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 352,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=352&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 353,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=353&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 354,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=354&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 355,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=355&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 356,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=356&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 357,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=357&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 358,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=358&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 359,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=359&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 360,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=360&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 361,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=361&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 362,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=362&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 363,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=363&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 364,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=364&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 365,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=365&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 366,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=366&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 367,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=367&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 368,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=368&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 369,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=369&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 370,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=370&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 371,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=371&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 372,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=372&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 373,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=373&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 374,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=374&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 375,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=375&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 376,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=376&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 377,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=377&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 378,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=378&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 379,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=379&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 380,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=380&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 381,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=381&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 382,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=382&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 383,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=383&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 384,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=384&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 385,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=385&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 386,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=386&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 387,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=387&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 388,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=388&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 389,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=389&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 390,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=390&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 391,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=391&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 392,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=392&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 393,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=393&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 394,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=394&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 395,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=395&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 396,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=396&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 397,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=397&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 398,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=398&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 399,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=399&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 400,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=400&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 401,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=401&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 402,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=402&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 403,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=403&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 404,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=404&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 405,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=405&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 406,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=406&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 407,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=407&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 408,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=408&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 409,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=409&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 410,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=410&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 411,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=411&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 412,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=412&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 413,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=413&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    },
-    {
-      "epoch": 414,
-      "error": "Request failed 503: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=414&page=1&pageSize=200&sortField=amount&sortOrder=desc"
-    }
-  ],
+  "warnings": [],
+  "failedDelegatorEpochs": [],
   "insights": {
-    "latestEpoch": 414,
-    "latestDelegated": 235078738.42287964,
-    "latestDelta": -39544.3536798656,
-    "latestDelegators": null,
-    "whaleConcentrationPct": null,
-    "largestWallet": null,
+    "latestEpoch": 415,
+    "latestDelegated": 235078794.82845563,
+    "latestDelta": 56.40557599067688,
+    "latestDelegators": 5,
+    "whaleConcentrationPct": 99.96648152441264,
+    "largestWallet": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
     "largestMove": {
       "epoch": 409,
       "delta": -264955347.31377077,
@@ -328,455 +24,378 @@
   },
   "history": [
     {
-      "epoch": 340,
-      "timestamp": null,
-      "delegated": 471684437.4222124,
-      "delegators": null
-    },
-    {
-      "epoch": 341,
-      "timestamp": null,
-      "delegated": 471692750.0392418,
-      "delegators": null
-    },
-    {
-      "epoch": 342,
-      "timestamp": null,
-      "delegated": 471692750.0392418,
-      "delegators": null
-    },
-    {
-      "epoch": 343,
-      "timestamp": null,
-      "delegated": 472050511.65557504,
-      "delegators": null
-    },
-    {
-      "epoch": 344,
-      "timestamp": null,
-      "delegated": 469868326.70942897,
-      "delegators": null
-    },
-    {
-      "epoch": 345,
-      "timestamp": null,
-      "delegated": 469876307.1679801,
-      "delegators": null
-    },
-    {
-      "epoch": 346,
-      "timestamp": null,
-      "delegated": 469885059.96384495,
-      "delegators": null
-    },
-    {
-      "epoch": 347,
-      "timestamp": null,
-      "delegated": 469893510.06637895,
-      "delegators": null
-    },
-    {
-      "epoch": 348,
-      "timestamp": null,
-      "delegated": 466117307.4694427,
-      "delegators": null
-    },
-    {
-      "epoch": 349,
-      "timestamp": null,
-      "delegated": 466117307.4694427,
-      "delegators": null
-    },
-    {
-      "epoch": 350,
-      "timestamp": null,
-      "delegated": 466129343.3052499,
-      "delegators": null
-    },
-    {
-      "epoch": 351,
-      "timestamp": null,
-      "delegated": 466129343.3052499,
-      "delegators": null
-    },
-    {
-      "epoch": 352,
-      "timestamp": null,
-      "delegated": 466129564.32900953,
-      "delegators": null
-    },
-    {
-      "epoch": 353,
-      "timestamp": null,
-      "delegated": 478024274.30291647,
-      "delegators": null
-    },
-    {
-      "epoch": 354,
-      "timestamp": null,
-      "delegated": 478026281.9224488,
-      "delegators": null
-    },
-    {
-      "epoch": 355,
-      "timestamp": null,
-      "delegated": 478026281.9224488,
-      "delegators": null
-    },
-    {
-      "epoch": 356,
-      "timestamp": null,
-      "delegated": 478026281.9224488,
-      "delegators": null
-    },
-    {
-      "epoch": 357,
-      "timestamp": null,
-      "delegated": 478048675.69510794,
-      "delegators": null
-    },
-    {
-      "epoch": 358,
-      "timestamp": null,
-      "delegated": 478048675.69510794,
-      "delegators": null
-    },
-    {
-      "epoch": 359,
-      "timestamp": null,
-      "delegated": 478048675.69510794,
-      "delegators": null
-    },
-    {
-      "epoch": 360,
-      "timestamp": null,
-      "delegated": 478136256.8014343,
-      "delegators": null
-    },
-    {
-      "epoch": 361,
-      "timestamp": null,
-      "delegated": 489986256.8014343,
-      "delegators": null
-    },
-    {
-      "epoch": 362,
-      "timestamp": null,
-      "delegated": 489986256.8014343,
-      "delegators": null
-    },
-    {
-      "epoch": 363,
-      "timestamp": null,
-      "delegated": 489986256.8014343,
-      "delegators": null
-    },
-    {
       "epoch": 364,
-      "timestamp": null,
+      "timestamp": 1768494691000,
       "delegated": 490020274.53104806,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 365,
-      "timestamp": null,
+      "timestamp": 1768639672000,
       "delegated": 490020274.53104806,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 366,
-      "timestamp": null,
+      "timestamp": 1768801808000,
       "delegated": 490020274.53104806,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 367,
-      "timestamp": null,
+      "timestamp": 1769174602000,
       "delegated": 490020274.53104806,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 368,
-      "timestamp": null,
+      "timestamp": 1769556593000,
       "delegated": 490020274.53104806,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 369,
-      "timestamp": null,
+      "timestamp": 1769768627000,
       "delegated": 489750505.00499064,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 370,
-      "timestamp": null,
+      "timestamp": 1770262116000,
       "delegated": 487548633.63455915,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 371,
-      "timestamp": null,
+      "timestamp": 1770547447000,
       "delegated": 487548633.63455915,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 372,
-      "timestamp": null,
+      "timestamp": 1770888008000,
       "delegated": 487575437.9599281,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 373,
-      "timestamp": null,
+      "timestamp": 1771027615000,
       "delegated": 487575437.9599281,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 374,
-      "timestamp": null,
+      "timestamp": 1771292916000,
       "delegated": 487575437.9599281,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 375,
-      "timestamp": null,
+      "timestamp": 1771631831000,
       "delegated": 350075437.9599281,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 376,
-      "timestamp": null,
+      "timestamp": 1771934747000,
       "delegated": 350075437.9599281,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 377,
-      "timestamp": null,
+      "timestamp": 1772358437000,
       "delegated": 350154723.7314024,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 378,
-      "timestamp": null,
+      "timestamp": 1772703917000,
       "delegated": 350000687.26793784,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 379,
-      "timestamp": null,
+      "timestamp": 1772973073000,
       "delegated": 350000687.26793784,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 380,
-      "timestamp": null,
+      "timestamp": 1773035485000,
       "delegated": 350000687.26793784,
-      "delegators": null
+      "delegators": 7
     },
     {
       "epoch": 381,
-      "timestamp": null,
+      "timestamp": 1773478348000,
       "delegated": 350077389.20654404,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 382,
-      "timestamp": null,
+      "timestamp": 1773718004000,
       "delegated": 350077389.20654404,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 383,
-      "timestamp": null,
+      "timestamp": 1774101456000,
       "delegated": 350077389.20654404,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 384,
-      "timestamp": null,
+      "timestamp": 1774406838000,
       "delegated": 350077493.652125,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 385,
-      "timestamp": null,
+      "timestamp": 1774653575000,
       "delegated": 350153214.8875158,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 386,
-      "timestamp": null,
+      "timestamp": 1774856575000,
       "delegated": 350153248.6002873,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 387,
-      "timestamp": null,
+      "timestamp": 1775397172000,
       "delegated": 300001293.64028734,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 388,
-      "timestamp": null,
+      "timestamp": 1775675965000,
       "delegated": 300074317.80796844,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 389,
-      "timestamp": null,
+      "timestamp": 1775777241000,
       "delegated": 300074317.80796844,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 390,
-      "timestamp": null,
+      "timestamp": 1776187831000,
       "delegated": 300074743.67886317,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 391,
-      "timestamp": null,
+      "timestamp": 1776421585000,
       "delegated": 300074743.67886317,
-      "delegators": null
+      "delegators": 8
     },
     {
       "epoch": 392,
-      "timestamp": null,
+      "timestamp": 1776880693000,
       "delegated": 300135437.64558566,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 393,
-      "timestamp": null,
+      "timestamp": 1777235516000,
       "delegated": 300135821.09845364,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 394,
-      "timestamp": null,
+      "timestamp": 1777527602000,
       "delegated": 300135863.1000637,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 395,
-      "timestamp": null,
+      "timestamp": 1777821560000,
       "delegated": 300135906.27520263,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 396,
-      "timestamp": null,
+      "timestamp": 1777872058000,
       "delegated": 300135906.27520263,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 397,
-      "timestamp": null,
-      "delegated": 300132141.56280905,
-      "delegators": null
+      "timestamp": 1778461474000,
+      "delegated": 300132141.5628091,
+      "delegators": 9
     },
     {
       "epoch": 398,
-      "timestamp": null,
+      "timestamp": 1778777717000,
       "delegated": 300132223.03204066,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 399,
-      "timestamp": null,
+      "timestamp": 1778861721000,
       "delegated": 300132266.87243694,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 400,
-      "timestamp": null,
+      "timestamp": 1779255255000,
       "delegated": 300132310.47462493,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 401,
-      "timestamp": null,
+      "timestamp": 1779544794000,
       "delegated": 300064331.14180464,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 402,
-      "timestamp": null,
+      "timestamp": 1779877562000,
       "delegated": 300064402.2070337,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 403,
-      "timestamp": null,
+      "timestamp": 1780248361000,
       "delegated": 500064431.7705375,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 404,
-      "timestamp": null,
+      "timestamp": 1780362107000,
       "delegated": 500064460.36204976,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 405,
-      "timestamp": null,
+      "timestamp": 1780767550000,
       "delegated": 500103412.8596844,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 406,
-      "timestamp": null,
+      "timestamp": 1780960210000,
       "delegated": 500103440.91734,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 407,
-      "timestamp": null,
+      "timestamp": 1781284530000,
       "delegated": 500104478.8747417,
-      "delegators": null
+      "delegators": 9
     },
     {
       "epoch": 408,
-      "timestamp": null,
+      "timestamp": 1781549291000,
       "delegated": 500139389.69357497,
-      "delegators": null
+      "delegators": 10
     },
     {
       "epoch": 409,
-      "timestamp": null,
+      "timestamp": 1781899454000,
       "delegated": 235184042.3798042,
-      "delegators": null
+      "delegators": 6
     },
     {
       "epoch": 410,
-      "timestamp": null,
+      "timestamp": 1782357188000,
       "delegated": 235184068.30332085,
-      "delegators": null
+      "delegators": 6
     },
     {
       "epoch": 411,
-      "timestamp": null,
+      "timestamp": 1782569352000,
       "delegated": 235149213.1924621,
-      "delegators": null
+      "delegators": 5
     },
     {
       "epoch": 412,
-      "timestamp": null,
+      "timestamp": 1782832427000,
       "delegated": 235070124.1008088,
-      "delegators": null
+      "delegators": 5
     },
     {
       "epoch": 413,
-      "timestamp": null,
+      "timestamp": 1783308175000,
       "delegated": 235118282.7765595,
-      "delegators": null
+      "delegators": 5
     },
     {
       "epoch": 414,
-      "timestamp": null,
+      "timestamp": 1783391801000,
       "delegated": 235078738.42287964,
-      "delegators": null
+      "delegators": 5
+    },
+    {
+      "epoch": 415,
+      "timestamp": 1783804949000,
+      "delegated": 235078794.82845563,
+      "delegators": 5
     }
   ],
-  "delegators": []
+  "delegators": [
+    {
+      "from": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
+      "amount": 235000000,
+      "share": 99.96648152441264,
+      "firstSeen": 1767351280000,
+      "lastSeen": 1781626818000,
+      "firstEpoch": 364,
+      "lastEpoch": 415,
+      "eventEpoch": 411,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
+      "amount": 61229.751937873676,
+      "share": 0.02604648028017795,
+      "firstSeen": 1776878866000,
+      "lastSeen": 1783701279000,
+      "firstEpoch": 392,
+      "lastEpoch": 415,
+      "eventEpoch": 415,
+      "delta": 56.405576004741306,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457",
+      "amount": 17115.072155564347,
+      "share": 0.007280568274162607,
+      "firstSeen": 1772638918000,
+      "lastSeen": 1783325556000,
+      "firstEpoch": 378,
+      "lastEpoch": 415,
+      "eventEpoch": 414,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a",
+      "amount": 450,
+      "share": 0.00019142517738717315,
+      "firstSeen": 1756463057000,
+      "lastSeen": 1756463057000,
+      "firstEpoch": 364,
+      "lastEpoch": 415,
+      "eventEpoch": 325,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0xa7fd33f85cf752919213c836a144f22906823869",
+      "amount": 0.00436218892390319,
+      "share": 1.855628419010067e-9,
+      "firstSeen": 1768407972000,
+      "lastSeen": 1783349703000,
+      "firstEpoch": 364,
+      "lastEpoch": 415,
+      "eventEpoch": 414,
+      "delta": 0,
+      "hasPriorSnapshot": true
+    }
+  ]
 }
