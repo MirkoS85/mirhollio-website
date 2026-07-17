@@ -630,6 +630,17 @@ const MirSFlr = (() => {
     return `<span class="condition-mark ${state}" title="${label}: ${text}" aria-label="${label}: ${text}">${symbol}</span>`;
   }
 
+  function epochParticipating(item) {
+    if (item?.eligibleForReward === true) return true;
+    if (item?.eligibleForReward === false) return false;
+    const passes = Number(item?.passes ?? item?.newNumberOfPasses);
+    if (Number.isFinite(passes) && passes >= 3) return true;
+    const reward = Number(item?.totalRewardAmount);
+    if (Number.isFinite(reward) && reward > 0) return true;
+    if (item?.passEarned === true) return true;
+    return null;
+  }
+
   function renderConditionHistoryTable(provider) {
     const rows = [...(provider?.epochData || [])]
       .sort((a, b) => Number(b.epoch ?? 0) - Number(a.epoch ?? 0))
@@ -654,7 +665,7 @@ const MirSFlr = (() => {
       const checks = [
         {
           label: "Participating",
-          value: item => item.passEarned ?? item.eligibleForReward
+          value: item => epochParticipating(item)
         },
         {
           label: "Eligible for Rewards",
