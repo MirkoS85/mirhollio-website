@@ -299,8 +299,19 @@
             <strong data-field="validatorVersion">v-</strong>
           </article>
           <article>
-            <span>Stake</span>
+            <span>Validator stake</span>
             <strong data-field="validatorStake">-</strong>
+            <small>self-bond capacity</small>
+          </article>
+          <article>
+            <span>FTSO staked weight</span>
+            <strong data-field="ftsoStakedWeight">-</strong>
+            <small>self-bond + FF boost</small>
+          </article>
+          <article>
+            <span>FF boost</span>
+            <strong data-field="ftsoFoundationBoost">-</strong>
+            <small>direct FTSO weight</small>
           </article>
           <article>
             <span>Free space</span>
@@ -323,6 +334,9 @@
             <div class="capacity-track"><i data-bar="stakeCapacity"></i></div>
             <div class="stake-breakdown">
               <span>Self-bond <b data-field="selfBond">3M FLR</b></span>
+              <span>FF boost <b data-field="ftsoFoundationBoost">-</b></span>
+              <span>FTSO direct <b data-field="ftsoStakedWeight">-</b></span>
+              <span>Total FTSO <b data-field="ftsoPolicyWeight">-</b></span>
               <span>Delegated <b data-field="delegatedStake">-</b></span>
               <span>Free <b data-field="freeSpace">-</b></span>
             </div>
@@ -372,6 +386,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-35"></script>
+  <script src="../assets/ops.js?v=ops-36"></script>
 </body>
 </html>
