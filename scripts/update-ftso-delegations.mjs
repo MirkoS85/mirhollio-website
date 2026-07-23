@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
 const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+const TARGET_VOTER_CHECKSUM = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
 const FLARE_BASE_HISTORY_URL = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
 const FLARE_BASE_DELEGATORS_URL = "https://flare-base.io/api/delegations/getDelegatorsAt/flare";
 const ORACLE_PROVIDERS_URL = "https://api.oracle-daemon.com/v2/flare/providers";
+const FSE_ENTITY_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER_CHECKSUM}`;
 const OUT_PATH = path.resolve("data/ftso-delegations.json");
 const HISTORY_DAYS = 180;
 const MAX_DELEGATOR_EPOCHS = 80;
@@ -22,6 +24,14 @@ function urlWithParams(baseUrl, params) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function readExistingSnapshot() {
+  try {
+    return JSON.parse(await readFile(OUT_PATH, "utf8"));
+  } catch (_) {
+    return null;
+  }
 }
 
 function parseSemicolonRows(text) {
@@ -106,6 +116,46 @@ function oracleHistoryRows(provider) {
     delegated: row.m_dDelegationWeight,
     delegators: row.delegators
   })));
+}
+
+function normalizePolicyWeight(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return Math.abs(n) > 1_000_000_000_000 ? n / 1_000_000_000_000_000_000 : n;
+}
+
+function normalizeFseWeights(data) {
+  const policy = data?.denormalizedsigningpolicy || {};
+  const totalWeight = normalizePolicyWeight(policy.weight);
+  const delegatedWeight = normalizePolicyWeight(policy.w_nat_weight ?? policy.w_nat_capped_weight);
+  const cappedDelegatedWeight = normalizePolicyWeight(policy.w_nat_capped_weight ?? policy.w_nat_weight);
+  const stakingWeight = normalizePolicyWeight(policy.staking_weight);
+  const epoch = Number(policy.reward_epoch);
+  const feeBips = Number(policy.delegation_fee_bips);
+
+  if (
+    !Number.isFinite(totalWeight)
+    && !Number.isFinite(delegatedWeight)
+    && !Number.isFinite(stakingWeight)
+  ) {
+    return null;
+  }
+
+  return {
+    epoch: Number.isFinite(epoch) ? epoch : null,
+    totalWeight: Number.isFinite(totalWeight) ? totalWeight : null,
+    delegatedWeight: Number.isFinite(delegatedWeight) ? delegatedWeight : null,
+    cappedDelegatedWeight: Number.isFinite(cappedDelegatedWeight) ? cappedDelegatedWeight : null,
+    stakingWeight: Number.isFinite(stakingWeight) ? stakingWeight : null,
+    feeBips: Number.isFinite(feeBips) ? feeBips : null,
+    source: "flare-systems-explorer"
+  };
+}
+
+async function fetchFseWeights() {
+  const weights = normalizeFseWeights(await fetchJson(FSE_ENTITY_URL));
+  if (!weights) throw new Error("Flare Systems Explorer entity response did not include signing-policy weights");
+  return weights;
 }
 
 async function fetchFlareBaseHistory() {
@@ -217,9 +267,24 @@ function buildInsights(history, wallets) {
 
 async function main() {
   const generatedAt = new Date().toISOString();
+  const existingSnapshot = await readExistingSnapshot();
   const warnings = [];
   let history = [];
   let historySource = "flare-base";
+  let weights = null;
+  let weightsSource = "unavailable";
+
+  try {
+    weights = await fetchFseWeights();
+    weightsSource = "flare-systems-explorer";
+  } catch (error) {
+    warnings.push(`Flare Systems Explorer weights failed: ${error.message}`);
+    if (existingSnapshot?.weights) {
+      weights = existingSnapshot.weights;
+      weightsSource = `${existingSnapshot.source?.weights || "flare-systems-explorer"}-cache`;
+      warnings.push("Reused existing weight snapshot after FSE failure");
+    }
+  }
 
   try {
     history = await fetchFlareBaseHistory();
@@ -236,6 +301,21 @@ async function main() {
     }
   } catch (error) {
     warnings.push(`Oracle history fallback failed: ${error.message}`);
+  }
+
+  const existingHistory = normalizeHistoryRows(Array.isArray(existingSnapshot?.history) ? existingSnapshot.history : []);
+  const existingHistorySource = String(existingSnapshot?.source?.history || "");
+  const existingLatestEpoch = Number(existingHistory[existingHistory.length - 1]?.epoch || 0);
+  const latestEpoch = Number(history[history.length - 1]?.epoch || 0);
+  if (
+    existingHistory.length
+    && existingHistorySource.startsWith("flare-base")
+    && historySource !== "flare-base"
+    && existingLatestEpoch >= latestEpoch
+  ) {
+    history = existingHistory;
+    historySource = `${existingHistorySource}-cache`;
+    warnings.push("Reused existing Flare Base history because Oracle fallback was not newer");
   }
 
   if (!history.length) throw new Error("No delegation history could be loaded");
@@ -258,7 +338,15 @@ async function main() {
     warnings.push(`${failedDelegatorEpochs.length} delegator epoch snapshots failed`);
   }
 
-  const wallets = summarizeWallets(snapshotRows, history);
+  let wallets = summarizeWallets(snapshotRows, history);
+  if (!wallets.length && Array.isArray(existingSnapshot?.delegators) && existingSnapshot.delegators.length) {
+    const existingWalletEpoch = Number(existingSnapshot?.insights?.latestEpoch);
+    const currentEpoch = Number(history[history.length - 1]?.epoch);
+    if (Number.isFinite(existingWalletEpoch) && existingWalletEpoch === currentEpoch) {
+      wallets = existingSnapshot.delegators;
+      warnings.push("Reused existing delegator snapshot for the current Flare Base epoch");
+    }
+  }
   const payload = {
     generatedAt,
     address: TARGET_DELEGATION,
@@ -266,11 +354,13 @@ async function main() {
     rangeDays: HISTORY_DAYS,
     source: {
       history: historySource,
-      delegators: snapshotRows.length ? "flare-base" : "unavailable"
+      delegators: snapshotRows.length ? "flare-base" : "unavailable",
+      weights: weightsSource
     },
     warnings,
     failedDelegatorEpochs,
     insights: buildInsights(history, wallets),
+    weights,
     history,
     delegators: wallets
   };

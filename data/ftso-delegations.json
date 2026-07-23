@@ -1,26 +1,36 @@
 {
-  "generatedAt": "2026-07-23T17:50:08.498Z",
+  "generatedAt": "2026-07-23T20:33:13.677Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
     "history": "flare-base",
-    "delegators": "flare-base"
+    "delegators": "flare-base",
+    "weights": "flare-systems-explorer"
   },
   "warnings": [],
   "failedDelegatorEpochs": [],
   "insights": {
-    "latestEpoch": 417,
-    "latestDelegated": 235457211.05675688,
-    "latestDelta": 42597.10754698515,
-    "latestDelegators": 6,
-    "whaleConcentrationPct": 99.80581989623302,
-    "largestWallet": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
+    "latestEpoch": 418,
+    "latestDelegated": 103643.59725070628,
+    "latestDelta": -235353567.45950618,
+    "latestDelegators": 3,
+    "whaleConcentrationPct": 59.15788007635898,
+    "largestWallet": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
     "largestMove": {
       "epoch": 409,
       "delta": -264955347.31377077,
       "pct": -52.97630076209423
     }
+  },
+  "weights": {
+    "epoch": 418,
+    "totalWeight": 21463183.597250707,
+    "delegatedWeight": 103643.59725070628,
+    "cappedDelegatedWeight": 103643.59725070628,
+    "stakingWeight": 21359539.999999996,
+    "feeBips": 2000,
+    "source": "flare-systems-explorer"
   },
   "history": [
     {
@@ -334,77 +344,47 @@
       "timestamp": 1784339607000,
       "delegated": 235457211.05675688,
       "delegators": 6
+    },
+    {
+      "epoch": 418,
+      "timestamp": 1784782782000,
+      "delegated": 103643.59725070628,
+      "delegators": 3
     }
   ],
   "delegators": [
     {
-      "from": "0x2306757c2a67904b7526b35c5cc9a53e0692c964",
-      "amount": 235000000,
-      "share": 99.805819896233,
-      "firstSeen": 1767351280000,
-      "lastSeen": 1781626818000,
-      "firstEpoch": 366,
-      "lastEpoch": 417,
-      "eventEpoch": 411,
-      "delta": 0,
-      "hasPriorSnapshot": true
-    },
-    {
-      "from": "0x2d4764863ed4c0882b17575943f7cf7646c2f32c",
-      "amount": 352930,
-      "share": 0.14989135325947878,
-      "firstSeen": 1783939021000,
-      "lastSeen": 1783939021000,
-      "firstEpoch": 416,
-      "lastEpoch": 417,
-      "eventEpoch": 416,
-      "delta": 0,
-      "hasPriorSnapshot": true
-    },
-    {
       "from": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
-      "amount": 61257.86546508748,
-      "share": 0.026016559522707202,
+      "amount": 61313.35496839732,
+      "share": 59.15788007635898,
       "firstSeen": 1776878866000,
-      "lastSeen": 1784000303000,
+      "lastSeen": 1784577600000,
       "firstEpoch": 392,
-      "lastEpoch": 417,
-      "eventEpoch": 417,
-      "delta": 28.113527213805355,
+      "lastEpoch": 418,
+      "eventEpoch": 418,
+      "delta": 55.48950330983644,
       "hasPriorSnapshot": true
     },
     {
       "from": "0xa7fd33f85cf752919213c836a144f22906823869",
       "amount": 41880.24228230896,
-      "share": 0.017786774121015873,
+      "share": 40.4079397022507,
       "firstSeen": 1768407972000,
       "lastSeen": 1784185948000,
       "firstEpoch": 366,
-      "lastEpoch": 417,
+      "lastEpoch": 418,
       "eventEpoch": 417,
-      "delta": 41880.23792012003,
-      "hasPriorSnapshot": true
-    },
-    {
-      "from": "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457",
-      "amount": 692.949009473122,
-      "share": 0.000294299336326585,
-      "firstSeen": 1772638918000,
-      "lastSeen": 1783973685000,
-      "firstEpoch": 378,
-      "lastEpoch": 417,
-      "eventEpoch": 417,
-      "delta": 688.7560996508348,
+      "delta": 0,
       "hasPriorSnapshot": true
     },
     {
       "from": "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a",
       "amount": 450,
-      "share": 0.00019111752746087173,
+      "share": 0.43418022139031215,
       "firstSeen": 1756463057000,
       "lastSeen": 1756463057000,
       "firstEpoch": 366,
-      "lastEpoch": 417,
+      "lastEpoch": 418,
       "eventEpoch": 325,
       "delta": 0,
       "hasPriorSnapshot": true

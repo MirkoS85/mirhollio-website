@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirsflr-shell-v187";
+const CACHE_NAME = "mirsflr-shell-v189";
 const APP_SHELL = [
   "/",
   "/ops/",
@@ -10,7 +10,7 @@ const APP_SHELL = [
   "/performance/",
   "/assets/operator.css?v=guide-flow-3",
   "/assets/live-refresh.css?v=delegation-refresh-3",
-  "/assets/operator.js?v=validator-stake-fix-1",
+  "/assets/operator.js?v=ftso-live-weights-2",
   "/assets/live-refresh.js?v=pre-reg-pill-size-1",
   "/assets/ops.css?v=ops-34",
   "/assets/ops.js?v=ops-34",
