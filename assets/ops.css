@@ -1297,22 +1297,22 @@ h2{
     border-left:0;
   }
 
-  .ftso-table article:nth-child(7),
-  .ftso-table article:nth-child(8){
+  .ftso-table article:nth-child(11),
+  .ftso-table article:nth-child(12){
     grid-column:1 / -1;
   }
 
-  .ftso-table article:nth-child(15){
+  .ftso-table article:nth-child(19){
     grid-column:1 / -1;
   }
 
-  .ftso-table article:nth-child(7) strong.split-value,
-  .ftso-table article:nth-child(8) strong.split-value{
+  .ftso-table article:nth-child(11) strong.split-value,
+  .ftso-table article:nth-child(12) strong.split-value{
     font-size:clamp(13px, 4vw, 18px);
   }
 
-  .ftso-table article:nth-child(7) small,
-  .ftso-table article:nth-child(8) small{
+  .ftso-table article:nth-child(11) small,
+  .ftso-table article:nth-child(12) small{
     margin-top:4px;
     font-size:9px;
     line-height:1.25;

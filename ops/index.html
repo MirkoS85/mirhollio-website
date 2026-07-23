@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-34">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-35">
 </head>
 <body>
   <main class="ops-shell">
@@ -134,6 +134,26 @@
           <article>
             <span>Avail now</span>
             <strong data-field="ftsoAvailability">-</strong>
+          </article>
+          <article class="stat-compact">
+            <span>Weight</span>
+            <strong data-field="ftsoPolicyWeight">-</strong>
+            <small><span data-field="ftsoWeightEpoch">-</span> <span data-field="ftsoWeightSource">-</span></small>
+          </article>
+          <article class="stat-compact">
+            <span>Staked weight</span>
+            <strong data-field="ftsoStakedWeight">-</strong>
+            <small>self-bond + FF boost</small>
+          </article>
+          <article class="stat-compact">
+            <span>Delegated weight</span>
+            <strong data-field="ftsoDelegatedWeight">-</strong>
+            <small>WFLR delegation</small>
+          </article>
+          <article class="stat-compact">
+            <span>Foundation boost</span>
+            <strong data-field="ftsoFoundationBoost">-</strong>
+            <small>direct weight</small>
           </article>
           <article>
             <span>Avail 6h</span>
@@ -352,6 +372,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-34"></script>
+  <script src="../assets/ops.js?v=ops-35"></script>
 </body>
 </html>

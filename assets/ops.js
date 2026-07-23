@@ -13,6 +13,7 @@
     // Flare Systems Explorer (existing)
     explorerEntity: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
     explorerFtso: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3/ftso",
+    ftsoSnapshot: "/data/ftso-delegations.json?v=delegation-data-2",
     // Self (existing)
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
     daemonStatus: "https://node.mirhollio.com/ops/status.json",
@@ -56,6 +57,7 @@
       validator: "loading",
       explorer: "loading",
       explorerFtso: "loading",
+      ftsoSnapshot: "loading",
       node: "loading",
       daemon: "loading",
       rpc: "loading",
@@ -66,6 +68,7 @@
       validator: null,
       explorer: null,
       explorerFtso: null,
+      ftsoSnapshot: null,
       node: null,
       daemon: null,
       rpc: null,
@@ -297,6 +300,41 @@
     if (!Number.isFinite(n)) return "-";
     const normalized = Math.abs(n) > 1_000_000_000_000 ? n / 1e18 : n;
     return fmtCompact(normalized, " FLR");
+  }
+
+  function policyWeightNumber(value) {
+    if (value == null || value === "") return null;
+    const n = Number(value);
+    if (!Number.isFinite(n)) return null;
+    return Math.abs(n) > 1_000_000_000_000 ? n / 1e18 : n;
+  }
+
+  function firstFinite(...values) {
+    for (const value of values) {
+      const n = policyWeightNumber(value);
+      if (Number.isFinite(n)) return n;
+    }
+    return null;
+  }
+
+  function ftsoPolicyWeights(explorer, ftsoSnapshot) {
+    const policy = explorer?.denormalizedsigningpolicy || {};
+    const snapshot = ftsoSnapshot?.weights || {};
+    const totalWeight = firstFinite(policy.weight, snapshot.totalWeight, snapshot.weight);
+    const delegatedWeight = firstFinite(policy.w_nat_weight, policy.w_nat_capped_weight, snapshot.delegatedWeight, snapshot.cappedDelegatedWeight);
+    const cappedDelegatedWeight = firstFinite(policy.w_nat_capped_weight, snapshot.cappedDelegatedWeight, snapshot.delegatedWeight);
+    const stakingWeight = firstFinite(policy.staking_weight, snapshot.stakingWeight);
+    const epoch = Number(policy.reward_epoch ?? policy.rewardEpoch ?? snapshot.epoch);
+    const feeBips = Number(policy.delegation_fee_bips ?? snapshot.feeBips);
+    return {
+      epoch: Number.isFinite(epoch) ? epoch : null,
+      totalWeight,
+      delegatedWeight,
+      cappedDelegatedWeight,
+      stakingWeight,
+      feeBips: Number.isFinite(feeBips) ? feeBips : null,
+      source: policy.weight != null ? "FSE" : snapshot.source === "flare-systems-explorer" ? "FSE snapshot" : snapshot.source ? "snapshot" : "-"
+    };
   }
 
   function chainAmountNumber(value) {
@@ -1267,7 +1305,7 @@
     if (panel) panel.dataset.alertState = actionable.length ? worstLevel(actionable.map(item => item.level)) : "ok";
   }
 
-  function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload) {
+  function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
     const node = getNode(validator);
@@ -1291,6 +1329,7 @@
         policy: state.walletBalances.policy != null ? `${fmtNum(state.walletBalances.policy, 2)} FLR` : "unavailable"
       },
       validatorFallback: state.validatorFallback || null,
+      ftsoSigningPolicy: ftsoPolicyWeights(explorer, ftsoSnapshot),
       provider: {
         matchedBy: provider?.voterAddress === TARGET.voter ? "voterAddress" : "name",
         topLevelName: provider?.dataProviderName,
@@ -1337,7 +1376,7 @@
     mount.textContent = JSON.stringify(payload, null, 2);
   }
 
-  function applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload) {
+  function applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload) {
     const latest = latestEpoch(provider);
     const node = getNode(validator);
     const network = networkInfo(providerPayload);
@@ -1406,6 +1445,19 @@
     setStatusCard("nodeStatus", levels.node, levels.node === "ok" ? "OK" : levels.node === "warn" ? "WARN" : "DOWN", nodeHealthTime ? `${fmtAge(nodeHealthTime)} old` : nodeHealth?.healthy ? "healthy" : "unhealthy");
 
     const policy = explorer?.denormalizedsigningpolicy || {};
+    const policyWeights = ftsoPolicyWeights(explorer, ftsoSnapshot);
+    const policyDirectWeight = policyWeights.stakingWeight;
+    const policyDelegatedWeight = policyWeights.delegatedWeight;
+    const policyTotalWeight = policyWeights.totalWeight ?? (
+      Number.isFinite(policyDirectWeight) && Number.isFinite(policyDelegatedWeight)
+        ? policyDirectWeight + policyDelegatedWeight
+        : null
+    );
+    const policySelfBond = policyWeightNumber(validator?.m_dTotalStake)
+      ?? policyWeightNumber(Array.isArray(node?.m_axStake) ? node.m_axStake[0]?.m_dAmount : null);
+    const policyFoundationBoost = Number.isFinite(policyDirectWeight) && Number.isFinite(policySelfBond)
+      ? Math.max(0, policyDirectWeight - policySelfBond)
+      : null;
     const reward = Number(latest?.totalRewardAmount);
     const passes = Number(latest?.passes ?? latest?.newNumberOfPasses);
     const conditionOk = [latest?.ftsoScaling?.conditionMet, latest?.fastUpdates?.conditionMet, latest?.fdc?.conditionMet, latest?.staking?.conditionMet].filter(value => value === true).length;
@@ -1414,6 +1466,12 @@
     setText("latestReward", Number.isFinite(reward) ? fmtCompact(reward, "") : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "eligible" : latest?.eligibleForReward === false ? "not eligible" : "eligibility -");
     setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
+    setText("ftsoPolicyWeight", Number.isFinite(policyTotalWeight) ? fmtCompact(policyTotalWeight, " FLR") : "-");
+    setText("ftsoStakedWeight", Number.isFinite(policyDirectWeight) ? fmtCompact(policyDirectWeight, " FLR") : "-");
+    setText("ftsoDelegatedWeight", Number.isFinite(policyDelegatedWeight) ? fmtCompact(policyDelegatedWeight, " FLR") : "-");
+    setText("ftsoFoundationBoost", Number.isFinite(policyFoundationBoost) ? fmtCompact(policyFoundationBoost, " FLR") : "-");
+    setText("ftsoWeightEpoch", policyWeights.epoch != null ? `E${policyWeights.epoch}` : "-");
+    setText("ftsoWeightSource", policyWeights.source);
     setText("ftsoPerformance", provider?.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
     setText("ftsoPrimary", provider?.ftsoPerformance?.performance1 != null ? fmtPct(provider.ftsoPerformance.performance1) : "-");
     setText("ftsoSecondary", provider?.ftsoPerformance?.performance2 != null ? fmtPct(provider.ftsoPerformance.performance2) : "-");
@@ -1489,6 +1547,10 @@
     setMetricTone("preRegistered", provider?.isPreRegistered === true ? "ok" : provider?.isPreRegistered === false ? "down" : "warn");
     setMetricTone("rewardRate", "", "Informational yield metric; lower rewards are not an operator health alarm.");
     setMetricTone("latestReward", "", "Informational payout metric; delegation loss is tracked in the FTSO delegation section.");
+    setMetricTone("ftsoPolicyWeight", "", "Total signing-policy weight: delegated WFLR plus direct staked weight.");
+    setMetricTone("ftsoStakedWeight", "", "Direct FTSO weight from validator self-bond and Flare Foundation boost.");
+    setMetricTone("ftsoDelegatedWeight", "", "Delegated WFLR only; this excludes direct staked/boost weight.");
+    setMetricTone("ftsoFoundationBoost", "", "Estimated direct boost: staked weight minus validator self-bond.");
     setMetricTone("ftsoHitPct", higherIsBetterTone(pctNumber(latest?.ftsoScaling?.hitPercentage), hitOk, 97), `Six-month median ${fmtPct(hitMedian6m)}`);
     setMetricTone("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "ok" : latest?.fdc?.conditionMet === false ? "down" : "warn");
     setMetricTone("stakingCondition", latest?.staking?.conditionMet === true ? "ok" : latest?.staking?.conditionMet === false ? "down" : "warn");
@@ -1589,7 +1651,7 @@
     setText("oracleSource", state.sources.provider === "ok" && state.sources.validator === "ok" ? "OK" : state.sources.provider === "down" || state.sources.validator === "down" ? "DOWN" : "WARN");
     setText("oracleSourceMeta", "providers + validators");
     setText("explorerSource", state.sources.explorer === "ok" ? "OK" : state.sources.explorer === "warn" ? "BLOCKED" : "DOWN");
-    const policyEpoch = policy.reward_epoch ?? policy.rewardEpoch;
+    const policyEpoch = policy.reward_epoch ?? policy.rewardEpoch ?? policyWeights.epoch;
     setText("explorerSourceMeta", explorerFtso ? "FTSO 6h/24h windows" : policyEpoch ? `policy E${policyEpoch}` : state.sources.explorer === "warn" ? "direct browser fetch blocked" : "entity policy");
     setText("nodeSource", state.sources.node === "ok" ? "OK" : "DOWN");
     setText("nodeSourceMeta", nodeHealthTime ? `health ${fmtAge(nodeHealthTime)} old` : nodeHealth?.checks?.network?.message?.connectedPeers != null ? `${nodeHealth.checks.network.message.connectedPeers} peers` : "self health");
@@ -1621,7 +1683,7 @@
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green", tooltip: "validatorReward" });
     renderUptimeStrip(uptimeValues);
     renderExpiryList(node);
-    renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, providerPayload, daemonPayload);
+    renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload);
   }
 
   // ââ MAIN LOAD ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -1636,6 +1698,7 @@
         fetchJson(ENDPOINTS.validators),
         fetchJson(ENDPOINTS.explorerEntity),
         fetchJson(ENDPOINTS.explorerFtso),
+        fetchJson(ENDPOINTS.ftsoSnapshot, 8_000),
         fetchJson(ENDPOINTS.nodeHealth),
         fetchJson(ENDPOINTS.daemonStatus, 2_500)
       ])
@@ -1645,13 +1708,15 @@
     let validatorPayload = sourceResults[1].status === "fulfilled" ? sourceResults[1].value : null;
     let explorer = sourceResults[2].status === "fulfilled" ? sourceResults[2].value : null;
     let explorerFtso = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
-    let nodeHealth = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
-    let daemonPayload = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
+    let ftsoSnapshot = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
+    let nodeHealth = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
+    let daemonPayload = sourceResults[6].status === "fulfilled" ? sourceResults[6].value : null;
 
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
     state.sourceLoadedAt.explorer = explorer ? new Date() : null;
     state.sourceLoadedAt.explorerFtso = explorerFtso ? new Date() : null;
+    state.sourceLoadedAt.ftsoSnapshot = ftsoSnapshot ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
     state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
 
@@ -1677,6 +1742,7 @@
     setSource("validator", validator ? "ok" : "down");
     setSource("explorer", explorer || explorerFtso ? "ok" : "warn");
     setSource("explorerFtso", explorerFtso ? "ok" : "warn");
+    setSource("ftsoSnapshot", ftsoSnapshot ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
     setSource("daemon", daemonPayload ? "ok" : "public-only");
 
@@ -1688,12 +1754,12 @@
       !validator ? fetchValidatorFallback() : Promise.resolve()
     ]).then(() => {
       // Re-render with enriched data once supplementary sources return
-      applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
+      applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload);
     });
 
     state.lastLoadedAt = new Date();
-    state.data = { provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload };
-    applyData(provider, validator, explorer, explorerFtso, nodeHealth, providerPayload, daemonPayload);
+    state.data = { provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload };
+    applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload);
     // Show per-source error state if any source failed after 10s
     if (!provider || !validator || !nodeHealth) {
       const mount = document.querySelector('[data-render="alerts"]');
