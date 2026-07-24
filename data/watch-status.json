@@ -1,0 +1,77 @@
+{
+  "schema": "mirsflr-watch-status/v1",
+  "generatedAt": "2026-07-24T19:59:23.221Z",
+  "updatedAt": "2026-07-24T19:59:23.221Z",
+  "provider": {
+    "name": "MirSFlr",
+    "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
+    "delegationAddress": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
+    "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
+  },
+  "summary": {
+    "validatorLabel": "99.6% full",
+    "ftsoLabel": "FTSO E418"
+  },
+  "validator": {
+    "status": "connected",
+    "stake": 89663081,
+    "capacity": 90000000,
+    "fillPct": 99.6256,
+    "free": 336919,
+    "delegation": 83663081,
+    "selfBond": 6000000,
+    "delegationCount": 12,
+    "stakeEnd": "2026-10-19T10:00:00Z",
+    "topDelegations": [
+      {
+        "address": null,
+        "amount": 15000000,
+        "start": "2026-07-20T19:50:40Z",
+        "end": "2026-10-19T10:00:00Z"
+      },
+      {
+        "address": null,
+        "amount": 10615390,
+        "start": "2026-07-24T15:21:55Z",
+        "end": "2026-08-07T15:26:00Z"
+      },
+      {
+        "address": null,
+        "amount": 10000000,
+        "start": "2026-07-24T10:53:11Z",
+        "end": "2026-08-07T11:08:09Z"
+      },
+      {
+        "address": null,
+        "amount": 10000000,
+        "start": "2026-07-24T10:54:11Z",
+        "end": "2026-08-07T11:09:08Z"
+      },
+      {
+        "address": null,
+        "amount": 10000000,
+        "start": "2026-07-24T10:55:10Z",
+        "end": "2026-08-07T11:10:08Z"
+      }
+    ]
+  },
+  "ftso": {
+    "status": "ok",
+    "latestCompletedEpoch": 417,
+    "signingPolicyEpoch": 418,
+    "weight": 21463183.597250707,
+    "delegatedWeight": 103643.59725070628,
+    "cappedDelegatedWeight": 103643.59725070628,
+    "stakingWeight": 21359539.999999996,
+    "delegationFeeBips": 2000,
+    "rewardRate": 2.5366954759974143,
+    "performance": null,
+    "availability": null
+  },
+  "sources": {
+    "provider": "oracle-daemon-v2",
+    "validator": "oracle-daemon-v1",
+    "ftso": "flare-systems-explorer"
+  },
+  "warnings": []
+}
