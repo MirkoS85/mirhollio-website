@@ -72,6 +72,18 @@ function firstFinite(...values) {
   return null;
 }
 
+function numberOrNull(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function recentAverage(values, hours) {
+  if (!Array.isArray(values) || !values.length) return null;
+  const slice = values.slice(-hours).map(numberOrNull).filter(value => value != null);
+  if (!slice.length) return null;
+  return slice.reduce((sum, value) => sum + value, 0) / slice.length;
+}
+
 function findDeep(root, predicate) {
   const stack = [root];
   const seen = new Set();
@@ -245,6 +257,8 @@ async function main() {
     ? (validatorStake / capacity) * 100
     : null;
   const ftso = ftsoWeights(explorer, snapshot);
+  const ftsoAvailabilityHours = provider?.ftsoPerformance?.availability1h;
+  const fdcAvailabilityHours = provider?.fdcPerformance?.availability1h;
 
   const payload = {
     schema: "mirsflr-watch-status/v1",
@@ -282,8 +296,22 @@ async function main() {
       stakingWeight: Number.isFinite(ftso.stakingWeight) ? ftso.stakingWeight : null,
       delegationFeeBips: ftso.delegationFeeBips,
       rewardRate: latest?.m_dRewardRate ?? null,
-      performance: latest?.ftsoPerformance?.performance ?? null,
-      availability: latest?.ftsoPerformance?.availability ?? null
+      performance: numberOrNull(provider?.ftsoPerformance?.performance ?? latest?.ftsoPerformance?.performance),
+      primaryPerformance: numberOrNull(provider?.ftsoPerformance?.performance1),
+      secondaryPerformance: numberOrNull(provider?.ftsoPerformance?.performance2),
+      availability: numberOrNull(provider?.ftsoPerformance?.availability ?? latest?.ftsoPerformance?.availability),
+      availability6h: recentAverage(ftsoAvailabilityHours, 6),
+      availability24h: recentAverage(ftsoAvailabilityHours, 24)
+    },
+    fdc: {
+      status: latest?.fdc?.conditionMet === false ? "warn" : provider?.fdcPerformance ? "ok" : "unknown",
+      availability: numberOrNull(provider?.fdcPerformance?.availability),
+      availability6h: recentAverage(fdcAvailabilityHours, 6),
+      availability24h: recentAverage(fdcAvailabilityHours, 24),
+      participation: numberOrNull(latest?.fdc?.participationPercentage),
+      conditionMet: latest?.fdc?.conditionMet ?? null,
+      rewardedVotingRounds: numberOrNull(latest?.fdc?.rewardedVotingRounds),
+      totalRewardedVotingRounds: numberOrNull(latest?.fdc?.totalRewardedVotingRounds)
     },
     sources,
     warnings

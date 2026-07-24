@@ -8,6 +8,7 @@ struct WatchStatus: Codable, Equatable {
     let summary: Summary
     let validator: Validator
     let ftso: FTSO
+    let fdc: FDC?
     let sources: Sources?
     let warnings: [String]
 
@@ -63,7 +64,22 @@ struct WatchStatus: Codable, Equatable {
         let delegationFeeBips: Int?
         let rewardRate: Double?
         let performance: Double?
+        let primaryPerformance: Double?
+        let secondaryPerformance: Double?
         let availability: Double?
+        let availability6h: Double?
+        let availability24h: Double?
+    }
+
+    struct FDC: Codable, Equatable {
+        let status: String
+        let availability: Double?
+        let availability6h: Double?
+        let availability24h: Double?
+        let participation: Double?
+        let conditionMet: Bool?
+        let rewardedVotingRounds: Double?
+        let totalRewardedVotingRounds: Double?
     }
 
     struct Sources: Codable, Equatable {
@@ -110,8 +126,22 @@ extension WatchStatus {
             stakingWeight: 21_359_540,
             delegationFeeBips: 2000,
             rewardRate: 2.5367,
-            performance: nil,
-            availability: nil
+            performance: 0.7508,
+            primaryPerformance: 0.4808,
+            secondaryPerformance: 0.9307,
+            availability: 1,
+            availability6h: 1,
+            availability24h: 1
+        ),
+        fdc: FDC(
+            status: "ok",
+            availability: 0.9793,
+            availability6h: 0.9794,
+            availability24h: 0.9816,
+            participation: 92.5,
+            conditionMet: true,
+            rewardedVotingRounds: 3108,
+            totalRewardedVotingRounds: 3360
         ),
         sources: Sources(
             provider: "oracle-daemon-v2",
