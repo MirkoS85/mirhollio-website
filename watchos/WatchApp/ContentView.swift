@@ -13,6 +13,7 @@ struct ContentView: View {
                 if let status {
                     validatorBlock(status)
                     ftsoBlock(status)
+                    fdcBlock(status)
                     footer(status)
                 } else if isLoading {
                     ProgressView("Loading")
@@ -58,6 +59,10 @@ struct ContentView: View {
                 Text(status.validator.status.capitalized)
                     .foregroundStyle(status.validator.status == "connected" ? .green : .yellow)
                 Spacer()
+                Text(sourceBadge(status.sources?.validator))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
                 Text(StatusFormat.percent(status.validator.fillPct))
                     .fontWeight(.semibold)
             }
@@ -88,6 +93,10 @@ struct ContentView: View {
                 Text(status.summary.ftsoLabel ?? "FTSO")
                     .fontWeight(.semibold)
                 Spacer()
+                Text("FSE live")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
                 Text(status.ftso.status.uppercased())
                     .foregroundStyle(status.ftso.status == "ok" ? .green : .yellow)
             }
@@ -95,11 +104,41 @@ struct ContentView: View {
             Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
                 GridRow {
                     metric("Weight", StatusFormat.compactFLR(status.ftso.weight))
-                    metric("Deleg.", StatusFormat.compactFLR(status.ftso.delegatedWeight))
+                    metric("Avail", StatusFormat.percent(status.ftso.availability))
                 }
                 GridRow {
-                    metric("Stake wt.", StatusFormat.compactFLR(status.ftso.stakingWeight))
+                    metric("Perf", StatusFormat.percent(status.ftso.performance))
                     metric("Fee", feeText(status.ftso.delegationFeeBips))
+                }
+            }
+        }
+        .padding(.vertical, 6)
+    }
+
+    private func fdcBlock(_ status: WatchStatus) -> some View {
+        let fdc = status.fdc
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("FDC")
+                    .fontWeight(.semibold)
+                Spacer()
+                Text(sourceBadge(status.sources?.fdc ?? status.sources?.provider))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(fdc?.conditionMet == false ? "WARN" : "OK")
+                    .foregroundStyle(fdc?.conditionMet == false ? .pink : .green)
+            }
+
+            Grid(alignment: .leading, horizontalSpacing: 10, verticalSpacing: 6) {
+                GridRow {
+                    metric("Avail", StatusFormat.percent(fdc?.availability))
+                    metric("6h", StatusFormat.percent(fdc?.availability6h))
+                }
+                GridRow {
+                    metric("Epoch", StatusFormat.percent(fdc?.participation))
+                    metric("Rounds", roundsText(fdc))
                 }
             }
         }
@@ -132,6 +171,22 @@ struct ContentView: View {
     private func feeText(_ bips: Int?) -> String {
         guard let bips else { return "-" }
         return StatusFormat.percent(Double(bips) / 100)
+    }
+
+    private func roundsText(_ fdc: WatchStatus.FDC?) -> String {
+        guard let rewarded = fdc?.rewardedVotingRounds, let total = fdc?.totalRewardedVotingRounds else {
+            return "-"
+        }
+        return "\(Int(rewarded))/\(Int(total))"
+    }
+
+    private func sourceBadge(_ source: String?) -> String {
+        guard let source else { return "-" }
+        if source.contains("flare-systems-explorer") { return "FSE live" }
+        if source.contains("live-validator") { return "Val live" }
+        if source.contains("live-performance") { return "Perf live" }
+        if source.contains("snapshot") { return "Snapshot" }
+        return "Live"
     }
 
     private func refresh() async {

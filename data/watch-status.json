@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-07-24T21:22:49.470Z",
-  "updatedAt": "2026-07-24T21:22:49.470Z",
+  "generatedAt": "2026-07-24T21:27:32.224Z",
+  "updatedAt": "2026-07-24T21:27:32.224Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -83,9 +83,10 @@
     "totalRewardedVotingRounds": 3360
   },
   "sources": {
-    "provider": "oracle-daemon-v2",
-    "validator": "oracle-daemon-v1",
-    "ftso": "flare-systems-explorer"
+    "provider": "oracle-daemon-v2-live-performance",
+    "fdc": "oracle-daemon-v2-live-performance",
+    "validator": "oracle-daemon-v1-live-validator",
+    "ftso": "flare-systems-explorer-live-signing-policy"
   },
   "warnings": []
 }

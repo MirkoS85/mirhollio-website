@@ -86,6 +86,7 @@ struct WatchStatus: Codable, Equatable {
         let provider: String?
         let validator: String?
         let ftso: String?
+        let fdc: String?
     }
 }
 
@@ -144,9 +145,10 @@ extension WatchStatus {
             totalRewardedVotingRounds: 3360
         ),
         sources: Sources(
-            provider: "oracle-daemon-v2",
-            validator: "oracle-daemon-v1",
-            ftso: "flare-systems-explorer"
+            provider: "oracle-daemon-v2-live-performance",
+            validator: "oracle-daemon-v1-live-validator",
+            ftso: "flare-systems-explorer-live-signing-policy",
+            fdc: "oracle-daemon-v2-live-performance"
         ),
         warnings: []
     )

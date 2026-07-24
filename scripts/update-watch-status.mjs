@@ -205,21 +205,24 @@ async function main() {
 
   try {
     providerPayload = await fetchJson(ENDPOINTS.providersV2);
-    sources.provider = "oracle-daemon-v2";
+    sources.provider = "oracle-daemon-v2-live-performance";
+    sources.fdc = "oracle-daemon-v2-live-performance";
   } catch (error) {
     warnings.push(`Oracle providers v2 failed: ${error.message}`);
     try {
       providerPayload = await fetchJson(ENDPOINTS.providersV1);
-      sources.provider = "oracle-daemon-v1";
+      sources.provider = "oracle-daemon-v1-live-performance";
+      sources.fdc = "oracle-daemon-v1-live-performance";
     } catch (fallbackError) {
       warnings.push(`Oracle providers v1 failed: ${fallbackError.message}`);
       sources.provider = "unavailable";
+      sources.fdc = "unavailable";
     }
   }
 
   try {
     validatorPayload = await fetchJson(ENDPOINTS.validators);
-    sources.validator = "oracle-daemon-v1";
+    sources.validator = "oracle-daemon-v1-live-validator";
   } catch (error) {
     warnings.push(`Oracle validators failed: ${error.message}`);
     sources.validator = "unavailable";
@@ -227,7 +230,7 @@ async function main() {
 
   try {
     explorer = await fetchJson(ENDPOINTS.explorerEntity);
-    sources.ftso = "flare-systems-explorer";
+    sources.ftso = "flare-systems-explorer-live-signing-policy";
   } catch (error) {
     warnings.push(`Flare Systems Explorer failed: ${error.message}`);
     sources.ftso = snapshot ? "local-snapshot" : "unavailable";
