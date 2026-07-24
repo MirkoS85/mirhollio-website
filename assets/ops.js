@@ -343,11 +343,36 @@
     return Math.abs(n) > 1_000_000_000_000 ? n / 1_000_000_000 : n;
   }
 
-  function validatorCapacityStake(latest) {
+  function providerFtsoDirectStake(latest) {
     return chainAmountNumber(latest?.staking?.stakeWithUptime)
       ?? chainAmountNumber(latest?.staking?.stake)
       ?? chainAmountNumber(latest?.staking?.nodes?.[0]?.totalStakeAmount)
       ?? null;
+  }
+
+  function validatorDelegationRows(node) {
+    return Array.isArray(node?.m_axDelegation) ? node.m_axDelegation : [];
+  }
+
+  function validatorDelegationTotal(validator, node) {
+    const rows = validatorDelegationRows(node);
+    const rowTotal = rows.reduce((sum, item) => {
+      const amount = Number(item?.m_dAmount);
+      return Number.isFinite(amount) ? sum + amount : sum;
+    }, 0);
+    if (rowTotal > 0) return rowTotal;
+    const apiTotal = Number(validator?.m_dTotalDelegation ?? state.validatorFallback?.delegated);
+    return Number.isFinite(apiTotal) ? apiTotal : null;
+  }
+
+  function validatorSelfBond(validator, node, latest) {
+    const apiSelfBond = Number(validator?.m_dTotalStake);
+    if (Number.isFinite(apiSelfBond)) return apiSelfBond;
+    const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
+    const stakeAmount = Number(stake?.m_dAmount);
+    if (Number.isFinite(stakeAmount)) return stakeAmount;
+    return chainAmountNumber(latest?.staking?.totalSelfBond)
+      ?? chainAmountNumber(latest?.staking?.nodes?.[0]?.selfBond);
   }
 
   function fmtAge(date) {
@@ -1446,15 +1471,15 @@
 
     const policy = explorer?.denormalizedsigningpolicy || {};
     const policyWeights = ftsoPolicyWeights(explorer, ftsoSnapshot);
-    const policyDirectWeight = policyWeights.stakingWeight;
+    const providerDirectWeight = providerFtsoDirectStake(latest);
+    const policyDirectWeight = policyWeights.stakingWeight ?? providerDirectWeight;
     const policyDelegatedWeight = policyWeights.delegatedWeight;
     const policyTotalWeight = policyWeights.totalWeight ?? (
       Number.isFinite(policyDirectWeight) && Number.isFinite(policyDelegatedWeight)
         ? policyDirectWeight + policyDelegatedWeight
         : null
     );
-    const policySelfBond = policyWeightNumber(validator?.m_dTotalStake)
-      ?? policyWeightNumber(Array.isArray(node?.m_axStake) ? node.m_axStake[0]?.m_dAmount : null);
+    const policySelfBond = validatorSelfBond(validator, node, latest);
     const policyFoundationBoost = Number.isFinite(policyDirectWeight) && Number.isFinite(policySelfBond)
       ? Math.max(0, policyDirectWeight - policySelfBond)
       : null;
@@ -1470,6 +1495,7 @@
     setText("ftsoStakedWeight", Number.isFinite(policyDirectWeight) ? fmtCompact(policyDirectWeight, " FLR") : "-");
     setText("ftsoDelegatedWeight", Number.isFinite(policyDelegatedWeight) ? fmtCompact(policyDelegatedWeight, " FLR") : "-");
     setText("ftsoFoundationBoost", Number.isFinite(policyFoundationBoost) ? fmtCompact(policyFoundationBoost, " FLR") : "-");
+    setText("ftsoStakeInput", Number.isFinite(policyFoundationBoost) ? fmtCompact(policyFoundationBoost, " FLR") : "-");
     setText("ftsoWeightEpoch", policyWeights.epoch != null ? `E${policyWeights.epoch}` : "-");
     setText("ftsoWeightSource", policyWeights.source);
     setText("ftsoPerformance", provider?.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
@@ -1551,6 +1577,7 @@
     setMetricTone("ftsoStakedWeight", "", "Direct FTSO weight from validator self-bond and Flare Foundation boost.");
     setMetricTone("ftsoDelegatedWeight", "", "Delegated WFLR only; this excludes direct staked/boost weight.");
     setMetricTone("ftsoFoundationBoost", "", "Estimated direct boost: staked weight minus validator self-bond.");
+    setMetricTone("ftsoStakeInput", "", "Direct stake input counted with self-bond in FTSO signing-policy weight.");
     setMetricTone("ftsoHitPct", higherIsBetterTone(pctNumber(latest?.ftsoScaling?.hitPercentage), hitOk, 97), `Six-month median ${fmtPct(hitMedian6m)}`);
     setMetricTone("fdcConditionStatus", latest?.fdc?.conditionMet === true ? "ok" : latest?.fdc?.conditionMet === false ? "down" : "warn");
     setMetricTone("stakingCondition", latest?.staking?.conditionMet === true ? "ok" : latest?.staking?.conditionMet === false ? "down" : "warn");
@@ -1586,16 +1613,23 @@
     const timeLeft = Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d ${stake.m_aiTimeLeftDHM[1]}h` : "-";
     const validatorApiTotal = Number(validator?.m_dTotal ?? state.validatorFallback?.stake);
     const validatorApiFreeSpace = Number(validator?.m_dFreeDelegationSpace ?? state.validatorFallback?.freeSpace);
+    const selfBond = validatorSelfBond(validator, node, latest);
+    const delegatedStake = validatorDelegationTotal(validator, node);
     const apiCapacityMax = Number.isFinite(validatorApiTotal) && Number.isFinite(validatorApiFreeSpace)
       ? validatorApiTotal + validatorApiFreeSpace
       : null;
-    const liveCapacity = validatorCapacityStake(latest);
-    const capacity = Number.isFinite(liveCapacity) && liveCapacity > 0 ? liveCapacity : validatorApiTotal;
+    const liveCapacity = providerFtsoDirectStake(latest);
+    const summedCapacity = Number.isFinite(selfBond) && Number.isFinite(delegatedStake)
+      ? selfBond + delegatedStake
+      : null;
+    const capacity = Number.isFinite(validatorApiTotal) && validatorApiTotal > 0
+      ? validatorApiTotal
+      : Number.isFinite(summedCapacity) && summedCapacity > 0
+        ? summedCapacity
+        : liveCapacity;
     const capacityMax = Number.isFinite(apiCapacityMax) && apiCapacityMax > 0 ? apiCapacityMax : 45_000_000;
     const freeSpace = Number.isFinite(capacityMax) && Number.isFinite(capacity) ? Math.max(0, capacityMax - capacity) : validatorApiFreeSpace;
     const capacityPct = capacityMax > 0 ? (capacity / capacityMax) * 100 : 0;
-    const selfBond = Number(validator?.m_dTotalStake ?? stake?.m_dAmount);
-    const delegatedStake = Number.isFinite(capacity) && Number.isFinite(selfBond) ? Math.max(0, capacity - selfBond) : pctNumber(state.validatorFallback?.delegated);
 
     setText("validatorVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "v") : "v-");
     setText("validatorConnected", validatorLooksConnected ? "Connected" : node?.m_bConnected === false ? "Offline" : state.validatorFallback ? `via ${state.validatorFallback.source}` : "-");
@@ -1606,10 +1640,10 @@
     setText("validatorUptime", Number.isFinite(uptimeAvg) ? fmtPct(uptimeAvg) : "-");
     setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
     setText("validatorStake", capacity > 0 ? fmtCompact(capacity, " FLR") : validator?.m_dTotal != null ? fmtCompact(validator.m_dTotal, " FLR") : "-");
-    setText("validatorStakeMeta", timeLeft !== "-" ? `stake ends in ${timeLeft}` : "self + delegation");
+    setText("validatorStakeMeta", timeLeft !== "-" ? `stake ends in ${timeLeft}` : "self + live delegation");
     setText("freeSpace", freeSpace > 0 ? fmtCompact(freeSpace, " FLR") : validator?.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
     setText("selfBond", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "3M FLR");
-    setText("delegatedStake", delegatedStake != null ? fmtCompact(delegatedStake, " FLR") : "-");
+    setText("delegatedStake", Number.isFinite(delegatedStake) ? fmtCompact(delegatedStake, " FLR") : "-");
     setText("stakeEnds", Array.isArray(stake?.m_aiTimeLeftDHM) ? `${stake.m_aiTimeLeftDHM[0]}d` : state.validatorFallback?.endTime ? fmtUntil(state.validatorFallback.endTime) : "-");
     setText("capacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
     setText("capacityPct", `${fmtNum(capacityPct, 1)}%`);

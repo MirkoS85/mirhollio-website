@@ -182,6 +182,55 @@ const MirSFlr = (() => {
       ?? normalizedWeight(latestData?.m_dStakeWeight);
   }
 
+  function validatorDelegationRows(node) {
+    return Array.isArray(node?.m_axDelegation) ? node.m_axDelegation : [];
+  }
+
+  function validatorDelegationTotal(validator, node) {
+    const rows = validatorDelegationRows(node);
+    const rowTotal = rows.reduce((sum, item) => {
+      const amount = Number(item?.m_dAmount);
+      return Number.isFinite(amount) ? sum + amount : sum;
+    }, 0);
+    if (rowTotal > 0) return rowTotal;
+    const apiTotal = Number(validator?.m_dTotalDelegation);
+    return Number.isFinite(apiTotal) ? apiTotal : null;
+  }
+
+  function validatorSelfBond(validator, node) {
+    const apiSelfBond = Number(validator?.m_dTotalStake);
+    if (Number.isFinite(apiSelfBond)) return apiSelfBond;
+    const stake = Array.isArray(node?.m_axStake) ? node.m_axStake[0] : null;
+    const stakeAmount = Number(stake?.m_dAmount);
+    if (Number.isFinite(stakeAmount)) return stakeAmount;
+    return chainAmountNumber(latestData?.staking?.totalSelfBond)
+      ?? chainAmountNumber(latestData?.staking?.nodes?.[0]?.selfBond);
+  }
+
+  function ftsoDirectStakeWeight() {
+    const policy = ftsoEntityData?.denormalizedsigningpolicy || {};
+    const weights = ftsoSnapshotData?.weights || {};
+    const policyDirect = normalizedWeight(policy.staking_weight ?? weights.stakingWeight ?? weights.staking_weight);
+    if (Number.isFinite(policyDirect)) return policyDirect;
+    return chainAmountNumber(latestData?.staking?.stakeWithUptime)
+      ?? chainAmountNumber(latestData?.staking?.stake)
+      ?? chainAmountNumber(latestData?.staking?.nodes?.[0]?.totalStakeAmount)
+      ?? normalizedWeight(latestData?.m_dStakeWeight);
+  }
+
+  function ftsoStakeInput(selfBond) {
+    const directWeight = ftsoDirectStakeWeight();
+    if (!Number.isFinite(directWeight) || !Number.isFinite(selfBond)) return null;
+    return Math.max(0, directWeight - selfBond);
+  }
+
+  function refreshFtsoStakeInputField() {
+    const node = Array.isArray(validatorData?.m_axNode) ? validatorData.m_axNode[0] : null;
+    const selfBond = validatorSelfBond(validatorData, node);
+    const stakeInput = ftsoStakeInput(selfBond);
+    setText("ftsoStakeInput", Number.isFinite(stakeInput) ? fmtCompact(stakeInput, " FLR") : "-");
+  }
+
   function shortAddr(addr) {
     if (!addr) return "-";
     const s = String(addr);
@@ -1131,6 +1180,7 @@ const MirSFlr = (() => {
       setText("ftsoFeeSnapshot", `${fmtNum(Number(feeBips) / 100, 2)}%`);
     }
     if (Number.isFinite(epoch)) setText("ftsoWeightEpoch", epoch);
+    refreshFtsoStakeInputField();
   }
 
   async function loadFtsoSnapshot() {
@@ -2294,6 +2344,7 @@ const MirSFlr = (() => {
     monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
     renderMonthlyRewards();
     setText("selfBond", latest?.staking?.totalSelfBond != null ? fmtChainAmount(latest.staking.totalSelfBond) : "-");
+    refreshFtsoStakeInputField();
     setText("stakedFlr", latest?.staking?.stakeWithUptime != null ? fmtChainAmount(latest.staking.stakeWithUptime) : latest?.staking?.stake != null ? fmtChainAmount(latest.staking.stake) : "-");
     setText("latestEpoch", latest?.epoch ?? "-");
     setText("latestReward", latest?.totalRewardAmount != null ? `${fmtNum(latest.totalRewardAmount, 2)} FLR` : "-");
@@ -2342,13 +2393,21 @@ const MirSFlr = (() => {
     const stakeEnd = stake?.m_xTimeEnd ? new Date(stake.m_xTimeEnd).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "-";
     const validatorApiTotal = Number(validator.m_dTotal);
     const validatorApiFreeSpace = Number(validator.m_dFreeDelegationSpace);
+    const selfBond = validatorSelfBond(validator, node);
+    const delegationTotal = validatorDelegationTotal(validator, node);
+    const stakeInput = ftsoStakeInput(selfBond);
     const apiCapacityMax = Number.isFinite(validatorApiTotal) && Number.isFinite(validatorApiFreeSpace)
       ? validatorApiTotal + validatorApiFreeSpace
       : null;
     const liveCapacity = latestValidatorCapacityStake();
-    const capacity = Number.isFinite(liveCapacity) && liveCapacity > 0
-      ? liveCapacity
-      : validatorApiTotal;
+    const summedCapacity = Number.isFinite(selfBond) && Number.isFinite(delegationTotal)
+      ? selfBond + delegationTotal
+      : null;
+    const capacity = Number.isFinite(validatorApiTotal) && validatorApiTotal > 0
+      ? validatorApiTotal
+      : Number.isFinite(summedCapacity) && summedCapacity > 0
+        ? summedCapacity
+        : liveCapacity;
     const capacityMax = Number.isFinite(apiCapacityMax) && apiCapacityMax > 0
       ? apiCapacityMax
       : 45_000_000;
@@ -2371,10 +2430,12 @@ const MirSFlr = (() => {
     renderMonthlyRewards();
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
     setText("validatorTotal", Number.isFinite(capacity) ? fmtCompact(capacity, " FLR") : "-");
-    setText("validatorStake", validator.m_dTotalStake != null ? fmtCompact(validator.m_dTotalStake, " FLR") : "-");
-    setText("validatorDelegation", validator.m_dTotalDelegation != null ? fmtCompact(validator.m_dTotalDelegation, " FLR") : "-");
+    setText("validatorStake", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");
+    setText("selfBond", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");
+    setText("ftsoStakeInput", Number.isFinite(stakeInput) ? fmtCompact(stakeInput, " FLR") : "-");
+    setText("validatorDelegation", Number.isFinite(delegationTotal) ? fmtCompact(delegationTotal, " FLR") : "-");
     setText("freeDelegationSpace", validator.m_dFreeDelegationSpace != null ? fmtCompact(validator.m_dFreeDelegationSpace, " FLR") : "-");
-    setText("stakeDelegation", `${fmtCompact(validator.m_dTotalStake, "")} / ${fmtCompact(validator.m_dTotalDelegation, "")}`);
+    setText("stakeDelegation", `${fmtCompact(selfBond, "")} / ${fmtCompact(delegationTotal, "")}`);
     setText("validatorCapacityText", capacityMax > 0 ? `${fmtCompact(capacity, "")} / ${fmtCompact(capacityMax, " FLR")}` : "-");
     setText("validatorCapacityPct", Number.isFinite(capacityPct) ? `${fmtNum(capacityPct, 1)}% full` : "-");
     setText("validatorTimeLeftPct", Number.isFinite(leftPct) ? `${fmtNum(leftPct, 1)}% of staking period left` : "-");
@@ -2411,6 +2472,7 @@ const MirSFlr = (() => {
     if (policy.reward_epoch != null) setText("ftsoWeightEpoch", policy.reward_epoch);
     if (fee != null) setText("ftsoFee", `${fmtNum(Number(fee) / 100, 2)}%`);
     if (fee != null) setText("ftsoFeeSnapshot", `${fmtNum(Number(fee) / 100, 2)}%`);
+    refreshFtsoStakeInputField();
   }
 
   function applyProviderV2Data(data) {

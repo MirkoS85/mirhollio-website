@@ -301,25 +301,26 @@
           <article>
             <span>Validator stake</span>
             <strong data-field="validatorStake">-</strong>
-            <small>self-bond capacity</small>
-          </article>
-          <article>
-            <span>FTSO staked weight</span>
-            <strong data-field="ftsoStakedWeight">-</strong>
-            <small>self-bond + FF boost</small>
-          </article>
-          <article>
-            <span>FF boost</span>
-            <strong data-field="ftsoFoundationBoost">-</strong>
-            <small>direct FTSO weight</small>
-          </article>
-          <article>
-            <span>Free space</span>
-            <strong data-field="freeSpace">-</strong>
+            <small>live total / 90M</small>
           </article>
           <article>
             <span>Self-bond</span>
             <strong data-field="selfBond">3M FLR</strong>
+            <small>operator stake</small>
+          </article>
+          <article>
+            <span>Stake input</span>
+            <strong data-field="ftsoStakeInput">-</strong>
+            <small>Flare Foundation</small>
+          </article>
+          <article>
+            <span>Live delegation</span>
+            <strong data-field="delegatedStake">-</strong>
+            <small>validator API</small>
+          </article>
+          <article>
+            <span>Free space</span>
+            <strong data-field="freeSpace">-</strong>
           </article>
           <article>
             <span>Ends in</span>
@@ -334,10 +335,10 @@
             <div class="capacity-track"><i data-bar="stakeCapacity"></i></div>
             <div class="stake-breakdown">
               <span>Self-bond <b data-field="selfBond">3M FLR</b></span>
-              <span>FF boost <b data-field="ftsoFoundationBoost">-</b></span>
+              <span>Stake input <b data-field="ftsoStakeInput">-</b></span>
+              <span>Live delegation <b data-field="delegatedStake">-</b></span>
               <span>FTSO direct <b data-field="ftsoStakedWeight">-</b></span>
-              <span>Total FTSO <b data-field="ftsoPolicyWeight">-</b></span>
-              <span>Delegated <b data-field="delegatedStake">-</b></span>
+              <span>Total stake <b data-field="validatorStake">-</b></span>
               <span>Free <b data-field="freeSpace">-</b></span>
             </div>
           </div>
@@ -386,6 +387,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-36"></script>
+  <script src="../assets/ops.js?v=ops-37"></script>
 </body>
 </html>
