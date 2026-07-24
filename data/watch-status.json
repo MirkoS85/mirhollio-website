@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-07-24T19:59:23.221Z",
-  "updatedAt": "2026-07-24T19:59:23.221Z",
+  "generatedAt": "2026-07-24T21:20:13.565Z",
+  "updatedAt": "2026-07-24T21:20:13.565Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "99.6% full",
+    "validatorLabel": "100.0% full",
     "ftsoLabel": "FTSO E418"
   },
   "validator": {
     "status": "connected",
-    "stake": 89663081,
+    "stake": 89993340,
     "capacity": 90000000,
-    "fillPct": 99.6256,
-    "free": 336919,
-    "delegation": 83663081,
+    "fillPct": 99.9926,
+    "free": 6660,
+    "delegation": 83993340,
     "selfBond": 6000000,
-    "delegationCount": 12,
+    "delegationCount": 13,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
