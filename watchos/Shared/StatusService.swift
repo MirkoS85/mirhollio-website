@@ -4,7 +4,8 @@ enum StatusServiceError: Error {
     case badResponse
 }
 
-actor StatusService {
+@MainActor
+final class StatusService {
     static let shared = StatusService()
 
     private let statusURL = URL(string: "https://www.mirhollio.com/data/watch-status.json")!
