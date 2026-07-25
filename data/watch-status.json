@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-07-24T23:36:31.287Z",
-  "updatedAt": "2026-07-24T23:36:31.287Z",
+  "generatedAt": "2026-07-25T01:06:30.008Z",
+  "updatedAt": "2026-07-25T01:06:30.008Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -74,9 +74,9 @@
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9789671361502348,
-    "availability6h": 0.9827630797367638,
-    "availability24h": 0.9809992538825835,
+    "availability": 0.9785314685314686,
+    "availability6h": 0.9754298495526567,
+    "availability24h": 0.9751524622632078,
     "participation": 92.5,
     "conditionMet": true,
     "rewardedVotingRounds": 3108,
