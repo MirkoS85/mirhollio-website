@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T04:07:15.882Z",
+  "generatedAt": "2026-07-27T07:56:03.798Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -11,12 +11,12 @@
   "warnings": [],
   "failedDelegatorEpochs": [],
   "insights": {
-    "latestEpoch": 418,
-    "latestDelegated": 103643.59725070628,
-    "latestDelta": -235353567.45950618,
-    "latestDelegators": 3,
-    "whaleConcentrationPct": 59.15788007635898,
-    "largestWallet": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
+    "latestEpoch": 419,
+    "latestDelegated": 221258.1570538897,
+    "latestDelta": 117614.55980318342,
+    "latestDelegators": 6,
+    "whaleConcentrationPct": 46.23956103484768,
+    "largestWallet": "0xa3141269c7e38829e702cc5f59e5fb9578a09262",
     "largestMove": {
       "epoch": 409,
       "delta": -264955347.31377077,
@@ -24,11 +24,11 @@
     }
   },
   "weights": {
-    "epoch": 418,
-    "totalWeight": 21463183.597250707,
-    "delegatedWeight": 103643.59725070628,
-    "cappedDelegatedWeight": 103643.59725070628,
-    "stakingWeight": 21359539.999999996,
+    "epoch": 419,
+    "totalWeight": 90214602.5570539,
+    "delegatedWeight": 221258.1570538897,
+    "cappedDelegatedWeight": 221258.1570538897,
+    "stakingWeight": 89993344.4,
     "feeBips": 2000,
     "source": "flare-systems-explorer"
   },
@@ -344,43 +344,85 @@
       "timestamp": 1784782782000,
       "delegated": 103643.59725070628,
       "delegators": 3
+    },
+    {
+      "epoch": 419,
+      "timestamp": 1785072959000,
+      "delegated": 221258.1570538897,
+      "delegators": 6
     }
   ],
   "delegators": [
     {
+      "from": "0xa3141269c7e38829e702cc5f59e5fb9578a09262",
+      "amount": 102308.80057551248,
+      "share": 46.23956103484768,
+      "firstSeen": 1785065816000,
+      "lastSeen": 1785065816000,
+      "firstEpoch": 419,
+      "lastEpoch": 419,
+      "eventEpoch": 419,
+      "delta": null,
+      "hasPriorSnapshot": false
+    },
+    {
       "from": "0x9b3173b90dd9db94ffecb9ada2108db47f9309af",
-      "amount": 61313.35496839732,
-      "share": 59.15788007635898,
+      "amount": 61326.25597376738,
+      "share": 27.717059922374176,
       "firstSeen": 1776878866000,
-      "lastSeen": 1784577600000,
+      "lastSeen": 1784910618000,
       "firstEpoch": 392,
-      "lastEpoch": 418,
-      "eventEpoch": 418,
-      "delta": 55.48950330983644,
+      "lastEpoch": 419,
+      "eventEpoch": 419,
+      "delta": 12.901005370062194,
       "hasPriorSnapshot": true
     },
     {
       "from": "0xa7fd33f85cf752919213c836a144f22906823869",
       "amount": 41880.24228230896,
-      "share": 40.4079397022507,
+      "share": 18.92822521888248,
       "firstSeen": 1768407972000,
       "lastSeen": 1784185948000,
       "firstEpoch": 367,
-      "lastEpoch": 418,
+      "lastEpoch": 419,
       "eventEpoch": 417,
       "delta": 0,
       "hasPriorSnapshot": true
     },
     {
+      "from": "0xc757c022f2eaf4adba3bb320897cf319e0b5eed7",
+      "amount": 15207.84128881147,
+      "share": 6.873347175673819,
+      "firstSeen": 1785043177000,
+      "lastSeen": 1785043177000,
+      "firstEpoch": 419,
+      "lastEpoch": 419,
+      "eventEpoch": 419,
+      "delta": null,
+      "hasPriorSnapshot": false
+    },
+    {
       "from": "0xd408546b600d7f3ec3dce6adab1ee888f18ad75a",
       "amount": 450,
-      "share": 0.43418022139031215,
+      "share": 0.20338233220047924,
       "firstSeen": 1756463057000,
       "lastSeen": 1756463057000,
       "firstEpoch": 367,
-      "lastEpoch": 418,
+      "lastEpoch": 419,
       "eventEpoch": 325,
       "delta": 0,
+      "hasPriorSnapshot": true
+    },
+    {
+      "from": "0xa6943aced3adb657f5ec7f358e3c04d40c7f7457",
+      "amount": 85.01693348942963,
+      "share": 0.03842431602136272,
+      "firstSeen": 1772638918000,
+      "lastSeen": 1784909623000,
+      "firstEpoch": 378,
+      "lastEpoch": 419,
+      "eventEpoch": 419,
+      "delta": -607.9320759836924,
       "hasPriorSnapshot": true
     }
   ]
