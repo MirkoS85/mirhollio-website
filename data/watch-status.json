@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-07-30T19:02:46.648Z",
-  "updatedAt": "2026-07-30T19:02:46.648Z",
+  "generatedAt": "2026-07-30T20:20:49.614Z",
+  "updatedAt": "2026-07-30T20:20:49.614Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -10,7 +10,7 @@
   },
   "summary": {
     "validatorLabel": "100.0% full",
-    "ftsoLabel": "FTSO E419"
+    "ftsoLabel": "FTSO E420"
   },
   "validator": {
     "status": "connected",
@@ -58,25 +58,25 @@
   "ftso": {
     "status": "ok",
     "latestCompletedEpoch": 418,
-    "signingPolicyEpoch": 419,
-    "weight": 90214602.5570539,
-    "delegatedWeight": 221258.1570538897,
-    "cappedDelegatedWeight": 221258.1570538897,
+    "signingPolicyEpoch": 420,
+    "weight": 95462751.8873912,
+    "delegatedWeight": 5469407.4873911925,
+    "cappedDelegatedWeight": 5469407.4873911925,
     "stakingWeight": 89993344.4,
     "delegationFeeBips": 2000,
     "rewardRate": 2.866293464078475,
-    "performance": 0.7583414932987853,
-    "primaryPerformance": 0.5032263248017756,
-    "secondaryPerformance": 0.9284182722967917,
+    "performance": 0.7751412429378531,
+    "primaryPerformance": 0.5157384987893463,
+    "secondaryPerformance": 0.9480764057035244,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9806713381555153,
-    "availability6h": 0.9725397360923677,
-    "availability24h": 0.9781578164884085,
+    "availability": 0.9846045197740113,
+    "availability6h": 0.971407632328685,
+    "availability24h": 0.9781931205834713,
     "participation": 93.03571428571429,
     "conditionMet": true,
     "rewardedVotingRounds": 3126,
