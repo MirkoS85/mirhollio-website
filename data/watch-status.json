@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-07T15:26:55.970Z",
-  "updatedAt": "2026-08-07T15:26:55.970Z",
+  "generatedAt": "2026-08-07T16:22:42.557Z",
+  "updatedAt": "2026-08-07T16:22:42.557Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "99.8% full",
+    "validatorLabel": "88.1% full",
     "ftsoLabel": "FTSO E422"
   },
   "validator": {
     "status": "connected",
-    "stake": 89860598,
+    "stake": 79245208,
     "capacity": 90000000,
-    "fillPct": 99.8451,
-    "free": 139402,
-    "delegation": 83860598,
+    "fillPct": 88.0502,
+    "free": 10754792,
+    "delegation": 73245208,
     "selfBond": 6000000,
-    "delegationCount": 11,
+    "delegationCount": 10,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -28,12 +28,6 @@
         "amount": 15000000,
         "start": "2026-07-20T19:50:40Z",
         "end": "2026-10-19T10:00:00Z"
-      },
-      {
-        "address": null,
-        "amount": 10615390,
-        "start": "2026-07-24T15:21:55Z",
-        "end": "2026-08-07T15:26:00Z"
       },
       {
         "address": null,
@@ -52,6 +46,12 @@
         "amount": 10000000,
         "start": "2026-08-07T11:17:39Z",
         "end": "2026-08-21T11:32:11Z"
+      },
+      {
+        "address": null,
+        "amount": 10000000,
+        "start": "2026-08-07T11:18:40Z",
+        "end": "2026-08-22T11:33:14Z"
       }
     ]
   },
@@ -65,18 +65,18 @@
     "stakingWeight": 89993344.4,
     "delegationFeeBips": 2000,
     "rewardRate": 1.793721959780885,
-    "performance": 0.7639141086611904,
-    "primaryPerformance": 0.5015028925534762,
-    "secondaryPerformance": 0.9388549193996665,
+    "performance": 0.7641948985232567,
+    "primaryPerformance": 0.5013721077153913,
+    "secondaryPerformance": 0.939410092395167,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9753535915014514,
-    "availability6h": 0.9540025566341356,
-    "availability24h": 0.9701670692866512,
+    "availability": 0.9757433072731581,
+    "availability6h": 0.9772130647130647,
+    "availability24h": 0.9760733120678942,
     "participation": 91.16071428571429,
     "conditionMet": true,
     "rewardedVotingRounds": 3063,
