@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-07T09:40:40.138Z",
-  "updatedAt": "2026-08-07T09:40:40.138Z",
+  "generatedAt": "2026-08-07T10:32:15.164Z",
+  "updatedAt": "2026-08-07T10:32:15.164Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "88.9% full",
+    "validatorLabel": "100.0% full",
     "ftsoLabel": "FTSO E422"
   },
   "validator": {
     "status": "connected",
-    "stake": 79993341,
+    "stake": 89993341,
     "capacity": 90000000,
-    "fillPct": 88.8815,
-    "free": 10006659,
-    "delegation": 73993341,
+    "fillPct": 99.9926,
+    "free": 6659,
+    "delegation": 83993341,
     "selfBond": 6000000,
-    "delegationCount": 12,
+    "delegationCount": 13,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -57,29 +57,29 @@
   },
   "ftso": {
     "status": "ok",
-    "latestCompletedEpoch": 420,
+    "latestCompletedEpoch": 421,
     "signingPolicyEpoch": 422,
     "weight": 93698476.52924566,
     "delegatedWeight": 3705132.1292456686,
     "cappedDelegatedWeight": 3705132.1292456686,
     "stakingWeight": 89993344.4,
     "delegationFeeBips": 2000,
-    "rewardRate": 1.7752539439641357,
-    "performance": 0.762649704887972,
-    "primaryPerformance": 0.5013466277004183,
-    "secondaryPerformance": 0.9368517563463412,
+    "rewardRate": 1.793721959780885,
+    "performance": 0.7628890511343663,
+    "primaryPerformance": 0.5012033206241042,
+    "secondaryPerformance": 0.9373462048078743,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9737020801100223,
-    "availability6h": 0.970495526855176,
-    "availability24h": 0.9682345632455281,
-    "participation": 91.48809523809524,
+    "availability": 0.97461263892269,
+    "availability6h": 0.9552068500204465,
+    "availability24h": 0.9700039967912776,
+    "participation": 91.16071428571429,
     "conditionMet": true,
-    "rewardedVotingRounds": 3074,
+    "rewardedVotingRounds": 3063,
     "totalRewardedVotingRounds": 3360
   },
   "sources": {
