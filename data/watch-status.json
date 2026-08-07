@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-07T10:32:15.164Z",
-  "updatedAt": "2026-08-07T10:32:15.164Z",
+  "generatedAt": "2026-08-07T11:24:55.034Z",
+  "updatedAt": "2026-08-07T11:24:55.034Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -14,11 +14,11 @@
   },
   "validator": {
     "status": "connected",
-    "stake": 89993341,
+    "stake": 89999997,
     "capacity": 90000000,
-    "fillPct": 99.9926,
-    "free": 6659,
-    "delegation": 83993341,
+    "fillPct": 100,
+    "free": 3,
+    "delegation": 83999997,
     "selfBond": 6000000,
     "delegationCount": 13,
     "stakeEnd": "2026-10-19T10:00:00Z",
@@ -38,20 +38,20 @@
       {
         "address": null,
         "amount": 10000000,
-        "start": "2026-07-24T10:53:11Z",
-        "end": "2026-08-07T11:08:09Z"
+        "start": "2026-08-07T09:55:14Z",
+        "end": "2026-08-22T10:09:44Z"
       },
       {
         "address": null,
         "amount": 10000000,
-        "start": "2026-07-24T10:54:11Z",
-        "end": "2026-08-07T11:09:08Z"
+        "start": "2026-08-07T11:16:41Z",
+        "end": "2026-08-22T11:31:08Z"
       },
       {
         "address": null,
         "amount": 10000000,
-        "start": "2026-07-24T10:55:10Z",
-        "end": "2026-08-07T11:10:08Z"
+        "start": "2026-08-07T11:17:39Z",
+        "end": "2026-08-21T11:32:11Z"
       }
     ]
   },
@@ -65,18 +65,18 @@
     "stakingWeight": 89993344.4,
     "delegationFeeBips": 2000,
     "rewardRate": 1.793721959780885,
-    "performance": 0.7628890511343663,
-    "primaryPerformance": 0.5012033206241042,
-    "secondaryPerformance": 0.9373462048078743,
+    "performance": 0.7628059395801331,
+    "primaryPerformance": 0.5011392729134665,
+    "secondaryPerformance": 0.9372503840245776,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.97461263892269,
-    "availability6h": 0.9552068500204465,
-    "availability24h": 0.9700039967912776,
+    "availability": 0.9750230414746544,
+    "availability6h": 0.9532289832125359,
+    "availability24h": 0.9696501443335322,
     "participation": 91.16071428571429,
     "conditionMet": true,
     "rewardedVotingRounds": 3063,
