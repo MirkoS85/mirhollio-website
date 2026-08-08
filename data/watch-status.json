@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-08T18:57:42.851Z",
-  "updatedAt": "2026-08-08T18:57:42.851Z",
+  "generatedAt": "2026-08-08T19:27:17.883Z",
+  "updatedAt": "2026-08-08T19:27:17.883Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "90.9% full",
+    "validatorLabel": "91.3% full",
     "ftsoLabel": "FTSO E422"
   },
   "validator": {
     "status": "connected",
-    "stake": 81853763,
+    "stake": 82213303,
     "capacity": 90000000,
-    "fillPct": 90.9486,
-    "free": 8146237,
-    "delegation": 75853763,
+    "fillPct": 91.3481,
+    "free": 7786697,
+    "delegation": 76213303,
     "selfBond": 6000000,
-    "delegationCount": 16,
+    "delegationCount": 17,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -65,18 +65,18 @@
     "stakingWeight": 89993344.4,
     "delegationFeeBips": 2000,
     "rewardRate": 1.793721959780885,
-    "performance": 0.7642733642733642,
-    "primaryPerformance": 0.5035035035035035,
-    "secondaryPerformance": 0.9381199381199381,
+    "performance": 0.7643144929204558,
+    "primaryPerformance": 0.5034918076819769,
+    "secondaryPerformance": 0.9381962830794418,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9775657269559709,
-    "availability6h": 0.9842999950017494,
-    "availability24h": 0.9799925773161712,
+    "availability": 0.9774462197159566,
+    "availability6h": 0.982995017863439,
+    "availability24h": 0.979400207031786,
     "participation": 91.16071428571429,
     "conditionMet": true,
     "rewardedVotingRounds": 3063,
