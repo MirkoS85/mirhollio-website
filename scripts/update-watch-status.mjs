@@ -84,6 +84,11 @@ function recentAverage(values, hours) {
   return slice.reduce((sum, value) => sum + value, 0) / slice.length;
 }
 
+function recentSeries(values, hours) {
+  if (!Array.isArray(values) || !values.length) return [];
+  return values.slice(-hours).map(numberOrNull).filter(value => value != null);
+}
+
 function findDeep(root, predicate) {
   const stack = [root];
   const seen = new Set();
@@ -304,13 +309,15 @@ async function main() {
       secondaryPerformance: numberOrNull(provider?.ftsoPerformance?.performance2),
       availability: numberOrNull(provider?.ftsoPerformance?.availability ?? latest?.ftsoPerformance?.availability),
       availability6h: recentAverage(ftsoAvailabilityHours, 6),
-      availability24h: recentAverage(ftsoAvailabilityHours, 24)
+      availability24h: recentAverage(ftsoAvailabilityHours, 24),
+      availabilityHourly24h: recentSeries(ftsoAvailabilityHours, 24)
     },
     fdc: {
       status: latest?.fdc?.conditionMet === false ? "warn" : provider?.fdcPerformance ? "ok" : "unknown",
       availability: numberOrNull(provider?.fdcPerformance?.availability),
       availability6h: recentAverage(fdcAvailabilityHours, 6),
       availability24h: recentAverage(fdcAvailabilityHours, 24),
+      availabilityHourly24h: recentSeries(fdcAvailabilityHours, 24),
       participation: numberOrNull(latest?.fdc?.participationPercentage),
       conditionMet: latest?.fdc?.conditionMet ?? null,
       rewardedVotingRounds: numberOrNull(latest?.fdc?.rewardedVotingRounds),
