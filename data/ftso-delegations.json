@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T17:15:57.146Z",
+  "generatedAt": "2026-08-11T21:07:01.488Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -33,12 +33,6 @@
     "source": "flare-systems-explorer"
   },
   "history": [
-    {
-      "epoch": 371,
-      "timestamp": 1770547447000,
-      "delegated": 487548633.63455915,
-      "delegators": 7
-    },
     {
       "epoch": 372,
       "timestamp": 1770888008000,
@@ -563,7 +557,7 @@
       "share": 0.012662933200596239,
       "firstSeen": 1756463057000,
       "lastSeen": 1756463057000,
-      "firstEpoch": 371,
+      "firstEpoch": 372,
       "lastEpoch": 423,
       "eventEpoch": 325,
       "delta": 0,
@@ -597,9 +591,9 @@
       "from": "0xa7fd33f85cf752919213c836a144f22906823869",
       "amount": 0.002958529363435737,
       "share": 8.325257711375389e-8,
-      "firstSeen": 1770116646000,
+      "firstSeen": 1770797285000,
       "lastSeen": 1785617671000,
-      "firstEpoch": 371,
+      "firstEpoch": 372,
       "lastEpoch": 423,
       "eventEpoch": 422,
       "delta": 0,
