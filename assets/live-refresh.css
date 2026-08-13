@@ -4738,3 +4738,79 @@ tbody tr:hover td{
     min-width:0;
   }
 }
+
+/* ===== Mobile FTSO delegation: 2 compact real tables (override card layout) =====
+   Scoped under .table-wrap-compact for specificity (0,2,x) to beat per-cell card rules. */
+@media (max-width:620px){
+  .ftso-delegation-card .table-wrap-compact{
+    overflow-x:auto !important; -webkit-overflow-scrolling:touch;
+    background:rgba(255,255,255,.82) !important;
+    border:1px solid rgba(217,63,132,.12) !important;
+    border-radius:16px !important;
+    box-shadow:0 12px 24px rgba(124,67,93,.05) !important;
+    padding:2px 12px !important; margin:0 14px 18px !important;
+  }
+  .table-wrap-compact table.ftso-delegation-table,
+  .table-wrap-compact table.ftso-delegator-table{
+    display:table !important; width:100% !important; min-width:0 !important;
+    border-collapse:collapse !important; font-size:12.5px !important;
+  }
+  .table-wrap-compact .ftso-delegation-table thead,
+  .table-wrap-compact .ftso-delegator-table thead{ display:table-header-group !important; }
+  .table-wrap-compact .ftso-delegation-table tbody,
+  .table-wrap-compact .ftso-delegator-table tbody{ display:table-row-group !important; gap:0 !important; }
+  .table-wrap-compact .ftso-delegation-table tbody tr,
+  .table-wrap-compact .ftso-delegator-table tbody tr{
+    display:table-row !important; grid-template-columns:none !important; grid-template-areas:none !important;
+    padding:0 !important; border:0 !important; border-bottom:1px solid rgba(217,63,132,.10) !important;
+    border-radius:0 !important; background:transparent !important; box-shadow:none !important;
+  }
+  .table-wrap-compact .ftso-delegation-table th,
+  .table-wrap-compact .ftso-delegation-table td,
+  .table-wrap-compact .ftso-delegator-table th,
+  .table-wrap-compact .ftso-delegator-table td{
+    display:table-cell !important; grid-area:auto !important; width:auto !important; height:auto !important;
+    min-width:0 !important; padding:9px 6px !important; border:0 !important; text-align:right !important;
+    white-space:nowrap !important; vertical-align:middle !important; justify-content:flex-end;
+    font-size:12.5px !important; font-weight:700;
+  }
+  .table-wrap-compact .ftso-delegation-table th:first-child,
+  .table-wrap-compact .ftso-delegation-table td:first-child,
+  .table-wrap-compact .ftso-delegator-table th:first-child,
+  .table-wrap-compact .ftso-delegator-table td:first-child{ text-align:left !important; }
+  .table-wrap-compact .ftso-delegation-table thead th,
+  .table-wrap-compact .ftso-delegator-table thead th{
+    font-size:10px !important; letter-spacing:.05em !important; text-transform:uppercase !important;
+    color:#9a8992 !important; background:transparent !important; font-weight:800 !important;
+    padding:8px 6px !important; border-bottom:1px solid rgba(217,63,132,.14) !important;
+  }
+  .table-wrap-compact .ftso-delegation-table th::before,
+  .table-wrap-compact .ftso-delegation-table td::before,
+  .table-wrap-compact .ftso-delegator-table th::before,
+  .table-wrap-compact .ftso-delegator-table td::before{ content:none !important; display:none !important; }
+  .table-wrap-compact .ftso-delegation-table .mobile-field-label,
+  .table-wrap-compact .ftso-delegator-table .mobile-field-label{ display:none !important; }
+  .table-wrap-compact .ftso-delegator-table th[data-label="#"]{
+    width:auto !important; height:auto !important; padding:9px 6px !important; border-radius:0 !important;
+    background:transparent !important; color:#9a8992 !important; font-size:12.5px !important;
+    font-weight:800 !important; display:table-cell !important; place-items:initial !important;
+  }
+  .table-wrap-compact .ftso-delegator-table td[data-label="Amount"],
+  .table-wrap-compact .ftso-delegator-table td[data-label="Share"]{ font-size:12.5px !important; font-weight:800 !important; color:var(--ink); }
+  /* Table 1 (epoch): keep Epoch, Delta, Delegators — hide Date/Delegated/% */
+  .table-wrap-compact .ftso-delegation-table th:nth-child(2),
+  .table-wrap-compact .ftso-delegation-table td:nth-child(2),
+  .table-wrap-compact .ftso-delegation-table th:nth-child(3),
+  .table-wrap-compact .ftso-delegation-table td:nth-child(3),
+  .table-wrap-compact .ftso-delegation-table th:nth-child(5),
+  .table-wrap-compact .ftso-delegation-table td:nth-child(5){ display:none !important; }
+  /* Table 2 (wallets): keep #, Delegator, Amount, Share — hide First/Last/Known delta */
+  .table-wrap-compact .ftso-delegator-table th:nth-child(5),
+  .table-wrap-compact .ftso-delegator-table td:nth-child(5),
+  .table-wrap-compact .ftso-delegator-table th:nth-child(6),
+  .table-wrap-compact .ftso-delegator-table td:nth-child(6),
+  .table-wrap-compact .ftso-delegator-table th:nth-child(7),
+  .table-wrap-compact .ftso-delegator-table td:nth-child(7){ display:none !important; }
+  .table-wrap-compact .ftso-delegator-table td:nth-child(2){ text-align:left !important; max-width:42vw; overflow:hidden; text-overflow:ellipsis; }
+  .table-wrap-compact .ftso-delegator-table td:nth-child(2) .delegator-address{ max-width:42vw; }
+}

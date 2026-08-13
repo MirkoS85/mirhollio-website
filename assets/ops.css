@@ -583,6 +583,17 @@ h2{
   white-space:nowrap;
 }
 
+/* Validator column: long "90.00M FLR" values were clipping — allow fit/wrap */
+.validator-table strong{
+  font-size:clamp(16px,4.3vw,22px);
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.05;
+}
+.stake-breakdown b{
+  overflow-wrap:anywhere;
+}
+
 [data-metric-tone="ok"]{
   color:var(--green) !important;
 }

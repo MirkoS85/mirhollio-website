@@ -1782,10 +1782,17 @@
 
     // ââ NEW: Fire supplementary fetches in parallel (non-blocking) ââââââââââââ
     // These enrich the page but don't block the initial render
+    const needEpochFallback = !networkInfo(providerPayload);
+    const needValidatorFallback = !validator;
+    // Flare Metrics is a fallback-only source; if primary Oracle Daemon data is healthy
+    // it is never queried, so mark it idle instead of leaving it stuck on "loading".
+    if (!needEpochFallback && !needValidatorFallback && state.sources.flareMetrics === "loading") {
+      state.sources.flareMetrics = "idle";
+    }
     Promise.allSettled([
       fetchWalletBalances(provider),
-      !networkInfo(providerPayload) ? fetchEpochFallback() : Promise.resolve(),
-      !validator ? fetchValidatorFallback() : Promise.resolve()
+      needEpochFallback ? fetchEpochFallback() : Promise.resolve(),
+      needValidatorFallback ? fetchValidatorFallback() : Promise.resolve()
     ]).then(() => {
       // Re-render with enriched data once supplementary sources return
       applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload);
