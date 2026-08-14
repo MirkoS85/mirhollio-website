@@ -19,7 +19,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="../assets/ops.css?v=ops-36">
+  <link rel="stylesheet" href="../assets/ops.css?v=ops-37">
 </head>
 <body>
   <main class="ops-shell">
@@ -74,6 +74,26 @@
         <strong data-field="nodeStatus">...</strong>
         <small data-field="nodeStatusMeta">self health</small>
       </article>
+    </section>
+
+    <section class="infra-card" id="infra-health" data-infra-state="loading" aria-label="Background infra monitor">
+      <div class="infra-head">
+        <div>
+          <span>Background monitor</span>
+          <strong data-field="infraOverall">Checking</strong>
+        </div>
+        <div class="infra-meta">
+          <b data-field="infraGenerated">-</b>
+          <span data-field="infraCadence">CI 15 min</span>
+        </div>
+      </div>
+      <p data-field="infraSummary">Waiting for the latest scheduled infra check.</p>
+      <div class="infra-check-grid" data-render="infraChecks">
+        <article class="infra-check loading">
+          <b>Loading</b>
+          <span>Reading published monitor status.</span>
+        </article>
+      </div>
     </section>
 
     <section class="truth-panel" aria-label="Operational truth">
@@ -381,6 +401,6 @@
     </section>
   </main>
 
-  <script src="../assets/ops.js?v=ops-38"></script>
+  <script src="../assets/ops.js?v=ops-39"></script>
 </body>
 </html>

@@ -17,6 +17,7 @@
     // Self (existing)
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
     daemonStatus: "https://node.mirhollio.com/ops/status.json",
+    infraHealth: "https://raw.githubusercontent.com/MirkoS85/mirsflr-status/master/api/infra-health/status.json",
     // ââ NEW: Official Flare RPC endpoints (wallet balances + epoch) ââ
     flareRpcPrimary: "https://flare-api.flare.network/ext/C/rpc",
     flareRpcBackup: "https://rpc.ankr.com/flare",
@@ -60,6 +61,7 @@
       ftsoSnapshot: "loading",
       node: "loading",
       daemon: "loading",
+      infraHealth: "loading",
       rpc: "loading",
       flareMetrics: "loading"
     },
@@ -71,6 +73,7 @@
       ftsoSnapshot: null,
       node: null,
       daemon: null,
+      infraHealth: null,
       rpc: null,
       flareMetrics: null
     },
@@ -1330,7 +1333,92 @@
     if (panel) panel.dataset.alertState = actionable.length ? worstLevel(actionable.map(item => item.level)) : "ok";
   }
 
-  function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload) {
+  function infraStatusLabel(status) {
+    if (status === "ok") return "OK";
+    if (status === "warn") return "Watch";
+    if (status === "down") return "Down";
+    if (status === "stale") return "Stale";
+    return "Checking";
+  }
+
+  function infraCheckMeta(check) {
+    const parts = [];
+    if (check?.ageMinutes != null) {
+      const age = Number(check.ageMinutes);
+      parts.push(`${Number.isFinite(age) ? age.toFixed(1) : check.ageMinutes} min old`);
+    }
+    if (check?.peers != null) parts.push(`${fmtNum(check.peers, 0)} peers`);
+    if (check?.validatorReachPct != null) parts.push(`${fmtPct(check.validatorReachPct, 1)} reach`);
+    if (check?.ftso?.availability != null) parts.push(`FTSO ${fmtPct(check.ftso.availability, 1)}`);
+    if (check?.fdc?.availability24h != null) parts.push(`FDC 24h ${fmtPct(check.fdc.availability24h, 1)}`);
+    return parts.length ? parts.join(" - ") : check?.kind === "external" ? "external reference" : "critical";
+  }
+
+  function renderInfraHealth(payload) {
+    const card = $("#infra-health");
+    const mount = $('[data-render="infraChecks"]');
+    if (!card || !mount) return;
+
+    if (!payload || payload.schema !== "mirsflr-infra-health/v1") {
+      card.dataset.infraState = "warn";
+      setText("infraOverall", "No status");
+      setText("infraGenerated", "not published");
+      setText("infraCadence", "CI 15 min");
+      setText("infraSummary", "The background monitor JSON is not available yet.");
+      mount.innerHTML = `
+        <article class="infra-check warn">
+          <b>Monitor status</b>
+          <span>Published status JSON could not be loaded.</span>
+          <em>OPS live checks still run in this browser</em>
+        </article>
+      `;
+      return;
+    }
+
+    const generated = new Date(payload.generatedAt);
+    const ageMs = Number.isFinite(generated.getTime()) ? Date.now() - generated.getTime() : null;
+    const staleDown = ageMs != null && ageMs > 90 * 60_000;
+    const staleWarn = ageMs != null && ageMs > 45 * 60_000;
+    const publishedOverall = payload.overall === "down" || payload.overall === "warn" || payload.overall === "ok"
+      ? payload.overall
+      : "warn";
+    let overall = publishedOverall;
+    if (staleDown) overall = "down";
+    else if (staleWarn && overall === "ok") overall = "warn";
+
+    card.dataset.infraState = overall;
+    setText("infraOverall", (staleDown || staleWarn) && publishedOverall !== "down" ? "Stale" : infraStatusLabel(overall));
+    setText("infraGenerated", ageMs == null ? "unknown" : `${fmtAge(generated)} ago`);
+    setText("infraCadence", `CI ${payload.monitor?.intervalMinutes || 15} min`);
+    setText("infraSummary", staleDown || staleWarn
+      ? `Background monitor has not updated for ${fmtAge(generated)}.`
+      : payload.summary || "Background infra monitor is reachable.");
+
+    const checks = Array.isArray(payload.checks) ? payload.checks : [];
+    if (!checks.length) {
+      mount.innerHTML = `
+        <article class="infra-check warn">
+          <b>No checks</b>
+          <span>The monitor status exists, but contains no check rows.</span>
+          <em>status schema issue</em>
+        </article>
+      `;
+      return;
+    }
+
+    mount.innerHTML = checks.map(check => {
+      const status = check.status === "down" || check.status === "warn" || check.status === "ok" ? check.status : "loading";
+      return `
+        <article class="infra-check ${status}">
+          <b>${escapeHtml(check.label || check.id || "Check")}</b>
+          <span>${escapeHtml(check.message || infraStatusLabel(status))}</span>
+          <em>${escapeHtml(infraCheckMeta(check))}</em>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload, infraHealth) {
     const mount = $('[data-render="rawDetails"]');
     if (!mount) return;
     const node = getNode(validator);
@@ -1396,12 +1484,13 @@
       sources: { ...state.sources },
       sourceLoadedAt: Object.fromEntries(
         Object.entries(state.sourceLoadedAt).map(([k, v]) => [k, v ? v.toISOString() : null])
-      )
+      ),
+      infraHealth: infraHealth || null
     };
     mount.textContent = JSON.stringify(payload, null, 2);
   }
 
-  function applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload) {
+  function applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload, infraHealth) {
     const latest = latestEpoch(provider);
     const node = getNode(validator);
     const network = networkInfo(providerPayload);
@@ -1417,6 +1506,7 @@
     setText("overallLabel", overall === "ok" ? "Primary checks nominal" : overall === "warn" ? "Watch required" : "Action required");
     setText("overallTitle", overall === "ok" ? "Primary OK" : overall === "warn" ? "Watch" : "Act now");
     setText("freshness", state.lastLoadedAt ? `${fmtAge(state.lastLoadedAt)} ago` : "-");
+    renderInfraHealth(infraHealth);
 
     // ââ Reward epoch: primary from Oracle Daemon, fallback from Flare Metrics/RPC
     const currentEpoch = network?.m_iCurrentRewardEpoch ?? state.epochFallback?.currentEpoch;
@@ -1717,7 +1807,7 @@
     renderLineChart("validatorRewards", validatorRewards, { empty: "No validator rewards", zeroBase: true, yBottom: "0", lineClass: "line-green", tooltip: "validatorReward" });
     renderUptimeStrip(uptimeValues);
     renderExpiryList(node);
-    renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload);
+    renderRaw(provider, latest, validator, nodeHealth, explorer, explorerFtso, ftsoSnapshot, providerPayload, daemonPayload, infraHealth);
   }
 
   // ââ MAIN LOAD ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -1734,7 +1824,8 @@
         fetchJson(ENDPOINTS.explorerFtso),
         fetchJson(ENDPOINTS.ftsoSnapshot, 8_000),
         fetchJson(ENDPOINTS.nodeHealth),
-        fetchJson(ENDPOINTS.daemonStatus, 2_500)
+        fetchJson(ENDPOINTS.daemonStatus, 2_500),
+        fetchJson(ENDPOINTS.infraHealth, 8_000)
       ])
     ]);
 
@@ -1745,6 +1836,7 @@
     let ftsoSnapshot = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
     let nodeHealth = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
     let daemonPayload = sourceResults[6].status === "fulfilled" ? sourceResults[6].value : null;
+    let infraHealth = sourceResults[7].status === "fulfilled" ? sourceResults[7].value : null;
 
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
@@ -1753,6 +1845,7 @@
     state.sourceLoadedAt.ftsoSnapshot = ftsoSnapshot ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
     state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
+    state.sourceLoadedAt.infraHealth = infraHealth ? new Date() : null;
 
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
 
@@ -1779,6 +1872,7 @@
     setSource("ftsoSnapshot", ftsoSnapshot ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
     setSource("daemon", daemonPayload ? "ok" : "public-only");
+    state.sources.infraHealth = infraHealth ? "ok" : "warn";
 
     // ââ NEW: Fire supplementary fetches in parallel (non-blocking) ââââââââââââ
     // These enrich the page but don't block the initial render
@@ -1795,12 +1889,12 @@
       needValidatorFallback ? fetchValidatorFallback() : Promise.resolve()
     ]).then(() => {
       // Re-render with enriched data once supplementary sources return
-      applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload);
+      applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload, infraHealth);
     });
 
     state.lastLoadedAt = new Date();
-    state.data = { provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload };
-    applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload);
+    state.data = { provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload, infraHealth };
+    applyData(provider, validator, explorer, explorerFtso, ftsoSnapshot, nodeHealth, providerPayload, daemonPayload, infraHealth);
     // Show per-source error state if any source failed after 10s
     if (!provider || !validator || !nodeHealth) {
       const mount = document.querySelector('[data-render="alerts"]');
