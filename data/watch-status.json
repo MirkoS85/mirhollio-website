@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-23T14:09:52.849Z",
-  "updatedAt": "2026-08-23T14:09:52.849Z",
+  "generatedAt": "2026-08-23T14:36:43.184Z",
+  "updatedAt": "2026-08-23T14:36:43.184Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "41.9% full",
+    "validatorLabel": "40.1% full",
     "ftsoLabel": "FTSO E426"
   },
   "validator": {
     "status": "connected",
-    "stake": 37688882,
+    "stake": 36048882,
     "capacity": 90000000,
-    "fillPct": 41.8765,
-    "free": 52311118,
-    "delegation": 31688882,
+    "fillPct": 40.0543,
+    "free": 53951118,
+    "delegation": 30048882,
     "selfBond": 6000000,
-    "delegationCount": 11,
+    "delegationCount": 10,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -49,9 +49,9 @@
       },
       {
         "address": null,
-        "amount": 1640000,
-        "start": "2026-08-09T14:00:45Z",
-        "end": "2026-08-23T14:10:38Z"
+        "amount": 1542240,
+        "start": "2026-08-09T11:00:38Z",
+        "end": "2026-10-19T10:00:00Z"
       }
     ]
   },
@@ -65,10 +65,10 @@
     "stakingWeight": 89998947.01807821,
     "delegationFeeBips": 2000,
     "rewardRate": 1.7275213369796987,
-    "performance": 0.677271418098031,
-    "primaryPerformance": 0.3921567343946376,
-    "secondaryPerformance": 0.8673478739002932,
-    "availability": 0.9801136363636364,
+    "performance": 0.6766301309305561,
+    "primaryPerformance": 0.39115991210620066,
+    "secondaryPerformance": 0.866943610146793,
+    "availability": 0.9802498992341797,
     "availability6h": 1,
     "availability24h": 1,
     "availabilityHourly24h": [
@@ -100,7 +100,7 @@
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9886899910738541,
+    "availability": 0.9887678017382591,
     "availability6h": 1,
     "availability24h": 1,
     "availabilityHourly24h": [
