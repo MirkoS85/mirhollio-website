@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-24T23:14:07.478Z",
-  "updatedAt": "2026-08-24T23:14:07.478Z",
+  "generatedAt": "2026-08-24T23:37:07.782Z",
+  "updatedAt": "2026-08-24T23:37:07.782Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -65,9 +65,9 @@
     "stakingWeight": 69848947.01807821,
     "delegationFeeBips": 2000,
     "rewardRate": 1.5754225973072622,
-    "performance": 0.6070033955857386,
-    "primaryPerformance": 0.29243155772495755,
-    "secondaryPerformance": 0.8167179541595926,
+    "performance": 0.6095475559711184,
+    "primaryPerformance": 0.29366006960677365,
+    "secondaryPerformance": 0.8201392135473482,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1,
