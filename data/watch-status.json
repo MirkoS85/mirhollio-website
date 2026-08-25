@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-25T02:08:04.218Z",
-  "updatedAt": "2026-08-25T02:08:04.218Z",
+  "generatedAt": "2026-08-25T03:09:53.314Z",
+  "updatedAt": "2026-08-25T03:09:53.314Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "38.6% full",
+    "validatorLabel": "34.1% full",
     "ftsoLabel": "FTSO E427"
   },
   "validator": {
     "status": "connected",
-    "stake": 34741351,
+    "stake": 30713351,
     "capacity": 90000000,
-    "fillPct": 38.6015,
-    "free": 55258649,
-    "delegation": 28741351,
+    "fillPct": 34.1259,
+    "free": 59286649,
+    "delegation": 24713351,
     "selfBond": 6000000,
-    "delegationCount": 10,
+    "delegationCount": 9,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -37,12 +37,6 @@
       },
       {
         "address": null,
-        "amount": 4028000,
-        "start": "2026-08-09T06:16:24Z",
-        "end": "2026-08-25T03:00:00Z"
-      },
-      {
-        "address": null,
         "amount": 1542240,
         "start": "2026-08-09T11:00:38Z",
         "end": "2026-10-19T10:00:00Z"
@@ -52,6 +46,12 @@
         "amount": 999999,
         "start": "2026-08-24T07:28:44Z",
         "end": "2026-10-19T10:00:00Z"
+      },
+      {
+        "address": null,
+        "amount": 359540,
+        "start": "2026-08-08T19:01:12Z",
+        "end": "2026-08-31T08:00:00Z"
       }
     ]
   },
@@ -65,9 +65,9 @@
     "stakingWeight": 69848947.01807821,
     "delegationFeeBips": 2000,
     "rewardRate": 1.5754225973072622,
-    "performance": 0.6276773296244784,
-    "primaryPerformance": 0.30641796401812554,
-    "secondaryPerformance": 0.8418502400287137,
+    "performance": 0.6325734009460093,
+    "primaryPerformance": 0.3092747262112754,
+    "secondaryPerformance": 0.8481058507691652,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1,
