@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-29T23:13:56.517Z",
-  "updatedAt": "2026-08-29T23:13:56.517Z",
+  "generatedAt": "2026-08-30T01:16:02.994Z",
+  "updatedAt": "2026-08-30T01:16:02.994Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "50.5% full",
+    "validatorLabel": "50.8% full",
     "ftsoLabel": "FTSO E428"
   },
   "validator": {
     "status": "connected",
-    "stake": 45493855,
+    "stake": 45689292,
     "capacity": 90000000,
-    "fillPct": 50.5487,
-    "free": 44506145,
-    "delegation": 39493855,
+    "fillPct": 50.7659,
+    "free": 44310708,
+    "delegation": 39689292,
     "selfBond": 6000000,
-    "delegationCount": 21,
+    "delegationCount": 22,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -56,83 +56,33 @@
     ]
   },
   "ftso": {
-    "status": "ok",
-    "latestCompletedEpoch": 427,
+    "status": "unknown",
+    "latestCompletedEpoch": null,
     "signingPolicyEpoch": 428,
     "weight": 37249413.20063317,
     "delegatedWeight": 4702727.788860414,
     "cappedDelegatedWeight": 4702727.788860414,
     "stakingWeight": 32546685.41177275,
     "delegationFeeBips": 2000,
-    "rewardRate": 1.6723388659922573,
-    "performance": 0.7479147465437788,
-    "primaryPerformance": 0.40028801843317974,
-    "secondaryPerformance": 0.9796658986175115,
-    "availability": 1,
-    "availability6h": 1,
-    "availability24h": 1,
-    "availabilityHourly24h": [
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1
-    ]
+    "rewardRate": null,
+    "performance": null,
+    "primaryPerformance": null,
+    "secondaryPerformance": null,
+    "availability": null,
+    "availability6h": null,
+    "availability24h": null,
+    "availabilityHourly24h": []
   },
   "fdc": {
-    "status": "ok",
-    "availability": 1,
-    "availability6h": 1,
-    "availability24h": 1,
-    "availabilityHourly24h": [
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1,
-      1
-    ],
-    "participation": 99.85119047619048,
-    "conditionMet": true,
-    "rewardedVotingRounds": 3355,
-    "totalRewardedVotingRounds": 3360
+    "status": "unknown",
+    "availability": null,
+    "availability6h": null,
+    "availability24h": null,
+    "availabilityHourly24h": [],
+    "participation": null,
+    "conditionMet": null,
+    "rewardedVotingRounds": null,
+    "totalRewardedVotingRounds": null
   },
   "sources": {
     "provider": "oracle-daemon-v2-live-performance",
@@ -140,5 +90,7 @@
     "validator": "oracle-daemon-v1-live-validator",
     "ftso": "flare-systems-explorer-live-signing-policy"
   },
-  "warnings": []
+  "warnings": [
+    "MirSFlr provider not found"
+  ]
 }
