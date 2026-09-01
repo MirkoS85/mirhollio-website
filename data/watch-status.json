@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-09-01T06:29:31.014Z",
-  "updatedAt": "2026-09-01T06:29:31.014Z",
+  "generatedAt": "2026-09-01T11:56:09.864Z",
+  "updatedAt": "2026-09-01T11:56:09.864Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "94.9% full",
+    "validatorLabel": "95.8% full",
     "ftsoLabel": "FTSO E429"
   },
   "validator": {
     "status": "connected",
-    "stake": 85396668,
+    "stake": 86249853,
     "capacity": 90000000,
-    "fillPct": 94.8852,
-    "free": 4603332,
-    "delegation": 79396668,
+    "fillPct": 95.8332,
+    "free": 3750147,
+    "delegation": 80249853,
     "selfBond": 6000000,
-    "delegationCount": 38,
+    "delegationCount": 45,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -65,12 +65,12 @@
     "stakingWeight": 46712516.28406492,
     "delegationFeeBips": 2000,
     "rewardRate": 2.0329597092719642,
-    "performance": 0.7637918241882486,
-    "primaryPerformance": 0.4378069462601138,
-    "secondaryPerformance": 0.9811150761403384,
-    "availability": 0.9978094194961665,
-    "availability6h": 0.9912280701754387,
-    "availability24h": 0.9978070175438596,
+    "performance": 0.765399556847285,
+    "primaryPerformance": 0.4408865931915628,
+    "secondaryPerformance": 0.9817415326177664,
+    "availability": 0.9982158786797503,
+    "availability6h": 1,
+    "availability24h": 1,
     "availabilityHourly24h": [
       1,
       1,
@@ -90,7 +90,7 @@
       1,
       1,
       1,
-      0.9473684210526315,
+      1,
       1,
       1,
       1,
@@ -100,9 +100,9 @@
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9875359364382416,
-    "availability6h": 0.9474316578483245,
-    "availability24h": 0.9868579144620812,
+    "availability": 0.9898527596919018,
+    "availability6h": 0.9578144078144079,
+    "availability24h": 0.9894536019536019,
     "availabilityHourly24h": [
       1,
       1,
@@ -122,12 +122,12 @@
       1,
       1,
       1,
-      0.6845899470899471,
       1,
       1,
       1,
       1,
-      1
+      1,
+      0.7468864468864469
     ],
     "participation": 99.9702380952381,
     "conditionMet": true,
