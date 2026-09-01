@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-08-31T22:49:29.673Z",
-  "updatedAt": "2026-08-31T22:49:29.673Z",
+  "generatedAt": "2026-09-01T01:26:31.221Z",
+  "updatedAt": "2026-09-01T01:26:31.221Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,18 +9,18 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "80.4% full",
+    "validatorLabel": "94.9% full",
     "ftsoLabel": "FTSO E429"
   },
   "validator": {
     "status": "connected",
-    "stake": 72398144,
+    "stake": 85396668,
     "capacity": 90000000,
-    "fillPct": 80.4424,
-    "free": 17601856,
-    "delegation": 66398144,
+    "fillPct": 94.8852,
+    "free": 4603332,
+    "delegation": 79396668,
     "selfBond": 6000000,
-    "delegationCount": 33,
+    "delegationCount": 38,
     "stakeEnd": "2026-10-19T10:00:00Z",
     "topDelegations": [
       {
@@ -37,6 +37,12 @@
       },
       {
         "address": null,
+        "amount": 11290999,
+        "start": "2026-08-31T23:21:29Z",
+        "end": "2026-09-14T23:31:22Z"
+      },
+      {
+        "address": null,
         "amount": 7870400,
         "start": "2026-08-31T17:04:12Z",
         "end": "2026-09-17T18:55:00Z"
@@ -46,12 +52,6 @@
         "amount": 6301690,
         "start": "2026-08-22T00:20:37Z",
         "end": "2026-10-04T23:30:00Z"
-      },
-      {
-        "address": null,
-        "amount": 5000000,
-        "start": "2026-08-29T03:17:02Z",
-        "end": "2026-09-25T12:00:00Z"
       }
     ]
   },
@@ -65,12 +65,12 @@
     "stakingWeight": 46712516.28406492,
     "delegationFeeBips": 2000,
     "rewardRate": 2.0329597092719642,
-    "performance": 0.760307870127141,
-    "primaryPerformance": 0.43138594094777766,
-    "secondaryPerformance": 0.9795891562467164,
-    "availability": 0.996742671009772,
+    "performance": 0.7621619193099111,
+    "primaryPerformance": 0.43391140264174677,
+    "secondaryPerformance": 0.9809955970886872,
+    "availability": 0.9972144846796658,
     "availability6h": 1,
-    "availability24h": 0.9978632478632479,
+    "availability24h": 0.9978070175438596,
     "availabilityHourly24h": [
       1,
       1,
@@ -82,10 +82,10 @@
       1,
       1,
       1,
-      0.9487179487179487,
       1,
       1,
       1,
+      0.9473684210526315,
       1,
       1,
       1,
@@ -100,9 +100,9 @@
   },
   "fdc": {
     "status": "ok",
-    "availability": 0.9814464674758793,
+    "availability": 0.9841413939877627,
     "availability6h": 1,
-    "availability24h": 0.987213105963106,
+    "availability24h": 0.9868731435069155,
     "availabilityHourly24h": [
       1,
       1,
@@ -114,10 +114,10 @@
       1,
       1,
       1,
-      0.6931145431145431,
       1,
       1,
-      1,
+      0.993421052631579,
+      0.6915343915343916,
       1,
       1,
       1,
