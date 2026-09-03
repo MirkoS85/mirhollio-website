@@ -4835,3 +4835,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--pink);outline-offse
   .mobile-row .former{font-size:8px;letter-spacing:.05em;}
   .mobile-row .brand img{width:30px;height:30px;}
 }
+/* === core-3 layout polish === */
+.hero-live-strip{display:grid !important;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;align-items:stretch;}
+.hero-live-strip .hero-live-tile{min-height:86px;display:flex;flex-direction:column;justify-content:center;gap:6px;border-radius:14px;}
+.section .inner{padding-top:8px;}
+.section{scroll-margin-top:20px;}
+@media (max-width:700px){ .hero-live-strip{grid-template-columns:repeat(2,1fr);} }
+@media (min-width:1000px){ .hero-live-strip:has(> :nth-child(5)){grid-template-columns:repeat(5,1fr);} }
