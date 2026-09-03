@@ -5002,3 +5002,22 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);}
 @media (max-width:1120px){.hero-mark{display:none;}}
 @media (min-width:1121px){.home-hero-copy{padding-right:220px;}}
+/* === core-12: proof sekcija, fragmenti na podstraneh, bullet === */
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.proof-tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;}
+.proof-tile .pv{font-family:Archivo,sans-serif;font-size:40px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+.proof-tile .pl{font-size:13px;font-weight:600;color:var(--text);margin-top:10px;}
+.proof-tile .ps{font-size:12px;color:var(--muted);margin-top:3px;}
+.proof-tile.star .pv{color:var(--pink);text-shadow:0 0 22px rgba(255,46,99,.45);}
+.proof-tile.star{border-color:rgba(255,46,99,.4);}
+.hero-mark-wrap{position:absolute;right:-185px;top:-250px;width:590px;height:590px;z-index:0;pointer-events:none;
+  mix-blend-mode:screen;opacity:.42;
+  -webkit-mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);
+  mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);}
+.hero-mark-wrap img{width:100%;height:100%;display:block;}
+.hm-b img{transform:rotate(120deg);}
+.hm-c img{transform:rotate(240deg);}
+.hm-d img{transform:rotate(180deg) scale(1.12);}
+.hm-e img{transform:rotate(60deg) scale(1.08);}
+.hm-f img{transform:rotate(300deg) scale(1.05);}
+@media (max-width:1120px){.hero-mark-wrap{display:none;}}

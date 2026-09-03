@@ -73,15 +73,19 @@
   }
 
   function rrCurve(svg, rr) {
-    if (!svg || !rr) return;
-    const vals = rr.curve.slice();       // p90..p10 (desc)
-    const max = Math.max(...vals, rr.ours || 0);
-    const W = 320, H = 74, bw = 9, gap = 5, x0 = 6;
-    const medY = H - 6 - (rr.median / max) * (H - 22);
-    svg.appendChild(el("line", { x1: 0, x2: W, y1: medY, y2: medY, stroke: "rgba(255,255,255,.18)", "stroke-dasharray": "4 5" }));
-    const ml = el("text", { x: 2, y: medY - 4, "font-size": 9, fill: MUT, "font-family": mono }); ml.textContent = "median"; svg.appendChild(ml);
-    vals.forEach((v, i) => svg.appendChild(el("rect", { x: x0 + i * (bw + gap), y: H - 6 - (v / max) * (H - 22), width: bw, height: (v / max) * (H - 22), rx: 2, fill: DIM })));
-    if (rr.ours != null) svg.appendChild(el("rect", { x: x0 + vals.length * (bw + gap) + 6, y: H - 6 - (rr.ours / max) * (H - 22), width: bw + 2, height: (rr.ours / max) * (H - 22), rx: 2, fill: MAG, filter: "drop-shadow(0 0 5px rgba(255,46,99,.6))" }));
+    if (!svg || !rr || rr.ours == null) return;
+    const W = 320, H = 74;
+    const max = Math.max(rr.ours, rr.median) * 1.25;
+    const x = (v) => 8 + (v / max) * (W - 16);
+    const yy = 34;
+    svg.appendChild(el("rect", { x: 8, y: yy - 5, width: W - 16, height: 10, rx: 5, fill: "rgba(255,255,255,.07)" }));
+    svg.appendChild(el("rect", { x: 8, y: yy - 5, width: x(rr.ours) - 8, height: 10, rx: 5, fill: MAG, filter: "drop-shadow(0 0 7px rgba(255,46,99,.55))" }));
+    svg.appendChild(el("circle", { cx: x(rr.ours), cy: yy, r: 6, fill: MAGL, stroke: "#17171d", "stroke-width": 2 }));
+    svg.appendChild(el("line", { x1: x(rr.median), x2: x(rr.median), y1: yy - 13, y2: yy + 13, stroke: "rgba(255,255,255,.55)", "stroke-width": 2, "stroke-dasharray": "3 3" }));
+    const tm = el("text", { x: Math.min(x(rr.median) + 5, W - 90), y: yy + 26, "font-size": 10, fill: MUT, "font-family": mono });
+    tm.textContent = `median ${(rr.median * 100).toFixed(2)}%`; svg.appendChild(tm);
+    const to = el("text", { x: Math.min(x(rr.ours), W - 66), y: yy - 18, "font-size": 11, "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" });
+    to.textContent = `${(rr.ours * 100).toFixed(2)}%`; svg.appendChild(to);
   }
 
   function weightChart(svg, hist) {
@@ -166,6 +170,13 @@
       `<span style="opacity:.7">updated ${Math.round((Date.now() - new Date(np.generatedAt)) / 36e5 * 10) / 10}h ago</span>`;
     // feature cards
     if ($("np-f-rank") && rr) $("np-f-rank").textContent = `#${rr.rank} reward rate of ${rr.count} providers (FlareMetrics), ${(rr.ours/rr.median).toFixed(1)}× the median.`;
+    // proof sekcija
+    if ($("pf-rank") && rr) { $("pf-rank").textContent = "#" + rr.rank;
+      $("pf-rank-sub").textContent = `of ${rr.count} providers — top ${Math.max(1, Math.ceil((rr.rank / rr.count) * 100))}%`; }
+    if ($("pf-avail") && p.availabilityPct != null) $("pf-avail").textContent = p.availabilityPct.toFixed(1).replace(".0", "") + "%";
+    if ($("pf-passes") && p.passes != null) { $("pf-passes").textContent = p.passes + "/3";
+      $("pf-passes-sub").textContent = p.eligible ? "eligible for rewards" : "minimal conditions"; }
+    if ($("pf-uptime") && val && val.uptime != null) $("pf-uptime").textContent = val.uptime.toFixed(1) + "%";
     if ($("np-f-cond") && p) $("np-f-cond").textContent = `${p.passes ?? "-"} passes held, availability ${p.availabilityPct != null ? p.availabilityPct.toFixed(1) : "-"}%, eligible for rewards.`;
     // subpage charts
     weightChart(document.querySelector("svg[data-render='np-weight-chart']"), np.weightHistory || []);

@@ -19,7 +19,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-11" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-12" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/" />
   <meta property="og:type" content="website" />
@@ -55,7 +55,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=core-11" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=core-12" />
 </head>
 <body>
   <div class="mobile-top">
@@ -97,7 +97,7 @@
               <div class="kicker">Flare validator + FTSO provider</div>
               <h1>Stake with proof. Delegate with confidence.</h1>
               <p class="lead">Independent Flare validator and FTSO provider with live metrics, verified addresses, and transparent performance history.</p>
-            <img class="hero-mark" src="assets/brand-mark.jpg?v=core-11" alt="" aria-hidden="true"></div>
+            <img class="hero-mark" src="assets/brand-mark.jpg?v=core-12" alt="" aria-hidden="true"></div>
             <div class="hero-panels" aria-label="Live metric highlights">
               <div class="panel"><div class="p-head">FLR price <span class="p-chip" id="np-price-delta"></span></div>
                 <div class="p-big" id="np-price">&ndash;</div><div class="p-sub" id="np-price-sub">live market data &middot; 7 days</div>
@@ -115,13 +115,14 @@
       </section>
 
       <div class="ticker-band" aria-hidden="true"><div class="ticker-track" id="ticker-track"><span class="ticker-seg" id="ticker-a">loading live data…</span><span class="ticker-seg" id="ticker-b">loading live data…</span></div></div>
-      <section class="section light np-section">
+      <section class="section light proof-section">
         <div class="inner">
-          <div class="section-title"><h2>Network position.</h2><p>Where Mirhollio Core stands among the registered FTSO voters right now.</p></div>
-          <div class="card np-card">
-            <div class="np-head"><strong>Rank <span id="np-rank">&ndash;</span> of <span id="np-voters">100</span> by registration weight</strong><span class="p-chip" id="np-epoch"></span></div>
-            <svg id="np-strip" viewBox="0 0 1200 92" class="np-strip" role="img" aria-label="Weight of all registered voters with Mirhollio Core highlighted"></svg>
-            <div class="np-legend" id="np-legend"></div>
+          <div class="section-title"><h2>Proof over promises.</h2><p>Live protocol numbers, straight from the chain and public explorers.</p></div>
+          <div class="proof-grid">
+            <div class="proof-tile star"><div class="pv" id="pf-rank">&ndash;</div><div class="pl">Reward rate rank</div><div class="ps" id="pf-rank-sub">on FlareMetrics</div></div>
+            <div class="proof-tile"><div class="pv" id="pf-avail">&ndash;</div><div class="pl">FTSO availability</div><div class="ps">current reward epoch</div></div>
+            <div class="proof-tile"><div class="pv" id="pf-passes">&ndash;</div><div class="pl">Protocol passes</div><div class="ps" id="pf-passes-sub">minimal conditions met</div></div>
+            <div class="proof-tile"><div class="pv" id="pf-uptime">&ndash;</div><div class="pl">Validator uptime</div><div class="ps">live from P-chain</div></div>
           </div>
         </div>
       </section>
@@ -217,6 +218,16 @@
         </div>
       </section>
 
+      <section class="section light np-section">
+        <div class="inner">
+          <div class="section-title"><h2>Network context.</h2><p>Full transparency &mdash; including the number that is still growing. Every delegation climbs this ladder.</p></div>
+          <div class="card np-card">
+            <div class="np-head"><strong>Rank <span id="np-rank">&ndash;</span> of <span id="np-voters">100</span> by registration weight</strong><span class="p-chip" id="np-epoch"></span></div>
+            <svg id="np-strip" viewBox="0 0 1200 92" class="np-strip" role="img" aria-label="Weight of all registered voters with Mirhollio Core highlighted"></svg>
+            <div class="np-legend" id="np-legend"></div>
+          </div>
+        </div>
+      </section>
       <div class="band-divider" aria-hidden="true"><i></i></div>
       <section class="section light cta-section">
         <div class="inner">
@@ -255,9 +266,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=core-11"></script>
-  <script src="assets/live-refresh.js?v=core-11"></script>
-  <script src="assets/core-home.js?v=core-11" defer></script>
-  <script src="assets/pwa.js?v=core-11"></script>
+  <script src="assets/operator.js?v=core-12"></script>
+  <script src="assets/live-refresh.js?v=core-12"></script>
+  <script src="assets/core-home.js?v=core-12" defer></script>
+  <script src="assets/pwa.js?v=core-12"></script>
 </body>
 </html>
