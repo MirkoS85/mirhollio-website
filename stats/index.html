@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MirSFlr Live Stats</title>
-  <meta name="description" content="Live MirSFlr validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
-  <meta name="theme-color" content="#d93f84" />
+  <title>Mirhollio Core Live Stats</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap">
+
+  <meta name="description" content="Live Mirhollio Core validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
+  <meta name="theme-color" content="#2F6BFF" />
   <link rel="preconnect" href="https://api.oracle-daemon.com">
   <link rel="dns-prefetch" href="//api.oracle-daemon.com">
   <link rel="preconnect" href="https://api.coinbase.com">
@@ -14,42 +18,42 @@
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
+  <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
   <link rel="canonical" href="https://www.mirhollio.com/stats/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="MirSFlr Live Stats" />
-  <meta property="og:description" content="Live MirSFlr validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
+  <meta property="og:title" content="Mirhollio Core Live Stats" />
+  <meta property="og:description" content="Live Mirhollio Core validator and FTSO provider statistics, rewards, reward rates, eligibility, and performance history." />
   <meta property="og:url" content="https://www.mirhollio.com/stats/" />
   <meta property="og:image" content="https://www.mirhollio.com/og-image.png" />
   <meta property="og:image:width" content="2400" />
   <meta property="og:image:height" content="1260" />
-  <meta property="og:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta property="og:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MirSFlr Live Stats" />
-  <meta name="twitter:description" content="Live validator and FTSO provider statistics for MirSFlr." />
+  <meta name="twitter:title" content="Mirhollio Core Live Stats" />
+  <meta name="twitter:description" content="Live validator and FTSO provider statistics for Mirhollio Core." />
   <meta name="twitter:image" content="https://www.mirhollio.com/og-image.png" />
-  <meta name="twitter:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta name="twitter:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=ftso-delegation-summary-5" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-1" />
 </head>
 <body>
   <div class="mobile-top">
-    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png" alt="Mirhollio Core logo"><span>Mirhollio Core</span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
     <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="../ftso/">FTSO</a><a href="../validator/">Validator</a><a href="../epochs/">Epochs</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav>
   </div>
   <div class="site-shell">
     <aside class="side">
-      <div><a class="brand" href="../"><img src="../logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a><nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="../ftso/">FTSO provider</a><a href="../validator/">Validator node</a><a href="../epochs/">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav></div>
+      <div><a class="brand" href="../"><img src="../logo.png" alt="Mirhollio Core logo"><span>Mirhollio Core</span></a><nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="../ftso/">FTSO provider</a><a href="../validator/">Validator node</a><a href="../epochs/">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a></nav></div>
       <p class="side-note">Live reward, eligibility, and performance signals for a quick provider check.</p>
     </aside>
     <main>
       <section class="section home-hero-section">
         <div class="inner">
           <div class="hero home-hero">
-            <div class="home-hero-copy"><div class="kicker">Live metrics</div><h1>Provider stats without the noise.</h1><p class="lead">Rewards, eligibility, availability, and recent epochs for MirSFlr.</p></div>
+            <div class="home-hero-copy"><div class="kicker">Live metrics</div><h1>Provider stats without the noise.</h1><p class="lead">Rewards, eligibility, availability, and recent epochs for Mirhollio Core.</p></div>
             <div class="hero-live-strip" aria-label="Provider metric highlights">
               <div class="hero-live-tile"><span>Total weight</span><strong data-field="ftsoWeight">-</strong></div>
               <div class="hero-live-tile"><span>Delegated weight</span><strong data-field="delegationWeight">-</strong></div>
@@ -74,8 +78,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=validator-live-stake-1"></script>
-  <script src="../assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
-  <script src="../assets/pwa.js?v=pwa-install-2"></script>
+  <script src="../assets/operator.js?v=core-1"></script>
+  <script src="../assets/live-refresh.js?v=core-1"></script>
+  <script src="../assets/pwa.js?v=core-1"></script>
 </body>
 </html>

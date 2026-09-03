@@ -3,9 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MirSFlr — Flare Validator & FTSO Provider</title>
-  <meta name="description" content="MirSFlr runs Flare validator and FTSO infrastructure with live metrics, verified addresses, and delegation guidance." />
-  <meta name="theme-color" content="#d93f84" />
+  <title>Mirhollio Core — Flare Validator & FTSO Provider</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap">
+
+  <meta name="description" content="Mirhollio Core runs Flare validator and FTSO infrastructure with live metrics, verified addresses, and delegation guidance." />
+  <meta name="theme-color" content="#2F6BFF" />
   <link rel="preconnect" href="https://api.oracle-daemon.com">
   <link rel="dns-prefetch" href="//api.oracle-daemon.com">
   <link rel="preconnect" href="https://api.coinbase.com">
@@ -14,26 +18,27 @@
   <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="MirSFlr" />
+  <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
   <link rel="canonical" href="https://www.mirhollio.com/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta property="og:title" content="Mirhollio Core — Flare Validator & FTSO Provider" />
   <meta property="og:description" content="Live Flare provider metrics, verified addresses, and safe delegation guidance." />
   <meta property="og:url" content="https://www.mirhollio.com/" />
   <meta property="og:image" content="https://www.mirhollio.com/og-image.png" />
   <meta property="og:image:width" content="2400" />
   <meta property="og:image:height" content="1260" />
-  <meta property="og:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta property="og:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="MirSFlr — Flare Validator & FTSO Provider" />
+  <meta name="twitter:title" content="Mirhollio Core — Flare Validator & FTSO Provider" />
   <meta name="twitter:description" content="Live Flare provider metrics, verified addresses, and safe delegation guidance." />
   <meta name="twitter:image" content="https://www.mirhollio.com/og-image.png" />
-  <meta name="twitter:image:alt" content="MirSFlr Flare validator and FTSO provider" />
+  <meta name="twitter:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "MirSFlr",
+    "name": "Mirhollio Core",
+    "alternateName": "MirSFlr",
     "url": "https://www.mirhollio.com/",
     "logo": "https://www.mirhollio.com/logo.png",
     "image": "https://www.mirhollio.com/og-image.png",
@@ -48,12 +53,12 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=ftso-delegation-summary-5" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=core-1" />
 </head>
 <body>
   <div class="mobile-top">
     <div class="mobile-row">
-      <a class="brand" href="./"><img src="logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+      <a class="brand" href="./"><img src="logo.png" alt="Mirhollio Core logo"><span>Mirhollio Core</span></a>
       <a class="btn primary" href="addresses/">Delegate</a>
     </div>
     <nav class="mobile-links" aria-label="Mobile navigation">
@@ -69,7 +74,7 @@
   <div class="site-shell">
     <aside class="side">
       <div>
-        <a class="brand" href="./"><img src="logo.png" alt="MirSFlr logo"><span>MirSFlr</span></a>
+        <a class="brand" href="./"><img src="logo.png" alt="Mirhollio Core logo"><span>Mirhollio Core</span></a>
         <nav class="nav" aria-label="Primary navigation">
           <a href="./" aria-current="page">Home</a>
           <a href="ftso/">FTSO provider</a>
@@ -79,10 +84,11 @@
           <a href="performance/">Performance</a>
         </nav>
       </div>
-      <p class="side-note">Independent Flare validator and FTSO provider.</p>
+      <p class="side-note">Independent Flare validator and FTSO provider.<em>Formerly known as MirSFlr.</em></p>
     </aside>
 
     <main>
+      <div class="inner"><div class="stake-note"><span class="dot"></span><span><strong>Validator notice:</strong> the current staking period ends <strong>Oct 19, 2026</strong>. Renewal is planned — verify addresses on this site before re-delegating, and never trust support DMs.</span></div></div>
       <section class="section home-hero-section">
         <div class="inner">
           <div class="hero home-hero">
@@ -123,15 +129,15 @@
                 <summary>How to delegate WFLR</summary>
                 <ol>
                   <li><strong>Prepare WFLR</strong><span>Delegation uses wrapped FLR. If you only hold FLR, wrap the amount first inside Flare Portal.</span></li>
-                  <li><strong>Verify MirSFlr</strong><span>Open this site's address page and compare the provider identity before any wallet signature.</span></li>
+                  <li><strong>Verify Mirhollio Core</strong><span>Open this site's address page and compare the provider identity before any wallet signature.</span></li>
                   <li><strong>Open Flare Portal</strong><span>Use portal.flare.network, connect your wallet, then open the delegation screen.</span></li>
-                  <li><strong>Select provider</strong><span>Search for MirSFlr, choose it as your FTSO provider, and enter the WFLR amount.</span></li>
-                  <li><strong>Review and sign</strong><span>Confirm the wallet shows MirSFlr, never share a seed phrase, then sign the delegation.</span></li>
+                  <li><strong>Select provider</strong><span>Search for Mirhollio Core, choose it as your FTSO provider, and enter the WFLR amount.</span></li>
+                  <li><strong>Review and sign</strong><span>Confirm the wallet shows Mirhollio Core, never share a seed phrase, then sign the delegation.</span></li>
                   <li><strong>Wait one epoch</strong><span>The change normally starts from the next reward epoch. Check epochs before judging rewards.</span></li>
                 </ol>
                 <div class="role-guide-actions">
                   <a href="https://portal.flare.network/" target="_blank" rel="noopener">Open Flare Portal</a>
-                  <a href="addresses/">Verify MirSFlr</a>
+                  <a href="addresses/">Verify Mirhollio Core</a>
                 </div>
               </details>
               <div class="home-snap-actions"><a class="btn decision-btn" href="ftso/">View FTSO metrics</a></div>
@@ -153,7 +159,7 @@
                   <li><strong>Prepare FLR</strong><span>Staking uses FLR, not WFLR. Keep enough free FLR for the amount and transaction fees.</span></li>
                   <li><strong>Check capacity</strong><span>Free space should be larger than your stake amount, and validator uptime should be healthy.</span></li>
                   <li><strong>Open Flare Portal</strong><span>Use portal.flare.network, connect your wallet, then open staking or validators.</span></li>
-                  <li><strong>Select validator</strong><span>Search for MirSFlr and compare the validator identity with this site before selecting it.</span></li>
+                  <li><strong>Select validator</strong><span>Search for Mirhollio Core and compare the validator identity with this site before selecting it.</span></li>
                   <li><strong>Choose amount and period</strong><span>Enter FLR amount, select the staking period, review all details, then sign.</span></li>
                   <li><strong>Monitor stake</strong><span>Track free space, period end, and rewards on the validator metrics page after staking.</span></li>
                 </ol>
@@ -172,7 +178,7 @@
         <div class="inner">
           <div class="section-title">
             <h2>Before you confirm.</h2>
-            <p>Use official wallet screens only, verify the MirSFlr identity, and never trust support DMs or seed phrase requests.</p>
+            <p>Use official wallet screens only, verify the Mirhollio Core identity, and never trust support DMs or seed phrase requests.</p>
           </div>
           <div class="actions secondary-actions">
             <a class="btn primary" href="addresses/">Verify addresses</a>
@@ -185,7 +191,7 @@
         <div class="inner">
           <div class="section-title">
             <h2>Contact.</h2>
-            <p>For public questions, use the official MirSFlr profiles on X or Telegram. MirSFlr will never ask for your seed phrase or private keys.</p>
+            <p>For public questions, use the official Mirhollio Core profiles on X or Telegram. Mirhollio Core will never ask for your seed phrase or private keys.</p>
           </div>
           <div class="cards two">
             <article class="card contact-card">
@@ -210,8 +216,8 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=validator-live-stake-1"></script>
-  <script src="assets/live-refresh.js?v=pre-reg-pill-size-1"></script>
-  <script src="assets/pwa.js?v=pwa-install-2"></script>
+  <script src="assets/operator.js?v=core-1"></script>
+  <script src="assets/live-refresh.js?v=core-1"></script>
+  <script src="assets/pwa.js?v=core-1"></script>
 </body>
 </html>

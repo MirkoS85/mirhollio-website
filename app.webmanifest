@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "MirSFlr",
-  "short_name": "MirSFlr",
+  "name": "Mirhollio Core",
+  "short_name": "Mirhollio Core",
   "description": "Flare validator and FTSO provider with live metrics, verified addresses, and delegation guidance.",
   "lang": "en",
   "dir": "ltr",
@@ -10,8 +10,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "categories": ["finance", "utilities"],
-  "background_color": "#fff8fb",
-  "theme_color": "#d93f84",
+  "background_color": "#f8faff",
+  "theme_color": "#2F6BFF",
   "prefer_related_applications": false,
   "icons": [
     {

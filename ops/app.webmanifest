@@ -1,8 +1,8 @@
 {
   "id": "/ops/",
-  "name": "MirSFlr OPS",
+  "name": "Mirhollio Core OPS",
   "short_name": "OPS",
-  "description": "Private MirSFlr operator health dashboard.",
+  "description": "Private Mirhollio Core operator health dashboard.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "/ops/",
