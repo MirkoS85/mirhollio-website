@@ -240,24 +240,6 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();
 
-/* minimal-conditions history (FTSO page) — live from FlareMetrics */
-(() => {
-  const mount = document.getElementById("np-mc-history");
-  if (!mount) return;
-  const EID = "329f3b42-6a70-4258-987d-44292880ee7f";
-  fetch(`https://api.flaremetrics.io/v3/ftso/providers/${EID}/minimum-conditions`)
-    .then((r) => r.json())
-    .then((j) => {
-      const rows = (j.data || []).slice(0, 10);
-      if (!rows.length) { mount.textContent = "No history available."; return; }
-      const pill = (ok) => `<i class="mc-mini ${ok ? "ok" : "bad"}"></i>`;
-      mount.innerHTML = rows.map((r) => `
-        <div class="mc-row"><span class="mc-ep">${r.rewardEpochNumber ?? ""}</span>
-          <span class="mc-pills">${pill(r.ftsoScalingConditionMet)}${pill(r.fastUpdatesConditionMet)}${pill(r.stakingConditionMet !== false)}</span>
-          <span class="mc-meta">${r.passesHeld} passes${r.strikes ? ` · ${r.strikes} strike` : ""} · ${r.eligibleForReward ? "eligible" : "not eligible"}</span></div>`).join("");
-    })
-    .catch(() => { mount.textContent = "History unavailable right now."; });
-})();
 /* delegation calculator (validator page) */
 (() => {
   const inp = document.getElementById("np-calc-in"); if (!inp) return;
@@ -386,4 +368,76 @@
     }).catch(render);
     render(); setInterval(render, 30000);
   }
+})();
+
+/* FDC performance table + operator earnings (from oracle-daemon v2 payload, cache-first) */
+(() => {
+  const fdcTb = document.querySelector("#fdc-table tbody");
+  const oe = document.getElementById("oe-fsp-latest");
+  if (!fdcTb && !oe) return;
+  const OURS = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
+  function fromCache() {
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf("mirsflr_cache_") === 0 && k.indexOf("/v2/flare/providers") > 0) {
+          return JSON.parse(localStorage.getItem(k)).data;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+  function findProv(o) {
+    if (!o || typeof o !== "object") return null;
+    if (String(o.voterAddress || "").toLowerCase() === OURS) return o;
+    for (const k in o) { const r = findProv(o[k]); if (r) return r; }
+    return null;
+  }
+  function render(p) {
+    if (!p || !p.epochData) return;
+    const eps = p.epochData.slice().sort((a, b) => b.epoch - a.epoch);
+    if (fdcTb) {
+      const rows = eps.filter((e) => e.fdc && e.fdc.totalRewardedVotingRounds > 0).slice(0, 12);
+      let sumR = 0, sumT = 0;
+      fdcTb.innerHTML = rows.map((e) => {
+        const r = e.fdc.rewardedVotingRounds, tt = e.fdc.totalRewardedVotingRounds, pc = e.fdc.participationPercentage;
+        sumR += r; sumT += tt;
+        return `<tr><td class="addr">E${e.epoch}</td><td class="num">${r.toLocaleString("en-US")}/${tt.toLocaleString("en-US")}</td><td class="num"${pc >= 99 ? ' style="color:var(--green)"' : pc < 95 ? ' style="color:var(--yellow)"' : ""}>${pc.toFixed(2)}%</td><td><div class="fdc-bar"><i style="width:${pc.toFixed(2)}%"></i></div></td></tr>`;
+      }).join("");
+      const agg = document.getElementById("fdc-agg");
+      if (agg && sumT) agg.textContent = `${((sumR / sumT) * 100).toFixed(2)}% over ${sumT.toLocaleString("en-US")} rewarded voting rounds (last ${rows.length} epochs).`;
+    }
+    if (oe) {
+      const latest = eps.find((e) => e.feeBasedRewardAmount > 0) || eps[0];
+      const fees = eps.filter((e) => e.feeBasedRewardAmount > 0).slice(0, 10).map((e) => e.feeBasedRewardAmount);
+      const avg = fees.length ? fees.reduce((s, x) => s + x, 0) / fees.length : 0;
+      const monthlyFsp = avg * 8.68;
+      const fmtF = (x) => x >= 1000 ? Math.round(x).toLocaleString("en-US") + " FLR" : x.toFixed(1) + " FLR";
+      document.getElementById("oe-ep").textContent = latest ? latest.epoch : "?";
+      oe.textContent = latest ? fmtF(latest.feeBasedRewardAmount) : "–";
+      document.getElementById("oe-fsp-month").textContent = fmtF(monthlyFsp);
+      const aprEl = document.querySelector('[data-field="validatorApr"]');
+      const apr = aprEl && parseFloat((aprEl.textContent || "").replace(",", ".")) / 100;
+      let stakeMonthly = null;
+      if (apr && apr > 0) { stakeMonthly = 84e6 * apr * 0.2 / 12; }
+      fetch("/data/network-position.json?v=core-13").then((r) => r.json()).then((np) => {
+        const vv = np.validator;
+        if (vv && apr) stakeMonthly = (vv.totalStakeM - vv.selfBondM) * 1e6 * apr * 0.2 / 12;
+        document.getElementById("oe-stake-month").textContent = stakeMonthly ? fmtF(stakeMonthly) : "–";
+        document.getElementById("oe-total-month").textContent = fmtF(monthlyFsp + (stakeMonthly || 0));
+      }).catch(() => {
+        document.getElementById("oe-stake-month").textContent = stakeMonthly ? fmtF(stakeMonthly) : "–";
+        document.getElementById("oe-total-month").textContent = fmtF(monthlyFsp + (stakeMonthly || 0));
+      });
+    }
+  }
+  const cached = findProv(fromCache());
+  if (cached) { render(cached); return; }
+  const tryRender = (attempt) => {
+    const p = findProv(fromCache());
+    if (p) { render(p); return; }
+    if (attempt < 6) setTimeout(() => tryRender(attempt + 1), 2500);
+    else fetch("https://api.oracle-daemon.com/v2/flare/providers").then((r) => r.json()).then((d) => render(findProv(d))).catch(() => {});
+  };
+  tryRender(0);
 })();

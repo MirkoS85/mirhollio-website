@@ -23,7 +23,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-12" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-13" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/validator/" />
   <meta property="og:type" content="website" />
@@ -43,7 +43,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-12" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-13" />
 </head>
 <body>
   <div class="mobile-top">
@@ -61,7 +61,7 @@
     <main>
       <section class="section home-hero-section">
         <div class="inner">
-          <div class="hero home-hero"><span class="hero-mark-wrap hm-c" aria-hidden="true"><img src="../assets/brand-mark.jpg?v=core-12" alt=""></span>
+          <div class="hero home-hero"><span class="hero-mark-wrap hm-c" aria-hidden="true"><img src="../assets/brand-mark.jpg?v=core-13" alt=""></span>
             <div class="home-hero-copy"><div class="kicker">Stake FLR</div><h1>Validator node metrics.</h1><p class="lead">APR, uptime, capacity, delegation details, and validator reward history for Mirhollio Core.</p></div>
             <div class="hero-live-strip hero-live-strip-3" aria-label="Validator metric highlights">
               <div class="hero-live-tile"><span>APR</span><strong data-field="validatorAprSnapshot">-</strong></div>
@@ -96,6 +96,15 @@
               <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-expiry-chart" viewBox="0 0 1000 260" preserveAspectRatio="xMidYMid meet" aria-label="Delegation expiry timeline"></svg></div>
             </article>
             <article class="card panel-wide-card">
+              <div class="panel-head"><strong>Operator earnings</strong><small>What the infrastructure operator actually earns &mdash; protocol fee income, live.</small></div>
+              <div class="oe-grid">
+                <div class="oe-tile"><span>FSP fee income &middot; latest epoch</span><strong id="oe-fsp-latest">&ndash;</strong><em>20% fee on FSP rewards (E<span id="oe-ep">?</span>)</em></div>
+                <div class="oe-tile"><span>FSP fee income &middot; monthly avg</span><strong id="oe-fsp-month">&ndash;</strong><em>average of last 10 epochs &times; 8.7 epochs/month</em></div>
+                <div class="oe-tile"><span>Staking fee &middot; monthly est.</span><strong id="oe-stake-month">&ndash;</strong><em>20% of delegators&rsquo; staking rewards at current APR</em></div>
+                <div class="oe-tile total"><span>Total &middot; monthly est.</span><strong id="oe-total-month">&ndash;</strong><em>before infrastructure costs</em></div>
+              </div>
+            </article>
+            <article class="card panel-wide-card">
               <div class="panel-head"><strong>Delegation calculator</strong><small>Estimate staking rewards at the current live APR.</small></div>
               <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
               <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
@@ -121,9 +130,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-12"></script>
-  <script src="../assets/live-refresh.js?v=core-12"></script>
-  <script src="../assets/pwa.js?v=core-12"></script>
-  <script src="../assets/core-home.js?v=core-12" defer></script>
+  <script src="../assets/operator.js?v=core-13"></script>
+  <script src="../assets/live-refresh.js?v=core-13"></script>
+  <script src="../assets/pwa.js?v=core-13"></script>
+  <script src="../assets/core-home.js?v=core-13" defer></script>
 </body>
 </html>
