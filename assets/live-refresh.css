@@ -4960,3 +4960,38 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .epoch-pulse .ep-row b{color:var(--text);font-weight:600;}
 .epoch-pulse .ep-bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;}
 .epoch-pulse .ep-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),#FF6E93);box-shadow:0 0 8px rgba(255,46,99,.5);transition:width 1s linear;}
+/* === core-10: hero grafika, ticker, pasice, tilt === */
+.home-hero{position:relative;}
+#rays{position:absolute;inset:-40px -24px 0;width:calc(100% + 48px);height:calc(100% + 40px);pointer-events:none;z-index:0;opacity:.85;}
+.home-hero > *{position:relative;z-index:1;}
+.hero-orbit{position:absolute;right:6px;top:30px;width:192px;height:192px;z-index:1;filter:drop-shadow(0 0 26px rgba(255,46,99,.28));}
+@media (min-width:1121px){.home-hero-copy{padding-right:225px;}}
+@media (max-width:1120px){.hero-orbit{display:none;}}
+.orb-ring-a{animation:orb-spin 70s linear infinite;transform-origin:128px 128px;}
+.orb-ring-b{animation:orb-spin 46s linear infinite reverse;transform-origin:128px 128px;}
+.orb-carousel{animation:orb-spin 130s linear infinite;transform-origin:128px 128px;}
+.orb-node{animation:orb-spin 130s linear infinite reverse;transform-box:fill-box;transform-origin:center;}
+.orb-glow{animation:orb-breathe 3.4s ease-in-out infinite;transform-origin:128px 128px;}
+.orb-core{animation:orb-breathe 3.4s ease-in-out infinite;transform-origin:128px 128px;}
+.orb-star{animation:orb-spin 24s linear infinite;transform-box:fill-box;transform-origin:center;opacity:.95;}
+@keyframes orb-spin{to{transform:rotate(360deg);}}
+@keyframes orb-breathe{0%,100%{opacity:.82;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
+.ticker-band{overflow:hidden;border-top:1px solid rgba(255,46,99,.16);border-bottom:1px solid rgba(255,46,99,.16);background:rgba(255,46,99,.035);margin:0;}
+.ticker-track{display:flex;white-space:nowrap;width:max-content;animation:ticker-run 46s linear infinite;}
+.ticker-band:hover .ticker-track{animation-play-state:paused;}
+.ticker-seg{padding:9px 0 9px 28px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
+.ticker-seg b{color:var(--text);font-weight:600;}
+.ticker-seg em{font-style:normal;color:var(--pink);}
+.ticker-seg .up{color:var(--green);} .ticker-seg .down{color:var(--danger);}
+@keyframes ticker-run{to{transform:translateX(-50%);}}
+.band-divider{max-width:var(--max);margin:0 auto;padding:0 24px;height:22px;display:flex;align-items:center;position:relative;}
+.band-divider::before{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,46,99,.38) 18%,rgba(255,46,99,.38) 82%,transparent);}
+.band-divider i{position:absolute;left:50%;top:50%;width:7px;height:7px;transform:translate(-50%,-50%) rotate(45deg);background:var(--pink);box-shadow:0 0 12px rgba(255,46,99,.75);animation:orb-breathe 3.4s ease-in-out infinite;}
+.panel,.why-card{position:relative;overflow:hidden;transform-style:preserve-3d;transition:transform .18s ease,border-color .18s ease;}
+.panel::after,.why-card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .25s ease;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),rgba(255,46,99,.14),transparent 65%);}
+.panel:hover::after,.why-card:hover::after{opacity:1;}
+@media (prefers-reduced-motion:reduce){
+  .orb-ring-a,.orb-ring-b,.orb-carousel,.orb-node,.orb-glow,.orb-core,.orb-star,.band-divider i{animation:none !important;}
+  .ticker-track{animation:none !important;}
+  .panel,.why-card{transition:none;}
+}

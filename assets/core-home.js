@@ -290,3 +290,89 @@
   }
   tick(); setInterval(tick, 1000);
 })();
+/* hero graphics: data rays canvas + tilt/glow + live ticker */
+(() => {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* --- data rays --- */
+  const cv = document.getElementById("rays");
+  if (cv && !reduced) {
+    const ctx = cv.getContext("2d");
+    let W, H, parts = [], running = false, raf = 0;
+    const DPR = Math.min(devicePixelRatio || 1, 2);
+    function size() {
+      W = cv.clientWidth; H = cv.clientHeight;
+      cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    function spawn() {
+      const fromLeft = Math.random() < 0.7;
+      return { x: fromLeft ? -20 : Math.random() * W, y: Math.random() * H,
+        vx: 0.25 + Math.random() * 0.55, vy: (Math.random() - 0.5) * 0.12,
+        len: 26 + Math.random() * 60, a: 0.04 + Math.random() * 0.14, w: Math.random() < 0.25 ? 1.6 : 1 };
+    }
+    function step() {
+      if (!running) return;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of parts) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x - p.len > W) Object.assign(p, spawn(), { x: -20 });
+        const g = ctx.createLinearGradient(p.x - p.len, p.y, p.x, p.y);
+        g.addColorStop(0, "rgba(255,46,99,0)"); g.addColorStop(1, `rgba(255,46,99,${p.a})`);
+        ctx.strokeStyle = g; ctx.lineWidth = p.w;
+        ctx.beginPath(); ctx.moveTo(p.x - p.len, p.y - p.vy * p.len); ctx.lineTo(p.x, p.y); ctx.stroke();
+      }
+      raf = requestAnimationFrame(step);
+    }
+    function start() { if (running) return; running = true; size(); if (!parts.length) parts = Array.from({ length: 34 }, spawn); step(); }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+    new IntersectionObserver((e) => { e[0].isIntersecting && !document.hidden ? start() : stop(); }).observe(cv);
+    document.addEventListener("visibilitychange", () => { document.hidden ? stop() : start(); });
+    addEventListener("resize", () => { if (running) size(); });
+  }
+  /* --- tilt + glow --- */
+  if (!reduced) {
+    document.querySelectorAll(".panel, .why-card").forEach((el) => {
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+        el.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
+        el.style.setProperty("--my", (py * 100).toFixed(1) + "%");
+        el.style.transform = `perspective(900px) rotateX(${((0.5 - py) * 3).toFixed(2)}deg) rotateY(${((px - 0.5) * 3).toFixed(2)}deg)`;
+      });
+      el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+    });
+  }
+  /* --- live ticker --- */
+  const segA = document.getElementById("ticker-a"), segB = document.getElementById("ticker-b");
+  if (segA) {
+    const T0 = 1787857200, E0 = 428, LEN = 302400;
+    const S = { price: null, delta: null, rank: null, rrRank: null, rrCount: null, weight: null, uptime: null, stake: null, days: null };
+    function esc(x) { return String(x); }
+    function render() {
+      const now = Date.now() / 1000;
+      const ep = Math.floor((now - T0) / LEN) + E0;
+      const left = T0 + (ep - E0 + 1) * LEN - now;
+      const h = Math.floor(left / 3600), m = Math.floor((left % 3600) / 60);
+      const parts = [];
+      parts.push(`FLR <b>${S.price != null ? "$" + S.price.toFixed(5) : "…"}</b>${S.delta != null ? ` <span class="${S.delta >= 0 ? "up" : "down"}">${S.delta >= 0 ? "▲" : "▼"}${Math.abs(S.delta).toFixed(1)}% 7d</span>` : ""}`);
+      parts.push(`epoch <b>${ep}</b> ends in <b>${h}h ${String(m).padStart(2, "0")}m</b>`);
+      if (S.rrRank) parts.push(`reward rate <em>#${S.rrRank}</em> of ${S.rrCount} providers`);
+      if (S.rank) parts.push(`network weight <b>#${S.rank}</b> of 100`);
+      if (S.stake) parts.push(`validator stake <b>${S.stake}M FLR</b>${S.days != null ? ` · renews in ${S.days}d` : ""}`);
+      parts.push(`uptime <b>100%</b>`);
+      parts.push(`<em>formerly MirSFlr</em>`);
+      const html = parts.map((p) => esc(p)).join('<span style="color:var(--pink);padding:0 14px">◆</span>');
+      segA.innerHTML = html; segB.innerHTML = html;
+    }
+    fetch("/data/network-position.json?v=core-10").then((r) => r.json()).then((np) => {
+      S.rank = np.position && np.position.rank; 
+      if (np.rewardRate) { S.rrRank = np.rewardRate.rank; S.rrCount = np.rewardRate.count; }
+      if (np.validator) { S.stake = np.validator.totalStakeM.toFixed(0); S.days = Math.max(0, Math.round((new Date(np.validator.stakeEndsAt) - Date.now()) / 864e5)); }
+      render();
+    }).catch(render);
+    fetch("https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=21600").then((r) => r.json()).then((c) => {
+      const rows = c.slice(0, 28).reverse(); const cl = rows.map((x) => x[4]);
+      S.price = cl[cl.length - 1]; S.delta = ((cl[cl.length - 1] - cl[0]) / cl[0]) * 100; render();
+    }).catch(render);
+    render(); setInterval(render, 30000);
+  }
+})();
