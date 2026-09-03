@@ -173,3 +173,43 @@
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", main); else main();
 })();
+/* live P-chain delegations (validator page) + live stake numbers */
+(() => {
+  const tb = document.querySelector("#np-del-table tbody");
+  const NODE = "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz";
+  async function run() {
+    try {
+      const r = await fetch("https://flare-api.flare.network/ext/bc/P", { method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "platform.getCurrentValidators", params: { nodeIDs: [NODE] } }) });
+      const j = await r.json();
+      const v = j.result && j.result.validators && j.result.validators[0];
+      if (!v) throw new Error("node not found");
+      const dels = (v.delegators || []).map((d) => ({
+        owner: (d.rewardOwner && d.rewardOwner.addresses && d.rewardOwner.addresses[0]) || "",
+        amt: Number(d.weight) / 1e9, start: Number(d.startTime) * 1000, end: Number(d.endTime) * 1000 }))
+        .sort((a, b) => a.end - b.end);
+      const total = dels.reduce((s, d) => s + d.amt, 0);
+      const selfB = Number(v.weight) / 1e9;
+      // živi popravki hero panela na domači strani
+      const st = document.getElementById("np-stake");
+      if (st) st.innerHTML = ((total + selfB) / 1e6).toFixed(1) + "M<small> FLR</small>";
+      const ss = document.getElementById("np-stake-sub2");
+      if (ss) ss.textContent = `self-bond ${(selfB/1e6).toFixed(0)}M · ${dels.length} delegations · live`;
+      if (!tb) return;
+      const day = 864e5, now = Date.now();
+      const fd = (t) => new Date(t).toISOString().slice(0, 10);
+      const rows = dels.map((d) => {
+        const left = Math.max(0, Math.ceil((d.end - now) / day));
+        const short = d.owner ? d.owner.slice(0, 10) + "…" + d.owner.slice(-4) : "–";
+        return `<tr><td class="addr">${short}</td><td class="num">${d.amt >= 1e6 ? (d.amt/1e6).toFixed(2)+"M" : Math.round(d.amt).toLocaleString("en-US")}</td><td>${fd(d.start)}</td><td>${fd(d.end)}</td><td class="num${left <= 7 ? " soon" : ""}">${left}d</td></tr>`;
+      });
+      tb.innerHTML = rows.join("") || '<tr><td colspan="5">No active delegations.</td></tr>';
+      const sub = document.getElementById("np-del-sub");
+      if (sub) sub.textContent = `${dels.length} active delegations · ${(total/1e6).toFixed(2)}M FLR delegated + ${(selfB/1e6).toFixed(0)}M self-bond · live from P-chain`;
+    } catch (e) {
+      if (tb) tb.innerHTML = '<tr><td colspan="5">Live P-chain data unavailable right now.</td></tr>';
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
+})();

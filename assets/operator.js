@@ -392,27 +392,33 @@ const MirhollioCore = (() => {
     if (node) renderValidatorDelegators(node);
   }
 
+  let staleServed = false;
+
   async function fetchJsonWithCache(url, ttlMs = 60_000) {
     const key = `${CACHE_PREFIX}${url}`;
-    const cache = getStorage("sessionStorage");
+    const cache = getStorage("localStorage");
     const cached = storageGet(cache, key);
+    let stale = null;
     if (cached) {
       try {
         const { data, ts } = JSON.parse(cached);
         if (Date.now() - Number(ts) < ttlMs) return data;
+        stale = data;
       } catch (_) {}
     }
-
-    const res = await fetch(url, { mode: "cors" });
-    if (!res.ok) throw new Error(`Request failed: ${url}`);
-    const data = await res.json();
-    storageSet(cache, key, JSON.stringify({ data, ts: Date.now() }));
-    return data;
+    const refresh = fetch(url, { mode: "cors" }).then(async res => {
+      if (!res.ok) throw new Error(`Request failed: ${url}`);
+      const data = await res.json();
+      storageSet(cache, key, JSON.stringify({ data, ts: Date.now() }));
+      return data;
+    });
+    if (stale != null) { refresh.catch(() => {}); staleServed = true; return stale; }
+    return refresh;
   }
 
   async function fetchTextWithCache(url, ttlMs = 60_000) {
     const key = `${CACHE_PREFIX}${url}`;
-    const cache = getStorage("sessionStorage");
+    const cache = getStorage("localStorage");
     const cached = storageGet(cache, key);
     if (cached) {
       try {
@@ -421,11 +427,18 @@ const MirhollioCore = (() => {
       } catch (_) {}
     }
 
-    const res = await fetch(url, { mode: "cors" });
-    if (!res.ok) throw new Error(`Request failed: ${url}`);
-    const data = await res.text();
-    storageSet(cache, key, JSON.stringify({ data, ts: Date.now() }));
-    return data;
+    let stale = null;
+    if (cached) {
+      try { const { data, ts } = JSON.parse(cached); stale = data; } catch (_) {}
+    }
+    const refresh = fetch(url, { mode: "cors" }).then(async res => {
+      if (!res.ok) throw new Error(`Request failed: ${url}`);
+      const data = await res.text();
+      storageSet(cache, key, JSON.stringify({ data, ts: Date.now() }));
+      return data;
+    });
+    if (stale != null) { refresh.catch(() => {}); staleServed = true; return stale; }
+    return refresh;
   }
 
   function setLoadingState() {
@@ -2619,6 +2632,11 @@ const MirhollioCore = (() => {
     loadFtsoEntity();
     loadFtsoDelegationSummary();
     loadPrice();
+    window.setTimeout(() => {
+      if (!staleServed || !navigator.onLine) return;
+      staleServed = false;
+      loadFtsoSnapshot(); load(); loadValidator(); loadFtsoExplorer(); loadFtsoEntity(); loadFtsoDelegationSummary(); loadPrice();
+    }, 7000);
     let resizeTimer = 0;
     window.addEventListener("resize", () => {
       window.clearTimeout(resizeTimer);
