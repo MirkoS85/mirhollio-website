@@ -1,0 +1,136 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mirhollio Core — homepage v2 preview</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#0A0A0E;--surface:#131318;--surface2:#18181F;--line:rgba(255,255,255,.10);--ink:#F4F4F8;--text:#ECECF2;--muted:#9AA0AF;--mag:#FF2E63;--magl:#FF6E93;--good:#35C77E;--amber:#F2B233;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:"Public Sans",sans-serif;padding:34px;max-width:1280px;margin:0 auto}
+h1{font-family:Archivo;font-size:26px;margin:0 0 6px}
+.note{color:var(--muted);font-size:13.5px;margin-bottom:26px}
+.tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--magl);border:1px solid rgba(255,46,99,.35);border-radius:999px;padding:2px 10px;margin-bottom:10px}
+section{margin-bottom:34px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden}
+.card h3{font-family:Archivo;font-size:15px;margin:0 0 2px;display:flex;justify-content:space-between;align-items:center}
+.card h3 .chip{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;color:var(--good)}
+.card h3 .chip.down{color:#FF6242}
+.big{font-family:Archivo;font-size:34px;font-weight:800;margin:6px 0 2px}
+.sub{font-size:12.5px;color:var(--muted)}
+svg{display:block;width:100%}
+.glowline{filter:drop-shadow(0 0 6px rgba(255,46,99,.55))}
+.row2{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+@media(max-width:900px){.row2{grid-template-columns:1fr}}
+.gauge-wrap{display:flex;gap:20px;align-items:center}
+.legend{font-size:12px;color:var(--muted);display:flex;gap:16px;margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:center}
+.step .n{width:34px;height:34px;border-radius:10px;background:var(--mag);color:#fff;font-family:Archivo;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.step b{font-family:Archivo}
+.step p{font-size:13px;color:var(--muted);margin:6px 0 0}
+.cta{background:linear-gradient(120deg,#2A0E1A, #4A1028 55%, #2A0E1A);border:1px solid rgba(255,46,99,.4);border-radius:18px;padding:26px 30px;display:flex;align-items:center;gap:26px;justify-content:space-between;flex-wrap:wrap}
+.cta b{font-family:Archivo;font-size:22px}
+.cta .btn{background:var(--mag);color:#fff;font-weight:700;border-radius:12px;padding:12px 22px;text-decoration:none;box-shadow:0 0 24px rgba(255,46,99,.45)}
+.pulse{animation:pu 3s ease-in-out infinite}
+@keyframes pu{50%{opacity:.55}}
+</style></head><body>
+<h1>Predlog: domača stran v2 — grafike</h1>
+<div class="note">Vse spodaj je izrisano z živimi web tehnologijami strani (SVG/CSS, brez knjižnic) v obstoječi temi. Številke so realne iz zadnje analize; oznaka ○ = potrebna razširitev podatkovnega cevovoda.</div>
+
+<div class="tag">1 · TRIJE PODATKOVNI HERO PANELI — pod naslov, namesto ponovljenih štirih ploščic</div>
+<section class="cards">
+  <div class="card"><h3>FLR price <span class="chip">▲ +2.1% 7D</span></h3>
+    <div class="big">$0.00581</div><div class="sub">€0.00584 · market data live</div>
+    <svg viewBox="0 0 320 84"><defs><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF2E63" stop-opacity=".35"/><stop offset="1" stop-color="#FF2E63" stop-opacity="0"/></linearGradient></defs>
+    <path d="M0,60 L20,58 40,62 60,55 80,57 100,50 120,53 140,46 160,49 180,42 200,45 220,38 240,42 260,34 280,37 300,30 320,33 L320,84 0,84 Z" fill="url(#a)"/>
+    <polyline class="glowline" points="0,60 20,58 40,62 60,55 80,57 100,50 120,53 140,46 160,49 180,42 200,45 220,38 240,42 260,34 280,37 300,30 320,33" fill="none" stroke="#FF2E63" stroke-width="2.2"/>
+    <circle cx="320" cy="33" r="4" fill="#FF6E93"/></svg></div>
+  <div class="card"><h3>Reward rate / epoch <span class="chip">9. / 77 ponudnikov ○</span></h3>
+    <div class="big">1.60%</div><div class="sub">mediana omrežja 1.44% — <b style="color:var(--magl)">1.1×</b> nad njo</div>
+    <svg viewBox="0 0 320 84">
+      <line x1="0" y1="47" x2="320" y2="47" stroke="rgba(255,255,255,.18)" stroke-dasharray="4 5"/>
+      <text x="4" y="42" font-size="9.5" fill="#9AA0AF" font-family="IBM Plex Mono">mediana</text>
+      <g fill="#5A2233">%BARS%</g>
+      <g fill="#FF2E63">%BARS2%</g></svg>
+    <div class="legend"><span><i style="background:#FF2E63"></i>Mirhollio Core</span><span><i style="background:#5A2233"></i>ostali (p25–p75)</span></div></div>
+  <div class="card"><h3>Validator stake <span class="chip down">konec 19. 10. ○</span></h3>
+    <div class="gauge-wrap">
+      <svg viewBox="0 0 120 120" style="width:110px;flex:0 0 110px">
+        <circle cx="60" cy="60" r="48" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="11"/>
+        <circle cx="60" cy="60" r="48" fill="none" stroke="#FF2E63" stroke-width="11" stroke-linecap="round" stroke-dasharray="301.6 301.6" stroke-dashoffset="0.4" transform="rotate(-90 60 60)" class="glowline"/>
+        <circle cx="60" cy="60" r="34" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="7"/>
+        <circle cx="60" cy="60" r="34" fill="none" stroke="#F2B233" stroke-width="7" stroke-linecap="round" stroke-dasharray="98 213.6" transform="rotate(-90 60 60)"/>
+        <text x="60" y="56" text-anchor="middle" font-size="17" font-weight="800" fill="#F4F4F8" font-family="Archivo">100%</text>
+        <text x="60" y="72" text-anchor="middle" font-size="9" fill="#9AA0AF" font-family="Public Sans">poln · 46 dni</text></svg>
+      <div><div class="big" style="font-size:26px;margin:0">90.0M<span style="font-size:13px;color:var(--muted)"> /90M FLR</span></div>
+      <div class="sub">self-bond 6M · 51 delegacij<br>uptime 100% · <span style="color:var(--amber)">obnova node-a napovedana</span></div></div>
+    </div></div>
+</section>
+
+<div class="tag">2 · POLOŽAJ V OMREŽJU — nova sekcija med "Live snapshot" in "Before you confirm"</div>
+<section class="card"><h3>Mesto med 100 registriranimi FTSO voterji <span class="chip">epoha 428 · ○ FSE</span></h3>
+  <svg viewBox="0 0 1200 92" style="margin-top:10px">
+    <g>%STRIP%</g>
+    <line x1="0" y1="78" x2="1200" y2="78" stroke="rgba(255,255,255,.12)"/>
+    <text x="1050" y="14" font-size="11" fill="#FF6E93" font-family="IBM Plex Mono">Mirhollio Core · #88 · 0.24%</text>
+    <text x="1160" y="90" font-size="9.5" fill="#9AA0AF" font-family="IBM Plex Mono">#100</text><text x="4" y="90" font-size="9.5" fill="#9AA0AF" font-family="IBM Plex Mono">#1</text></svg>
+  <div class="legend"><span><i style="background:#FF2E63"></i>naša teža 46.5</span><span><i style="background:#3A2A31"></i>ostali voterji</span><span><i style="background:#FF6242"></i>prag izpada 3.1</span><span>100/100 mest zasedenih</span></div></section>
+
+<div class="tag">3 · TEŽA PO EPOHAH — na FTSO podstran, pod vote power history</div>
+<section class="row2">
+  <div class="card"><h3>Registracijska teža in sestavini</h3>
+    <svg viewBox="0 0 640 170">
+      <g font-family="IBM Plex Mono" font-size="9.5" fill="#9AA0AF">
+        <text x="0" y="12">100</text><text x="0" y="82">50</text><text x="0" y="152">0</text></g>
+      <line x1="26" y1="8" x2="640" y2="8" stroke="rgba(255,255,255,.07)"/><line x1="26" y1="78" x2="640" y2="78" stroke="rgba(255,255,255,.07)"/><line x1="26" y1="148" x2="640" y2="148" stroke="rgba(255,255,255,.07)"/>
+      %EPOCHS%
+      <polyline class="glowline" points="%WLINE%" fill="none" stroke="#FF2E63" stroke-width="2.4" stroke-linejoin="round"/>
+      %WDOTS%
+    </svg>
+    <div class="legend"><span><i style="background:#4A3540"></i>P-stake ×5 (M)</span><span><i style="background:#F2B233"></i>WFLR (M)</span><span><i style="background:#FF2E63"></i>teža W<sub>reg</sub></span></div></div>
+  <div class="card"><h3>Iztek delegacij <span class="chip down">○ P-chain</span></h3>
+    <svg viewBox="0 0 460 170">
+      <g font-family="IBM Plex Mono" font-size="9.5" fill="#9AA0AF"><text x="0" y="12">90M</text><text x="0" y="82">45M</text><text x="0" y="152">0</text></g>
+      <line x1="30" y1="8" x2="460" y2="8" stroke="rgba(255,255,255,.07)"/><line x1="30" y1="78" x2="460" y2="78" stroke="rgba(255,255,255,.07)"/><line x1="30" y1="148" x2="460" y2="148" stroke="rgba(255,255,255,.07)"/>
+      <path d="M30,10 H210 V26 H300 V42 H360 V58 H420 V148 H460" fill="none" stroke="#FF2E63" stroke-width="2.4" class="glowline"/>
+      <path d="M30,10 H210 V26 H300 V42 H360 V58 H420 V148 H460 V148 H30 Z" fill="rgba(255,46,99,.10)"/>
+      <line x1="420" y1="6" x2="420" y2="150" stroke="#F2B233" stroke-dasharray="4 4"/>
+      <text x="414" y="164" font-size="10" fill="#F2B233" font-family="IBM Plex Mono" text-anchor="end">19. okt — obnova</text>
+    </svg>
+    <div class="sub" style="margin-top:6px">Vsaka stopnica = konec delegacije. Jasno pove, kdaj potrebuješ nove delegatorje — in kdaj pride nov node.</div></div>
+</section>
+
+<div class="tag">4 · ZAKAJ DELEGIRATI SEM — štiri kartice (vzor: oracle-daemon "feature cards")</div>
+<section class="steps" style="grid-template-columns:repeat(4,1fr)">
+  <div class="step"><div class="n">⚙</div><b>Lasten algoritem</b><p>Cene računa naš softver, ne kupljena koda. Razvoj javno na GitHubu.</p></div>
+  <div class="step"><div class="n">9.</div><b>Top-10 donos</b><p>9. najvišji reward rate od 77 ponudnikov (FlareMetrics). ○</p></div>
+  <div class="step"><div class="n">✓</div><b>3/3 pogoji</b><p>Vsi minimalni pogoji izpolnjeni, 89/89 upravičenih epoh, uptime 100%.</p></div>
+  <div class="step"><div class="n">🛡</div><b>Preverljivi naslovi</b><p>Vse naslove preveri tu — nikoli ne zaupaj DM "podpori".</p></div>
+</section>
+
+<div class="tag">5 · CTA PAS — čisto spodaj (vzor: oracle-daemon vijolični banner)</div>
+<section class="cta">
+  <div style="display:flex;align-items:center;gap:18px"><img src="logo.png" width="64" height="64" style="border-radius:14px" class="pulse"><div><b>Pripravljen delegirati?</b><div class="sub">2 minuti v Flare Portalu. Najprej preveri naslove.</div></div></div>
+  <div style="display:flex;gap:12px"><a class="btn" href="#">Delegate WFLR</a><a class="btn" style="background:transparent;border:1px solid rgba(255,46,99,.5);box-shadow:none" href="#">Verify addresses</a></div>
+</section>
+<script>
+// reward-rate bars (kartica 2)
+const rr=[62,58,64,55,60,52,57,49,54,47,51,44,49,42,46,40,44,38,42,36];
+document.querySelector('g[fill="#5A2233"]').innerHTML=rr.map((v,i)=>`<rect x="${30+i*14}" y="${84-v*0.75}" width="9" height="${v*0.75}" rx="2"/>`).join('');
+document.querySelector('g[fill="#FF2E63"]').innerHTML=`<rect x="${30+20*14}" y="${84-52*0.75}" width="9" height="${52*0.75}" rx="2"/>`;
+// strip 100 voterjev
+const g=[...document.querySelectorAll('svg g')].find(x=>x.parentElement.getAttribute('viewBox')==='0 0 1200 92');
+let s='';for(let i=0;i<100;i++){const w=Math.pow(1-i/100,1.55)*60+4;const me=i===87;
+ s+=`<rect x="${i*12+0.5}" y="${78-w}" width="10" height="${w}" rx="2" fill="${me?'#FF2E63':'#3A2A31'}" ${me?'filter="drop-shadow(0 0 6px rgba(255,46,99,.7))"':''}/>`;}
+s+=`<rect x="${99*12+0.5}" y="${78-6}" width="10" height="6" rx="2" fill="#FF6242"/>`;g.innerHTML=s;
+// epohe: stolpci stake*5 + wflr, črta teže
+const eps=[[418,21.4,0.1,33.3],[420,90,5.5,98.6],[421,90,7.2,98.9],[422,90,3.7,98.3],[423,79.7,3.6,89.7],[424,90,5.1,98.5],[425,90,5.0,98.5],[426,90,4.3,98.4],[427,69.9,4.3,81.5],[428,32.5,4.7,46.6]];
+const gs=[...document.querySelectorAll('svg')].find(x=>x.getAttribute('viewBox')==='0 0 640 170');
+let bars='',pts=[],dots='';
+eps.forEach((e,i)=>{const x=40+i*60;const st=e[1]*5/500*140, wf=e[2]/500*140*5;
+ bars+=`<rect x="${x}" y="${148-st}" width="18" height="${st}" rx="2" fill="#4A3540"/><rect x="${x+20}" y="${148-wf}" width="8" height="${Math.max(wf,2)}" rx="2" fill="#F2B233"/><text x="${x+12}" y="164" font-size="9.5" fill="#9AA0AF" font-family="IBM Plex Mono" text-anchor="middle">${e[0]}</text>`;
+ const y=148-e[3]/100*140;pts.push(`${x+12},${y}`);
+ if(i===eps.length-1||i===1)dots+=`<text x="${x+12}" y="${y-8}" font-size="10.5" font-weight="700" fill="#FF6E93" text-anchor="middle" font-family="Archivo">${e[3]}</text>`;
+ dots+=`<circle cx="${x+12}" cy="${y}" r="3.5" fill="#FF2E63"/>`;});
+gs.innerHTML=gs.innerHTML.replace('%EPOCHS%',bars).replace('%WLINE%',pts.join(' ')).replace('%WDOTS%',dots);
+</script></body></html>

@@ -39,7 +39,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-3" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-4" />
 </head>
 <body>
   <div class="mobile-top">
@@ -103,6 +103,11 @@
                 <span>Delegators <strong>-</strong></span>
               </div>
             </div>
+            <div class="card panel-wide-card">
+              <div class="panel-head"><strong>Registration weight per epoch</strong><small>P-stake ×5 + WFLR, combined into the FSP registration weight.</small></div>
+              <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-weight-chart" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet" aria-label="Registration weight history per epoch"></svg></div>
+              <div class="chart-summary"><span><i class="lg" style="background:#4A3540"></i>P-stake ×5</span><span><i class="lg" style="background:#F2B233"></i>WFLR</span><span><i class="lg" style="background:#FF2E63"></i>registration weight</span></div>
+            </div>
             <details class="card panel-wide-card ftso-delegation-card">
               <summary class="ftso-delegation-toggle">
                 <span><strong>Delegation summary</strong><small>FTSO vote power, epoch changes, and delegator concentration.</small></span>
@@ -164,8 +169,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-3"></script>
-  <script src="../assets/live-refresh.js?v=core-3"></script>
-  <script src="../assets/pwa.js?v=core-3"></script>
+  <script src="../assets/operator.js?v=core-4"></script>
+  <script src="../assets/live-refresh.js?v=core-4"></script>
+  <script src="../assets/pwa.js?v=core-4"></script>
+  <script src="../assets/core-home.js?v=core-4" defer></script>
 </body>
 </html>

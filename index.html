@@ -53,7 +53,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-full.png">
   <link rel="manifest" href="app.webmanifest">
-  <link rel="stylesheet" href="assets/live-refresh.css?v=core-3" />
+  <link rel="stylesheet" href="assets/live-refresh.css?v=core-4" />
 </head>
 <body>
   <div class="mobile-top">
@@ -96,16 +96,32 @@
               <h1>Stake with proof. Delegate with confidence.</h1>
               <p class="lead">Independent Flare validator and FTSO provider with live metrics, verified addresses, and transparent performance history.</p>
             </div>
-            <div class="hero-live-strip" aria-label="Live metric highlights">
-              <div class="hero-live-tile"><span>Reward rate</span><strong data-field="rewardRateSnapshot">-</strong></div>
-              <div class="hero-live-tile"><span>Availability</span><strong data-field="availabilitySnapshot">-</strong></div>
-              <div class="hero-live-tile"><span>APR</span><strong data-field="validatorAprSnapshot">-</strong></div>
-              <div class="hero-live-tile"><span>Uptime</span><strong data-field="validatorUptimeSnapshot">-</strong></div>
+            <div class="hero-panels" aria-label="Live metric highlights">
+              <div class="panel"><div class="p-head">FLR price <span class="p-chip" id="np-price-delta"></span></div>
+                <div class="p-big" id="np-price">&ndash;</div><div class="p-sub" id="np-price-sub">live market data &middot; 7 days</div>
+                <svg id="np-price-spark" viewBox="0 0 320 74" class="spark" aria-hidden="true"></svg></div>
+              <div class="panel"><div class="p-head">Reward rate / epoch <span class="p-chip" id="np-rr-rank"></span></div>
+                <div class="p-big"><span data-field="rewardRateSnapshot">-</span></div><div class="p-sub" id="np-rr-sub">vs network median</div>
+                <svg id="np-rr-curve" viewBox="0 0 320 74" class="spark" aria-hidden="true"></svg></div>
+              <div class="panel"><div class="p-head">Validator stake <span class="p-chip amberc" id="np-stake-end"></span></div>
+                <div class="p-gauge-row"><svg id="np-gauge" viewBox="0 0 120 120" aria-hidden="true"></svg>
+                  <div><div class="p-big" id="np-stake">&ndash;</div><div class="p-sub" id="np-stake-sub2">loading&hellip;</div>
+                  <div class="p-sub">uptime <span data-field="validatorUptimeSnapshot">-</span> &middot; APR <span data-field="validatorAprSnapshot">-</span></div></div></div></div>
             </div>
           </div>
         </div>
       </section>
 
+      <section class="section light np-section">
+        <div class="inner">
+          <div class="section-title"><h2>Network position.</h2><p>Where Mirhollio Core stands among the registered FTSO voters right now.</p></div>
+          <div class="card np-card">
+            <div class="np-head"><strong>Rank <span id="np-rank">&ndash;</span> of <span id="np-voters">100</span> by registration weight</strong><span class="p-chip" id="np-epoch"></span></div>
+            <svg id="np-strip" viewBox="0 0 1200 92" class="np-strip" role="img" aria-label="Weight of all registered voters with Mirhollio Core highlighted"></svg>
+            <div class="np-legend" id="np-legend"></div>
+          </div>
+        </div>
+      </section>
       <section class="section light">
         <div class="inner">
           <div class="section-title">
@@ -173,6 +189,17 @@
         </div>
       </section>
 
+      <section class="section light why-section">
+        <div class="inner">
+          <div class="section-title"><h2>Why delegate here.</h2></div>
+          <div class="why-grid">
+            <div class="why-card"><div class="w-ic">&#9881;</div><b>Own algorithm</b><p>Prices come from software we build ourselves &mdash; development happens in the open on GitHub.</p></div>
+            <div class="why-card"><div class="w-ic">&#9733;</div><b>Top reward rate</b><p id="np-f-rank">Among the best reward rates on FlareMetrics.</p></div>
+            <div class="why-card"><div class="w-ic">&#10003;</div><b>Conditions met</b><p id="np-f-cond">All minimal conditions met, full availability.</p></div>
+            <div class="why-card"><div class="w-ic">&#128737;</div><b>Verified addresses</b><p>Check every address on this site before delegating. No support DMs, ever.</p></div>
+          </div>
+        </div>
+      </section>
       <section class="section light delegate-section">
         <div class="inner">
           <div class="section-title">
@@ -186,6 +213,14 @@
         </div>
       </section>
 
+      <section class="section light cta-section">
+        <div class="inner">
+          <div class="cta-band">
+            <div class="cta-left"><img src="logo.png" alt="" width="64" height="64"><div><b>Ready to delegate?</b><div class="p-sub">Two minutes in Flare Portal. Verify the addresses first.</div></div></div>
+            <div class="cta-btns"><a class="btn primary" href="ftso/">Delegate WFLR</a><a class="btn ghost" href="addresses/">Verify addresses</a></div>
+          </div>
+        </div>
+      </section>
       <section class="section light contact-section">
         <div class="inner">
           <div class="section-title">
@@ -215,8 +250,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="assets/operator.js?v=core-3"></script>
-  <script src="assets/live-refresh.js?v=core-3"></script>
-  <script src="assets/pwa.js?v=core-3"></script>
+  <script src="assets/operator.js?v=core-4"></script>
+  <script src="assets/live-refresh.js?v=core-4"></script>
+  <script src="assets/core-home.js?v=core-4" defer></script>
+  <script src="assets/pwa.js?v=core-4"></script>
 </body>
 </html>
