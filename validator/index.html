@@ -23,7 +23,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-6" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-7" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/validator/" />
   <meta property="og:type" content="website" />
@@ -43,7 +43,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-6" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-7" />
 </head>
 <body>
   <div class="mobile-top">
@@ -100,10 +100,6 @@
               <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
               <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
             </article>
-            <article class="card panel-wide-card">
-              <div class="panel-head"><strong><span class="np-live-dot"></span>Live delegations</strong><small id="np-del-sub">Current delegations on the node, read straight from the P-chain on every visit.</small></div>
-              <div style="overflow-x:auto"><table class="np-table" id="np-del-table"><thead><tr><th>Reward owner</th><th class="num">Amount</th><th>Start</th><th>End</th><th class="num">Days left</th></tr></thead><tbody><tr><td colspan="5">Loading live P-chain data…</td></tr></tbody></table></div>
-            </article>
             <article class="card panel-wide-card delegation-summary-card">
               <div class="panel-head"><strong>Delegation summary</strong></div>
               <div class="delegator-summary">
@@ -125,9 +121,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-6"></script>
-  <script src="../assets/live-refresh.js?v=core-6"></script>
-  <script src="../assets/pwa.js?v=core-6"></script>
-  <script src="../assets/core-home.js?v=core-6" defer></script>
+  <script src="../assets/operator.js?v=core-7"></script>
+  <script src="../assets/live-refresh.js?v=core-7"></script>
+  <script src="../assets/pwa.js?v=core-7"></script>
+  <script src="../assets/core-home.js?v=core-7" defer></script>
 </body>
 </html>
