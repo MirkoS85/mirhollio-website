@@ -1390,7 +1390,7 @@ const MirhollioCore = (() => {
     const latest = rows[rows.length - 1];
     const grid = [0, .25, .5, .75, 1].map(tick => {
       const y = padTop + plotH * tick;
-      return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(76,90,120,.16)" />`;
+      return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 41, 109,.16)" />`;
     }).join("");
     const leftLabels = [maxDelegated, (maxDelegated + minDelegated) / 2, minDelegated].map((value, index) => {
       const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom + 4;
@@ -1406,7 +1406,7 @@ const MirhollioCore = (() => {
       return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#5C6577" font-size="13" font-weight="850">${formatChartMonth(point.timestamp)}</text>`;
     }).join("");
     const markers = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#1652e9" : "#f7fbff"}" stroke="#2F6BFF" stroke-width="2"></circle>
+      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#ff296d" : "#37101d"}" stroke="#ff296d" stroke-width="2"></circle>
       <circle cx="${point.x}" cy="${point.delegatorsY}" r="3.5" fill="#26a56c"></circle>
       <circle cx="${point.x}" cy="${Math.min(point.delegatedY, point.delegatorsY)}" r="18" fill="transparent" data-delegation-index="${index}" style="cursor:pointer"></circle>
     `).join("");
@@ -1414,20 +1414,20 @@ const MirhollioCore = (() => {
     svg.innerHTML = `
       <defs>
         <linearGradient id="ftsoDelegationFill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="rgba(22,82,233,.22)" />
-          <stop offset="100%" stop-color="rgba(22,82,233,.02)" />
+          <stop offset="0%" stop-color="rgba(255, 41, 109,.22)" />
+          <stop offset="100%" stop-color="rgba(255, 41, 109,.02)" />
         </linearGradient>
       </defs>
       ${grid}
       ${leftLabels}
       ${rightLabels}
       <polygon points="${area}" fill="url(#ftsoDelegationFill)"></polygon>
-      <polyline points="${voteLine}" fill="none" stroke="#1652e9" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <polyline points="${voteLine}" fill="none" stroke="#ff296d" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
       <polyline points="${delegatorLine}" fill="none" stroke="#26a56c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
       ${markers}
       ${xLabels}
       <g transform="translate(${padLeft},14)">
-        <circle cx="0" cy="0" r="5" fill="#1652e9"></circle>
+        <circle cx="0" cy="0" r="5" fill="#ff296d"></circle>
         <text x="12" y="5" fill="#5C6577" font-size="13" font-weight="900">Vote power</text>
         <circle cx="122" cy="0" r="5" fill="#26a56c"></circle>
         <text x="134" y="5" fill="#5C6577" font-size="13" font-weight="900">Delegators</text>
@@ -1689,7 +1689,7 @@ const MirhollioCore = (() => {
       <text x="${point.x}" y="${height - 6}" text-anchor="middle" fill="#b8c1bd" font-size="12" font-weight="700">${point.epoch}</text>
     `).join("");
     const circles = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#1652e9" : "#FFFFFF"}" stroke="rgba(47,107,255,.35)" stroke-width="1.5"></circle>
+      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#ff296d" : "#181616"}" stroke="rgba(255, 41, 109,.35)" stroke-width="1.5"></circle>
       <circle cx="${point.x}" cy="${point.y}" r="15" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>
     `).join("");
 
@@ -1698,18 +1698,18 @@ const MirhollioCore = (() => {
     svg.innerHTML = `
       <defs>
         <linearGradient id="${gradientId}LineGrad" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stop-color="rgba(22,82,233,.58)" />
-          <stop offset="100%" stop-color="#1652e9" />
+          <stop offset="0%" stop-color="rgba(255, 41, 109,.58)" />
+          <stop offset="100%" stop-color="#ff296d" />
         </linearGradient>
         <linearGradient id="${gradientId}FillGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="rgba(22,82,233,.28)" />
-          <stop offset="100%" stop-color="rgba(22,82,233,.02)" />
+          <stop offset="0%" stop-color="rgba(255, 41, 109,.28)" />
+          <stop offset="100%" stop-color="rgba(255, 41, 109,.02)" />
         </linearGradient>
       </defs>
       ${grid}
       <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(maxReward, 0)}</text>
       <text x="8" y="${height - padBottom}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(minReward, 0)}</text>
-      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(22,82,233,.48)" stroke-dasharray="6 6" />
+      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 41, 109,.48)" stroke-dasharray="6 6" />
       <path d="${areaPath}" fill="url(#${gradientId}FillGrad)"></path>
       <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"></path>
       ${circles}
@@ -1895,8 +1895,8 @@ const MirhollioCore = (() => {
       const y = padTop + ((domainMax - tick) / domainRange) * chartH;
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${isTarget ? "rgba(47,107,255,.42)" : "rgba(76,90,120,.11)"}" stroke-dasharray="${isTarget ? "7 8" : "0"}" />
-        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="${isTarget ? "#3459b8" : "#8d7f87"}" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${isTarget ? "rgba(255, 41, 109,.42)" : "rgba(255, 41, 109,.11)"}" stroke-dasharray="${isTarget ? "7 8" : "0"}" />
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="${isTarget ? "#ff296d" : "#8d7f87"}" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
       `;
     }).join("");
 
@@ -1907,15 +1907,15 @@ const MirhollioCore = (() => {
     }));
     const linePath = points.map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`).join(" ");
     const areaPath = `M${points[0].x} ${height - padBottom} L${points.map(point => `${point.x} ${point.y}`).join(" L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
-    const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#2F6BFF" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
-    const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(47,107,255,.12)"></path>`;
+    const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#ff296d" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
+    const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(255, 41, 109,.12)"></path>`;
 
     const markers = points.map((point, index) => {
       const label = hourlyAvailabilityLabel(index, series.length);
       const isLatest = index === series.length - 1;
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(point.value)}" aria-label="${label} ${metricLabel}: ${pct(point.value)}">
-          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#2F6BFF" : "#FFFFFF"}" stroke="#2F6BFF" stroke-width="${compact ? 2.6 : 2.8}"></circle>
+          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#ff296d" : "#181616"}" stroke="#ff296d" stroke-width="${compact ? 2.6 : 2.8}"></circle>
           <rect class="hourly-hit" x="${point.x - Math.max(10, barW / 2)}" y="${padTop}" width="${Math.max(20, barW)}" height="${chartH}" fill="transparent"></rect>
         </g>
       `;
@@ -2007,21 +2007,21 @@ const MirhollioCore = (() => {
         key: "performance",
         label: "Performance",
         values: provider?.ftsoPerformance?.performance1h,
-        color: "#3661cf",
+        color: "#ff296d",
         dash: ""
       },
       {
         key: "primary",
         label: "Primary band (IQR)",
         values: provider?.ftsoPerformance?.performance1_1h,
-        color: "#a1b7f0",
+        color: "#ff296d",
         dash: "8 7"
       },
       {
         key: "secondary",
         label: "Secondary band",
         values: provider?.ftsoPerformance?.performance2_1h,
-        color: "#527adf",
+        color: "#ff296d",
         dash: "8 7"
       }
     ].map(series => ({
@@ -2056,7 +2056,7 @@ const MirhollioCore = (() => {
     const grid = ticks.map(tick => {
       const y = yFor(tick);
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(76,90,120,.11)" />
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 41, 109,.11)" />
         <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${Math.round(tick * 100)}%</text>
       `;
     }).join("");
@@ -2064,7 +2064,7 @@ const MirhollioCore = (() => {
     const lines = series.map(item => {
       const points = item.values.map((value, index) => `${xFor(index)},${yFor(value)}`).join(" ");
       const circles = item.values.map((value, index) => `
-        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#FFFFFF" stroke="${item.color}" stroke-width="2"></circle>
+        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#181616" stroke="${item.color}" stroke-width="2"></circle>
       `).join("");
       return `
         <g class="performance-line performance-line-${item.key}">

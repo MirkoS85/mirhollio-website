@@ -1040,9 +1040,9 @@
     svg.innerHTML = `
       <defs>
         <linearGradient id="${selector}-area" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#6691ff" stop-opacity=".34"/>
-          <stop offset="42%" stop-color="#4a74e0" stop-opacity=".18"/>
-          <stop offset="100%" stop-color="#4a74e0" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#ff296d" stop-opacity=".34"/>
+          <stop offset="42%" stop-color="#ff296d" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="#ff296d" stop-opacity="0"/>
         </linearGradient>
         <filter id="${selector}-glow" x="-12%" y="-35%" width="124%" height="170%">
           <feGaussianBlur stdDeviation="3.4" result="blur"/>
