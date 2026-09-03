@@ -4901,3 +4901,24 @@ svg.spark{width:100%;height:64px;display:block;margin-top:8px;overflow:visible;}
 .condition-dots span.ok::after,.metric strong.pre-reg-value .pre-reg-pill.ok::after{content:"\2713";font-weight:800;font-size:13px;color:var(--green);}
 .condition-dots span.bad::after,.metric strong.pre-reg-value .pre-reg-pill.bad::after{content:"\2715";font-weight:800;font-size:12px;color:var(--danger);}
 .metric strong.pre-reg-value .pre-reg-pill{display:inline-flex !important;align-items:center;justify-content:center;}
+/* === core-6: poenoteni piloti, mc-history, kalkulator, kompaktna tabela === */
+.condition-dots span{width:40px !important;height:20px !important;border-radius:999px !important;font-size:0 !important;}
+.condition-dots span.ok::after{font-size:13px;}
+.light .info-tip, .info-tip{background:rgba(255,255,255,.06) !important;color:var(--muted) !important;border:1px solid rgba(255,255,255,.18) !important;}
+.np-table td{padding:5px 10px;}
+.np-toggle{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;color:var(--text);font-weight:600;font-size:13px;padding:8px 14px;cursor:pointer;width:100%;}
+.np-toggle:hover{border-color:var(--pink);}
+.mc-history{display:flex;flex-direction:column;gap:8px;margin-top:12px;font-size:13px;}
+.mc-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.mc-ep{font-family:"IBM Plex Mono",monospace;color:var(--muted);min-width:52px;}
+.mc-pills{display:inline-flex;gap:7px;}
+.mc-mini{width:40px;height:20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;}
+.mc-mini.ok{background:rgba(53,199,126,.16);border:2px solid var(--green);box-shadow:0 0 10px rgba(53,199,126,.3);}
+.mc-mini.ok::after{content:"\2713";font-weight:800;font-size:12px;color:var(--green);}
+.mc-mini.bad{background:rgba(255,98,66,.16);border:2px solid var(--danger);}
+.mc-mini.bad::after{content:"\2715";font-weight:800;font-size:11px;color:var(--danger);}
+.mc-meta{color:var(--muted);font-size:12.5px;}
+.np-calc{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.np-calc input{flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 14px;font-size:15px;font-family:"IBM Plex Mono",monospace;}
+.np-calc input:focus-visible{outline:2px solid var(--pink);outline-offset:1px;}
+.condition-dots span{padding:0 !important;line-height:1 !important;}

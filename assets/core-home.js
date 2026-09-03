@@ -204,7 +204,22 @@
         const short = d.owner ? d.owner.slice(0, 10) + "…" + d.owner.slice(-4) : "–";
         return `<tr><td class="addr">${short}</td><td class="num">${d.amt >= 1e6 ? (d.amt/1e6).toFixed(2)+"M" : Math.round(d.amt).toLocaleString("en-US")}</td><td>${fd(d.start)}</td><td>${fd(d.end)}</td><td class="num${left <= 7 ? " soon" : ""}">${left}d</td></tr>`;
       });
-      tb.innerHTML = rows.join("") || '<tr><td colspan="5">No active delegations.</td></tr>';
+      const LIMIT = 8;
+      if (rows.length > LIMIT) {
+        const hidden = rows.slice(LIMIT).map((r) => r.replace("<tr>", '<tr class="np-more" hidden>'));
+        tb.innerHTML = rows.slice(0, LIMIT).join("") + hidden.join("") +
+          `<tr class="np-toggle-row"><td colspan="5"><button type="button" class="np-toggle" id="np-del-toggle">Show all ${rows.length} delegations ▾</button></td></tr>`;
+        const btn = document.getElementById("np-del-toggle");
+        btn.addEventListener("click", () => {
+          const more = tb.querySelectorAll(".np-more");
+          const open = btn.dataset.open === "1";
+          more.forEach((r) => { r.hidden = open; });
+          btn.dataset.open = open ? "0" : "1";
+          btn.textContent = open ? `Show all ${rows.length} delegations ▾` : "Show fewer ▴";
+        });
+      } else {
+        tb.innerHTML = rows.join("") || '<tr><td colspan="5">No active delegations.</td></tr>';
+      }
       const sub = document.getElementById("np-del-sub");
       if (sub) sub.textContent = `${dels.length} active delegations · ${(total/1e6).toFixed(2)}M FLR delegated + ${(selfB/1e6).toFixed(0)}M self-bond · live from P-chain`;
     } catch (e) {
@@ -212,4 +227,43 @@
     }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
+})();
+
+/* minimal-conditions history (FTSO page) — live from FlareMetrics */
+(() => {
+  const mount = document.getElementById("np-mc-history");
+  if (!mount) return;
+  const EID = "329f3b42-6a70-4258-987d-44292880ee7f";
+  fetch(`https://api.flaremetrics.io/v3/ftso/providers/${EID}/minimum-conditions`)
+    .then((r) => r.json())
+    .then((j) => {
+      const rows = (j.data || []).slice(0, 10);
+      if (!rows.length) { mount.textContent = "No history available."; return; }
+      const pill = (ok) => `<i class="mc-mini ${ok ? "ok" : "bad"}"></i>`;
+      mount.innerHTML = rows.map((r) => `
+        <div class="mc-row"><span class="mc-ep">${r.rewardEpochNumber ?? ""}</span>
+          <span class="mc-pills">${pill(r.ftsoScalingConditionMet)}${pill(r.fastUpdatesConditionMet)}${pill(r.stakingConditionMet !== false)}</span>
+          <span class="mc-meta">${r.passesHeld} passes${r.strikes ? ` · ${r.strikes} strike` : ""} · ${r.eligibleForReward ? "eligible" : "not eligible"}</span></div>`).join("");
+    })
+    .catch(() => { mount.textContent = "History unavailable right now."; });
+})();
+/* delegation calculator (validator page) */
+(() => {
+  const inp = document.getElementById("np-calc-in"); if (!inp) return;
+  const out = document.getElementById("np-calc-out");
+  function aprNow() {
+    const el = document.querySelector('[data-field="validatorApr"]');
+    const v = el && parseFloat((el.textContent || "").replace(",", "."));
+    return Number.isFinite(v) && v > 0 ? v / 100 : null;
+  }
+  function calc() {
+    const amt = parseFloat(inp.value);
+    const apr = aprNow();
+    if (!Number.isFinite(amt) || amt <= 0) { out.textContent = "Enter an amount to estimate rewards."; return; }
+    if (!apr) { out.textContent = "Live APR still loading — try again in a moment."; return; }
+    const yr = amt * apr, mo = yr / 12;
+    out.innerHTML = `≈ <b>${mo.toLocaleString("en-US", { maximumFractionDigits: 0 })} FLR / month</b> · ${yr.toLocaleString("en-US", { maximumFractionDigits: 0 })} FLR / year at the current ${(apr * 100).toFixed(2)}% APR (after fee; not a guarantee).`;
+  }
+  inp.addEventListener("input", calc);
+  document.getElementById("np-calc-btn")?.addEventListener("click", calc);
 })();

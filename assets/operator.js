@@ -22,8 +22,8 @@ const MirhollioCore = (() => {
   };
   const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
   const TARGET_VOTER_CHECKSUM = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
-  const FTSO_EXPLORER_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER_CHECKSUM}/ftso`;
-  const FTSO_ENTITY_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER_CHECKSUM}`;
+  const FTSO_EXPLORER_URL = "/data/fse-entity-ftso.json?v=core-6";
+  const FTSO_ENTITY_URL = "/data/fse-entity.json?v=core-6";
   const FTSO_ENTITY_SNAPSHOT = {
     denormalizedsigningpolicy: {
       reward_epoch: 403,

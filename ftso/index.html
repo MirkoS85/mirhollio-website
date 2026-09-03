@@ -21,7 +21,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-5" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-6" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/ftso/" />
   <meta property="og:type" content="website" />
@@ -41,7 +41,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-5" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-6" />
 </head>
 <body>
   <div class="mobile-top">
@@ -110,6 +110,10 @@
               <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-weight-chart" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet" aria-label="Registration weight history per epoch"></svg></div>
               <div class="chart-summary"><span><i class="lg" style="background:#4A3540"></i>P-stake ×5</span><span><i class="lg" style="background:#F2B233"></i>WFLR</span><span><i class="lg" style="background:#FF2E63"></i>registration weight</span></div>
             </div>
+            <div class="card panel-wide-card">
+              <div class="panel-head"><strong>Minimal conditions — recent epochs</strong><small>Scaling · Fast Updates · Staking, per reward epoch (live from FlareMetrics).</small></div>
+              <div id="np-mc-history" class="mc-history">Loading…</div>
+            </div>
             <details class="card panel-wide-card ftso-delegation-card">
               <summary class="ftso-delegation-toggle">
                 <span><strong>Delegation summary</strong><small>FTSO vote power, epoch changes, and delegator concentration.</small></span>
@@ -171,9 +175,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-5"></script>
-  <script src="../assets/live-refresh.js?v=core-5"></script>
-  <script src="../assets/pwa.js?v=core-5"></script>
-  <script src="../assets/core-home.js?v=core-5" defer></script>
+  <script src="../assets/operator.js?v=core-6"></script>
+  <script src="../assets/live-refresh.js?v=core-6"></script>
+  <script src="../assets/pwa.js?v=core-6"></script>
+  <script src="../assets/core-home.js?v=core-6" defer></script>
 </body>
 </html>

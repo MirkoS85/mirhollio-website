@@ -1,0 +1,82 @@
+{
+ "id": 136,
+ "denormalizedentity": {
+  "id": 3368116,
+  "node_ids": [
+   {
+    "node_id": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz",
+    "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
+   }
+  ],
+  "signing_policy_address_balance": 3491.49,
+  "submit_signatures_address_balance": 3759.31,
+  "submit_address_balance": 3628.05,
+  "delegation_address_balance": 5077.95,
+  "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
+  "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
+  "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
+  "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
+  "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
+  "rewards_signed": 0,
+  "uptime_signed": 2,
+  "voter_registered_event_re": [
+   429,
+   428,
+   427,
+   426
+  ],
+  "uptime_vote_re": [
+   425,
+   424
+  ],
+  "uptime_vote_hash": [
+   "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
+   "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+  ],
+  "rewards_signed_re": [],
+  "rewards_signed_hash": []
+ },
+ "denormalizedsigningpolicy": {
+  "id": 5780,
+  "node_ids": [
+   "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
+  ],
+  "reward_epoch": 429,
+  "staking_weight": 4.671251628406492e+25,
+  "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
+  "delegation_fee_bips": 2000,
+  "w_nat_weight": 4.707663620834906e+24,
+  "w_nat_capped_weight": 4.707663620834906e+24,
+  "delegation_rate": 0.0001058604257594356,
+  "weight": 5.142017990489983e+25,
+  "vote_power": 60646027510097860000,
+  "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
+  "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
+  "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
+  "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
+  "registration_weight": 60646025415443190000,
+  "normalized_weight": 203
+ },
+ "fast_updates_addresses": [
+  {
+   "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
+   "last_used": 1788423308,
+   "balance": 3956.16
+  },
+  {
+   "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
+   "last_used": 1788422439,
+   "balance": 3955.92
+  },
+  {
+   "address": "0x53E46B1E920d092c130986B99763774792aEe578",
+   "last_used": 1788422698,
+   "balance": 3956.82
+  }
+ ],
+ "identity_address_balance": 42152.14,
+ "identity_address": "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
+ "display_name": "MirSFlr",
+ "logo_url": "https://raw.githubusercontent.com/TowoLabs/ftso-signal-providers/master/assets/0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade.png",
+ "listed": true
+}

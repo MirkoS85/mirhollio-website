@@ -41,13 +41,13 @@ jobs:
 
       - name: Commit snapshot
         run: |
-          if git diff --quiet -- data/network-position.json; then
+          if git diff --quiet -- data/network-position.json data/fse-entity.json data/fse-entity-ftso.json; then
             echo "No network position changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/network-position.json
+          git add data/network-position.json data/fse-entity.json data/fse-entity-ftso.json
           git commit -m "Update network position snapshot"
           git pull --rebase origin main
           git push

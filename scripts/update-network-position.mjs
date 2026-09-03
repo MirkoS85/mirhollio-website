@@ -124,6 +124,15 @@ async function main() {
       weight: +(Number(regw / 10n ** 15n) / 1000).toFixed(2) });
   }
 
+    // raw FSE mirrors for the site (FSE has no CORS for browsers)
+  try {
+    const CK = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
+    const ent = await getJson(`https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${CK}`);
+    writeFileSync("data/fse-entity.json", JSON.stringify(ent, null, 1) + "\n");
+    const entF = await getJson(`https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${CK}/ftso`);
+    writeFileSync("data/fse-entity-ftso.json", JSON.stringify(entF, null, 1) + "\n");
+  } catch (e) { console.error("fse mirror failed:", e.message); }
+
   const out = { schema: "mirhollio-network-position/v1", generatedAt: new Date().toISOString(),
     position, rewardRate, validator, weightHistory };
   writeFileSync("data/network-position.json", JSON.stringify(out, null, 2) + "\n");
