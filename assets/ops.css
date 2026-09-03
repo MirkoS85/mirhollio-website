@@ -1,22 +1,22 @@
 :root{
   color-scheme:dark;
-  --bg:#ff296d;
+  --bg:#08090b;
   --surface:#111315;
   --surface-2:#17191c;
   --surface-3:#1d2023;
   --line:rgba(255,255,255,.09);
   --line-strong:rgba(255,255,255,.14);
-  --ink:#37101d;
+  --ink:#f5f1f4;
   --muted:#a09aa0;
   --soft:#6f686e;
-  --pink:#FF2E63;
-  --pink-2:#FF6E93;
+  --pink:#e04a8a;
+  --pink-2:#ff66a5;
   --green:#73d577;
   --green-2:#4ba94f;
   --amber:#efb84e;
-  --red:#FF6242;
+  --red:#ff5f78;
   --shadow:0 18px 46px rgba(0,0,0,.34);
-  font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:"Public Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 *{box-sizing:border-box}
@@ -32,8 +32,8 @@ body{
   margin:0;
   background:
     radial-gradient(circle at 20% 0%, rgba(255,255,255,.05), transparent 24rem),
-    radial-gradient(circle at 92% 18%, rgba(255, 41, 109,.08), transparent 34rem),
-    linear-gradient(180deg, #101114 0%, #ff296d 24rem, #ff296d 100%);
+    radial-gradient(circle at 92% 18%, rgba(224,74,138,.08), transparent 34rem),
+    linear-gradient(180deg, #101114 0%, #08090b 24rem, #08090b 100%);
   color:var(--ink);
   letter-spacing:0;
 }
@@ -120,8 +120,8 @@ button{
 
 .ops-back:hover{
   color:var(--ink);
-  border-color:rgba(255, 41, 109,.45);
-  background:rgba(255, 41, 109,.1);
+  border-color:rgba(224,74,138,.45);
+  background:rgba(224,74,138,.1);
 }
 
 .icon-button,
@@ -200,12 +200,12 @@ button{
 
 .mobile-mini-grid i[data-status="down"]{
   background:var(--red);
-  box-shadow:0 0 10px rgba(255, 41, 109,.7);
+  box-shadow:0 0 10px rgba(255,95,120,.7);
 }
 
 .mobile-mini-grid i[data-status="loading"]{
   background:var(--pink);
-  box-shadow:0 0 10px rgba(255, 41, 109,.7);
+  box-shadow:0 0 10px rgba(224,74,138,.7);
 }
 
 [data-overall-state="warn"] .health-pill,
@@ -215,7 +215,7 @@ button{
 [data-overall-state="down"] .health-pill,
 [data-overall-state="down"].mobile-health .mobile-health-top strong{color:var(--red) !important}
 [data-overall-state="down"] .health-pill i,
-[data-overall-state="down"].mobile-health .mobile-health-top i{background:var(--red);box-shadow:0 0 10px rgba(255, 41, 109,.7)}
+[data-overall-state="down"].mobile-health .mobile-health-top i{background:var(--red);box-shadow:0 0 10px rgba(255,95,120,.7)}
 
 .mobile-health{
   overflow:hidden;
@@ -360,8 +360,8 @@ button{
 .status-tile[data-status="down"] strong{color:var(--red)}
 .status-tile[data-status="loading"] strong{color:var(--pink)}
 .status-tile[data-status="warn"]::after{content:"!";background:linear-gradient(180deg, var(--amber), #aa731e)}
-.status-tile[data-status="down"]::after{content:"×";background:linear-gradient(180deg, var(--red), #ff296d)}
-.status-tile[data-status="loading"]::after{content:"…";background:linear-gradient(180deg, var(--pink), #ff296d)}
+.status-tile[data-status="down"]::after{content:"×";background:linear-gradient(180deg, var(--red), #a71f39)}
+.status-tile[data-status="loading"]::after{content:"…";background:linear-gradient(180deg, var(--pink), #9c2458)}
 
 .infra-card{
   margin-top:10px;
@@ -473,12 +473,12 @@ button{
 
 .infra-check.down::before{
   background:var(--red);
-  box-shadow:0 0 12px rgba(255, 41, 109,.6);
+  box-shadow:0 0 12px rgba(255,95,120,.6);
 }
 
 .infra-check.loading::before{
   background:var(--pink);
-  box-shadow:0 0 12px rgba(255, 41, 109,.6);
+  box-shadow:0 0 12px rgba(224,74,138,.6);
 }
 
 .infra-check b{
@@ -925,8 +925,8 @@ h2{
   width:100%;
   height:120px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 41, 109,.09), transparent 48%),
-    linear-gradient(180deg, rgba(255, 41, 109,.07), transparent 72%),
+    radial-gradient(circle at 50% 0%, rgba(255,102,165,.09), transparent 48%),
+    linear-gradient(180deg, rgba(224,74,138,.07), transparent 72%),
     rgba(0,0,0,.13);
 }
 
@@ -957,18 +957,18 @@ h2{
 }
 
 .chart .grid-line{stroke:rgba(255,255,255,.065);stroke-width:1}
-.chart .target-line{stroke:rgba(255, 41, 109,.34);stroke-width:1.4;stroke-dasharray:6 8}
+.chart .target-line{stroke:rgba(224,74,138,.34);stroke-width:1.4;stroke-dasharray:6 8}
 .chart .axis-label{fill:#7a747a;font-size:10px;font-weight:760}
 .chart .zone-band{stroke:none}
 .chart .zone-ok{fill:rgba(115,213,119,.055)}
 .chart .zone-watch{fill:rgba(239,184,78,.075)}
-.chart .zone-down{fill:rgba(255, 41, 109,.07)}
+.chart .zone-down{fill:rgba(255,95,120,.07)}
 .chart .area-fill{opacity:.96}
 .chart .line-glow{fill:none;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;opacity:.22}
 .chart .line-main{fill:none;stroke:var(--pink-2);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .chart .line-green{fill:none;stroke:var(--pink-2);stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-.chart .line-amber{fill:none;stroke:#ff296d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:6 7}
-.chart .line-soft{fill:none;stroke:#ff296d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.chart .line-amber{fill:none;stroke:#dd6b8b;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:6 7}
+.chart .line-soft{fill:none;stroke:#a93b70;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .chart .dot{fill:var(--pink-2);stroke:#17191c;stroke-width:1.7}
 .chart .chart-hit{fill:transparent;pointer-events:all;cursor:crosshair;outline:none}
 .chart .chart-hit:focus{stroke:rgba(255,255,255,.16);stroke-width:1}
@@ -1034,8 +1034,8 @@ h2{
 
 .ops-chart-tooltip[data-zone="ok"]{border-color:rgba(115,213,119,.42)}
 .ops-chart-tooltip[data-zone="warn"]{border-color:rgba(239,184,78,.5)}
-.ops-chart-tooltip[data-zone="down"]{border-color:rgba(255, 41, 109,.5)}
-.ops-chart-tooltip[data-zone="reward"]{border-color:rgba(255, 41, 109,.46)}
+.ops-chart-tooltip[data-zone="down"]{border-color:rgba(255,95,120,.5)}
+.ops-chart-tooltip[data-zone="reward"]{border-color:rgba(224,74,138,.46)}
 
 .ops-chart-tooltip[data-type="validatorReward"]{
   min-width:220px;
@@ -1058,8 +1058,8 @@ h2{
   background:var(--pink-2);
 }
 
-.legend i:nth-of-type(2){background:#ff296d}
-.legend i:nth-of-type(3){background:#ff296d}
+.legend i:nth-of-type(2){background:#a93b70}
+.legend i:nth-of-type(3){background:#dd6b8b}
 
 .heatmap{
   display:grid;
