@@ -4927,24 +4927,36 @@ svg.spark{width:100%;height:64px;display:block;margin-top:8px;overflow:visible;}
 article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .delegation-flow-summary span strong ~ small, .table-section-head small{color:var(--muted) !important;}
 .section-side p{color:var(--muted) !important;}
-/* 2) minimal conditions -> označeni chipi (vrstni red: Scaling, Fast updates, FDC, Staking) */
-.condition-dots{gap:8px !important;flex-wrap:wrap;}
-.condition-dots span{width:auto !important;height:26px !important;padding:0 11px !important;border-radius:999px !important;gap:6px;}
-.condition-dots span::before{font-size:10px;font-weight:700;letter-spacing:.07em;font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--muted);}
-.condition-dots span:nth-child(1)::before{content:"SCALING";}
-.condition-dots span:nth-child(2)::before{content:"FAST UPD";}
-.condition-dots span:nth-child(3)::before{content:"FDC";}
-.condition-dots span:nth-child(4)::before{content:"STAKING";}
-.condition-dots span.ok::before{color:var(--green);}
-.condition-dots span.bad::before{color:var(--danger);}
-.condition-dots span.ok::after{font-size:12px;}
-.condition-dots.compact span{height:24px !important;padding:0 9px !important;}
-/* mc-history minis poravnaj z istim jezikom */
-.mc-mini{width:auto;min-width:40px;padding:0 8px;gap:5px;}
-.mc-row:first-child .mc-pills::before{content:"";}
 /* 3) kartice: enoten hover, mehkejši rob */
 .card{transition:border-color .18s ease;}
 .card:hover{border-color:rgba(255,46,99,.30);}
 /* 4) live delegations ostanki niso več potrebni */
 .np-toggle-row td{padding-top:10px;}
 .section-title p, .delegate-section .section-title p, .hero .lead{color:var(--muted) !important;}
+/* === core-9: čisti ✓ piloti kot pre-registered + gostota kartic === */
+.condition-dots{gap:8px !important;}
+.condition-dots span{width:40px !important;height:20px !important;padding:0 !important;border-radius:999px !important;font-size:0 !important;line-height:1 !important;border:2px solid rgba(255,255,255,.14);}
+.condition-dots span.ok{background:rgba(53,199,126,.2) !important;border-color:var(--green) !important;box-shadow:0 0 14px rgba(53,199,126,.4);}
+.condition-dots span.ok::after{content:"\2713";font-size:13px;font-weight:800;color:var(--green);}
+.condition-dots span.bad{background:rgba(255,98,66,.2) !important;border-color:var(--danger) !important;}
+.condition-dots span.bad::after{content:"\2715";font-size:12px;font-weight:800;color:var(--danger);}
+.condition-dots span.unknown{background:rgba(255,255,255,.06) !important;border-color:var(--line) !important;}
+/* gostota: FTSO metric mreža 4 stolpci, nižje kartice */
+@media (min-width:1100px){
+  .metric-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important;}
+  .metric:nth-child(2n){border-right:1px solid var(--line);}
+  .metric:nth-child(4n){border-right:0 !important;}
+  .metric:nth-last-child(-n+2){border-bottom:1px solid var(--line);}
+  .metric:nth-last-child(-n+4){border-bottom:0 !important;}
+}
+.metric{min-height:86px !important;padding:13px 14px !important;}
+.metric strong{font-size:23px !important;margin-top:7px !important;}
+.cards article.card, .cards .card{padding:15px 16px;}
+.cards .card p{margin:6px 0 0;font-size:12.5px;}
+.rewards-metric{min-height:0 !important;}
+/* live epoch pulz (sidebar) */
+.epoch-pulse{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);}
+.epoch-pulse .ep-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px;font-variant-numeric:tabular-nums;}
+.epoch-pulse .ep-row b{color:var(--text);font-weight:600;}
+.epoch-pulse .ep-bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;}
+.epoch-pulse .ep-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),#FF6E93);box-shadow:0 0 8px rgba(255,46,99,.5);transition:width 1s linear;}

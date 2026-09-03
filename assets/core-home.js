@@ -267,3 +267,26 @@
   inp.addEventListener("input", calc);
   document.getElementById("np-calc-btn")?.addEventListener("click", calc);
 })();
+/* live reward-epoch pulse in the sidebar (every page) */
+(() => {
+  const T0 = 1787857200, E0 = 428, LEN = 302400; // epoch 428 start, 3.5d epochs
+  const host = document.querySelector(".side > div");
+  if (!host) return;
+  const box = document.createElement("div");
+  box.className = "epoch-pulse";
+  box.innerHTML = '<div class="ep-row"><span>Epoch <b id="ep-n">–</b></span><span>ends in <b id="ep-left">–</b></span></div><div class="ep-bar"><div class="ep-fill" id="ep-fill" style="width:0%"></div></div>';
+  host.appendChild(box);
+  const n = document.getElementById("ep-n"), l = document.getElementById("ep-left"), f = document.getElementById("ep-fill");
+  function tick() {
+    const now = Date.now() / 1000;
+    const ep = Math.floor((now - T0) / LEN) + E0;
+    const st = T0 + (ep - E0) * LEN;
+    const left = st + LEN - now;
+    const pct = ((now - st) / LEN) * 100;
+    n.textContent = ep;
+    const h = Math.floor(left / 3600), m = Math.floor((left % 3600) / 60), s = Math.floor(left % 60);
+    l.textContent = h > 0 ? `${h}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s` : `${m}m ${String(s).padStart(2, "0")}s`;
+    f.style.width = pct.toFixed(2) + "%";
+  }
+  tick(); setInterval(tick, 1000);
+})();
