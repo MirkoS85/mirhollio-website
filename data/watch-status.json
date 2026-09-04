@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-09-04T09:07:03.888Z",
-  "updatedAt": "2026-09-04T09:07:03.888Z",
+  "generatedAt": "2026-09-04T13:27:38.229Z",
+  "updatedAt": "2026-09-04T13:27:38.229Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -57,17 +57,17 @@
   },
   "ftso": {
     "status": "ok",
-    "latestCompletedEpoch": 428,
+    "latestCompletedEpoch": 429,
     "signingPolicyEpoch": 430,
     "weight": 67512744.56709588,
     "delegatedWeight": 5528420.223030959,
     "cappedDelegatedWeight": 5528420.223030959,
     "stakingWeight": 61984324.34406492,
     "delegationFeeBips": 2000,
-    "rewardRate": 2.0329597092719642,
-    "performance": 0.7658245402472114,
-    "primaryPerformance": 0.4384835694905035,
-    "secondaryPerformance": 0.9840518540850166,
+    "rewardRate": 1.869573294078686,
+    "performance": 0.7651870232515394,
+    "primaryPerformance": 0.43853965628159175,
+    "secondaryPerformance": 0.9829519345648378,
     "availability": 1,
     "availability6h": 1,
     "availability24h": 1,
@@ -129,9 +129,9 @@
       1,
       1
     ],
-    "participation": 99.9702380952381,
+    "participation": 99.25595238095238,
     "conditionMet": true,
-    "rewardedVotingRounds": 3359,
+    "rewardedVotingRounds": 3335,
     "totalRewardedVotingRounds": 3360
   },
   "sources": {
