@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-04T05:07:09.750Z",
+  "generatedAt": "2026-09-04T11:44:44.897Z",
   "position": {
     "epoch": 430,
     "voters": 100,
@@ -112,31 +112,31 @@
       2.94
     ],
     "ourIndex": 81,
-    "primaryPct": 43.81,
-    "secondaryPct": 98.56,
+    "primaryPct": 44.63,
+    "secondaryPct": 98.82,
     "availabilityPct": 100,
-    "medianPrimaryPct": 47.75,
-    "medianSecondaryPct": 96.86,
+    "medianPrimaryPct": 47.13,
+    "medianSecondaryPct": 96.35,
     "passes": 3,
     "eligible": true
   },
   "rewardRate": {
     "rank": 1,
-    "count": 80,
-    "ours": 0.01949413419849829,
-    "median": 0.01270737877197848,
-    "p25": 0.0109414798760791,
-    "p75": 0.01474167401133763,
+    "count": 81,
+    "ours": 0.01792741514869973,
+    "median": 0.01272294346323656,
+    "p25": 0.01113256153195406,
+    "p75": 0.01470371283390188,
     "curve": [
-      0.01581,
-      0.01505,
-      0.01413,
-      0.01337,
-      0.01271,
-      0.01176,
-      0.01128,
-      0.01041,
-      0.00874
+      0.01588,
+      0.01489,
+      0.01392,
+      0.01325,
+      0.01272,
+      0.01171,
+      0.01123,
+      0.01094,
+      0.00923
     ]
   },
   "validator": {
