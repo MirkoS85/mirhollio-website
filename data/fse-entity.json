@@ -8,9 +8,9 @@
     "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
    }
   ],
-  "signing_policy_address_balance": 3482.47,
-  "submit_signatures_address_balance": 3758.33,
-  "submit_address_balance": 3626.44,
+  "signing_policy_address_balance": 3481.2,
+  "submit_signatures_address_balance": 3758.29,
+  "submit_address_balance": 3626.36,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -58,21 +58,21 @@
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1788560311,
-   "balance": 3956.04
+   "last_used": 1788567796,
+   "balance": 3956.03
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1788560235,
-   "balance": 3955.8
+   "last_used": 1788567731,
+   "balance": 3955.79
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1788560142,
-   "balance": 3956.7
+   "last_used": 1788567731,
+   "balance": 3956.69
   }
  ],
- "identity_address_balance": 42152.14,
+ "identity_address_balance": 52831.06,
  "identity_address": "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
  "display_name": "MirSFlr",
  "logo_url": "https://raw.githubusercontent.com/TowoLabs/ftso-signal-providers/master/assets/0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade.png",
