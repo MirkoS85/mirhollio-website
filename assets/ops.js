@@ -22,12 +22,12 @@
     infraHealth: "https://raw.githubusercontent.com/MirkoS85/mirsflr-status/master/api/infra-health/status.json",
     // ââ NEW: Official Flare RPC endpoints (wallet balances + epoch) ââ
     flareRpcPrimary: "https://flare-api.flare.network/ext/C/rpc",
-    flareRpcBackup: "https://rpc.ankr.com/flare",
+    flareRpcBackup: "https://flare.public-rpc.com",
     // ââ NEW: Flare Metrics API (validator backup) ââ
-    flareMetricsProvider: "https://flaremetrics.io/api/v1/ftso/providers?network=flare",
-    flareMetricsValidator: "https://flaremetrics.io/api/v1/validators?network=flare",
+    // Flare Metrics v1 and the validator tracker both 404 now. The P-chain
+    // answers the same question authoritatively and sends CORS "*".
+    pchain: "https://flare-api.flare.network/ext/bc/P",
     // ââ NEW: Official Flare Validator Tracker ââ
-    flareValidatorTracker: "https://flare-validators.flare.network/api/validators",
     // ââ NEW: Blockscout for on-chain tx verification ââ
     blockscoutAddress: "https://flare-explorer.flare.network/api/v2/addresses/"
   };
@@ -65,7 +65,8 @@
       daemon: "public-only",
       infraHealth: "loading",
       rpc: "loading",
-      flareMetrics: "loading"
+      flareMetrics: "loading",
+      pchain: "idle"
     },
     sourceLoadedAt: {
       provider: null,
@@ -77,7 +78,8 @@
       daemon: null,
       infraHealth: null,
       rpc: null,
-      flareMetrics: null
+      flareMetrics: null,
+      pchain: null
     },
     walletBalances: {
       submit: null,
@@ -717,79 +719,74 @@
   }
 
   // ââ NEW: Fetch epoch data from Flare Metrics as fallback âââââââââââââââââââ
-  async function fetchEpochFallback() {
-    try {
-      // Flare Metrics returns current epoch info
-      const data = await fetchJson("https://flaremetrics.io/api/v1/network?network=flare", 8_000);
-      if (data?.current_reward_epoch != null) {
-        state.epochFallback = {
-          currentEpoch: data.current_reward_epoch,
-          epochEndTime: data.reward_epoch_end_time || null,
-          source: "Flare Metrics"
-        };
-        state.sources.flareMetrics = "ok";
-        state.sourceLoadedAt.flareMetrics = new Date();
-      }
-    } catch (_) {
-      // Fallback: try computing from RPC block number
-      try {
-        const blockHex = await rpcCall(ENDPOINTS.flareRpcPrimary, "eth_blockNumber", []);
-        const block = parseInt(blockHex, 16);
-        // Flare epoch ~3.5 days = ~302,400 blocks at 1s/block
-        // Epoch 0 started at block 0, rough estimate
-        const estimatedEpoch = Math.floor(block / 302400);
-        state.epochFallback = { currentEpoch: estimatedEpoch, epochEndTime: null, source: "RPC estimate" };
-        state.sources.rpc = state.sources.rpc === "down" ? "warn" : state.sources.rpc;
-      } catch (__) {
-        state.sources.flareMetrics = "down";
-      }
-    }
+  // Reward epochs are fixed length from a known anchor, so the current one can be
+  // derived with no network call at all. Checked against the pipeline's signing
+  // policy epoch, which it reproduces exactly.
+  const EPOCH_ANCHOR = 428;
+  const EPOCH_ANCHOR_TIME = 1787857200;
+  const EPOCH_LENGTH_SECONDS = 302400;
+
+  function computedEpoch() {
+    const now = Math.floor(Date.now() / 1000);
+    const elapsed = now - EPOCH_ANCHOR_TIME;
+    if (!Number.isFinite(elapsed)) return null;
+    const epoch = EPOCH_ANCHOR + Math.floor(elapsed / EPOCH_LENGTH_SECONDS);
+    const endsAt = EPOCH_ANCHOR_TIME + (epoch + 1 - EPOCH_ANCHOR) * EPOCH_LENGTH_SECONDS;
+    return {
+      currentEpoch: epoch,
+      epochEndTime: new Date(endsAt * 1000).toISOString(),
+      source: "Computed schedule"
+    };
   }
 
+  async function fetchEpochFallback() {
+    state.epochFallback = computedEpoch();
+    state.sources.flareMetrics = state.epochFallback ? "computed" : "down";
+    state.sourceLoadedAt.flareMetrics = state.epochFallback ? new Date() : null;
+  }
+
+
   // ââ NEW: Fetch validator data from Flare Metrics / official tracker âââââââââ
+  const VALIDATOR_CAPACITY = 90_000_000;
+
+  // P-chain amounts are denominated in nanoFLR.
+  function nanoFlr(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n / 1e9 : null;
+  }
+
   async function fetchValidatorFallback() {
-    // Try Flare Metrics first
+    // The P-chain is the authoritative record for this node and, unlike the
+    // retired Flare Metrics and validator-tracker routes, it answers with
+    // Access-Control-Allow-Origin "*", so the browser can actually read it.
     try {
-      const data = await fetchJson(ENDPOINTS.flareMetricsValidator, 10_000);
-      const validators = Array.isArray(data) ? data : data?.validators || [];
-      const match = validators.find(v => {
-        const nodeId = String(v.nodeId || v.node_id || "");
-        return nodeId === TARGET.nodeId;
-      });
-      if (match) {
-        state.validatorFallback = {
-          uptime: match.uptime_percentage ?? match.uptime ?? null,
-          stake: match.stake_amount ?? match.total_stake ?? null,
-          delegated: match.delegated_amount ?? null,
-          freeSpace: match.free_space ?? match.available_delegation ?? null,
-          endTime: match.end_time ?? match.stake_end ?? null,
-          source: "Flare Metrics"
-        };
-        state.sources.flareMetrics = "ok";
-        state.sourceLoadedAt.flareMetrics = new Date();
+      const result = await rpcCall(
+        ENDPOINTS.pchain,
+        "platform.getCurrentValidators",
+        { nodeIDs: [TARGET.nodeId] },
+        12_000
+      );
+      const match = (result?.validators || [])[0];
+      if (!match) {
+        state.sources.pchain = "warn";
         return;
       }
-    } catch (_) {}
-
-    // Try official Flare validator tracker
-    try {
-      const data = await fetchJson(ENDPOINTS.flareValidatorTracker, 10_000);
-      const validators = Array.isArray(data) ? data : data?.validators || [];
-      const match = validators.find(v => {
-        const nodeId = String(v.nodeId || v.node_id || "");
-        return nodeId === TARGET.nodeId;
-      });
-      if (match) {
-        state.validatorFallback = {
-          uptime: match.uptime ?? match.uptimePercentage ?? null,
-          stake: match.stakeAmount ?? match.stake ?? null,
-          delegated: match.delegatedStake ?? null,
-          freeSpace: null,
-          endTime: match.endTime ?? match.stakeEndTime ?? null,
-          source: "Flare Validator Tracker"
-        };
-      }
-    } catch (__) {}
+      const selfBond = nanoFlr(match.weight);
+      const delegated = nanoFlr(match.delegatorWeight);
+      const stake = selfBond == null ? null : selfBond + (delegated || 0);
+      state.validatorFallback = {
+        uptime: match.uptime == null ? null : Number(match.uptime),
+        stake,
+        delegated,
+        freeSpace: stake == null ? null : Math.max(0, VALIDATOR_CAPACITY - stake),
+        endTime: match.endTime ? new Date(Number(match.endTime) * 1000).toISOString() : null,
+        source: "P-chain"
+      };
+      state.sources.pchain = "ok";
+      state.sourceLoadedAt.pchain = new Date();
+    } catch (_) {
+      state.sources.pchain = "down";
+    }
   }
 
   function seriesFrom(values) {
