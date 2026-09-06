@@ -4,6 +4,10 @@ import SwiftUI
 struct MirSFlrEntry: TimelineEntry {
     let date: Date
     let status: WatchStatus
+    /// True when `status` is the last-known or placeholder feed rather than a
+    /// fresh fetch. Views dim themselves so stale numbers are never mistaken
+    /// for live ones.
+    var isStale: Bool = false
 }
 
 struct MirSFlrProvider: TimelineProvider {
@@ -17,16 +21,32 @@ struct MirSFlrProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<MirSFlrEntry>) -> Void) {
         Task {
-            let status = (try? await StatusService.shared.fetch()) ?? .sample
-            let entry = MirSFlrEntry(date: Date(), status: status)
-            let refreshDate = Calendar.current.date(byAdding: .minute, value: 5, to: Date()) ?? Date().addingTimeInterval(300)
-            completion(Timeline(entries: [entry], policy: .after(refreshDate)))
+            let now = Date()
+            do {
+                let status = try await StatusService.shared.fetch()
+                completion(Timeline(
+                    entries: [MirSFlrEntry(date: now, status: status)],
+                    policy: .after(now.addingTimeInterval(5 * 60))
+                ))
+            } catch {
+                // Never fall back to `.sample` here. It renders as plausible live
+                // numbers, so a broken feed looked exactly like a working one and
+                // the failure went unnoticed. Prefer the last real fetch, mark it
+                // stale, and come back sooner than the normal five minutes.
+                let entry = MirSFlrEntry(
+                    date: now,
+                    status: StatusService.shared.cached ?? .sample,
+                    isStale: true
+                )
+                completion(Timeline(entries: [entry], policy: .after(now.addingTimeInterval(60))))
+            }
         }
     }
 }
 
 private enum WatchTone {
-    static func availability(_ value: Double?) -> Color {
+    static func availability(_ value: Double?, stale: Bool = false) -> Color {
+        if stale { return .secondary }
         guard let value else { return .secondary }
         let pct = value <= 1 ? value * 100 : value
         if pct >= 98 { return .green }
@@ -34,7 +54,8 @@ private enum WatchTone {
         return .pink
     }
 
-    static func capacityFree(_ value: Double?) -> Color {
+    static func capacityFree(_ value: Double?, stale: Bool = false) -> Color {
+        if stale { return .secondary }
         guard let value else { return .secondary }
         if value >= 1_000_000 { return .green }
         if value >= 250_000 { return .yellow }
@@ -69,7 +90,7 @@ struct MirSFlrCapacityView: View {
                 Text("Capacity").font(.headline)
                 Text("\(StatusFormat.compactBare(entry.status.validator.stake)) / 90M")
                 Text("Free \(StatusFormat.compactBare(entry.status.validator.free, decimals: 0))")
-                    .foregroundStyle(WatchTone.capacityFree(entry.status.validator.free))
+                    .foregroundStyle(WatchTone.capacityFree(entry.status.validator.free, stale: entry.isStale))
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }
@@ -91,14 +112,14 @@ struct MirSFlrFTSOAvailabilityView: View {
                     .font(.system(size: 13, weight: .bold))
             }
             .gaugeStyle(.accessoryCircular)
-            .tint(WatchTone.availability(availability))
+            .tint(WatchTone.availability(availability, stale: entry.isStale))
         case .accessoryInline:
             Text("FTSO avail \(StatusFormat.percent(availability))")
         default:
             VStack(alignment: .leading, spacing: 2) {
                 Text("FTSO live").font(.headline)
                 Text(StatusFormat.percent(availability, decimals: 1))
-                    .foregroundStyle(WatchTone.availability(availability))
+                    .foregroundStyle(WatchTone.availability(availability, stale: entry.isStale))
                 Text("Perf \(StatusFormat.percent(entry.status.ftso.performance, decimals: 1))")
             }
             .containerBackground(.fill.tertiary, for: .widget)
@@ -122,15 +143,15 @@ struct MirSFlrFDCAvailabilityView: View {
                     .font(.system(size: 13, weight: .bold))
             }
             .gaugeStyle(.accessoryCircular)
-            .tint(WatchTone.availability(availability))
+            .tint(WatchTone.availability(availability, stale: entry.isStale))
         case .accessoryInline:
             Text("FDC avail \(StatusFormat.percent(availability))")
         default:
             VStack(alignment: .leading, spacing: 2) {
                 Text("FDC live").font(.headline)
                 Text(StatusFormat.percent(availability, decimals: 1))
-                    .foregroundStyle(WatchTone.availability(availability))
-                Text("Epoch \(StatusFormat.percent(fdc?.participation, decimals: 1))")
+                    .foregroundStyle(WatchTone.availability(availability, stale: entry.isStale))
+                Text("Participation \(StatusFormat.percent(fdc?.participation, decimals: 1))")
             }
             .containerBackground(.fill.tertiary, for: .widget)
         }

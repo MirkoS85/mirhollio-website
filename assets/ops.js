@@ -11,12 +11,14 @@
     providersV1: "https://api.oracle-daemon.com/v1/flare/providers",
     validators: "https://api.oracle-daemon.com/v1/flare/validators",
     // Flare Systems Explorer (existing)
-    explorerEntity: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3",
-    explorerFtso: "https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3/ftso",
+    // Flare Systems Explorer sends no Access-Control-Allow-Origin header, so the
+    // browser can never read it directly. The pipeline commits raw same-shape
+    // mirrors of both payloads; read those instead.
+    explorerEntity: "/data/fse-entity.json",
+    explorerFtso: "/data/fse-entity-ftso.json",
     ftsoSnapshot: "/data/ftso-delegations.json?v=delegation-data-2",
     // Self (existing)
     nodeHealth: "https://node.mirhollio.com/flare/ext/health",
-    daemonStatus: "https://node.mirhollio.com/ops/status.json",
     infraHealth: "https://raw.githubusercontent.com/MirkoS85/mirsflr-status/master/api/infra-health/status.json",
     // ââ NEW: Official Flare RPC endpoints (wallet balances + epoch) ââ
     flareRpcPrimary: "https://flare-api.flare.network/ext/C/rpc",
@@ -60,7 +62,7 @@
       explorerFtso: "loading",
       ftsoSnapshot: "loading",
       node: "loading",
-      daemon: "loading",
+      daemon: "public-only",
       infraHealth: "loading",
       rpc: "loading",
       flareMetrics: "loading"
@@ -1824,7 +1826,6 @@
         fetchJson(ENDPOINTS.explorerFtso),
         fetchJson(ENDPOINTS.ftsoSnapshot, 8_000),
         fetchJson(ENDPOINTS.nodeHealth),
-        fetchJson(ENDPOINTS.daemonStatus, 2_500),
         fetchJson(ENDPOINTS.infraHealth, 8_000)
       ])
     ]);
@@ -1835,8 +1836,11 @@
     let explorerFtso = sourceResults[3].status === "fulfilled" ? sourceResults[3].value : null;
     let ftsoSnapshot = sourceResults[4].status === "fulfilled" ? sourceResults[4].value : null;
     let nodeHealth = sourceResults[5].status === "fulfilled" ? sourceResults[5].value : null;
-    let daemonPayload = sourceResults[6].status === "fulfilled" ? sourceResults[6].value : null;
-    let infraHealth = sourceResults[7].status === "fulfilled" ? sourceResults[7].value : null;
+    let infraHealth = sourceResults[6].status === "fulfilled" ? sourceResults[6].value : null;
+
+    // node.mirhollio.com/ops/status.json is not published and, by decision, will
+    // not be. The daemon panels report public-only rather than 404 every cycle.
+    let daemonPayload = null;
 
     state.sourceLoadedAt.provider = providerPayload ? new Date() : null;
     state.sourceLoadedAt.validator = validatorPayload ? new Date() : null;
@@ -1844,7 +1848,6 @@
     state.sourceLoadedAt.explorerFtso = explorerFtso ? new Date() : null;
     state.sourceLoadedAt.ftsoSnapshot = ftsoSnapshot ? new Date() : null;
     state.sourceLoadedAt.node = nodeHealth ? new Date() : null;
-    state.sourceLoadedAt.daemon = daemonPayload ? new Date() : null;
     state.sourceLoadedAt.infraHealth = infraHealth ? new Date() : null;
 
     let provider = providerPayload ? findDeep(providerPayload, isMirProvider) : null;
@@ -1871,7 +1874,7 @@
     setSource("explorerFtso", explorerFtso ? "ok" : "warn");
     setSource("ftsoSnapshot", ftsoSnapshot ? "ok" : "warn");
     setSource("node", nodeHealth ? "ok" : "down");
-    setSource("daemon", daemonPayload ? "ok" : "public-only");
+    setSource("daemon", "public-only");
     state.sources.infraHealth = infraHealth ? "ok" : "warn";
 
     // ââ NEW: Fire supplementary fetches in parallel (non-blocking) ââââââââââââ
