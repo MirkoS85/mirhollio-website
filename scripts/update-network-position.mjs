@@ -43,9 +43,26 @@ async function main() {
     ents.push(...d.results);
   }
   const epochs = await getJson("https://flare-systems-explorer.flare.network/backend-url/api/v0/reward_epoch?limit=14");
-  const active = epochs.results.find((e) => e.vote_power_block_selected);
+  // An epoch gets its vote power block selected before the entity signing policies
+  // are published for it, so around every epoch boundary the newest selected epoch
+  // still has zero registered entities. Taking it blindly left `reg` empty and blew
+  // up on reg[-1]. Prefer the newest selected epoch the entities actually carry.
+  const entityEpochCount = new Map();
+  for (const e of ents) {
+    const id = e.denormalizedsigningpolicy && e.denormalizedsigningpolicy.reward_epoch;
+    if (id != null) entityEpochCount.set(id, (entityEpochCount.get(id) || 0) + 1);
+  }
+  const selected = epochs.results.filter((e) => e.vote_power_block_selected);
+  const active = selected.find((e) => entityEpochCount.get(e.id)) || selected[0];
+  if (!active) throw new Error("No reward epoch with a selected vote power block");
   const epochId = active.id;
   const reg = ents.filter((e) => e.denormalizedsigningpolicy && e.denormalizedsigningpolicy.reward_epoch === epochId);
+  if (!reg.length) {
+    throw new Error(
+      `No entities registered for epoch ${epochId}; entity records carry ` +
+      `${[...entityEpochCount.keys()].sort((a, b) => b - a).join(", ") || "none"}`
+    );
+  }
   const w = (e) => Number(BigInt(e.denormalizedsigningpolicy.registration_weight || 0) / 10n ** 15n) / 1000;
   reg.sort((a, b) => w(b) - w(a));
   const total = reg.reduce((s, e) => s + w(e), 0);
