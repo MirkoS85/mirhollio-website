@@ -266,6 +266,14 @@ async function main() {
     : null;
   const ftso = ftsoWeights(explorer, snapshot);
   const ftsoAvailabilityHours = provider?.ftsoPerformance?.availability1h;
+  // The watch charts three 24h curves. Its model already declares these fields
+  // and the complication already reads them, but nothing ever published them,
+  // so all three rendered as flat lines. The provider payload is 15MB
+  // decompressed, far past what a widget extension can pull, so derive them
+  // here and ship them in the feed instead.
+  const ftsoPerformanceHours = provider?.ftsoPerformance?.performance1h;
+  const ftsoPrimaryHours = provider?.ftsoPerformance?.performance1_1h;
+  const ftsoSecondaryHours = provider?.ftsoPerformance?.performance2_1h;
   const fdcAvailabilityHours = provider?.fdcPerformance?.availability1h;
 
   const payload = {
@@ -310,7 +318,10 @@ async function main() {
       availability: numberOrNull(provider?.ftsoPerformance?.availability ?? latest?.ftsoPerformance?.availability),
       availability6h: recentAverage(ftsoAvailabilityHours, 6),
       availability24h: recentAverage(ftsoAvailabilityHours, 24),
-      availabilityHourly24h: recentSeries(ftsoAvailabilityHours, 24)
+      availabilityHourly24h: recentSeries(ftsoAvailabilityHours, 24),
+      performanceHourly24h: recentSeries(ftsoPerformanceHours, 24),
+      primaryPerformanceHourly24h: recentSeries(ftsoPrimaryHours, 24),
+      secondaryPerformanceHourly24h: recentSeries(ftsoSecondaryHours, 24)
     },
     fdc: {
       status: latest?.fdc?.conditionMet === false ? "warn" : provider?.fdcPerformance ? "ok" : "unknown",
