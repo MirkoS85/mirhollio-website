@@ -370,6 +370,18 @@
   }
 })();
 
+/* The FDC panel is a <details> so phones are not handed a 12-row table by
+   default. Wide screens get it open, matching how it read before. */
+(() => {
+  const card = document.getElementById("fdc-perf");
+  if (!card) return;
+  const wide = window.matchMedia("(min-width: 761px)");
+  const apply = () => { if (!card.dataset.userToggled) card.open = wide.matches; };
+  card.addEventListener("toggle", () => { card.dataset.userToggled = "1"; });
+  apply();
+  wide.addEventListener("change", () => { delete card.dataset.userToggled; apply(); });
+})();
+
 /* FDC performance table + operator earnings (from oracle-daemon v2 payload, cache-first) */
 (() => {
   const fdcTb = document.querySelector("#fdc-table tbody");
@@ -402,7 +414,8 @@
       fdcTb.innerHTML = rows.map((e) => {
         const r = e.fdc.rewardedVotingRounds, tt = e.fdc.totalRewardedVotingRounds, pc = e.fdc.participationPercentage;
         sumR += r; sumT += tt;
-        return `<tr><td class="addr">E${e.epoch}</td><td class="num">${r.toLocaleString("en-US")}/${tt.toLocaleString("en-US")}</td><td class="num"${pc >= 99 ? ' style="color:var(--green)"' : pc < 95 ? ' style="color:var(--yellow)"' : ""}>${pc.toFixed(2)}%</td><td><div class="fdc-bar"><i style="width:${pc.toFixed(2)}%"></i></div></td></tr>`;
+        // data-label drives the stacked mobile layout, where thead is hidden.
+        return `<tr><td class="addr" data-label="Epoch">E${e.epoch}</td><td class="num" data-label="Rounds">${r.toLocaleString("en-US")}/${tt.toLocaleString("en-US")}</td><td class="num" data-label="Share"${pc >= 99 ? ' style="color:var(--green)"' : pc < 95 ? ' style="color:var(--yellow)"' : ""}>${pc.toFixed(2)}%</td><td><div class="fdc-bar"><i style="width:${pc.toFixed(2)}%"></i></div></td></tr>`;
       }).join("");
       const agg = document.getElementById("fdc-agg");
       if (agg && sumT) agg.textContent = `${((sumR / sumT) * 100).toFixed(2)}% over ${sumT.toLocaleString("en-US")} rewarded voting rounds (last ${rows.length} epochs).`;

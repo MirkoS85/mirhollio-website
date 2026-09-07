@@ -1,4 +1,4 @@
-@import url("operator.css?v=guide-flow-3");
+@import url("operator.css?v=core-20");
 
 :root{
   color-scheme:dark;
@@ -5041,3 +5041,82 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .condition-mark.ok{background:rgba(53,199,126,.16);border:1.5px solid var(--green);color:var(--green);box-shadow:0 0 9px rgba(53,199,126,.3);}
 .condition-mark.bad{background:rgba(255,98,66,.16);border:1.5px solid var(--danger);color:var(--danger);}
 .condition-mark.unknown{background:rgba(255,255,255,.05);border:1.5px solid var(--line);color:var(--muted);}
+
+/* ==========================================================================
+   Mobile pass — measured at 390x844 with real device emulation.
+   Findings this addresses: no page-level overflow anywhere, but tap targets
+   ran 16-36px tall (44px is the accessible floor), several labels sat at
+   9-11px, and the FDC table squeezed four columns into 340px so every cell
+   wrapped and the panel ran 1.83 screens tall.
+   ========================================================================== */
+
+/* FDC performance: collapsed on mobile, opened by script on wide screens. */
+.fdc-perf-card .table-wrap{overflow-x:auto;}
+.fdc-perf-card .th-short{display:none;}
+.fdc-table td.addr{white-space:nowrap;}
+.fdc-bar-col{width:42%;}
+
+@media (max-width:760px){
+  /* --- FDC table: drop the bar column and the long header so rows stop
+         wrapping. Share % already carries the same information. --- */
+  .fdc-perf-card .th-long{display:none;}
+  .fdc-perf-card .th-short{display:inline;}
+  .fdc-table th:nth-child(4),
+  .fdc-table td:nth-child(4){display:none;}
+  /* Tables stack into cards here (thead is hidden), which left the FDC rows
+     as three unlabelled numbers. Pair each value with its column name and
+     keep it to one line so twelve epochs stay scannable. */
+  .fdc-table td[data-label]{
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    white-space:nowrap;padding:5px 10px;
+  }
+  .fdc-table td[data-label]::before{
+    content:attr(data-label);
+    font-size:11.5px;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .fdc-table td.addr[data-label]{font-weight:700;}
+  .fdc-table{font-size:13px;}
+
+  /* --- Tap targets: 44px minimum. These override the narrower rules that
+         already win on specificity (.mobile-links .install-app-button etc). --- */
+  /* Six competing .mobile-links a rules already exist, the last of them
+     36px !important, so the accessible floor has to be marked too. */
+  .mobile-links a,
+  .nav a{min-height:44px !important;display:flex;align-items:center;}
+  .mobile-links .install-app-button{min-height:44px !important;}
+  .toggle-btn{min-height:44px;padding-top:0;padding-bottom:0;}
+  .brand{min-height:44px;}
+  .table-link,
+  .delegator-address-link{display:inline-flex;align-items:center;min-height:44px;}
+  /* .info-tip already asks for 44px, but operator.css's more specific
+     `.metric .info-tip` pins it to 26px. Keep the badge visually 26px and
+     grow only the hit box: content-box sizing plus padding, cancelled by a
+     negative margin so surrounding layout does not move. */
+  /* .info-tip already asks for 44px; operator.css's more specific
+     `.metric .info-tip` pins it to 26px. Padding tricks leave the 1px ring
+     drawn on the outer box, so just honour the intended size on touch. */
+  .metric .info-tip{width:44px;height:44px;font-size:14px;}
+
+  /* --- Legibility floor. The brand sub-label was set as low as 8px by
+         .mobile-row/.mobile-top rules, so match their specificity. --- */
+  .brand .former,
+  .mobile-top .brand .former,
+  .mobile-row .former{font-size:11px;letter-spacing:.06em;}
+  /* Both are pinned to 11px !important by an older @620px block. */
+  .kicker,
+  .mini-label,
+  .chart-panel .mini-label{font-size:12px !important;}
+  .np-table th{font-size:12px;}
+  .np-table td{font-size:12.5px;}
+
+  /* --- Minimal Conditions: 11 epoch columns cannot fit 390px. Show the
+         four most recent; the full history stays available on desktop. --- */
+  .condition-history-table th:nth-child(n+6),
+  .condition-history-table td:nth-child(n+6){display:none;}
+  .condition-history-wrap{overflow-x:visible;}
+
+  /* --- Charts keep their aspect but stop demanding a 736px canvas. --- */
+  .reward-chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .reward-chart-wrap svg{min-width:0;width:100%;}
+}

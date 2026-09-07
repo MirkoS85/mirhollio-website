@@ -1,3 +1,21 @@
+> **This folder is a read-only mirror.**
+>
+> Nothing here is compiled. The Xcode project that actually builds and ships
+> the watch app lives outside this repository, at
+> `~/Desktop/Apps/MirSFlrWatch/MirSFlrWatch.xcodeproj`, and it keeps its own
+> copies of every file below. Editing anything here changes nothing on the
+> watch — patch the project instead, then copy the files back here so the
+> mirror stays honest. The folder names match the project's two targets.
+>
+> Xcode is installed but `xcode-select` points at the Command Line Tools, so
+> builds need the developer directory named explicitly:
+>
+> ```
+> DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild build \
+>   -project MirSFlrWatch.xcodeproj -scheme "MirSFlrWatch Watch App" \
+>   -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO
+> ```
+
 # MirSFlr Apple Watch Starter
 
 This folder contains the Swift source files for the first native Apple Watch
