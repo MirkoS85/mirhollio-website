@@ -1,9 +1,13 @@
 name: Update Apple Watch status
 
+# GitHub does not honour a */5 cron. Measured gaps between runs on this repo
+# were 36, 85, 89, 101, 114 and 291 minutes, so the feed the watch reads was
+# routinely three quarters of an hour stale. Hourly schedules do fire close to
+# on time, so anchor on one and do the five-minute cadence inside the job.
 on:
   workflow_dispatch:
   schedule:
-    - cron: "3-58/5 * * * *"
+    - cron: "4 * * * *"
 
 permissions:
   contents: write
@@ -15,6 +19,7 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 70
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,30 +29,43 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Refresh watch status
-        run: node scripts/update-watch-status.mjs
-
-      - name: Commit watch status
+      - name: Refresh every five minutes for the hour
         run: |
-          if git diff --quiet -- data/watch-status.json; then
-            echo "No watch status changes."
-            exit 0
-          fi
+          set -u
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/watch-status.json
-          git commit -m "Update Apple Watch status"
-          # Three workflows push to main, watch-status every five minutes, so a
-          # bare push loses the race whenever another lands first. Rebase and
-          # retry instead of failing the run and letting the feed go stale.
-          for attempt in 1 2 3 4 5; do
-            if git push; then
-              echo "Pushed on attempt $attempt."
-              exit 0
+
+          # Stop a little before the next hourly run starts, so the two never
+          # overlap even if that run fires early.
+          END=$(( $(date +%s) + 56 * 60 ))
+
+          push_with_retry() {
+            for attempt in 1 2 3 4 5; do
+              if git push; then return 0; fi
+              echo "Push rejected, rebasing and retrying ($attempt/5)."
+              git pull --rebase origin main || return 1
+              sleep $(( attempt * 3 ))
+            done
+            return 1
+          }
+
+          while :; do
+            if node scripts/update-watch-status.mjs; then
+              if ! git diff --quiet -- data/watch-status.json; then
+                git add data/watch-status.json
+                git commit -m "Update Apple Watch status"
+                push_with_retry || echo "Push failed this cycle; will retry next cycle."
+              else
+                echo "No change this cycle."
+              fi
+            else
+              echo "Refresh script failed this cycle; will retry next cycle."
             fi
-            echo "Push rejected, rebasing and retrying ($attempt/5)."
-            git pull --rebase origin main || exit 1
-            sleep $((attempt * 3))
+
+            NOW=$(date +%s)
+            [ "$NOW" -ge "$END" ] && break
+            REMAIN=$(( END - NOW ))
+            [ "$REMAIN" -lt 300 ] && break
+            sleep 300
           done
-          echo "Push still failing after 5 attempts."
-          exit 1
+          echo "Cycle window complete."
