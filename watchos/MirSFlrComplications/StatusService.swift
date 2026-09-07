@@ -19,7 +19,6 @@ final class StatusService {
     private let liveStatusURL = URL(string: "https://raw.githubusercontent.com/MirkoS85/mirhollio-website/main/data/watch-status.json")!
     private let fallbackStatusURLs = [
         URL(string: "https://www.mirhollio.com/data/watch-status.json")!,
-        URL(string: "https://mirhollio.com/data/watch-status.json")!,
         URL(string: "https://mirsflr-live-status.svensekmir.chatgpt.site/watch-status.json")!
     ]
     private let livePerformanceURL = URL(string: "https://api.oracle-daemon.com/v2/flare/providers")!

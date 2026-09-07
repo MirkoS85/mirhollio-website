@@ -19,9 +19,23 @@ struct MirSFlrProvider: TimelineProvider {
         Task {
             let status = (try? await StatusService.shared.fetch()) ?? .sample
             let now = Date()
-            let entry = MirSFlrEntry(date: now, status: status)
-            let refreshDate = Calendar.current.date(byAdding: .minute, value: 2, to: now) ?? now.addingTimeInterval(120)
-            completion(Timeline(entries: [entry], policy: .after(refreshDate)))
+
+            // Asking for a reload every two minutes is 720 requests a day, far
+            // past what watchOS grants a complication. The system honours a few,
+            // throttles, then stops refreshing altogether — which is how the face
+            // ended up frozen on hours-old data while every feed was current.
+            //
+            // Ask for a realistic cadence instead, and hand back a series of
+            // entries carrying the same reading at later timestamps. The age
+            // label then keeps counting up on its own between network reloads
+            // rather than freezing at whatever it last saw.
+            var entries: [MirSFlrEntry] = []
+            for step in stride(from: 0, through: 60, by: 5) {
+                let date = now.addingTimeInterval(TimeInterval(step * 60))
+                entries.append(MirSFlrEntry(date: date, status: status))
+            }
+            let refreshDate = now.addingTimeInterval(15 * 60)
+            completion(Timeline(entries: entries, policy: .after(refreshDate)))
         }
     }
 }
