@@ -9,11 +9,14 @@ enum StatusServiceError: Error {
 final class StatusService {
     static let shared = StatusService()
 
-    // The site's own feed leads: it is the one this project controls, is
-    // regenerated every five minutes by CI, and is served from the same host
-    // the rest of the product depends on. The scratch host stays as a backup.
-    private let liveStatusURL = URL(string: "https://www.mirhollio.com/data/watch-status.json")!
+    // Read the committed file directly rather than through Pages. The feed is
+    // regenerated every five minutes, but GitHub Pages only rebuilds roughly
+    // ten times an hour, so the published copy fell hours behind while the
+    // commits themselves were landing on time. raw.githubusercontent serves
+    // the commit itself with max-age=300, which matches the feed's cadence.
+    private let liveStatusURL = URL(string: "https://raw.githubusercontent.com/MirkoS85/mirhollio-website/main/data/watch-status.json")!
     private let fallbackStatusURLs = [
+        URL(string: "https://www.mirhollio.com/data/watch-status.json")!,
         URL(string: "https://mirhollio.com/data/watch-status.json")!,
         URL(string: "https://mirsflr-live-status.svensekmir.chatgpt.site/watch-status.json")!
     ]
