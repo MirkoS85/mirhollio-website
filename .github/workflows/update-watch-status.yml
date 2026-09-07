@@ -35,9 +35,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Stop a little before the next hourly run starts, so the two never
-          # overlap even if that run fires early.
-          END=$(( $(date +%s) + 56 * 60 ))
+          # Run past the hour rather than stopping short of it. concurrency
+          # cancel-in-progress means the next scheduled run replaces this one,
+          # so overlapping is handled for us, while stopping at 56 minutes left
+          # a gap whenever the next run started late — or, after a manual
+          # dispatch part way through an hour, a gap of up to 17 minutes.
+          END=$(( $(date +%s) + 65 * 60 ))
 
           push_with_retry() {
             for attempt in 1 2 3 4 5; do
