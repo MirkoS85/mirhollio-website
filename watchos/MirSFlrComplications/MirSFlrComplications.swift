@@ -860,121 +860,73 @@ private struct MirSFlrFDCBarsRect: View {
     }
 }
 
+/// Rectangular complication: FTSO performance, primary and secondary over 24h.
+///
+/// The previous layout autoscaled each lane to its own min/max, so 0.3% of
+/// noise filled a lane exactly like a 3% climb and there was no way to tell a
+/// drift from a flat line. This version answers that question three ways at
+/// once: a signed delta in the header, a dashed baseline at the 24h-ago value
+/// so "above the line" reads as risen, and a filled area so the eye follows a
+/// shape rather than a thin wiggle.
 private struct MirSFlrFTSOPerformanceBandsRect: View {
     let entry: MirSFlrEntry
 
     private let performanceColor = Color.green
-    private let primaryColor = Color.purple
-    private let secondaryColor = Color.blue
-    private let labelColor = Color.white.opacity(0.72)
-    private let valueColor = Color.white.opacity(0.95)
+    private let primaryColor = Color(red: 1.0, green: 0.34, blue: 0.85)
+    private let secondaryColor = Color(red: 0.24, green: 0.62, blue: 1.0)
+    private let labelColor = Color.white.opacity(0.62)
+
+    private struct Lane {
+        let title: String
+        let color: Color
+        let values: [Double]
+        let latest: Double?
+        let dashed: Bool
+    }
 
     var body: some View {
-        let performanceValues = hourlyValues(
-            entry.status.ftso.performanceHourly24h,
-            current: entry.status.ftso.performance,
-            defaultPercent: 72
-        )
-        let primaryValues = hourlyValues(
-            entry.status.ftso.primaryPerformanceHourly24h,
-            current: entry.status.ftso.primaryPerformance,
-            defaultPercent: 38
-        )
-        let secondaryValues = hourlyValues(
-            entry.status.ftso.secondaryPerformanceHourly24h,
-            current: entry.status.ftso.secondaryPerformance,
-            defaultPercent: 98
-        )
-        let performanceLatest = percentValue(entry.status.ftso.performance) ?? performanceValues.last
-        let primaryLatest = percentValue(entry.status.ftso.primaryPerformance) ?? primaryValues.last
-        let secondaryLatest = percentValue(entry.status.ftso.secondaryPerformance) ?? secondaryValues.last
-        let chartPerformance = Array(performanceValues.reversed())
-        let chartPrimary = Array(primaryValues.reversed())
-        let chartSecondary = Array(secondaryValues.reversed())
+        let perf = series(entry.status.ftso.performanceHourly24h, entry.status.ftso.performance, 72)
+        let pri  = series(entry.status.ftso.primaryPerformanceHourly24h, entry.status.ftso.primaryPerformance, 38)
+        let sec  = series(entry.status.ftso.secondaryPerformanceHourly24h, entry.status.ftso.secondaryPerformance, 98)
+
+        let lanes = [
+            Lane(title: "SEC", color: secondaryColor, values: sec,
+                 latest: percentValue(entry.status.ftso.secondaryPerformance) ?? sec.last, dashed: false),
+            Lane(title: "PERF", color: performanceColor, values: perf,
+                 latest: percentValue(entry.status.ftso.performance) ?? perf.last, dashed: false),
+            Lane(title: "PRI", color: primaryColor, values: pri,
+                 latest: percentValue(entry.status.ftso.primaryPerformance) ?? pri.last, dashed: true),
+        ]
+
         let ageSeconds = StatusFormat.ageSeconds(from: entry.status.updatedAt, now: entry.date)
-        let updateLabel = ageSeconds >= 3_600
-            ? "OLD \(StatusFormat.compactAge(from: entry.status.updatedAt, now: entry.date))"
-            : "UPD \(StatusFormat.compactAge(from: entry.status.updatedAt, now: entry.date))"
+        let stale = ageSeconds >= 3_600
+        let ageText = StatusFormat.compactAge(from: entry.status.updatedAt, now: entry.date)
 
-        VStack(alignment: .leading, spacing: 1) {
-            HStack(alignment: .top, spacing: 3) {
-                readout("PERF", performanceLatest, performanceColor)
-                readout("PRI", primaryLatest, primaryColor)
-                readout("SEC", secondaryLatest, secondaryColor)
-
-                Spacer(minLength: 0)
-
-                legend(color: performanceColor, text: "P")
-                legend(color: primaryColor, text: "IQR")
-                legend(color: secondaryColor, text: "S")
+        VStack(spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                readout(lanes[0])
+                Spacer(minLength: 3)
+                readout(lanes[1])
+                Spacer(minLength: 3)
+                readout(lanes[2])
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
 
             GeometryReader { proxy in
-                let width = max(1, proxy.size.width)
-                let height = max(1, proxy.size.height)
-                let axisWidth = min(25, max(21, width * 0.17))
-                let footerHeight: CGFloat = 9
-                let plotHeight = max(1, height - footerHeight - 2)
-                let laneGap: CGFloat = 2
-                let laneHeight = max(1, (plotHeight - laneGap * 2) / 3)
-                let plotWidth = max(1, width - axisWidth - 1)
-                let secondaryRect = CGRect(
-                    x: axisWidth,
-                    y: 1,
-                    width: plotWidth,
-                    height: laneHeight
-                )
-                let performanceRect = CGRect(
-                    x: axisWidth,
-                    y: secondaryRect.maxY + laneGap,
-                    width: plotWidth,
-                    height: laneHeight
-                )
-                let primaryRect = CGRect(
-                    x: axisWidth,
-                    y: performanceRect.maxY + laneGap,
-                    width: plotWidth,
-                    height: laneHeight
-                )
-                let secondaryBounds = seriesBounds(chartSecondary, minimumSpan: 4)
-                let performanceBounds = seriesBounds(chartPerformance, minimumSpan: 4)
-                let primaryBounds = seriesBounds(chartPrimary, minimumSpan: 4)
+                let w = max(1, proxy.size.width)
+                let h = max(1, proxy.size.height)
+                let footer: CGFloat = 7.5
+                let gap: CGFloat = 2
+                let laneH = max(1, (h - footer - gap * 2) / 3)
 
                 ZStack(alignment: .topLeading) {
-                    laneAxisLabels(bounds: secondaryBounds, in: secondaryRect, axisWidth: axisWidth)
-                    laneAxisLabels(bounds: performanceBounds, in: performanceRect, axisWidth: axisWidth)
-                    laneAxisLabels(bounds: primaryBounds, in: primaryRect, axisWidth: axisWidth)
-
-                    laneGuide(in: secondaryRect)
-                    laneGuide(in: performanceRect)
-                    laneGuide(in: primaryRect)
-
-                    performancePath(values: chartSecondary, bounds: secondaryBounds, in: secondaryRect)
-                        .stroke(secondaryColor.opacity(0.34), style: StrokeStyle(lineWidth: 5.0, lineCap: .round, lineJoin: .round))
-                    performancePath(values: chartSecondary, bounds: secondaryBounds, in: secondaryRect)
-                        .stroke(secondaryColor, style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
-
-                    performancePath(values: chartPerformance, bounds: performanceBounds, in: performanceRect)
-                        .stroke(performanceColor.opacity(0.28), style: StrokeStyle(lineWidth: 5.0, lineCap: .round, lineJoin: .round))
-                    performancePath(values: chartPerformance, bounds: performanceBounds, in: performanceRect)
-                        .stroke(performanceColor, style: StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round))
-
-                    performancePath(values: chartPrimary, bounds: primaryBounds, in: primaryRect)
-                        .stroke(primaryColor.opacity(0.30), style: StrokeStyle(lineWidth: 5.0, lineCap: .round, lineJoin: .round, dash: [4, 3]))
-                    performancePath(values: chartPrimary, bounds: primaryBounds, in: primaryRect)
-                        .stroke(primaryColor, style: StrokeStyle(lineWidth: 2.3, lineCap: .round, lineJoin: .round, dash: [4, 3]))
-
-                    endpointDot(values: chartSecondary, bounds: secondaryBounds, in: secondaryRect, color: secondaryColor)
-                    endpointDot(values: chartPerformance, bounds: performanceBounds, in: performanceRect, color: performanceColor)
-                    endpointDot(values: chartPrimary, bounds: primaryBounds, in: primaryRect, color: primaryColor)
-
-                    xLabel("23h", x: primaryRect.minX, y: primaryRect.maxY + 5, alignment: .leading)
-                    xLabel(updateLabel, x: primaryRect.midX, y: primaryRect.maxY + 5, alignment: .center)
-                    xLabel("now", x: primaryRect.maxX, y: primaryRect.maxY + 5, alignment: .trailing)
+                    ForEach(Array(lanes.enumerated()), id: \.offset) { i, lane in
+                        let rect = CGRect(x: 0, y: (laneH + gap) * CGFloat(i), width: w, height: laneH)
+                        laneView(lane, in: rect)
+                    }
+                    footerRow(stale: stale, ageText: ageText, width: w, y: h - footer / 2 - 1)
                 }
-                .frame(width: width, height: height, alignment: .leading)
+                .frame(width: w, height: h, alignment: .topLeading)
             }
         }
         .padding(.horizontal, 1)
@@ -983,161 +935,176 @@ private struct MirSFlrFTSOPerformanceBandsRect: View {
         .privacySensitive(false)
     }
 
-    private func readout(_ title: String, _ value: Double?, _ color: Color) -> some View {
-        VStack(alignment: .leading, spacing: -2) {
-            Text(title)
-                .font(.system(size: 6.0, weight: .black, design: .rounded))
+    // MARK: header
+
+    private func readout(_ lane: Lane) -> some View {
+        let delta = trend(lane.values)
+        return HStack(spacing: 1.5) {
+            Text(lane.title)
+                .font(.system(size: 5.9, weight: .black, design: .rounded))
                 .foregroundStyle(labelColor)
-                .lineLimit(1)
-            Text(shortPercent(value))
-                .font(.system(size: 8.6, weight: .black, design: .rounded))
+            Text(shortPercent(lane.latest))
+                .font(.system(size: 8.8, weight: .black, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.70)
+                .foregroundStyle(lane.color)
+            Text(deltaText(delta))
+                .font(.system(size: 6.0, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(deltaColor(delta, lane.color))
         }
-        .frame(width: 31, alignment: .leading)
-    }
-
-    private func legend(color: Color, text: String) -> some View {
-        HStack(spacing: 1) {
-            Circle()
-                .stroke(color, lineWidth: 1.4)
-                .frame(width: 6, height: 6)
-            Text(text)
-                .font(.system(size: 5.8, weight: .black, design: .rounded))
-                .foregroundStyle(labelColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-    }
-
-    private func laneAxisLabels(bounds: (min: Double, max: Double), in rect: CGRect, axisWidth: CGFloat) -> some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            Text(axisPercent(bounds.max))
-            Spacer(minLength: 0)
-            Text(axisPercent(bounds.min))
-        }
-        .font(.system(size: 5.4, weight: .heavy, design: .rounded))
-        .monospacedDigit()
-        .foregroundStyle(labelColor)
         .lineLimit(1)
-        .minimumScaleFactor(0.60)
-        .frame(width: axisWidth - 2, height: rect.height, alignment: .trailing)
-        .position(x: (axisWidth - 2) / 2, y: rect.midY)
+        .minimumScaleFactor(0.6)
+        .fixedSize()
     }
 
-    private func laneGuide(in rect: CGRect) -> some View {
-        Path { path in
-            let y = rect.midY
-            path.move(to: CGPoint(x: rect.minX, y: y))
-            path.addLine(to: CGPoint(x: rect.maxX, y: y))
-        }
-        .stroke(.secondary.opacity(0.16), style: StrokeStyle(lineWidth: 1, dash: [2, 4]))
+    /// Change across the visible window, in percentage points.
+    private func trend(_ values: [Double]) -> Double? {
+        guard let first = values.first, let last = values.last, values.count > 1 else { return nil }
+        return last - first
     }
 
-    private func performancePath(values: [Double], bounds: (min: Double, max: Double), in rect: CGRect) -> Path {
-        var path = Path()
-        guard !values.isEmpty else { return path }
+    private func deltaText(_ d: Double?) -> String {
+        guard let d else { return "" }
+        if abs(d) < 0.15 { return "▬" }
+        return String(format: "%@%.1f", d > 0 ? "▲" : "▼", abs(d))
+    }
 
-        for (index, value) in values.enumerated() {
-            let point = chartPoint(index: index, value: value, count: values.count, bounds: bounds, rect: rect)
-            if index == 0 {
-                path.move(to: point)
-            } else {
-                path.addLine(to: point)
+    private func deltaColor(_ d: Double?, _ base: Color) -> Color {
+        guard let d, abs(d) >= 0.15 else { return labelColor }
+        return base.opacity(0.92)
+    }
+
+    // MARK: lanes
+
+    private func laneView(_ lane: Lane, in rect: CGRect) -> some View {
+        let b = bounds(lane.values)
+        let baseline = lane.values.first
+        return ZStack(alignment: .topLeading) {
+            areaPath(lane.values, b, rect)
+                .fill(LinearGradient(
+                    colors: [lane.color.opacity(0.16), lane.color.opacity(0.0)],
+                    startPoint: .top, endPoint: .bottom))
+
+            if let baseline {
+                Path { p in
+                    let y = yPos(baseline, b, rect)
+                    p.move(to: CGPoint(x: rect.minX, y: y))
+                    p.addLine(to: CGPoint(x: rect.maxX - 16, y: y))
+                }
+                .stroke(lane.color.opacity(0.55), style: StrokeStyle(lineWidth: 0.7, dash: [2, 2.5]))
             }
+
+            linePath(lane.values, b, rect)
+                .stroke(lane.color, style: StrokeStyle(
+                    lineWidth: 2.0, lineCap: .round, lineJoin: .round,
+                    dash: lane.dashed ? [3.5, 2.5] : []))
+
+            if let last = lane.values.last {
+                Circle()
+                    .fill(lane.color)
+                    .frame(width: 3.4, height: 3.4)
+                    .position(x: rect.maxX - 17, y: yPos(last, b, rect))
+            }
+
+            Text(spanText(b))
+                .font(.system(size: 5.2, weight: .heavy, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(labelColor)
+                .frame(width: 15, alignment: .trailing)
+                .position(x: rect.maxX - 7.5, y: rect.midY)
         }
-
-        return path
     }
 
-    private func endpointDot(values: [Double], bounds: (min: Double, max: Double), in rect: CGRect, color: Color) -> some View {
-        let value = values.last ?? 0
-        let point = chartPoint(index: values.count - 1, value: value, count: values.count, bounds: bounds, rect: rect)
-
-        return Circle()
-            .fill(color)
-            .overlay(Circle().stroke(Color.black.opacity(0.65), lineWidth: 0.8))
-            .frame(width: 5.0, height: 5.0)
-            .position(point)
-    }
-
-    private func xLabel(_ text: String, x: CGFloat, y: CGFloat, alignment: Alignment) -> some View {
-        Text(text)
-            .font(.system(size: 6.2, weight: .heavy, design: .rounded))
-            .foregroundStyle(labelColor)
-            .lineLimit(1)
-            .minimumScaleFactor(0.72)
-            .frame(width: text.hasPrefix("UPD") || text.hasPrefix("OLD") ? 48 : 24, alignment: alignment)
-            .position(x: x, y: y)
-            .unredacted()
-            .privacySensitive(false)
-    }
-
-    private func chartPoint(index: Int, value: Double, count: Int, bounds: (min: Double, max: Double), rect: CGRect) -> CGPoint {
-        let denominator = max(1, count - 1)
-        let x = rect.minX + rect.width * CGFloat(index) / CGFloat(denominator)
-        let y = chartY(value: value, bounds: bounds, rect: rect)
-        return CGPoint(x: x, y: y)
-    }
-
-    private func chartY(value: Double, bounds: (min: Double, max: Double), rect: CGRect) -> CGFloat {
-        let range = max(0.01, bounds.max - bounds.min)
-        let ratio = max(0, min(1, (value - bounds.min) / range))
-        return rect.maxY - rect.height * CGFloat(ratio)
-    }
-
-    private func hourlyValues(_ values: [Double]?, current: Double?, defaultPercent: Double) -> [Double] {
-        let hourly = Array((values ?? []).compactMap { percentValue($0) }.suffix(24))
-        if hourly.count >= 4 {
-            return hourly
+    private func footerRow(stale: Bool, ageText: String, width: CGFloat, y: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            Text("24h")
+            Spacer(minLength: 0)
+            HStack(spacing: 2) {
+                Circle()
+                    .fill(stale ? Color.orange : Color.white.opacity(0.5))
+                    .frame(width: 3, height: 3)
+                Text(ageText)
+            }
+            Spacer(minLength: 0)
+            Text("now")
         }
-
-        let fallback = percentValue(current) ?? defaultPercent
-        return Array(repeating: fallback, count: 24)
+        .font(.system(size: 6.0, weight: .heavy, design: .rounded))
+        .monospacedDigit()
+        .foregroundStyle(stale ? Color.orange.opacity(0.9) : labelColor)
+        .lineLimit(1)
+        .frame(width: width - 17, alignment: .leading)
+        .position(x: (width - 17) / 2, y: y)
     }
 
-    private func seriesBounds(_ values: [Double], minimumSpan: Double) -> (min: Double, max: Double) {
-        guard let rawMin = values.min(), let rawMax = values.max() else {
-            return (0, 100)
+    // MARK: geometry
+
+    /// Centre on the window mean with a floor on the span, so a genuinely flat
+    /// series renders flat instead of being stretched into fake drama.
+    private func bounds(_ v: [Double]) -> (min: Double, max: Double) {
+        guard let lo = v.min(), let hi = v.max() else { return (0, 1) }
+        let mid = (lo + hi) / 2
+        let span = max(hi - lo, 3.0)
+        let pad = span * 0.62
+        return (mid - pad, mid + pad)
+    }
+
+    private func yPos(_ value: Double, _ b: (min: Double, max: Double), _ r: CGRect) -> CGFloat {
+        let range = max(0.0001, b.max - b.min)
+        let t = (value - b.min) / range
+        return r.maxY - CGFloat(t) * r.height
+    }
+
+    private func xPos(_ i: Int, _ count: Int, _ r: CGRect) -> CGFloat {
+        guard count > 1 else { return r.minX }
+        let usable = r.width - 18
+        return r.minX + usable * CGFloat(i) / CGFloat(count - 1)
+    }
+
+    private func linePath(_ v: [Double], _ b: (min: Double, max: Double), _ r: CGRect) -> Path {
+        var p = Path()
+        guard !v.isEmpty else { return p }
+        for (i, value) in v.enumerated() {
+            let pt = CGPoint(x: xPos(i, v.count, r), y: yPos(value, b, r))
+            i == 0 ? p.move(to: pt) : p.addLine(to: pt)
         }
-
-        let midpoint = (rawMin + rawMax) / 2
-        let span = max(minimumSpan, rawMax - rawMin)
-        let paddedSpan = span * 1.35
-        let minValue = max(0, midpoint - paddedSpan / 2)
-        let maxValue = min(100, midpoint + paddedSpan / 2)
-
-        if maxValue - minValue >= 0.5 {
-            return (minValue, maxValue)
-        }
-
-        return (max(0, midpoint - 2), min(100, midpoint + 2))
+        return p
     }
 
-    private func percentValue(_ value: Double?) -> Double? {
-        guard let value else { return nil }
-        return value <= 1 ? value * 100 : value
+    private func areaPath(_ v: [Double], _ b: (min: Double, max: Double), _ r: CGRect) -> Path {
+        var p = linePath(v, b, r)
+        guard !v.isEmpty else { return p }
+        p.addLine(to: CGPoint(x: xPos(v.count - 1, v.count, r), y: r.maxY))
+        p.addLine(to: CGPoint(x: xPos(0, v.count, r), y: r.maxY))
+        p.closeSubpath()
+        return p
     }
 
-    private func shortPercent(_ value: Double?) -> String {
-        guard let value else { return "-" }
-        return "\(fixed(value, decimals: 0))%"
+    // MARK: values
+
+    /// The feed carries these newest-first — checked against the current value,
+    /// which sits at index 0 — so reverse into oldest-to-newest for drawing
+    /// left to right. Getting this backwards silently inverts the trend arrow.
+    private func series(_ hourly: [Double]?, _ current: Double?, _ fallback: Double) -> [Double] {
+        let v = (hourly ?? []).compactMap { percentValue($0) }.prefix(24)
+        if v.count >= 4 { return Array(v.reversed()) }
+        return [percentValue(current) ?? fallback]
     }
 
-    private func axisPercent(_ value: Double) -> String {
-        "\(fixed(value, decimals: value.rounded() == value ? 0 : 1))%"
+    private func percentValue(_ v: Double?) -> Double? {
+        guard let v, v.isFinite else { return nil }
+        return v <= 1 ? v * 100 : v
     }
 
-    private func fixed(_ value: Double, decimals: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.minimumFractionDigits = decimals
-        formatter.maximumFractionDigits = decimals
-        return formatter.string(from: NSNumber(value: value)) ?? String(format: "%.\(decimals)f", value)
+    private func shortPercent(_ v: Double?) -> String {
+        guard let v else { return "–" }
+        return String(format: "%.0f", v)
+    }
+
+    private func spanText(_ b: (min: Double, max: Double)) -> String {
+        String(format: "±%.1f", (b.max - b.min) / 2)
     }
 }
+
 
 struct MirSFlrCornerStripMetric: View {
     let title: String
