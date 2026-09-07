@@ -77,16 +77,26 @@ function numberOrNull(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+// The provider returns these hourly arrays NEWEST-FIRST. Confirmed by watching
+// the window slide: a value sitting at index 0 at 10:06 was at index 1 an hour
+// later, and testing a one-hour shift across that span fits newest-first with a
+// mean error of 0.0009 against 0.0056 for the opposite reading.
+//
+// So the most recent N hours are at the FRONT. slice(-hours) was taking the
+// oldest N instead, which made availability6h an average of the wrong six
+// hours. It has been invisible so far only because availability sits at a
+// constant 1.0; it would have been wrong the moment it dipped.
 function recentAverage(values, hours) {
   if (!Array.isArray(values) || !values.length) return null;
-  const slice = values.slice(-hours).map(numberOrNull).filter(value => value != null);
+  const slice = values.slice(0, hours).map(numberOrNull).filter(value => value != null);
   if (!slice.length) return null;
   return slice.reduce((sum, value) => sum + value, 0) / slice.length;
 }
 
+// Keeps the provider's newest-first order; the watch reverses for drawing.
 function recentSeries(values, hours) {
   if (!Array.isArray(values) || !values.length) return [];
-  return values.slice(-hours).map(numberOrNull).filter(value => value != null);
+  return values.slice(0, hours).map(numberOrNull).filter(value => value != null);
 }
 
 function findDeep(root, predicate) {
