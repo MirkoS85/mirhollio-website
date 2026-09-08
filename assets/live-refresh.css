@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-21");
+@import url("operator.css?v=core-22");
 
 :root{
   color-scheme:dark;
@@ -5120,3 +5120,18 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   .reward-chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .reward-chart-wrap svg{min-width:0;width:100%;}
 }
+
+/* Shown only when a source failed outright, so the page states the problem
+   instead of sitting on a spinner that will never resolve. */
+#data-source-notice{
+  display:flex;flex-direction:column;gap:4px;
+  margin:0 0 18px;padding:12px 14px;
+  border:1px solid rgba(255,176,32,.34);
+  border-radius:14px;
+  background:rgba(255,176,32,.07);
+  color:var(--ink,#fff);
+  font-size:13px;line-height:1.5;
+}
+#data-source-notice strong{font-size:13.5px;font-weight:700;}
+#data-source-notice span{color:var(--muted);}
+.data-unavailable{color:var(--muted) !important;font-style:italic;}

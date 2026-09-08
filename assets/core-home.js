@@ -454,3 +454,46 @@
   };
   tryRender(0);
 })();
+
+/* A data source that never answers used to leave the page sitting on
+   "Loading…" forever, which reads as a broken site rather than a blocked
+   request. In practice the cause is almost always a content blocker or a
+   shields setting cutting off the third-party APIs. After a grace period,
+   say so plainly and let the rest of the page stand. */
+(() => {
+  const GRACE_MS = 14000;
+  const LOADING = /^\s*(loading|nalag)/i;
+
+  function stillLoading() {
+    const nodes = [];
+    document.querySelectorAll("td, th, [data-field], [data-render], .skeleton").forEach(el => {
+      if (el.querySelector("td, [data-field]")) return;      // containers, not leaves
+      if (LOADING.test(el.textContent || "")) nodes.push(el);
+    });
+    return nodes;
+  }
+
+  function banner() {
+    if (document.getElementById("data-source-notice")) return;
+    const host = document.querySelector("main .inner, main") || document.body;
+    const el = document.createElement("div");
+    el.id = "data-source-notice";
+    el.setAttribute("role", "status");
+    el.innerHTML =
+      "<strong>Some live data could not be loaded.</strong>" +
+      "<span>The public APIs this page reads were not reachable. A content " +
+      "blocker, browser shields, or a network filter will usually be the cause — " +
+      "allowing this site should restore them. Everything else on the page is still valid.</span>";
+    host.insertBefore(el, host.firstChild);
+  }
+
+  window.setTimeout(() => {
+    const stuck = stillLoading();
+    if (!stuck.length) return;
+    stuck.forEach(el => {
+      el.textContent = "Unavailable";
+      el.classList.add("data-unavailable");
+    });
+    banner();
+  }, GRACE_MS);
+})();
