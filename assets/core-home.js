@@ -240,26 +240,81 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();
 
-/* delegation calculator (validator page) */
+/* delegation calculator (FTSO page)
+   Reads the reward rate the page is already showing rather than hardcoding one,
+   so the estimate always matches the figure above it. The rate is annualised —
+   it tracks the validator APR closely, which a per-epoch figure could not. */
+(() => {
+  const inp = document.getElementById("ftso-calc-in"); if (!inp) return;
+  const out = document.getElementById("ftso-calc-out");
+  const num = el => {
+    const v = el && parseFloat((el.textContent || "").replace(",", ".").replace(/[^\d.\-]/g, ""));
+    return Number.isFinite(v) ? v : null;
+  };
+  function calc() {
+    const amt = parseFloat(inp.value);
+    const rate = num(document.querySelector('[data-field="rewardRate"]'));
+    if (!Number.isFinite(amt) || amt <= 0) {
+      out.textContent = "Enter an amount to estimate rewards."; return;
+    }
+    if (!rate || rate <= 0) {
+      out.textContent = "Live reward rate still loading — try again in a moment."; return;
+    }
+    const yr = amt * (rate / 100), mo = yr / 12;
+    const f = n => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    out.innerHTML = `\u2248 <b>${f(mo)} FLR / month</b> \u00b7 ${f(yr)} FLR / year at the current ${rate.toFixed(2)}% reward rate (after the provider fee; past performance is not a guarantee).`;
+  }
+  inp.addEventListener("input", calc);
+  document.getElementById("ftso-calc-btn")?.addEventListener("click", calc);
+})();
+
+/* staking calculator (validator page)
+   The validator APR field has never populated — the upstream validators payload
+   carries no APR for this node, so the estimate had nothing to work from and sat
+   on "Live APR still loading" indefinitely. Fall back to the reward rate the
+   pipeline does publish, and label the output for whichever source answered so
+   the figure is never passed off as something it is not. */
 (() => {
   const inp = document.getElementById("np-calc-in"); if (!inp) return;
   const out = document.getElementById("np-calc-out");
-  function aprNow() {
-    const el = document.querySelector('[data-field="validatorApr"]');
-    const v = el && parseFloat((el.textContent || "").replace(",", "."));
-    return Number.isFinite(v) && v > 0 ? v / 100 : null;
+  let published = null;
+
+  const num = el => {
+    const v = el && parseFloat((el.textContent || "").replace(",", ".").replace(/[^\d.\-]/g, ""));
+    return Number.isFinite(v) && v > 0 ? v : null;
+  };
+
+  async function rate() {
+    const apr = num(document.querySelector('[data-field="validatorApr"]'));
+    if (apr) return { pct: apr, label: "APR" };
+    if (published === null) {
+      published = await fetch("/data/network-position.json")
+        .then(r => r.json())
+        .then(d => {
+          const v = d && d.rewardRate && d.rewardRate.ours;
+          return Number.isFinite(v) ? v * 100 : 0;
+        })
+        .catch(() => 0);
+    }
+    return published ? { pct: published, label: "published reward rate" } : null;
   }
-  function calc() {
+
+  async function calc() {
     const amt = parseFloat(inp.value);
-    const apr = aprNow();
-    if (!Number.isFinite(amt) || amt <= 0) { out.textContent = "Enter an amount to estimate rewards."; return; }
-    if (!apr) { out.textContent = "Live APR still loading — try again in a moment."; return; }
-    const yr = amt * apr, mo = yr / 12;
-    out.innerHTML = `≈ <b>${mo.toLocaleString("en-US", { maximumFractionDigits: 0 })} FLR / month</b> · ${yr.toLocaleString("en-US", { maximumFractionDigits: 0 })} FLR / year at the current ${(apr * 100).toFixed(2)}% APR (after fee; not a guarantee).`;
+    if (!Number.isFinite(amt) || amt <= 0) {
+      out.textContent = "Enter an amount to estimate rewards."; return;
+    }
+    const r = await rate();
+    if (!r) { out.textContent = "Reward rate unavailable right now — try again in a moment."; return; }
+    const yr = amt * (r.pct / 100), mo = yr / 12;
+    const f = n => n.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    out.innerHTML = `\u2248 <b>${f(mo)} FLR / month</b> \u00b7 ${f(yr)} FLR / year at the current ${r.pct.toFixed(2)}% ${r.label} (after the validator fee; past performance is not a guarantee).`;
   }
+
   inp.addEventListener("input", calc);
   document.getElementById("np-calc-btn")?.addEventListener("click", calc);
 })();
+
 /* live reward-epoch pulse in the sidebar (every page) */
 (() => {
   const T0 = 1787857200, E0 = 428, LEN = 302400; // epoch 428 start, 3.5d epochs
