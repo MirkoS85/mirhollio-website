@@ -924,6 +924,22 @@ const MirhollioCore = (() => {
     return data?.m_xData || data?.data || data || null;
   }
 
+  // Oracle Daemon only publishes COMPLETED reward epochs, so its newest entry
+  // is always one behind — with epochs running 3.5 days that meant the sidebar,
+  // under a label reading simply "Epoch", could show a number that was days out
+  // of date. Reward epochs run on a fixed schedule from a known anchor, so the
+  // current one is derived exactly instead. Checked against the live signing
+  // policy, which it reproduces.
+  const EPOCH_ANCHOR = 428;
+  const EPOCH_ANCHOR_TIME = 1787857200;
+  const EPOCH_LENGTH_SECONDS = 302400;
+
+  function currentEpoch() {
+    const elapsed = Math.floor(Date.now() / 1000) - EPOCH_ANCHOR_TIME;
+    if (!Number.isFinite(elapsed) || elapsed < 0) return null;
+    return EPOCH_ANCHOR + Math.floor(elapsed / EPOCH_LENGTH_SECONDS);
+  }
+
   function latestEpoch(provider) {
     if (!provider?.epochData?.length) return null;
     return [...provider.epochData].sort((a, b) => Number(b.epoch) - Number(a.epoch))[0];
@@ -2359,7 +2375,7 @@ const MirhollioCore = (() => {
     setText("selfBond", latest?.staking?.totalSelfBond != null ? fmtChainAmount(latest.staking.totalSelfBond) : "-");
     refreshFtsoStakeInputField();
     setText("stakedFlr", latest?.staking?.stakeWithUptime != null ? fmtChainAmount(latest.staking.stakeWithUptime) : latest?.staking?.stake != null ? fmtChainAmount(latest.staking.stake) : "-");
-    setText("latestEpoch", latest?.epoch ?? "-");
+    setText("latestEpoch", currentEpoch() ?? latest?.epoch ?? "-");
     setText("latestReward", latest?.totalRewardAmount != null ? `${fmtNum(latest.totalRewardAmount, 2)} FLR` : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "Yes" : latest?.eligibleForReward === false ? "No" : "-");
     setText("delegationAddress", delegation);
