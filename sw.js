@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirhollio-core-shell-v216";
+const CACHE_NAME = "mirhollio-core-shell-v217";
 const APP_SHELL = [
   "/",
   "/ops/",
@@ -95,14 +95,28 @@ self.addEventListener("fetch", event => {
     return;
   }
 
+  // Assets were pure cache-first, so anything that made it into the cache was
+  // served forever until CACHE_NAME changed. A bad or half-updated entry could
+  // therefore stick permanently, and the only cure was clearing site data by
+  // hand. Serve the cached copy immediately, but always refresh it in the
+  // background so the next load self-corrects.
   event.respondWith(
     caches.match(request).then(cached => {
-      if (cached) return cached;
-      return fetch(request).then(response => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
-        return response;
-      });
+      const network = fetch(request)
+        .then(response => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(error => {
+          // With nothing cached there is no answer to give, so let the browser
+          // surface its own network error rather than an undefined response.
+          if (cached) return cached;
+          throw error;
+        });
+      return cached || network;
     })
   );
 });
