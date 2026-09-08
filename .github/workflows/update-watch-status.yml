@@ -53,10 +53,13 @@ jobs:
           }
 
           while :; do
+            # The oracle mirror rides the same cycle: the site reads its slice
+            # from our own origin because content blockers drop the upstream host.
+            node scripts/update-oracle-mirror.mjs || echo "Oracle mirror failed this cycle."
             if node scripts/update-watch-status.mjs; then
-              if ! git diff --quiet -- data/watch-status.json; then
-                git add data/watch-status.json
-                git commit -m "Update Apple Watch status"
+              if ! git diff --quiet -- data/watch-status.json data/oracle-live.json; then
+                git add data/watch-status.json data/oracle-live.json
+                git commit -m "Update Apple Watch status and oracle mirror"
                 push_with_retry || echo "Push failed this cycle; will retry next cycle."
               else
                 echo "No change this cycle."

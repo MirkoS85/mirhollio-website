@@ -461,7 +461,7 @@
    shields setting cutting off the third-party APIs. After a grace period,
    say so plainly and let the rest of the page stand. */
 (() => {
-  const GRACE_MS = 14000;
+  const GRACE_MS = 20000;
   const LOADING = /^\s*(loading|nalag)/i;
 
   function stillLoading() {
@@ -487,13 +487,25 @@
     host.insertBefore(el, host.firstChild);
   }
 
-  window.setTimeout(() => {
+  // Give the slow sources room first, then keep watching: a notice raised
+  // while something was still in flight is withdrawn once it lands, so the
+  // page never accuses a source that was merely slow.
+  function sweep() {
     const stuck = stillLoading();
-    if (!stuck.length) return;
+    const notice = document.getElementById("data-source-notice");
+    if (!stuck.length) {
+      if (notice) notice.remove();
+      return;
+    }
     stuck.forEach(el => {
       el.textContent = "Unavailable";
       el.classList.add("data-unavailable");
     });
     banner();
+  }
+
+  window.setTimeout(() => {
+    sweep();
+    window.setTimeout(sweep, 8000);
   }, GRACE_MS);
 })();

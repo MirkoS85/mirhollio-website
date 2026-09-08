@@ -2,6 +2,13 @@ const MirhollioCore = (() => {
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
   const VALIDATORS_URL = "https://api.oracle-daemon.com/v1/flare/validators";
   const PROVIDERS_V2_URL = "https://api.oracle-daemon.com/v2/flare/providers";
+  // Content blockers list api.oracle-daemon.com as a tracker, so for anyone on
+  // Brave shields, uBlock or a DNS filter the three calls above never returned
+  // and the page sat on "Loading" indefinitely. Blocking each host in turn
+  // showed this was the only one that broke it. The pipeline mirrors our slice
+  // of those payloads here, on our own origin, where nothing can block it; the
+  // API stays as the fallback.
+  const ORACLE_MIRROR_URL = "/data/oracle-live.json";
   const FLR_PRICE_URL = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
   const FLARE_BASE_VOTE_POWER_URL = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
@@ -918,6 +925,25 @@ const MirhollioCore = (() => {
       const blob = JSON.stringify(item).toLowerCase();
       return blob.includes("mirsflr") || blob.includes(TARGET_DELEGATION);
     }) || null;
+  }
+
+  let oracleMirrorPromise = null;
+
+  function loadOracleMirror() {
+    if (!oracleMirrorPromise) {
+      oracleMirrorPromise = fetchJsonWithCache(ORACLE_MIRROR_URL, CACHE_TTLS.provider)
+        .catch(() => null);
+    }
+    return oracleMirrorPromise;
+  }
+
+  async function fetchOracle(url, ttl) {
+    const key = url === VALIDATORS_URL ? "validators"
+      : url === PROVIDERS_V2_URL ? "providersV2"
+      : "providersV1";
+    const mirror = await loadOracleMirror();
+    if (mirror && mirror[key]) return mirror[key];
+    return fetchJsonWithCache(url, ttl);
   }
 
   function findProviderV2Data(data) {
@@ -2542,13 +2568,13 @@ const MirhollioCore = (() => {
     try {
       let provider = null;
       try {
-        const v2Data = await fetchJsonWithCache(PROVIDERS_V2_URL, CACHE_TTLS.provider);
+        const v2Data = await fetchOracle(PROVIDERS_V2_URL, CACHE_TTLS.provider);
         applyProviderV2Data(v2Data);
         provider = findProviderDeep(v2Data);
       } catch (_) {}
 
       if (!provider) {
-        provider = findProviderDeep(await fetchJsonWithCache(API_URL, CACHE_TTLS.provider));
+        provider = findProviderDeep(await fetchOracle(API_URL, CACHE_TTLS.provider));
       }
 
       if (!provider) throw new Error("Mirhollio Core provider not found");
@@ -2566,7 +2592,7 @@ const MirhollioCore = (() => {
 
   async function loadValidator() {
     try {
-      const data = await fetchJsonWithCache(VALIDATORS_URL, CACHE_TTLS.validator);
+      const data = await fetchOracle(VALIDATORS_URL, CACHE_TTLS.validator);
       validatorData = findValidatorDeep(data);
       applyValidatorData(validatorData);
     } catch (_) {
@@ -2591,7 +2617,7 @@ const MirhollioCore = (() => {
 
   async function loadProviderV2() {
     try {
-      applyProviderV2Data(await fetchJsonWithCache(PROVIDERS_V2_URL, CACHE_TTLS.provider));
+      applyProviderV2Data(await fetchOracle(PROVIDERS_V2_URL, CACHE_TTLS.provider));
     } catch (_) {}
   }
 
