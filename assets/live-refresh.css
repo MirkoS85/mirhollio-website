@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-27");
+@import url("operator.css?v=core-28");
 
 :root{
   color-scheme:dark;
@@ -520,10 +520,15 @@ h1{
 
 .hero-live-tile strong{
   color:var(--ink);
-  font-size:29px;
+  /* A truncated address is far wider than a short label, and at a flat 29px it
+     ran straight out of the tile. Let the size follow the viewport and allow a
+     break, so the long values fit and the short ones keep their presence. */
+  min-width:0;
+  font-size:clamp(19px, 5.1vw, 29px);
   font-weight:950;
-  line-height:.95;
+  line-height:1.02;
   letter-spacing:-.04em;
+  overflow-wrap:anywhere;
 }
 
 .kicker{
@@ -5344,3 +5349,49 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   .vps-row{grid-template-columns:38px minmax(0,1fr) 30px;gap:8px;}
   .vps-at{display:none;}
 }
+
+/* Technical addresses: these are the ones people paste into a wallet, so they
+   read as content rather than as a cramped pink footnote squeezed to the edge
+   of the cell — full value, legible weight, and the copy control beside it. */
+.ea-addr{white-space:normal;}
+.ea-code{
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  font-size:13px;line-height:1.5;letter-spacing:-.01em;
+  color:var(--ink,#fff) !important;
+  word-break:break-all;
+}
+@media (max-width:760px){
+  [data-render="entity-address-table"] td.ea-addr{
+    display:flex;align-items:center;gap:8px;
+    text-align:left;
+  }
+  [data-render="entity-address-table"] td.ea-addr::before{
+    flex:0 0 auto;align-self:flex-start;padding-top:2px;
+  }
+  .ea-code{flex:1 1 auto;font-size:12.5px;}
+  .ea-addr .addr-copy{flex:0 0 auto;margin-left:0;}
+}
+
+/* Network rank sits beside the other hero figures, with the denominator kept
+   quiet so the position itself reads first. */
+.rank-of{
+  display:block;font-style:normal;font-size:11.5px;
+  color:var(--muted);margin-top:3px;font-weight:600;
+}
+
+/* Snapshot rows expand to what that snapshot actually captured — the figures
+   that decided the epoch, rather than only when it happened. */
+.vps-item{border-radius:10px;}
+.vps-item > summary{list-style:none;cursor:pointer;padding:3px 4px;border-radius:9px;}
+.vps-item > summary::-webkit-details-marker{display:none;}
+.vps-item > summary:hover{background:rgba(255,255,255,.035);}
+.vps-item[open] > summary{background:rgba(255,46,99,.07);}
+.vps-detail{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));
+  gap:8px 14px;margin:8px 4px 10px;padding:11px 12px;
+  border:1px solid var(--line);border-radius:11px;
+  background:rgba(255,255,255,.03);
+}
+.vps-detail dt{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.vps-detail dd{margin:3px 0 0;font-size:13.5px;font-weight:700;color:var(--ink,#fff);font-variant-numeric:tabular-nums;}
+.vps-detail-empty{margin:8px 4px 10px;font-size:12.5px;color:var(--muted);}

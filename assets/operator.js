@@ -238,17 +238,25 @@ const MirhollioCore = (() => {
     setText("ftsoStakeInput", Number.isFinite(stakeInput) ? fmtCompact(stakeInput, " FLR") : "-");
   }
 
-  // A truncated address is unusable on its own, so pair it with a copy control
-  // carrying the full value. The delegator list is the one place these appear
-  // without one anywhere else on the page to fall back to.
+  // These are the addresses people actually copy into a wallet, so they get the
+  // control — full value, not the truncated form.
+  function copyableAddress(addr) {
+    if (!addr) return "-";
+    const full = String(addr);
+    const esc = full.replace(/"/g, "&quot;");
+    return `<code class="ea-code">${full}</code>` +
+      `<button type="button" class="addr-copy" data-copy-text="${esc}" aria-label="Copy ${esc}">` +
+      `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2.5"/>` +
+      `<path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>`;
+  }
+
+  // The full address stays on the title attribute for anyone who wants it, but
+  // the list itself reads better without a control on every row.
   function addressCell(addr) {
     if (!addr) return "-";
     const full = String(addr);
     const esc = full.replace(/"/g, "&quot;");
-    return `<span class="delegator-address" title="${esc}">${shortAddr(full)}</span>` +
-      `<button type="button" class="addr-copy" data-copy-text="${esc}" aria-label="Copy full address ${esc}">` +
-      `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2.5"/>` +
-      `<path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>`;
+    return `<span class="delegator-address" title="${esc}">${shortAddr(full)}</span>`;
   }
 
   function shortAddr(addr) {
@@ -2354,7 +2362,7 @@ const MirhollioCore = (() => {
         <tr>
           <th scope="row" data-label="${labels[0] || "Role"}">${row.role}</th>
           <td data-label="${labels[1] || "Network"}">${row.network}</td>
-          <td data-label="${labels[2] || "Address"}"><code>${row.address}</code></td>
+          <td class="ea-addr" data-label="${labels[2] || "Address"}">${copyableAddress(row.address)}</td>
           <td data-label="${labels[3] || "FLR"}">${fmtAddressBalance(row.flr)}</td>
           <td data-label="${labels[4] || "WFLR"}">${fmtAddressBalance(row.wflr)}</td>
           <td data-label="${labels[5] || "Purpose"}">${row.purpose}</td>

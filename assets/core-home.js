@@ -504,8 +504,22 @@
   const tryRender = (attempt) => {
     const p = findProv(fromCache());
     if (p) { render(p); return; }
-    if (attempt < 6) setTimeout(() => tryRender(attempt + 1), 2500);
-    else fetch("https://api.oracle-daemon.com/v2/flare/providers").then((r) => r.json()).then((d) => render(findProv(d))).catch(() => {});
+    // This used to poll localStorage seven times at 2.5s before giving up and
+    // pulling the 16MB provider payload itself — seventeen seconds of empty
+    // tiles on a good connection, and nothing at all behind a content blocker.
+    // The pipeline already mirrors our slice of that payload on this origin.
+    fetch("/data/oracle-live.json")
+      .then((r) => r.json())
+      .then((m) => {
+        const prov = findProv(m && (m.providersV2 || m.providersV1));
+        if (prov) { render(prov); return; }
+        throw new Error("not in mirror");
+      })
+      .catch(() => {
+        if (attempt < 3) { setTimeout(() => tryRender(attempt + 1), 2000); return; }
+        fetch("https://api.oracle-daemon.com/v2/flare/providers")
+          .then((r) => r.json()).then((d) => render(findProv(d))).catch(() => {});
+      });
   };
   tryRender(0);
 })();
@@ -580,26 +594,69 @@
       : "";
   };
 
-  fetch("/data/network-position.json")
-    .then(r => r.json())
-    .then(d => {
+  const num = (v, d = 0) =>
+    Number.isFinite(v) ? v.toLocaleString("en-US", { maximumFractionDigits: d }) : "–";
+
+  Promise.all([
+    fetch("/data/network-position.json").then(r => r.json()),
+    fetch("/data/ftso-delegations.json").then(r => r.json()).catch(() => null),
+  ])
+    .then(([d, del]) => {
       const rows = (d && d.votePowerSnapshots) || [];
       if (!rows.length) {
         mount.innerHTML = '<p class="vps-empty">Snapshot history is not available right now.</p>';
         return;
       }
+      // What the snapshot actually captured, keyed by the epoch it decided.
+      const weights = new Map(((d && d.weightHistory) || []).map(w => [w.epoch, w]));
+      const counts = new Map((((del || {}).history) || []).map(h => [h.epoch, h]));
+
       mount.innerHTML = rows.map((s, i) => {
         const pct = Math.max(0, Math.min(100, Number(s.pct) || 0));
-        return `<div class="vps-row${i === 0 ? " latest" : ""}">
-            <span class="vps-ep">E${s.epoch}</span>
-            <span class="vps-track"><i style="left:${pct.toFixed(2)}%"></i></span>
-            <span class="vps-pct">${pct.toFixed(0)}%</span>
-            <span class="vps-at">${fmt(s.at)}</span>
-          </div>`;
+        const w = weights.get(s.epoch);
+        const c = counts.get(s.epoch);
+        const detail = (w || c)
+          ? `<dl class="vps-detail">
+               <div><dt>Delegated</dt><dd>${w ? num(w.wflrM) + " WFLR" : "–"}</dd></div>
+               <div><dt>Stake</dt><dd>${w ? num(w.stakeM) + " FLR" : "–"}</dd></div>
+               <div><dt>Delegators</dt><dd>${c ? num(c.delegators) : "–"}</dd></div>
+               <div><dt>Taken</dt><dd>${fmt(s.at)}</dd></div>
+               <div><dt>Block</dt><dd>${num(s.block)}</dd></div>
+             </dl>`
+          : `<p class="vps-detail-empty">No captured figures stored for this epoch.</p>`;
+        return `<details class="vps-item${i === 0 ? " latest" : ""}">
+            <summary class="vps-row">
+              <span class="vps-ep">E${s.epoch}</span>
+              <span class="vps-track"><i style="left:${pct.toFixed(2)}%"></i></span>
+              <span class="vps-pct">${pct.toFixed(0)}%</span>
+              <span class="vps-at">${fmt(s.at)}</span>
+            </summary>
+            ${detail}
+          </details>`;
       }).join("") +
-      `<p class="vps-foot">Position within epoch <span>E${rows[0].takenDuring}</span> and earlier — left is the start of that epoch, right is its end.</p>`;
+      `<p class="vps-foot">Position within epoch <span>E${rows[0].takenDuring}</span> and earlier — left is the start of that epoch, right is its end. Tap a row for what that snapshot captured.</p>`;
     })
     .catch(() => {
       mount.innerHTML = '<p class="vps-empty">Snapshot history could not be loaded.</p>';
     });
+})();
+
+/* Network rank (FTSO page): where this operator sits among the registered
+   voters by total registration weight — stake plus delegations, which is what
+   the signing policy actually ranks on. */
+(() => {
+  const el = document.querySelector('[data-field="networkRank"]');
+  if (!el) return;
+  fetch("/data/network-position.json")
+    .then(r => r.json())
+    .then(d => {
+      const p = d && d.position;
+      const rank = p && Number(p.rank);
+      const of = p && Number(p.voters);
+      el.textContent = rank > 0 && of > 0 ? `#${rank}` : "–";
+      if (rank > 0 && of > 0) {
+        el.insertAdjacentHTML("afterend", `<em class="rank-of">of ${of} voters</em>`);
+      }
+    })
+    .catch(() => { el.textContent = "–"; });
 })();
