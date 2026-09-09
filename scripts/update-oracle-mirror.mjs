@@ -59,7 +59,12 @@ async function main() {
   for (const [key, url] of Object.entries(SOURCES)) {
     try {
       const slice = extract(await getJson(url));
-      if (slice) out[key] = slice;
+      // The site finds the provider by walking the structure, so a bare object
+      // is fine there. findValidatorDeep is different: it reads
+      // data.m_axValidator and expects an array, so a bare node left it with an
+      // empty list and every validator field stayed on "Loading". Hand that one
+      // back in the shape its reader actually looks for.
+      if (slice) out[key] = key === "validators" ? { m_axValidator: [slice] } : slice;
       else out.warnings.push(`${key}: our entry was not present`);
     } catch (error) {
       out.warnings.push(`${key}: ${error.message}`);
