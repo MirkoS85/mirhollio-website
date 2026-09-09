@@ -1683,24 +1683,48 @@ h1{
   font-weight:760;
 }
 
+/* This was the "\203A" glyph set at 30px inside a ring — a piece of type doing
+   the job of an icon, which is why it read as heavy and slightly off-centre.
+   Drawn as a chevron instead: two hairlines, optically centred, and the ring
+   lights up as it opens so the state is legible at a glance. */
 .ftso-delegation-toggle i{
-  width:42px;
-  height:42px;
-  display:grid;
-  place-items:center;
-  border:1px solid rgba(255, 41, 109,.22);
+  position:relative;
+  width:34px;
+  height:34px;
+  flex:0 0 auto;
+  display:block;
+  border:1px solid rgba(255, 41, 109,.24);
   border-radius:999px;
-  color:#ff296d;
   background:rgba(22,22,30,0.62);
-  font-style:normal;
-  font-size:30px;
-  font-weight:900;
-  line-height:1;
-  transition:transform .18s ease;
+  font-size:0;
+  transition:transform .24s cubic-bezier(.4,0,.2,1),
+             background .24s ease, border-color .24s ease;
+}
+
+.ftso-delegation-toggle i::before{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:7.5px;
+  height:7.5px;
+  border-right:1.9px solid #ff296d;
+  border-bottom:1.9px solid #ff296d;
+  border-radius:0 0 1.5px 0;
+  /* -58% nudges the chevron back over the true centre; a plain -50% leaves it
+     looking pushed right because the shape's mass sits on its outer corner. */
+  transform:translate(-58%,-50%) rotate(-45deg);
+}
+
+.ftso-delegation-toggle:hover i{
+  border-color:rgba(255, 41, 109,.42);
+  background:rgba(255, 41, 109,.09);
 }
 
 .ftso-delegation-card[open] .ftso-delegation-toggle i{
   transform:rotate(90deg);
+  background:rgba(255, 41, 109,.15);
+  border-color:rgba(255, 41, 109,.5);
 }
 
 .ftso-delegation-content{
@@ -5110,11 +5134,33 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   .np-table th{font-size:12px;}
   .np-table td{font-size:12.5px;}
 
-  /* --- Minimal Conditions: 11 epoch columns cannot fit 390px. Show the
-         four most recent; the full history stays available on desktop. --- */
-  .condition-history-table th:nth-child(n+6),
-  .condition-history-table td:nth-child(n+6){display:none;}
-  .condition-history-wrap{overflow-x:visible;}
+  /* --- Minimal Conditions. Hiding the older epochs kept it inside the screen
+         but threw away most of the table. Pin the condition name instead and
+         let the epochs scroll under it, so every epoch stays reachable and you
+         can always see which row you are reading. --- */
+  .condition-history-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  /* Under table-layout:fixed the browser was handing the leftover width to the
+     first column, and width:max-content just sized it to its longest label
+     instead. Auto layout with a hard max-width is the combination that
+     actually holds it at the width asked for. */
+  .condition-history-table{min-width:0;width:auto;table-layout:auto;}
+  .condition-history-table th:first-child,
+  .condition-history-table td:first-child{
+    position:sticky;left:0;z-index:2;
+    width:126px;min-width:126px;max-width:126px;
+    white-space:normal;
+    background:#141019;
+    box-shadow:1px 0 0 var(--line);
+    font-size:11px;line-height:1.25;
+  }
+  .condition-history-header th:first-child{background:#1a1017;}
+  /* Tighter cells fit roughly twice the epochs per screen. */
+  .condition-history-table th,
+  .condition-history-table td{padding:7px 8px;}
+  .condition-history-table th:not(:first-child),
+  .condition-history-table td:not(:first-child){width:52px;min-width:52px;}
+  .condition-history-header th{font-size:11px;}
+  .condition-mark{width:21px;height:21px;font-size:13px;}
 
   /* --- Charts keep their aspect but stop demanding a 736px canvas. --- */
   .reward-chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
@@ -5135,3 +5181,82 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 #data-source-notice strong{font-size:13.5px;font-weight:700;}
 #data-source-notice span{color:var(--muted);}
 .data-unavailable{color:var(--muted) !important;font-style:italic;}
+
+/* ==========================================================================
+   Delegator list, addresses and copy controls.
+   Stacked as seven labelled rows per delegator, one entry filled most of a
+   phone screen. Grouped into three lines instead: who, how much, and for how
+   long. The truncated address also had no way to be used — it now carries a
+   copy control with the full value.
+   ========================================================================== */
+
+.delegator-address{
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  font-size:13px;letter-spacing:-.01em;
+  color:var(--ink,#fff);
+}
+.addr-copy{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;margin-left:7px;vertical-align:middle;
+  padding:0;border:1px solid var(--line);border-radius:8px;
+  background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;
+  transition:color .15s ease,border-color .15s ease,background .15s ease;
+}
+.addr-copy svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;}
+.addr-copy:hover,.addr-copy:focus-visible{
+  color:var(--ink,#fff);border-color:var(--pink);background:rgba(255,46,99,.12);
+}
+
+@media (max-width:760px){
+  /* Three lines per delegator instead of seven stacked label/value rows. */
+  [data-render="validator-delegator-table"] tr{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    grid-template-areas:
+      "rank  addr   addr"
+      "amt   amt    share"
+      "start end    left";
+    align-items:baseline;
+    gap:4px 10px;
+    padding:12px 13px;
+  }
+  [data-render="validator-delegator-table"] td,
+  [data-render="validator-delegator-table"] th{
+    display:block;border:0;padding:0;text-align:left;
+  }
+  [data-render="validator-delegator-table"] td::before,
+  [data-render="validator-delegator-table"] th::before{content:none;}
+
+  .dg-rank{grid-area:rank;font-size:12px;font-weight:800;color:var(--pink);}
+  .dg-addr{grid-area:addr;text-align:right;white-space:nowrap;}
+  .dg-amount{
+    grid-area:amt;
+    font-family:Archivo,sans-serif;font-size:18px;font-weight:800;
+    letter-spacing:-.02em;color:var(--ink,#fff);
+  }
+  .dg-amount::after{content:" FLR";font-size:11px;font-weight:600;color:var(--muted);}
+  .dg-share{grid-area:share;text-align:right;font-size:13px;font-weight:700;color:var(--pink);}
+
+  /* The date row keeps its labels — the numbers alone would not say which is which. */
+  .dg-start{grid-area:start;}
+  .dg-end{grid-area:end;}
+  .dg-left{grid-area:left;text-align:right;}
+  .dg-start,.dg-end,.dg-left{
+    margin-top:5px;padding-top:6px;
+    border-top:1px solid rgba(255,255,255,.06);
+    font-size:11.5px;color:var(--muted);white-space:nowrap;
+  }
+  /* The blanket `content:none` above is an attribute selector, so these need to
+     match its specificity to put the labels back on the date row. */
+  /* A global stacked-table rule blanks these, and it wins on ordering, so the
+     labels have to be marked to come back. Without them the row is three bare
+     values and nothing says which date is which. */
+  [data-render="validator-delegator-table"] td.dg-start::before{content:"from " !important;opacity:.6;}
+  [data-render="validator-delegator-table"] td.dg-end::before{content:"to " !important;opacity:.6;}
+  [data-render="validator-delegator-table"] td.dg-left::before{content:"left " !important;opacity:.6;}
+
+  /* Roomier, brighter addresses wherever they appear. */
+  .address code,.delegator-address{font-size:13.5px;color:var(--ink,#fff);}
+  .address code{display:block;line-height:1.55;word-break:break-all;}
+}

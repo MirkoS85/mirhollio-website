@@ -238,6 +238,19 @@ const MirhollioCore = (() => {
     setText("ftsoStakeInput", Number.isFinite(stakeInput) ? fmtCompact(stakeInput, " FLR") : "-");
   }
 
+  // A truncated address is unusable on its own, so pair it with a copy control
+  // carrying the full value. The delegator list is the one place these appear
+  // without one anywhere else on the page to fall back to.
+  function addressCell(addr) {
+    if (!addr) return "-";
+    const full = String(addr);
+    const esc = full.replace(/"/g, "&quot;");
+    return `<span class="delegator-address" title="${esc}">${shortAddr(full)}</span>` +
+      `<button type="button" class="addr-copy" data-copy-text="${esc}" aria-label="Copy full address ${esc}">` +
+      `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2.5"/>` +
+      `<path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H15"/></svg></button>`;
+  }
+
   function shortAddr(addr) {
     if (!addr) return "-";
     const s = String(addr);
@@ -994,6 +1007,13 @@ const MirhollioCore = (() => {
     showToast("Copied");
   }
 
+  document.addEventListener("click", event => {
+    const btn = event.target.closest("[data-copy-text]");
+    if (!btn) return;
+    event.preventDefault();
+    copy(btn.getAttribute("data-copy-text") || "");
+  });
+
   async function copyFromButton(text, button) {
     await copy(text);
     if (!button) return;
@@ -1127,13 +1147,13 @@ const MirhollioCore = (() => {
           : "-";
         return `
           <tr>
-            <th scope="row" data-label="${labels[0] || "#"}">${index + 1}</th>
-            <td data-label="${labels[1] || "Address"}"><span class="delegator-address">${shortAddr(item.m_sAddressP_Bech32 || item.m_sAddressP || item.m_sAddressC)}</span></td>
-            <td data-label="${labels[2] || "Amount"}">${Number.isFinite(amount) ? fmtNum(amount, 0) : "-"}</td>
-            <td data-label="${labels[3] || "Share"}">${Number.isFinite(share) ? `${fmtNum(share, 1)}%` : "-"}</td>
-            <td data-label="${labels[4] || "Start"}">${formatDate(item.m_xTimeStart)}</td>
-            <td data-label="${labels[5] || "End"}">${formatDate(item.m_xTimeEnd)}</td>
-            <td data-label="${labels[6] || "Time left"}">${timeLeft}</td>
+            <th scope="row" class="dg-rank" data-label="${labels[0] || "#"}">${index + 1}</th>
+            <td class="dg-addr" data-label="${labels[1] || "Address"}">${addressCell(item.m_sAddressP_Bech32 || item.m_sAddressP || item.m_sAddressC)}</td>
+            <td class="dg-amount" data-label="${labels[2] || "Amount"}">${Number.isFinite(amount) ? fmtNum(amount, 0) : "-"}</td>
+            <td class="dg-share" data-label="${labels[3] || "Share"}">${Number.isFinite(share) ? `${fmtNum(share, 1)}%` : "-"}</td>
+            <td class="dg-start" data-label="${labels[4] || "Start"}">${formatDate(item.m_xTimeStart)}</td>
+            <td class="dg-end" data-label="${labels[5] || "End"}">${formatDate(item.m_xTimeEnd)}</td>
+            <td class="dg-left" data-label="${labels[6] || "Time left"}">${timeLeft}</td>
           </tr>
         `;
       }).join("");
