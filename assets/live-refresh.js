@@ -153,29 +153,35 @@
       buttons.forEach(closeTouchTip);
     }
 
+    // A tap anywhere else dismisses whichever tip is open.
+    if (prefersTouch) {
+      document.addEventListener("click", event => {
+        if (!event.target.closest(".info-tip")) closeAllTouchTips();
+      });
+    }
+
     buttons.forEach(button => {
       ["pointerenter", "mouseenter", "focus"].forEach(type => {
         button.addEventListener(type, () => positionInfoTip(button));
       });
 
       if (prefersTouch) {
-        const openTip = event => {
+        // Holding the button to read the tip is what let iOS start a text
+        // selection on it, and the tip then stayed up behind the selection
+        // handles until that was dismissed — the ten seconds of it hanging
+        // around. Tap to open, tap again or anywhere else to close.
+        button.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          const wasOpen = button.classList.contains("info-touch-active");
           closeAllTouchTips();
-          button.classList.add("info-touch-active");
-          positionInfoTip(button);
-          button.setPointerCapture?.(event.pointerId);
-        };
-
-        button.addEventListener("pointerdown", openTip);
-        button.addEventListener("touchstart", openTip, { passive: true });
-
-        ["pointerup", "pointercancel", "pointerleave", "lostpointercapture", "touchend", "touchcancel"].forEach(type => {
-          button.addEventListener(type, () => closeTouchTip(button));
+          if (!wasOpen) {
+            button.classList.add("info-touch-active");
+            positionInfoTip(button);
+          }
         });
 
-        button.addEventListener("click", () => {
-          window.setTimeout(() => closeTouchTip(button), 0);
-        });
+        button.addEventListener("pointercancel", () => closeTouchTip(button));
       }
     });
 

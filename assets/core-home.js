@@ -645,7 +645,7 @@
    voters by total registration weight — stake plus delegations, which is what
    the signing policy actually ranks on. */
 (() => {
-  const el = document.querySelector('[data-field="networkRank"]');
+  const el = document.getElementById("ftso-rank");
   if (!el) return;
   fetch("/data/network-position.json")
     .then(r => r.json())
@@ -653,10 +653,41 @@
       const p = d && d.position;
       const rank = p && Number(p.rank);
       const of = p && Number(p.voters);
-      el.textContent = rank > 0 && of > 0 ? `#${rank}` : "–";
-      if (rank > 0 && of > 0) {
+      if (!(rank > 0 && of > 0)) { el.textContent = "–"; return; }
+      el.textContent = `#${rank}`;
+      el.classList.remove("skeleton-value");
+      el.removeAttribute("aria-busy");
+      if (!el.parentElement.querySelector(".rank-of")) {
         el.insertAdjacentHTML("afterend", `<em class="rank-of">of ${of} voters</em>`);
       }
     })
     .catch(() => { el.textContent = "–"; });
+})();
+
+/* Validator hero: the grid holds four and only three were filled, leaving a
+   quarter of it empty. Delegation count is the figure a would-be staker asks
+   for next, and the P-chain answers it live. */
+(() => {
+  const el = document.getElementById("val-delegations");
+  if (!el) return;
+  const show = v => {
+    el.textContent = v;
+    el.classList.remove("skeleton-value");
+    el.removeAttribute("aria-busy");
+  };
+  fetch("https://flare-api.flare.network/ext/bc/P", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0", id: 1, method: "platform.getCurrentValidators",
+      params: { nodeIDs: ["NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"] },
+    }),
+  })
+    .then(r => r.json())
+    .then(j => {
+      const v = ((j.result || {}).validators || [])[0];
+      const n = v && Number(v.delegatorCount);
+      show(Number.isFinite(n) ? n.toLocaleString("en-US") : "–");
+    })
+    .catch(() => show("–"));
 })();
