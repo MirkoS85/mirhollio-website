@@ -388,7 +388,8 @@
     if (!Number.isFinite(ms) || ms < 0) return "now";
     if (ms < 60_000) return `${Math.max(1, Math.round(ms / 1000))}s`;
     if (ms < 3_600_000) return `${Math.round(ms / 60_000)}m`;
-    return `${Math.round(ms / 3_600_000)}h`;
+    if (ms < 172_800_000) return `${Math.round(ms / 3_600_000)}h`;
+    return `${Math.round(ms / 86_400_000)}d`;
   }
 
   function fmtUntil(value) {
@@ -1307,6 +1308,39 @@
     return "ok";
   }
 
+  // The background monitor lives in another repository, so this page cannot fix
+  // it - but a monitor that has stopped is exactly what must not pass quietly.
+  function infraAlert(payload) {
+    if (state.sources.infraHealth === "loading") return null;
+    if (!payload || payload.schema !== "mirsflr-infra-health/v1") {
+      return {
+        level: "warn",
+        title: "Background monitor unavailable",
+        text: "The published infra-health JSON could not be read. OPS live checks in this browser are unaffected."
+      };
+    }
+    const generated = new Date(payload.generatedAt);
+    const ageMs = Number.isFinite(generated.getTime()) ? Date.now() - generated.getTime() : null;
+    if (ageMs == null) {
+      return { level: "warn", title: "Background monitor timestamp invalid", text: "Published status has no usable generatedAt." };
+    }
+    if (ageMs > 90 * 60_000) {
+      return {
+        level: "down",
+        title: "Background monitor stopped",
+        text: `Last published ${fmtAge(generated)} ago. The check rows below are that old, not current.`
+      };
+    }
+    if (ageMs > 45 * 60_000) {
+      return {
+        level: "warn",
+        title: "Background monitor lagging",
+        text: `Last published ${fmtAge(generated)} ago; expected every ${payload.monitor?.intervalMinutes || 15} min.`
+      };
+    }
+    return null;
+  }
+
   function renderAlerts(alerts) {
     const mount = $('[data-render="alerts"]');
     if (!mount) return;
@@ -1405,13 +1439,19 @@
       return;
     }
 
+    // Once the monitor stops publishing, every row below is a snapshot from
+    // whenever it last ran. Showing those in green reads as a live all-clear -
+    // it is how a monitor that had been dead for 23 days went unnoticed.
+    const staleAge = staleDown || staleWarn ? fmtAge(generated) : null;
     mount.innerHTML = checks.map(check => {
-      const status = check.status === "down" || check.status === "warn" || check.status === "ok" ? check.status : "loading";
+      const published = check.status === "down" || check.status === "warn" || check.status === "ok" ? check.status : "loading";
+      const status = staleAge ? "stale" : published;
+      const meta = staleAge ? `${infraCheckMeta(check)} - recorded ${staleAge} ago` : infraCheckMeta(check);
       return `
         <article class="infra-check ${status}">
           <b>${escapeHtml(check.label || check.id || "Check")}</b>
-          <span>${escapeHtml(check.message || infraStatusLabel(status))}</span>
-          <em>${escapeHtml(infraCheckMeta(check))}</em>
+          <span>${escapeHtml(check.message || infraStatusLabel(published))}</span>
+          <em>${escapeHtml(meta)}</em>
         </article>
       `;
     }).join("");
@@ -1785,7 +1825,8 @@
     const blockedSources = sourceGroups.filter(value => value === "warn").length;
     setText("sourceSummary", blockedSources ? `${liveSources}/3 live` : `${liveSources}/3 online`);
 
-    renderAlerts(levels.alerts);
+    const infraIssue = infraAlert(infraHealth);
+    renderAlerts(infraIssue ? [infraIssue, ...levels.alerts] : levels.alerts);
 
     const ftsoRewards = rewardSeries(provider);
     const validatorRewards = validatorRewardSeries(node);

@@ -481,6 +481,15 @@ button{
   box-shadow:0 0 12px rgba(224,74,138,.6);
 }
 
+/* Rows carried over from a monitor that has stopped: readable, never dressed
+   up as a live green all-clear. */
+.infra-check.stale{opacity:.72}
+
+.infra-check.stale::before{
+  background:var(--muted);
+  box-shadow:none;
+}
+
 .infra-check b{
   color:var(--green);
   font-size:13px;
@@ -490,6 +499,7 @@ button{
 .infra-check.warn b{color:var(--amber)}
 .infra-check.down b{color:var(--red)}
 .infra-check.loading b{color:var(--pink)}
+.infra-check.stale b{color:var(--muted)}
 
 .infra-check span{
   color:var(--ink);
