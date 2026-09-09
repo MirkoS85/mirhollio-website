@@ -55,10 +55,15 @@ struct MirFreshness {
         return ageSeconds > 45 * 60
     }
 
-    /// Nil while the reading is current. A clean face means live data, so the
-    /// presence of any badge at all is the signal - nothing to memorise.
+    /// Always shown, so the face answers "are these numbers current?" outright
+    /// instead of only warning once they are not. Absence of a warning is not
+    /// the same as confirmation: it looks identical to a complication that has
+    /// quietly stopped, which is the thing this is here to rule out.
+    ///
+    /// Nil only for gallery placeholders, whose bundled sample has no
+    /// meaningful timestamp.
     var badge: String? {
-        guard isBehind else { return nil }
+        if isPlaceholder { return nil }
         // A missing or unparseable timestamp has to read as a warning, not as a
         // dash: "-" looks like an empty metric, which is the one impression this
         // badge must never give.
@@ -70,6 +75,12 @@ struct MirFreshness {
         isStale ? .red : .orange
     }
 
+    /// Grey while current so it reads as a quiet footnote, and only takes on
+    /// colour once the age actually means something.
+    var labelColor: Color {
+        isBehind ? tint : Color.secondary
+    }
+
     func label(_ base: String) -> String {
         guard let badge else { return base }
         return "\(base) \(badge)"
@@ -77,18 +88,14 @@ struct MirFreshness {
 
     func detail(_ base: String) -> String {
         guard let badge else { return base }
-        return base.isEmpty ? "\(badge) old" : "\(base) - \(badge) old"
-    }
-
-    var labelColor: Color {
-        badge == nil ? Color.secondary : tint
+        return base.isEmpty ? badge : "\(base) - \(badge)"
     }
 
     /// The inline family is a single system-styled line with no separate label
     /// slot, so the age has to ride along in the text itself.
     var inlineSuffix: String {
         guard let badge else { return "" }
-        return " - \(badge) old"
+        return " - \(badge)"
     }
 }
 

@@ -260,25 +260,30 @@ Ko to builda v Xcode, je naslednji korak polish:
 - dodati rdeci alarm, ko free pade pod 1M
 - dodati short notification kasneje, ce validator postane skoraj full ali offline
 
-## Varovalka: ali so podatki sveži ali stari
+## Varovalka: starost podatkov
 
-Komplikacija zdaj sama pove, kdaj podatek ni vec aktualen. Vzorca si ni treba
-zapomniti - dokler je vse sveze, ni nobene oznake.
+Komplikacija zdaj **vedno** pise, kako stari so podatki. Ni ti treba ugibati
+niti si zapomniti vzorca - stevilka je zraven.
 
-- **Brez oznake** = podatek je aktualen. Feed se objavlja vsakih 5 minut,
-  watchOS pa komplikaciji dovoli osvezitev priblizno vsakih 15 minut, zato je
-  vse do 20 minut normalen razmik med posodobitvama.
+- **Siva starost** (npr. `FDC 3m`) = podatki so svezi, vse dela.
 - **Oranzna starost** (npr. `FDC 25m`) = nekaj v verigi je zastalo.
 - **Rdeca starost** (npr. `FDC 2h`) = feed stoji, stevilki ne zaupaj.
 
-Kje se oznaka pokaze:
+Prag za oranzno je 20 minut. Toliko je normalen razmik: feed se objavlja
+vsakih 5 minut, watchOS pa komplikaciji dovoli osvezitev priblizno vsakih 15
+minut. Rdeca pride po 45 minutah.
 
-- okrogla in kotna komplikacija: ob oznaki, `FDC` postane `FDC 25m`
-- pravokotna: v spodnji vrstici, `Oracle avg - 25m old`
-- inline: na koncu vrstice, `FDC 99.3% - 25m old`
+Kje se izpise:
+
+- okrogla in kotna: ob oznaki, `FDC` postane `FDC 3m`
+- pravokotna: v spodnji vrstici, `Oracle avg - 3m`
+- inline: na koncu vrstice, `FDC 99.3% - 3m`
+
+V galeriji pri izbiri komplikacije oznake ni, ker tam ni pravih podatkov.
 
 Pomembno je, kako se starost racuna: meri se glede na cas vnosa v timelineu,
-ne glede na trenutni cas. watchOS vnaprej pripravi vnose za ure naprej, zato
-starost na uri raste tudi takrat, ko sistem sploh ne dovoli vec osvezitev.
-Zamrznjena komplikacija to torej pove sama od sebe, namesto da bi kazala
-samozavestno stevilko, ki je stara vec ur.
+ne glede na trenutni cas. watchOS vnaprej pripravi vnose za sest ur naprej,
+zato starost na uri raste tudi takrat, ko sistem sploh ne dovoli vec
+osvezitev. Zamrznjena komplikacija to torej pove sama od sebe.
+
+V aplikaciji je starost povsem spodaj: `Updated 3m ago`.
