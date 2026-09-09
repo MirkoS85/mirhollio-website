@@ -12,7 +12,6 @@ final class MirSFlrExtensionDelegate: NSObject, WKExtensionDelegate {
 
     func applicationDidBecomeActive() {
         WidgetReloader.reloadAll()
-        Task { await WidgetReloader.reloadAgainSoon() }
         scheduleBackgroundRefresh(after: activeRefreshInterval)
     }
 
@@ -26,7 +25,7 @@ final class MirSFlrExtensionDelegate: NSObject, WKExtensionDelegate {
             case let refreshTask as WKApplicationRefreshBackgroundTask:
                 Task { @MainActor in
                     _ = try? await StatusService.shared.fetch()
-                    WidgetReloader.reloadAll()
+                    WidgetReloader.reloadAll(force: true)
                     self.scheduleBackgroundRefresh()
                     refreshTask.setTaskCompletedWithSnapshot(false)
                 }
@@ -47,47 +46,28 @@ final class MirSFlrExtensionDelegate: NSObject, WKExtensionDelegate {
 }
 
 enum WidgetReloader {
-    private static let kinds = [
-        "MirSFlrComplications",
-        "MirSFlrFDCBarsComplication",
-        "MirSFlrFDCBarsLiveV2Complication",
-        "MirSFlrDelegationComplication",
-        "MirSFlrFTSOAvailabilityComplication",
-        "MirSFlrFDCAvailabilityComplication",
-        "MirSFlrFTSOPerformanceBandsV2Complication",
-        "MirSFlrCapacityComplication",
-        "MirSFlrFTSOWeightComplication",
-        "MirSFlrEpochComplication",
-        "MirSFlrFreeSpaceComplication",
-        "MirSFlrPrimaryPerformanceComplication",
-        "MirSFlrSecondaryPerformanceComplication",
-        "MirSFlrAPRComplication",
-        "MirSFlrFDCParticipationComplication",
-        "MirSFlrEdgeFinalV8CapacityComplication",
-        "MirSFlrEdgeFinalV8FTSOAvailabilityComplication",
-        "MirSFlrEdgeFinalV8FDCAvailabilityComplication",
-        "MirSFlrEdgeFinalV8FTSOWeightComplication",
-        "MirSFlrEdgeFinalV8EpochComplication",
-        "MirSFlrEdgeFinalV8FreeSpaceComplication",
-        "MirSFlrEdgeFinalV8DelegationComplication",
-        "MirSFlrEdgeFinalV8PrimaryPerformanceComplication",
-        "MirSFlrEdgeFinalV8SecondaryPerformanceComplication",
-        "MirSFlrEdgeFinalV8APRComplication",
-        "MirSFlrEdgeFinalV8FDCParticipationComplication"
-    ]
+    /// WidgetKit hands a complication only a few dozen timeline reloads a day
+    /// and spends one whether or not the request was useful. Past that it
+    /// throttles, then stops refreshing altogether - which looks exactly like a
+    /// frozen complication, the very thing these calls exist to prevent.
+    ///
+    /// This used to call reloadAllTimelines() and then loop over all 26 kinds,
+    /// so every installed complication was asked to reload twice; becoming
+    /// active did that, then did it again four seconds later, for four requests
+    /// per app open where one does the same work. reloadAllTimelines() already
+    /// covers every widget this app vends, so the loop was pure duplication.
+    @MainActor private static var lastReload = Date.distantPast
+    private static let minimumInterval: TimeInterval = 60
 
+    /// - Parameter force: skip the coalescing window. Pass it when genuinely new
+    ///   data has just been fetched; leave it off for UI events such as the app
+    ///   becoming active, which a user can trigger repeatedly.
     @MainActor
-    static func reloadAll() {
+    static func reloadAll(force: Bool = false) {
+        let now = Date()
+        guard force || now.timeIntervalSince(lastReload) >= minimumInterval else { return }
+        lastReload = now
         WidgetCenter.shared.reloadAllTimelines()
-        for kind in kinds {
-            WidgetCenter.shared.reloadTimelines(ofKind: kind)
-        }
-    }
-
-    @MainActor
-    static func reloadAgainSoon() async {
-        try? await Task.sleep(for: .seconds(4))
-        reloadAll()
     }
 }
 
