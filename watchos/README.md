@@ -61,3 +61,16 @@ with the target membership described below.
 WidgetKit controls refresh timing. The complication asks for a new timeline
 about every 15 minutes, but watchOS may refresh less often to protect battery.
 The app screen fetches fresh data whenever it opens.
+
+## Freshness badge
+
+Complications carry no badge while the reading is current, so a clean face
+means live data. Past 20 minutes - the normal gap between a five-minute feed
+and a fifteen-minute complication reload - the age appears in orange next to
+the label, and past 45 minutes in red.
+
+The age is measured against the timeline entry's own timestamp rather than the
+current clock. Entries are pre-rendered hours ahead, so when watchOS stops
+granting reloads the face advances through them and the age keeps climbing: a
+frozen complication reports its own staleness instead of showing an hours-old
+number that still looks current.

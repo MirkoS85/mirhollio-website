@@ -259,3 +259,26 @@ Ko to builda v Xcode, je naslednji korak polish:
 - dodati vec komplikacij: `Free space`, `FTSO`, `Validator full`
 - dodati rdeci alarm, ko free pade pod 1M
 - dodati short notification kasneje, ce validator postane skoraj full ali offline
+
+## Varovalka: ali so podatki sveži ali stari
+
+Komplikacija zdaj sama pove, kdaj podatek ni vec aktualen. Vzorca si ni treba
+zapomniti - dokler je vse sveze, ni nobene oznake.
+
+- **Brez oznake** = podatek je aktualen. Feed se objavlja vsakih 5 minut,
+  watchOS pa komplikaciji dovoli osvezitev priblizno vsakih 15 minut, zato je
+  vse do 20 minut normalen razmik med posodobitvama.
+- **Oranzna starost** (npr. `FDC 25m`) = nekaj v verigi je zastalo.
+- **Rdeca starost** (npr. `FDC 2h`) = feed stoji, stevilki ne zaupaj.
+
+Kje se oznaka pokaze:
+
+- okrogla in kotna komplikacija: ob oznaki, `FDC` postane `FDC 25m`
+- pravokotna: v spodnji vrstici, `Oracle avg - 25m old`
+- inline: na koncu vrstice, `FDC 99.3% - 25m old`
+
+Pomembno je, kako se starost racuna: meri se glede na cas vnosa v timelineu,
+ne glede na trenutni cas. watchOS vnaprej pripravi vnose za ure naprej, zato
+starost na uri raste tudi takrat, ko sistem sploh ne dovoli vec osvezitev.
+Zamrznjena komplikacija to torej pove sama od sebe, namesto da bi kazala
+samozavestno stevilko, ki je stara vec ur.

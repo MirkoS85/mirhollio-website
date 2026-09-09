@@ -4,15 +4,114 @@ import SwiftUI
 struct MirSFlrEntry: TimelineEntry {
     let date: Date
     let status: WatchStatus
+    /// Gallery previews render the bundled sample, whose timestamp is ancient.
+    /// Flag those so the picker does not show every complication as stale.
+    var isPlaceholder: Bool = false
+}
+
+/// How old the reading on screen is, measured against the timeline entry's own
+/// timestamp rather than the current clock.
+///
+/// That distinction is the whole point. Entries are pre-rendered for the hours
+/// ahead, so when watchOS stops granting reloads the face keeps advancing
+/// through them and the age keeps climbing. A complication frozen on old data
+/// therefore says so by itself, instead of showing a confident number that
+/// happens to be hours out of date.
+struct MirFreshness {
+    var generatedAt: String?
+    var asOf: Date
+    var isPlaceholder: Bool = false
+
+    init(entry: MirSFlrEntry) {
+        self.generatedAt = entry.status.generatedAt
+        self.asOf = entry.date
+        self.isPlaceholder = entry.isPlaceholder
+    }
+
+    init(generatedAt: String?, asOf: Date, isPlaceholder: Bool = false) {
+        self.generatedAt = generatedAt
+        self.asOf = asOf
+        self.isPlaceholder = isPlaceholder
+    }
+
+    private var ageSeconds: Int? {
+        guard let generatedAt else { return nil }
+        let seconds = StatusFormat.ageSeconds(from: generatedAt, now: asOf)
+        return seconds >= 0 ? seconds : nil
+    }
+
+    /// The feed republishes every five minutes and watchOS grants a complication
+    /// reload roughly every fifteen, so up to twenty minutes is simply the gap
+    /// between updates. Past that, something in the chain has stopped.
+    var isBehind: Bool {
+        if isPlaceholder { return false }
+        guard let ageSeconds else { return true }
+        return ageSeconds > 20 * 60
+    }
+
+    var isStale: Bool {
+        if isPlaceholder { return false }
+        guard let ageSeconds else { return true }
+        return ageSeconds > 45 * 60
+    }
+
+    /// Nil while the reading is current. A clean face means live data, so the
+    /// presence of any badge at all is the signal - nothing to memorise.
+    var badge: String? {
+        guard isBehind else { return nil }
+        // A missing or unparseable timestamp has to read as a warning, not as a
+        // dash: "-" looks like an empty metric, which is the one impression this
+        // badge must never give.
+        guard ageSeconds != nil, let generatedAt else { return "?" }
+        return StatusFormat.compactAge(from: generatedAt, now: asOf)
+    }
+
+    var tint: Color {
+        isStale ? .red : .orange
+    }
+
+    func label(_ base: String) -> String {
+        guard let badge else { return base }
+        return "\(base) \(badge)"
+    }
+
+    func detail(_ base: String) -> String {
+        guard let badge else { return base }
+        return base.isEmpty ? "\(badge) old" : "\(base) - \(badge) old"
+    }
+
+    var labelColor: Color {
+        badge == nil ? Color.secondary : tint
+    }
+
+    /// The inline family is a single system-styled line with no separate label
+    /// slot, so the age has to ride along in the text itself.
+    var inlineSuffix: String {
+        guard let badge else { return "" }
+        return " - \(badge) old"
+    }
+}
+
+private struct MirFreshnessKey: EnvironmentKey {
+    // Unknown freshness must never read as current, so the default carries no
+    // timestamp and resolves to a warning badge.
+    static let defaultValue = MirFreshness(generatedAt: nil, asOf: Date())
+}
+
+extension EnvironmentValues {
+    var mirFreshness: MirFreshness {
+        get { self[MirFreshnessKey.self] }
+        set { self[MirFreshnessKey.self] = newValue }
+    }
 }
 
 struct MirSFlrProvider: TimelineProvider {
     func placeholder(in context: Context) -> MirSFlrEntry {
-        MirSFlrEntry(date: Date(), status: .sample)
+        MirSFlrEntry(date: Date(), status: .sample, isPlaceholder: true)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (MirSFlrEntry) -> Void) {
-        completion(MirSFlrEntry(date: Date(), status: .sample))
+        completion(MirSFlrEntry(date: Date(), status: .sample, isPlaceholder: true))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<MirSFlrEntry>) -> Void) {
@@ -29,8 +128,13 @@ struct MirSFlrProvider: TimelineProvider {
             // entries carrying the same reading at later timestamps. The age
             // label then keeps counting up on its own between network reloads
             // rather than freezing at whatever it last saw.
+            // Carry on well past the next reload. If watchOS stops granting
+            // them, these later entries are what keep the age badge climbing
+            // instead of the face settling on a stale number that looks fine.
             var entries: [MirSFlrEntry] = []
-            for step in stride(from: 0, through: 60, by: 5) {
+            var steps = Array(stride(from: 0, through: 60, by: 5))
+            steps += [75, 90, 105, 120, 150, 180, 240, 300, 360]
+            for step in steps {
                 let date = now.addingTimeInterval(TimeInterval(step * 60))
                 entries.append(MirSFlrEntry(date: date, status: status))
             }
@@ -90,15 +194,17 @@ private func validatorTotalStake(_ validator: WatchStatus.Validator) -> Double? 
 }
 
 struct MirSFlrPlainAccessoryMetric: View {
+    @Environment(\.mirFreshness) private var freshness
+
     let label: String
     let value: String
     let color: Color
 
     var body: some View {
         VStack(spacing: -4) {
-            Text(label)
+            Text(freshness.label(label))
                 .font(.system(size: 9.4, weight: .black, design: .rounded))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(freshness.labelColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
             Text(value)
@@ -115,6 +221,7 @@ struct MirSFlrPlainAccessoryMetric: View {
 
 struct MirSFlrAccessoryMetric: View {
     @Environment(\.widgetFamily) private var family
+    @Environment(\.mirFreshness) private var freshness
 
     let label: String
     let value: String
@@ -134,9 +241,9 @@ struct MirSFlrAccessoryMetric: View {
             Text(label)
         } currentValueLabel: {
             VStack(spacing: -5) {
-                Text(label)
+                Text(freshness.label(label))
                     .font(.system(size: labelSize, weight: .black, design: .rounded))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(freshness.labelColor)
                     .minimumScaleFactor(0.62)
                 Text(value)
                     .font(.system(size: valueSize, weight: .black, design: .rounded))
@@ -166,8 +273,9 @@ struct MirSFlrAccessoryMetric: View {
         .gaugeStyle(.accessoryLinearCapacity)
         .tint(color)
         .widgetLabel {
-            Text(cornerTitle)
+            Text(freshness.label(cornerTitle))
                 .font(.system(size: cornerLabelSize, weight: .heavy, design: .rounded))
+                .foregroundStyle(freshness.labelColor)
                 .minimumScaleFactor(0.65)
                 .lineLimit(1)
         }
@@ -223,6 +331,8 @@ struct MirSFlrAccessoryMetric: View {
 }
 
 struct MirSFlrRectMetric: View {
+    @Environment(\.mirFreshness) private var freshness
+
     let label: String
     let value: String
     let detail: String
@@ -249,9 +359,9 @@ struct MirSFlrRectMetric: View {
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.52)
-            Text(detail)
+            Text(freshness.detail(detail))
                 .font(.system(size: 9.5, weight: .bold, design: .rounded))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(freshness.labelColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             GeometryReader { proxy in
@@ -270,6 +380,8 @@ struct MirSFlrRectMetric: View {
 }
 
 struct MirSFlrPlainRectMetric: View {
+    @Environment(\.mirFreshness) private var freshness
+
     let label: String
     let value: String
     let detail: String
@@ -287,9 +399,9 @@ struct MirSFlrPlainRectMetric: View {
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.50)
-            Text(detail)
+            Text(freshness.detail(detail))
                 .font(.system(size: 9.5, weight: .bold, design: .rounded))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(freshness.labelColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -1252,6 +1364,8 @@ struct MirSFlrCornerWeatherArcMetric: View {
 }
 
 struct MirSFlrCornerPlainMetric: View {
+    @Environment(\.mirFreshness) private var freshness
+
     let title: String
     let value: String
     let color: Color
@@ -1263,11 +1377,11 @@ struct MirSFlrCornerPlainMetric: View {
             let scale = min(width / 54, height / 44)
 
             VStack(alignment: .trailing, spacing: -2 * scale) {
-                Text(shortTitle)
+                Text(freshness.label(shortTitle))
                     .font(.system(size: 9.2 * scale, weight: .black, design: .rounded))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(freshness.labelColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.7)
 
                 Text(value)
                     .font(.system(size: valueSize * scale, weight: .black, design: .rounded))
@@ -1317,7 +1431,7 @@ struct MirSFlrCapacityView: View {
                 ratio: clampedRatio(entry.status.validator.fillPct)
             )
         case .accessoryInline:
-            Text("CAP \(StatusFormat.percent(entry.status.validator.fillPct))")
+            Text("CAP \(StatusFormat.percent(entry.status.validator.fillPct))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "CAP",
@@ -1345,7 +1459,7 @@ struct MirSFlrFTSOAvailabilityView: View {
                 ratio: clampedRatio(availability)
             )
         case .accessoryInline:
-            Text("FTSO \(StatusFormat.percent(availability))")
+            Text("FTSO \(StatusFormat.percent(availability))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "FTSO",
@@ -1374,7 +1488,7 @@ struct MirSFlrFDCAvailabilityView: View {
                 ratio: clampedRatio(availability)
             )
         case .accessoryInline:
-            Text("FDC \(StatusFormat.percent(availability))")
+            Text("FDC \(StatusFormat.percent(availability))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "FDC",
@@ -1406,7 +1520,7 @@ struct MirSFlrFTSOWeightView: View {
                 color: .pink
             )
         case .accessoryInline:
-            Text("WGT \(StatusFormat.compactBare(entry.status.ftso.weight))")
+            Text("WGT \(StatusFormat.compactBare(entry.status.ftso.weight))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrPlainRectMetric(
                 label: "WGT",
@@ -1433,7 +1547,7 @@ struct MirSFlrEpochView: View {
                 ratio: isOk ? 1 : 0.25
             )
         case .accessoryInline:
-            Text("EPO E\(entry.status.ftso.signingPolicyEpoch ?? 0) \(isOk ? "OK" : "WARN")")
+            Text("EPO E\(entry.status.ftso.signingPolicyEpoch ?? 0) \(isOk ? "OK" : "WARN")\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: isOk ? "EPO" : "WARN",
@@ -1462,7 +1576,7 @@ struct MirSFlrFreeSpaceView: View {
                 ratio: clampedRatio(ratio)
             )
         case .accessoryInline:
-            Text("FREE \(StatusFormat.compactBare(free, decimals: 1))")
+            Text("FREE \(StatusFormat.compactBare(free, decimals: 1))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "FREE",
@@ -1491,7 +1605,7 @@ struct MirSFlrDelegationView: View {
                 ratio: clampedRatio(ratio)
             )
         case .accessoryInline:
-            Text("FTSO \(StatusFormat.percent(entry.status.ftso.availability, decimals: 0)) · FDC \(StatusFormat.percent(entry.status.fdc?.availability, decimals: 1))")
+            Text("FTSO \(StatusFormat.percent(entry.status.ftso.availability, decimals: 0)) · FDC \(StatusFormat.percent(entry.status.fdc?.availability, decimals: 1))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrAvailabilityCurvesRect(entry: entry)
         }
@@ -1513,7 +1627,7 @@ struct MirSFlrPrimaryPerformanceView: View {
                 ratio: clampedRatio(performance)
             )
         case .accessoryInline:
-            Text("PRI \(StatusFormat.percent(performance))")
+            Text("PRI \(StatusFormat.percent(performance))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "PRI",
@@ -1541,7 +1655,7 @@ struct MirSFlrSecondaryPerformanceView: View {
                 ratio: clampedRatio(performance)
             )
         case .accessoryInline:
-            Text("SEC \(StatusFormat.percent(performance))")
+            Text("SEC \(StatusFormat.percent(performance))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "SEC",
@@ -1569,7 +1683,7 @@ struct MirSFlrAPRView: View {
                 ratio: clampedRatio((rewardRate ?? 0) / 5)
             )
         case .accessoryInline:
-            Text("APR \(StatusFormat.percent(rewardRate))")
+            Text("APR \(StatusFormat.percent(rewardRate))\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "APR",
@@ -1598,7 +1712,7 @@ struct MirSFlrFDCParticipationView: View {
                 ratio: clampedRatio(participation)
             )
         case .accessoryInline:
-            Text("FDE \(StatusFormat.percent(participation)) \(conditionMet ? "OK" : "WARN")")
+            Text("FDE \(StatusFormat.percent(participation)) \(conditionMet ? "OK" : "WARN")\(MirFreshness(entry: entry).inlineSuffix)")
         default:
             MirSFlrRectMetric(
                 label: "FDE",
@@ -1618,6 +1732,7 @@ struct MirSFlrCapacityComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrCapacityView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID CAP - validator capacity")
         .description("Sredinski widget. Validator stake proti 90M limitu. Uporabi za hiter pogled, koliko prostora se je se na voljo.")
@@ -1633,6 +1748,7 @@ struct MirSFlrLegacyFTSOComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFTSOAvailabilityView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("FTSO availability")
         .description("Compatibility widget for older MirSFlr watch face slots.")
@@ -1648,6 +1764,7 @@ struct MirSFlrFTSOAvailabilityComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFTSOAvailabilityView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FTSO - oracle availability")
         .description("Sredinski widget. Live FTSO availability v procentih. Zeleno pri zelo dobrem stanju, rumeno pri opozorilu, pink pri problemu.")
@@ -1663,6 +1780,7 @@ struct MirSFlrFDCAvailabilityComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFDCAvailabilityView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FDC - data availability")
         .description("Sredinski widget. Live FDC availability. Najboljsi hiter signal, ali FDC infrastruktura normalno dela.")
@@ -1678,6 +1796,7 @@ struct MirSFlrFTSOWeightComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFTSOWeightView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID WGT - live FTSO weight")
         .description("Sredinski widget. Live FTSO weight iz FSE/externih virov, ne samo iz Oracle Daemona, ki lahko kaze epoho nazaj.")
@@ -1693,6 +1812,7 @@ struct MirSFlrEpochComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrEpochView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID EPO - epoch status")
         .description("Sredinski widget. Live signing-policy epoch in OK/WARN stanje za FTSO/FDC reward pogoje.")
@@ -1708,6 +1828,7 @@ struct MirSFlrFreeSpaceComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFreeSpaceView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FREE - validator headroom")
         .description("Sredinski widget. Preostali validator prostor do 90M. Kriticno, ko si zelo blizu full capacity.")
@@ -1723,6 +1844,7 @@ struct MirSFlrDelegationComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrDelegationView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FTSO/FDC - live curves")
         .description("Sredinski widget. Dve krivulji: FDC availability zgoraj, FTSO availability spodaj, z minimalnimi oznakami in procenti.")
@@ -1738,6 +1860,7 @@ struct MirSFlrFDCBarsComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFDCBarsRect(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FDC BARS - hourly availability")
         .description("Sredinski widget. Stolpci FDC availability za zadnjih 24 ur, z levo skalo in barvno legendo kot na Oracle Daemon pogledu.")
@@ -1753,6 +1876,7 @@ struct MirSFlrFDCBarsLiveComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFDCBarsRect(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FDC BARS LIVE")
         .description("Sredinski widget. Sveza V2 verzija stolpcev FDC availability z UPD starostjo podatkov, da watchOS ne reciklira starega cachea.")
@@ -1768,6 +1892,7 @@ struct MirSFlrFTSOPerformanceBandsComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFTSOPerformanceBandsRect(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FTSO PERF - hourly bands")
         .description("Sredinski widget. V2 FTSO performance, primary band/IQR in secondary band za zadnjih 24 ur z osvezitvijo na par minut.")
@@ -1783,6 +1908,7 @@ struct MirSFlrPrimaryPerformanceComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrPrimaryPerformanceView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID PRI - primary FTSO")
         .description("Sredinski widget. Live primary FTSO performance. Posebej uporabno za preverjanje primarnega price providerja.")
@@ -1798,6 +1924,7 @@ struct MirSFlrSecondaryPerformanceComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrSecondaryPerformanceView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID SEC - secondary FTSO")
         .description("Sredinski widget. Live secondary FTSO performance. Dober signal, ali backup pot dela normalno.")
@@ -1813,6 +1940,7 @@ struct MirSFlrAPRComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrAPRView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID APR - reward rate")
         .description("Sredinski widget. Trenutni FTSO reward rate/APR. Ni alarmni signal, bolj poslovni pogled.")
@@ -1828,6 +1956,7 @@ struct MirSFlrFDCParticipationComplication: Widget {
         StaticConfiguration(kind: kind, provider: MirSFlrProvider()) { entry in
             MirSFlrFDCParticipationView(entry: entry)
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("MID FDE - FDC epoch condition")
         .description("Sredinski widget. FDC epoch participation in condition status. Izberi, ce zelis hitro videti ali FDC izpolnjuje reward pogoje.")
@@ -1847,6 +1976,7 @@ struct MirSFlrEdgeCapacityComplication: Widget {
                 color: WatchTone.capacityFree(entry.status.validator.free)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL CAP - capacity")
         .description("Robni widget. Minimalen prikaz: CAP in velik procent, brez trakov in brez kroga.")
@@ -1866,6 +1996,7 @@ struct MirSFlrEdgeFTSOAvailabilityComplication: Widget {
                 color: WatchTone.availability(entry.status.ftso.availability)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL FTSO - availability")
         .description("Robni widget. Minimalen prikaz: FTSO in velik procent, brez trakov in brez kroga.")
@@ -1885,6 +2016,7 @@ struct MirSFlrEdgeFDCAvailabilityComplication: Widget {
                 color: WatchTone.availability(entry.status.fdc?.availability)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL FDC - availability")
         .description("Robni widget. Minimalen prikaz: FDC in velik procent, brez trakov in brez kroga.")
@@ -1904,6 +2036,7 @@ struct MirSFlrEdgeFTSOWeightComplication: Widget {
                 color: .pink
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL WGT - FTSO weight")
         .description("Robni widget. Minimalen prikaz: WEIGHT in velika kompaktna vrednost, brez trakov in brez kroga.")
@@ -1924,6 +2057,7 @@ struct MirSFlrEdgeEpochComplication: Widget {
                 color: isOk ? .green : .pink
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL EPO - live epoch")
         .description("Robni widget. Minimalen prikaz: EPOCH/WARN in live epoch, brez trakov in brez kroga.")
@@ -1944,6 +2078,7 @@ struct MirSFlrEdgeFreeSpaceComplication: Widget {
                 color: WatchTone.capacityFree(free)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL FREE - headroom")
         .description("Robni widget. Minimalen prikaz: FREE in headroom, brez trakov in brez kroga.")
@@ -1964,6 +2099,7 @@ struct MirSFlrEdgeDelegationComplication: Widget {
                 color: .pink
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL DEL - delegation")
         .description("Robni widget. Minimalen prikaz: DELEG. in live delegacije, brez trakov in brez kroga.")
@@ -1983,6 +2119,7 @@ struct MirSFlrEdgePrimaryPerformanceComplication: Widget {
                 color: WatchTone.performance(entry.status.ftso.primaryPerformance)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL PRI - primary performance")
         .description("Robni widget. Minimalen prikaz: PRI in velik procent, brez trakov in brez kroga.")
@@ -2002,6 +2139,7 @@ struct MirSFlrEdgeSecondaryPerformanceComplication: Widget {
                 color: WatchTone.performance(entry.status.ftso.secondaryPerformance)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL SEC - secondary performance")
         .description("Robni widget. Minimalen prikaz: SEC in velik procent, brez trakov in brez kroga.")
@@ -2021,6 +2159,7 @@ struct MirSFlrEdgeAPRComplication: Widget {
                 color: WatchTone.rewardRate(entry.status.ftso.rewardRate)
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL APR - reward rate")
         .description("Robni widget. Minimalen prikaz: APR in reward rate, brez trakov in brez kroga.")
@@ -2042,6 +2181,7 @@ struct MirSFlrEdgeFDCParticipationComplication: Widget {
                 color: conditionMet ? WatchTone.performance(participation) : .pink
             )
                 .containerBackground(.clear, for: .widget)
+                .environment(\.mirFreshness, MirFreshness(entry: entry))
         }
         .configurationDisplayName("EDGE FINAL FDE - FDC epoch")
         .description("Robni widget. Minimalen prikaz: FDE in FDC epoch participation, brez trakov in brez kroga.")
