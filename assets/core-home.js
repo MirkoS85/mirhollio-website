@@ -48,7 +48,7 @@
       "stroke-dasharray": `${(c2 * periodPct) / 100} ${c2}`, transform: "rotate(-90 60 60)" }));
     const t1 = el("text", { x: 60, y: 56, "text-anchor": "middle", "font-size": 17, "font-weight": 800, fill: "#F4F4F8", "font-family": "Archivo, sans-serif" });
     t1.textContent = Math.round(fillPct) + "%";
-    const t2 = el("text", { x: 60, y: 72, "text-anchor": "middle", "font-size": fontUnits(svg, 10, 120), fill: MUT });
+    const t2 = el("text", { x: 60, y: 72, "text-anchor": "middle", "font-size": fontUnits(svg, 11, 120), fill: MUT });
     t2.textContent = daysLeft != null ? `full · ${daysLeft}d left` : "full";
     svg.append(t1, t2);
   }
@@ -72,27 +72,64 @@
     svg.appendChild(t);
     // The 92-unit box was sized for 10-unit text; a legible label needs more
     // room under the axis, and the element is height:auto so it can grow.
-    const endFont = fs(10);
-    svg.setAttribute("viewBox", `0 0 ${W} ${Math.max(92, base + endFont + 8)}`);
+    const endFont = fs(11);
+    svg.setAttribute("viewBox", `0 0 ${W} ${Math.max(92, base + endFont * 1.45 + 6)}`);
     for (const [x, lab, anch] of [[2, "#1", "start"], [W - 2, "#" + n, "end"]]) {
       const tt = el("text", { x, y: base + endFont + 2, "font-size": endFont, fill: MUT, "font-family": mono, "text-anchor": anch }); tt.textContent = lab; svg.appendChild(tt);
     }
   }
 
+  // Where we sit in the field of providers. The old version scaled the track to
+  // our own value times 1.25, so the bar stopped at exactly 80% whatever the
+  // number was and its length said nothing. This spans the actual spread of
+  // providers instead, so position on the track is the information.
   function rrCurve(svg, rr) {
-    if (!svg || !rr || rr.ours == null) return;
-    const W = 320, H = 74;
-    const max = Math.max(rr.ours, rr.median) * 1.25;
-    const x = (v) => 8 + (v / max) * (W - 16);
-    const yy = 34;
-    svg.appendChild(el("rect", { x: 8, y: yy - 5, width: W - 16, height: 10, rx: 5, fill: "rgba(255,255,255,.07)" }));
-    svg.appendChild(el("rect", { x: 8, y: yy - 5, width: x(rr.ours) - 8, height: 10, rx: 5, fill: MAG, filter: "drop-shadow(0 0 7px rgba(255,46,99,.55))" }));
-    svg.appendChild(el("circle", { cx: x(rr.ours), cy: yy, r: 6, fill: MAGL, stroke: "#17171d", "stroke-width": 2 }));
-    svg.appendChild(el("line", { x1: x(rr.median), x2: x(rr.median), y1: yy - 13, y2: yy + 13, stroke: "rgba(255,255,255,.55)", "stroke-width": 2, "stroke-dasharray": "3 3" }));
-    const tm = el("text", { x: Math.min(x(rr.median) + 5, W - 96), y: yy + 26, "font-size": 11, fill: MUT, "font-family": mono });
-    tm.textContent = `median ${(rr.median * 100).toFixed(2)}%`; svg.appendChild(tm);
-    const to = el("text", { x: Math.min(x(rr.ours), W - 66), y: yy - 18, "font-size": 11, "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" });
-    to.textContent = `${(rr.ours * 100).toFixed(2)}%`; svg.appendChild(to);
+    if (!svg || !rr || rr.ours == null || rr.median == null) return;
+    const W = 320, H = 74, PAD = 10;
+    const fs = (px) => fontUnits(svg, px, W);
+    const field = [rr.ours, rr.median, rr.p25, rr.p75, ...(rr.curve || [])]
+      .map(Number).filter(Number.isFinite);
+    let lo = Math.min(...field), hi = Math.max(...field);
+    if (!(hi > lo)) { lo = 0; hi = rr.ours * 1.25 || 1; }
+    const room = (hi - lo) * 0.08;
+    lo -= room; hi += room;
+    const x = (v) => PAD + ((v - lo) / (hi - lo)) * (W - PAD * 2);
+    const yy = 36;
+
+    svg.appendChild(el("rect", { x: PAD, y: yy - 5, width: W - PAD * 2, height: 10, rx: 5,
+      fill: "rgba(255,255,255,.07)" }));
+
+    // the middle half of the field, so "typical" is a region rather than a point
+    if (Number.isFinite(rr.p25) && Number.isFinite(rr.p75)) {
+      svg.appendChild(el("rect", { x: x(rr.p25), y: yy - 5, width: Math.max(x(rr.p75) - x(rr.p25), 2),
+        height: 10, rx: 5, fill: "rgba(255,255,255,.19)" }));
+    }
+    // every sampled provider, so the spread is visible and not just implied
+    (rr.curve || []).forEach((v) => {
+      if (!Number.isFinite(v)) return;
+      svg.appendChild(el("line", { x1: x(v), x2: x(v), y1: yy - 9, y2: yy + 9,
+        stroke: "rgba(255,255,255,.20)", "stroke-width": 1.5 }));
+    });
+
+    svg.appendChild(el("line", { x1: x(rr.median), x2: x(rr.median), y1: yy - 13, y2: yy + 13,
+      stroke: "rgba(255,255,255,.65)", "stroke-width": 2, "stroke-dasharray": "3 3" }));
+    svg.appendChild(el("circle", { cx: x(rr.ours), cy: yy, r: 7, fill: MAGL, stroke: "#17171d",
+      "stroke-width": 2, filter: "drop-shadow(0 0 7px rgba(255,46,99,.65))" }));
+
+    const half = (t, size) => (t.length * size * 0.6) / 2;
+    const ourFont = fs(11), medFont = fs(11);
+    const ourTxt = `${(rr.ours * 100).toFixed(2)}%`;
+    const medTxt = `median ${(rr.median * 100).toFixed(2)}%`;
+    const clamp = (v, w) => Math.min(Math.max(v, w + 2), W - w - 2);
+
+    const to = el("text", { x: clamp(x(rr.ours), half(ourTxt, ourFont)), y: yy - 16,
+      "font-size": ourFont, "font-weight": 700, fill: MAGL,
+      "font-family": "Archivo, sans-serif", "text-anchor": "middle" });
+    to.textContent = ourTxt; svg.appendChild(to);
+
+    const tm = el("text", { x: clamp(x(rr.median), half(medTxt, medFont)), y: yy + 16 + medFont,
+      "font-size": medFont, fill: MUT, "font-family": mono, "text-anchor": "middle" });
+    tm.textContent = medTxt; svg.appendChild(tm);
   }
 
   // These charts draw in a 1000-unit space but render into a ~330px panel, so a
@@ -101,7 +138,9 @@
   function fontUnits(svg, cssPx, viewWidth) {
     const rendered = svg.getBoundingClientRect().width;
     if (!rendered) return cssPx;
-    return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
+    // Round up: a requested size must never come out below what was asked for,
+    // or a label lands just under the legibility floor the rest of the site keeps.
+    return Math.ceil(cssPx * (viewWidth / rendered) * 10) / 10;
   }
 
   // The panels are taller than the 1000x300 box these charts declare, so the
@@ -129,17 +168,17 @@
     const T = Math.max(14, fs(11) + 6);
     // The gutters have to fit their own labels once the text is legible:
     // otherwise the epoch row sits across the baseline it belongs under.
-    const L = Math.max(44, 6 + 4 * fs(10) * 0.62);
-    const B = Math.max(34, fs(10) + 14);
+    const L = Math.max(44, 6 + 4 * fs(11) * 0.62);
+    const B = Math.max(34, fs(11) + 14);
     const maxW = Math.max(...hist.map((h) => h.weight), 100);
     const maxBase = Math.max(...hist.map((h) => h.stakeM * 5 + h.wflrM));
     const gw = (W - L) / hist.length;
     for (const g of [0, 0.5, 1]) {
       const y = T + (H - T - B) * (1 - g);
       svg.appendChild(el("line", { x1: L, x2: W, y1: y, y2: y, stroke: "rgba(255,255,255,.07)" }));
-      const t = el("text", { x: L - 6, y: y + 3, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(maxW * g); svg.appendChild(t);
+      const t = el("text", { x: L - 6, y: y + 3, "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(maxW * g); svg.appendChild(t);
     }
-    const epochStride = labelStride(hist.length, gw, String(hist[hist.length - 1].epoch).length * fs(10) * 0.62 + 6);
+    const epochStride = labelStride(hist.length, gw, String(hist[hist.length - 1].epoch).length * fs(11) * 0.62 + 6);
     const pts = [];
     hist.forEach((h, i) => {
       const x = L + i * gw + gw / 2;
@@ -148,7 +187,7 @@
       svg.appendChild(el("rect", { x: x - 14, y: H - B - sh, width: 18, height: sh, rx: 2, fill: "#4A3540" }));
       svg.appendChild(el("rect", { x: x + 6, y: H - B - wh, width: 7, height: wh, rx: 2, fill: AMBER }));
       if (i % epochStride === 0 || i === hist.length - 1) {
-        const tl = el("text", { x, y: H - B + fs(10) + 4, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "middle" }); tl.textContent = h.epoch; svg.appendChild(tl);
+        const tl = el("text", { x, y: H - B + fs(11) + 4, "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "middle" }); tl.textContent = h.epoch; svg.appendChild(tl);
       }
       pts.push([x, T + (H - T - B) * (1 - h.weight / maxW), h.weight]);
     });
@@ -167,9 +206,9 @@
     const H = fitHeight(svg, W, 260);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     const fs = (px) => fontUnits(svg, px, W);
-    const T = Math.max(12, fs(10) + 6);
-    const B = Math.max(30, fs(10) + 14);
-    const L = Math.max(48, 6 + 4 * fs(10) * 0.62);
+    const T = Math.max(12, fs(11) + 6);
+    const B = Math.max(30, fs(11) + 14);
+    const L = Math.max(48, 6 + 4 * fs(11) * 0.62);
     const start = val.totalStakeM;
     const steps = val.expirySteps;
     if (!steps.length) return;
@@ -178,7 +217,7 @@
     const y = (v) => T + (H - T - B) * (1 - v / start);
     for (const g of [0, 0.5, 1]) {
       svg.appendChild(el("line", { x1: L, x2: W, y1: y(start * g), y2: y(start * g), stroke: "rgba(255,255,255,.07)" }));
-      const t = el("text", { x: L - 6, y: y(start * g) + 3, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(start * g) + "M"; svg.appendChild(t);
+      const t = el("text", { x: L - 6, y: y(start * g) + (g === 0 ? -5 : 3), "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(start * g) + "M"; svg.appendChild(t);
     }
     let d = `M${L},${y(start)}`; let cur = start;
     for (const s of steps) { d += ` H${Math.max(x(s.date), L)}`; cur = s.remainingM + (s.date < val.stakeEndsAt ? val.selfBondM : 0); d += ` V${y(Math.max(cur, 0))}`; }
@@ -189,13 +228,13 @@
     svg.appendChild(el("line", { x1: xe, x2: xe, y1: T, y2: y(0), stroke: AMBER, "stroke-dasharray": "4 4" }));
     // At a legible size the full sentence no longer fits the panel, so keep the
     // date and trim the prose, and hold the text inside the left edge.
-    const annFont = fs(9);
+    const annFont = fs(10.5);
     const annText = val.stakeEndsAt + " — self-bond ends";
     const t = el("text", { x: Math.max(xe - 6, L + annText.length * annFont * 0.62), y: T + annFont, "font-size": annFont, fill: AMBER, "font-family": mono, "text-anchor": "end" });
     t.textContent = annText; svg.appendChild(t);
     // Dates are not evenly spaced, so drop any tick that would touch the last
     // one drawn rather than keeping a fixed every-Nth rule.
-    const dateFont = fs(10);
+    const dateFont = fs(11);
     const minGap = 5 * dateFont * 0.62 + dateFont;
     let lastX = -Infinity;
     for (const [d0, lab] of steps.map((s) => [s.date, s.date.slice(5)])) {

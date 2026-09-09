@@ -284,6 +284,9 @@ const MirhollioCore = (() => {
   }
 
   function setText(key, value) {
+    // A field can be claimed by the widget that owns its comparison context;
+    // see the reward rate, which must match the median and rank beside it.
+    if (document.querySelector(`[data-field="${key}"][data-locked="1"]`)) return;
     document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
       el.textContent = value;
       el.classList.remove("skeleton-value");
@@ -1938,7 +1941,9 @@ const MirhollioCore = (() => {
   function fontUnits(svg, cssPx, viewWidth) {
     const rendered = svg.getBoundingClientRect().width;
     if (!rendered) return cssPx;
-    return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
+    // Round up: a requested size must never come out below what was asked for,
+    // or a label lands just under the legibility floor the rest of the site keeps.
+    return Math.ceil(cssPx * (viewWidth / rendered) * 10) / 10;
   }
 
   // Same reason as fontUnits: the element is taller than the 1000-unit box the
@@ -2418,6 +2423,29 @@ const MirhollioCore = (() => {
     });
   }
 
+  // The reward rate is quoted next to a median, a multiple and a rank that all
+  // come from network-position.json. Taking the number itself from the Oracle
+  // Daemon made the homepage card read 1.8% above its own chart's 1.70%, so it
+  // is read from the same file and locked against the next refresh. The Oracle
+  // Daemon value stays as the fallback if the file is unavailable.
+  async function applyFieldRewardRate() {
+    try {
+      const np = await fetchJsonWithCache("/data/network-position.json", 120_000);
+      const ours = np && np.rewardRate && Number(np.rewardRate.ours);
+      if (!Number.isFinite(ours)) return;
+      const write = (key, text) => {
+        document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+          el.textContent = text;
+          el.setAttribute("data-locked", "1");
+          el.classList.remove("skeleton-value");
+          el.removeAttribute("aria-busy");
+        });
+      };
+      write("rewardRateSnapshot", `${(ours * 100).toFixed(1)}%`);
+      write("rewardRate", `${(ours * 100).toFixed(2)}%`);
+    } catch (_) {}
+  }
+
   function applyData(provider, latest) {
     const delegation = provider.delegationAddress || TARGET_DELEGATION;
     const voter = provider.voterAddress || TARGET_VOTER;
@@ -2634,6 +2662,7 @@ const MirhollioCore = (() => {
       providerData = provider;
       latestData = latestEpoch(provider);
       applyData(providerData, latestData);
+      applyFieldRewardRate();
       if (validatorData) applyValidatorData(validatorData);
       if (!lastUpdatedSet) setText("lastUpdated", formatRelativeTime(new Date()));
       clearLiveErrors();
