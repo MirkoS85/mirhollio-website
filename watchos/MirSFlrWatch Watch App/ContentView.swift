@@ -412,15 +412,16 @@ struct ContentView: View {
         do {
             let newStatus = try await StatusService.shared.fetch()
             status = newStatus
-            WidgetReloader.reloadAll()
-            Task { await WidgetReloader.reloadAgainSoon() }
+            // A fetch just landed, so this reload is worth spending.
+            WidgetReloader.reloadAll(force: true)
             await notifyIfNeeded(for: newStatus)
         } catch {
             let fallbackStatus = StatusService.shared.cachedStatus() ?? status ?? .sample
             status = fallbackStatus
             errorMessage = "Using cached status"
-            WidgetReloader.reloadAll()
-            Task { await WidgetReloader.reloadAgainSoon() }
+            // No reload here: the fetch failed, so there is nothing new for the
+            // complications to show, and a reload spent on unchanged data is
+            // taken out of the same small daily budget as a useful one.
             await notifyStatusFetchFailure()
         }
         if showLoading {
