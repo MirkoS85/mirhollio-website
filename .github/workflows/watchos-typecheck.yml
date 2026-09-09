@@ -1,0 +1,64 @@
+name: watchOS typecheck
+
+# The watch sources live here but the Xcode project lives on the author's Mac,
+# so nothing verified them before a manual build. A macOS runner has the watchOS
+# SDK, which is enough to typecheck each target's sources and catch a compile
+# error at push time rather than in Xcode.
+#
+# This does not build or sign an app - installing to a watch still needs the
+# paired iPhone and the developer certificate.
+
+on:
+  push:
+    paths:
+      - "watchos/**"
+      - ".github/workflows/watchos-typecheck.yml"
+  pull_request:
+    paths:
+      - "watchos/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: watchos-typecheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          echo "watchOS SDK: $(xcrun --sdk watchos --show-sdk-path)"
+          echo "SDK version: $(xcrun --sdk watchos --show-sdk-version)"
+
+      # Each target is typechecked on its own: both declare an @main entry
+      # point, so compiling them together would fail on the duplicate rather
+      # than on anything real.
+      - name: Typecheck the widget extension
+        run: |
+          SDK="$(xcrun --sdk watchos --show-sdk-path)"
+          VER="$(xcrun --sdk watchos --show-sdk-version | cut -d. -f1)"
+          echo "Targeting watchOS ${VER}"
+          xcrun swiftc -typecheck \
+            -sdk "$SDK" \
+            -target "arm64_32-apple-watchos${VER}.0" \
+            -swift-version 5 \
+            watchos/MirSFlrComplications/*.swift
+
+      - name: Typecheck the watch app
+        run: |
+          SDK="$(xcrun --sdk watchos --show-sdk-path)"
+          VER="$(xcrun --sdk watchos --show-sdk-version | cut -d. -f1)"
+          xcrun swiftc -typecheck \
+            -sdk "$SDK" \
+            -target "arm64_32-apple-watchos${VER}.0" \
+            -swift-version 5 \
+            "watchos/MirSFlrWatch Watch App"/*.swift
