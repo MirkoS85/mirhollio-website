@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-09T05:18:55.760Z",
+  "generatedAt": "2026-09-09T06:52:07.425Z",
   "position": {
     "epoch": 431,
     "voters": 100,
@@ -112,11 +112,11 @@
       0.01
     ],
     "ourIndex": 69,
-    "primaryPct": 44.58,
-    "secondaryPct": 98.43,
+    "primaryPct": 45.12,
+    "secondaryPct": 98.66,
     "availabilityPct": 100,
-    "medianPrimaryPct": 48.35,
-    "medianSecondaryPct": 95.86,
+    "medianPrimaryPct": 48.15,
+    "medianSecondaryPct": 95.98,
     "passes": 3,
     "eligible": true
   },
@@ -294,6 +294,78 @@
       "wflrM": 66166988.84,
       "stakeM": 89999686.74,
       "weight": 108.29
+    }
+  ],
+  "votePowerSnapshots": [
+    {
+      "epoch": 431,
+      "takenDuring": 430,
+      "block": 69065040,
+      "at": "2026-09-05T08:40:53.000Z",
+      "pct": 44.86
+    },
+    {
+      "epoch": 430,
+      "takenDuring": 429,
+      "block": 68692853,
+      "at": "2026-08-31T12:36:27.000Z",
+      "pct": 6.68
+    },
+    {
+      "epoch": 429,
+      "takenDuring": 428,
+      "block": 68659072,
+      "at": "2026-08-31T01:52:34.000Z",
+      "pct": 93.9
+    },
+    {
+      "epoch": 428,
+      "takenDuring": 427,
+      "block": 68274379,
+      "at": "2026-08-26T02:16:27.000Z",
+      "pct": 51.52
+    },
+    {
+      "epoch": 427,
+      "takenDuring": 426,
+      "block": 67930566,
+      "at": "2026-08-21T16:35:38.000Z",
+      "pct": 25.71
+    },
+    {
+      "epoch": 426,
+      "takenDuring": 425,
+      "block": 67820078,
+      "at": "2026-08-20T06:36:36.000Z",
+      "pct": 85.25
+    },
+    {
+      "epoch": 425,
+      "takenDuring": 424,
+      "block": 67374696,
+      "at": "2026-08-14T09:12:49.000Z",
+      "pct": 16.92
+    },
+    {
+      "epoch": 424,
+      "takenDuring": 423,
+      "block": 67280307,
+      "at": "2026-08-13T02:53:45.000Z",
+      "pct": 80.83
+    },
+    {
+      "epoch": 423,
+      "takenDuring": 422,
+      "block": 66884403,
+      "at": "2026-08-07T21:02:15.000Z",
+      "pct": 31
+    },
+    {
+      "epoch": 422,
+      "takenDuring": 421,
+      "block": 66715164,
+      "at": "2026-08-05T15:34:47.000Z",
+      "pct": 67.36
     }
   ]
 }

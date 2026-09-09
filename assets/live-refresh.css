@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-25");
+@import url("operator.css?v=core-26");
 
 :root{
   color-scheme:dark;
@@ -4985,7 +4985,8 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .epoch-pulse .ep-bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;}
 .epoch-pulse .ep-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),#FF6E93);box-shadow:0 0 8px rgba(255,46,99,.5);transition:width 1s linear;}
 /* === core-10: hero grafika, ticker, pasice, tilt === */
-.home-hero{position:relative;}
+.home-hero{position:relative;overflow:hidden;}
+.home-hero-section{overflow:hidden;}
 #rays{position:absolute;inset:-40px -24px 0;width:calc(100% + 48px);height:calc(100% + 40px);pointer-events:none;z-index:0;opacity:.85;}
 .home-hero > *{position:relative;z-index:1;}
 
@@ -5020,7 +5021,20 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 }
 
 /* core-11: del originalnega logotipa, zlit v ozadje hero */
-.hero-mark{position:absolute;right:-185px;top:-250px;width:590px;height:590px;z-index:0;pointer-events:none;
+/* These were pinned at a fixed 590px with fixed negative offsets, and the hero
+   never clipped, so between about 1120px and full width the mark kept its size
+   while the column around it shrank — it drifted over the copy and spilled past
+   the section instead of easing out of frame. Size now scales with the
+   viewport and every offset is a fraction of that size, so the composition
+   holds at any width. */
+.hero-mark{position:absolute;
+  --mark-max:590px;
+  --mark-vw:41vw;
+  --mark:clamp(calc(var(--mark-max) * .58), var(--mark-vw), var(--mark-max));
+  width:var(--mark);height:var(--mark);
+  right:calc(var(--mark) * -.314);
+  top:calc(var(--mark) * -.424);
+  z-index:0;pointer-events:none;
   mix-blend-mode:screen;opacity:.45;
   -webkit-mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);
   mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);}
@@ -5034,20 +5048,27 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .proof-tile .ps{font-size:12px;color:var(--muted);margin-top:3px;}
 .proof-tile.star .pv{color:var(--pink);text-shadow:0 0 22px rgba(255,46,99,.45);}
 .proof-tile.star{border-color:rgba(255,46,99,.4);}
-.hero-mark-wrap{position:absolute;right:-185px;top:-250px;width:590px;height:590px;z-index:0;pointer-events:none;
+.hero-mark-wrap{position:absolute;
+  --mark-max:590px;
+  --mark-vw:41vw;
+  --mark:clamp(calc(var(--mark-max) * .58), var(--mark-vw), var(--mark-max));
+  width:var(--mark);height:var(--mark);
+  right:calc(var(--mark) * -.314);
+  top:calc(var(--mark) * -.424);
+  z-index:0;pointer-events:none;
   mix-blend-mode:screen;opacity:.42;
   -webkit-mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);
   mask-image:radial-gradient(50% 50% at 47% 58%, #000 16%, transparent 57%);}
 .hero-mark-wrap img{width:100%;height:100%;display:block;}
-.hm-b{right:-140px;top:-205px;width:555px;height:555px;opacity:.46;}
+.hm-b{--mark-max:555px;--mark-vw:38.5vw;right:calc(var(--mark) * -.252);top:calc(var(--mark) * -.369);opacity:.46;}
 .hm-b img{transform:translateY(29%) scale(1.5);}
-.hm-c{right:-175px;top:-235px;width:600px;height:600px;opacity:.40;}
+.hm-c{--mark-max:600px;--mark-vw:41.7vw;right:calc(var(--mark) * -.292);top:calc(var(--mark) * -.392);opacity:.40;}
 .hm-c img{transform:translate(-26%,-28%) scale(1.45);}
-.hm-d{right:-270px;top:-310px;width:780px;height:780px;opacity:.28;}
+.hm-d{--mark-max:780px;--mark-vw:54.2vw;right:calc(var(--mark) * -.346);top:calc(var(--mark) * -.397);opacity:.28;}
 .hm-d img{transform:scale(1.85);}
-.hm-e{right:-150px;top:-215px;width:565px;height:565px;opacity:.44;}
+.hm-e{--mark-max:565px;--mark-vw:39.2vw;right:calc(var(--mark) * -.265);top:calc(var(--mark) * -.381);opacity:.44;}
 .hm-e img{transform:translate(27%,-29%) scale(1.45);}
-.hm-f{right:-80px;top:-115px;width:390px;height:390px;opacity:.34;}
+.hm-f{--mark-max:390px;--mark-vw:27.1vw;right:calc(var(--mark) * -.205);top:calc(var(--mark) * -.295);opacity:.34;}
 .hm-f img{transform:scale(1);}
 @media (max-width:1120px){.hero-mark-wrap{display:none;}}
 
@@ -5056,9 +5077,14 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .fdc-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pink),#FF6E93);box-shadow:0 0 8px rgba(255,46,99,.45);}
 .oe-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px;}
 .oe-tile{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
-.oe-tile span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+/* This matched every span in the tile, including the epoch number sitting
+   inside the caption, so "20% fee on FSP rewards (E430)" was broken across
+   three lines with the number stranded on its own. Only the tile's own label
+   should be a block. */
+.oe-tile > span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.oe-tile em span{display:inline;font-weight:700;color:var(--text);}
 .oe-tile strong{display:block;font-family:Archivo,sans-serif;font-size:24px;font-weight:800;margin-top:7px;font-variant-numeric:tabular-nums;}
-.oe-tile em{display:block;font-style:normal;font-size:11.5px;color:var(--muted);margin-top:4px;}
+.oe-tile em{display:block;font-style:normal;font-size:12px;line-height:1.45;color:var(--muted);margin-top:5px;text-wrap:pretty;}
 .oe-tile.total{border-color:rgba(255,46,99,.45);}
 .oe-tile.total strong{color:var(--pink);text-shadow:0 0 16px rgba(255,46,99,.4);}
 .condition-mark{display:inline-flex !important;width:32px;height:18px;border-radius:999px;align-items:center;justify-content:center;font-size:11px;font-weight:800;line-height:1;}
@@ -5257,6 +5283,60 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   [data-render="validator-delegator-table"] td.dg-left::before{content:"left " !important;opacity:.6;}
 
   /* Roomier, brighter addresses wherever they appear. */
-  .address code,.delegator-address{font-size:13.5px;color:var(--ink,#fff);}
-  .address code{display:block;line-height:1.55;word-break:break-all;}
+  .delegator-address{font-size:13.5px;color:var(--ink,#fff);}
+
+  /* The address cards stacked a centred help line above a full-width Copy
+     button, so each one ran nearly half a screen and the centring fought the
+     left-aligned label and address above it. Same information, one row. */
+  .address{padding:14px 15px;}
+  .address code{
+    display:block;font-size:13.5px;line-height:1.5;
+    color:var(--ink,#fff);word-break:break-all;
+    margin-top:6px;
+  }
+  .copy-row{
+    /* An earlier rule sets column direction at this width, which is what put
+       the button on its own line under a centred caption. */
+    display:flex;flex-direction:row;align-items:center;justify-content:space-between;
+    gap:12px;margin-top:10px;
+  }
+  .copy-help{
+    text-align:left;font-size:12px;line-height:1.4;color:var(--muted);
+    flex:1 1 auto;margin:0;
+  }
+  .copy-row .btn{
+    flex:0 0 auto;width:auto;min-height:40px;padding:0 16px;
+    font-size:13px;border-radius:10px;
+  }
+}
+
+/* Vote power snapshot timing: one track per epoch, marker where the snapshot
+   block fell inside the preceding epoch. */
+.vps-list{display:flex;flex-direction:column;gap:9px;margin-top:12px;}
+.vps-row{
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 34px auto;
+  align-items:center;gap:10px;
+}
+.vps-ep{font-size:12px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;}
+.vps-track{
+  position:relative;height:7px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.12));
+  border:1px solid var(--line);
+}
+.vps-track i{
+  position:absolute;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;
+  border-radius:999px;background:var(--pink);
+  box-shadow:0 0 10px rgba(255,46,99,.55);
+}
+.vps-row.latest .vps-track{border-color:rgba(255,46,99,.35);}
+.vps-row.latest .vps-ep{color:var(--pink);}
+.vps-pct{font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--text);}
+.vps-at{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+.vps-foot{margin:12px 0 0;font-size:12px;color:var(--muted);line-height:1.45;}
+.vps-foot span{color:var(--text);font-weight:700;}
+.vps-empty{margin:12px 0 0;font-size:13px;color:var(--muted);}
+@media (max-width:760px){
+  .vps-row{grid-template-columns:38px minmax(0,1fr) 30px;gap:8px;}
+  .vps-at{display:none;}
 }

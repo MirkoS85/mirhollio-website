@@ -35,6 +35,56 @@ async function ethCall(to, data) {
 }
 const toM = (wei) => Number(wei / 10n ** 15n) / 1000; // token-M with 3 decimals
 
+
+// Vote-power snapshots: the block whose balances decide weight for the coming
+// reward epoch is picked at an unannounced point inside the epoch before it.
+// The explorer publishes which block was chosen; the chain gives its time, and
+// the epoch schedule turns that into a position you can actually read.
+const EPOCH_ANCHOR = 428;
+const EPOCH_ANCHOR_TIME = 1787857200;
+const EPOCH_LENGTH_SECONDS = 302400;
+const epochStart = (e) => EPOCH_ANCHOR_TIME + (e - EPOCH_ANCHOR) * EPOCH_LENGTH_SECONDS;
+
+async function blockTime(blockNumber) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const j = await getJson(RPC, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0", id: 1, method: "eth_getBlockByNumber",
+          params: ["0x" + Number(blockNumber).toString(16), false],
+        }),
+      });
+      if (j.result && j.result.timestamp) return parseInt(j.result.timestamp, 16);
+    } catch {}
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  return null;
+}
+
+async function votePowerSnapshots(epochs) {
+  const out = [];
+  for (const row of epochs.slice(0, 12)) {
+    const block = row?.vote_power_block_selected?.vote_power_block;
+    if (!block || !Number.isFinite(row.id)) continue;
+    const ts = await blockTime(block);
+    if (!ts) continue;
+    // The snapshot for epoch N is taken during epoch N-1.
+    const from = epochStart(row.id - 1);
+    const pct = ((ts - from) / EPOCH_LENGTH_SECONDS) * 100;
+    if (!(pct >= 0 && pct <= 100)) continue;
+    out.push({
+      epoch: row.id,
+      takenDuring: row.id - 1,
+      block,
+      at: new Date(ts * 1000).toISOString(),
+      pct: +pct.toFixed(2),
+    });
+  }
+  return out;
+}
+
 async function main() {
   // --- FSE entities (registered voters of the active epoch)
   const ents = [];
@@ -145,13 +195,14 @@ async function main() {
   try {
     const CK = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
     const ent = await getJson(`https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${CK}`);
-    writeFileSync("data/fse-entity.json", JSON.stringify(ent, null, 1) + "\n");
+  writeFileSync("data/fse-entity.json", JSON.stringify(ent, null, 1) + "\n");
     const entF = await getJson(`https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${CK}/ftso`);
     writeFileSync("data/fse-entity-ftso.json", JSON.stringify(entF, null, 1) + "\n");
   } catch (e) { console.error("fse mirror failed:", e.message); }
 
   const out = { schema: "mirhollio-network-position/v1", generatedAt: new Date().toISOString(),
     position, rewardRate, validator, weightHistory };
+  out.votePowerSnapshots = await votePowerSnapshots(epochs.results || []);
   writeFileSync("data/network-position.json", JSON.stringify(out, null, 2) + "\n");
   console.log("ok:", JSON.stringify({ rank: position.rank, voters: position.voters, rrRank: rewardRate && rewardRate.rank,
     stake: validator && validator.totalStakeM, hist: weightHistory.length }));

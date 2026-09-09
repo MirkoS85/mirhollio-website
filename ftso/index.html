@@ -21,7 +21,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-25" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-26" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/ftso/" />
   <meta property="og:type" content="website" />
@@ -41,7 +41,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png?v=2">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-25" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-26" />
 </head>
 <body>
   <div class="mobile-top">
@@ -59,7 +59,7 @@
     <main>
       <section class="section home-hero-section">
         <div class="inner">
-          <div class="hero home-hero"><span class="hero-mark-wrap hm-b" aria-hidden="true"><img src="../assets/brand-mark.jpg?v=core-25" alt=""></span>
+          <div class="hero home-hero"><span class="hero-mark-wrap hm-b" aria-hidden="true"><img src="../assets/brand-mark.jpg?v=core-26" alt=""></span>
             <div class="home-hero-copy"><div class="kicker">Delegate WFLR</div><h1>FTSO provider metrics.</h1><p class="lead">Reward rate, availability, performance, minimal conditions, and reward history for Mirhollio Core.</p></div>
             <div class="hero-live-strip" aria-label="FTSO metric highlights">
               <div class="hero-live-tile"><span>Status</span><strong data-field="status">-</strong></div>
@@ -114,6 +114,10 @@
               <div class="panel-head"><strong>Delegation calculator</strong><small>Estimate WFLR delegation rewards at the current live reward rate.</small></div>
               <div class="np-calc"><input id="ftso-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in WFLR (e.g. 50000)"><button type="button" class="btn primary" id="ftso-calc-btn">Estimate</button></div>
               <p class="np-calc-out" id="ftso-calc-out">Enter an amount to estimate rewards.</p>
+            </article>
+            <article class="card panel-wide-card" id="vps-card">
+              <div class="panel-head"><strong>Vote power snapshot</strong><small>The block that fixes weight for a reward epoch is chosen at an unannounced moment inside the epoch before it. This is where it landed.</small></div>
+              <div class="vps-list" data-render="vote-power-snapshots"><p class="vps-empty">Loading snapshot history&hellip;</p></div>
             </article>
             <details class="card panel-wide-card ftso-delegation-card fdc-perf-card" id="fdc-perf">
               <summary class="ftso-delegation-toggle">
@@ -183,9 +187,9 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-25"></script>
-  <script src="../assets/live-refresh.js?v=core-25"></script>
-  <script src="../assets/pwa.js?v=core-25"></script>
-  <script src="../assets/core-home.js?v=core-25" defer></script>
+  <script src="../assets/operator.js?v=core-26"></script>
+  <script src="../assets/live-refresh.js?v=core-26"></script>
+  <script src="../assets/pwa.js?v=core-26"></script>
+  <script src="../assets/core-home.js?v=core-26" defer></script>
 </body>
 </html>

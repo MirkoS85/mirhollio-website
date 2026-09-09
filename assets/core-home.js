@@ -564,3 +564,42 @@
     window.setTimeout(sweep, 8000);
   }, GRACE_MS);
 })();
+
+/* Vote power snapshot timing (FTSO page).
+   The block that fixes weight for a reward epoch is picked at an unannounced
+   point inside the epoch before it, so there is nothing to predict and plenty
+   to show: where each one actually landed. */
+(() => {
+  const mount = document.querySelector('[data-render="vote-power-snapshots"]');
+  if (!mount) return;
+
+  const fmt = iso => {
+    const d = new Date(iso);
+    return Number.isFinite(d.getTime())
+      ? d.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+      : "";
+  };
+
+  fetch("/data/network-position.json")
+    .then(r => r.json())
+    .then(d => {
+      const rows = (d && d.votePowerSnapshots) || [];
+      if (!rows.length) {
+        mount.innerHTML = '<p class="vps-empty">Snapshot history is not available right now.</p>';
+        return;
+      }
+      mount.innerHTML = rows.map((s, i) => {
+        const pct = Math.max(0, Math.min(100, Number(s.pct) || 0));
+        return `<div class="vps-row${i === 0 ? " latest" : ""}">
+            <span class="vps-ep">E${s.epoch}</span>
+            <span class="vps-track"><i style="left:${pct.toFixed(2)}%"></i></span>
+            <span class="vps-pct">${pct.toFixed(0)}%</span>
+            <span class="vps-at">${fmt(s.at)}</span>
+          </div>`;
+      }).join("") +
+      `<p class="vps-foot">Position within epoch <span>E${rows[0].takenDuring}</span> and earlier — left is the start of that epoch, right is its end.</p>`;
+    })
+    .catch(() => {
+      mount.innerHTML = '<p class="vps-empty">Snapshot history could not be loaded.</p>';
+    });
+})();
