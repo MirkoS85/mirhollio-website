@@ -2,8 +2,10 @@ name: Update Apple Watch status
 
 # GitHub does not honour a */5 cron. Measured gaps between runs on this repo
 # were 36, 85, 89, 101, 114 and 291 minutes, so the feed the watch reads was
-# routinely three quarters of an hour stale. Hourly schedules do fire close to
-# on time, so anchor on one and do the five-minute cadence inside the job.
+# routinely three quarters of an hour stale. Do the five-minute cadence inside
+# the job instead, and chain the runs with workflow_dispatch, which is not
+# rate-limited the way schedules are. Even the hourly cron here has been
+# delivered 2-5 hours apart, so it is only the bootstrap and the recovery path.
 on:
   workflow_dispatch:
   schedule:
@@ -11,10 +13,16 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: watch-status
-  cancel-in-progress: true
+  # Never cancel. The chain below hands off to a successor run, and
+  # cancel-in-progress killed exactly those successors - the queued dispatch was
+  # cancelled by the next scheduled run, so the chain broke and the feed sat
+  # still until the cron happened to fire again. GitHub keeps at most one
+  # pending run per group, so queued runs cannot pile up.
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -30,48 +38,19 @@ jobs:
           node-version: "20"
 
       - name: Refresh every five minutes for the hour
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: bash scripts/publish-watch-status-loop.sh
+
+      # Hand off rather than wait for the next cron. workflow_dispatch is
+      # delivered reliably, so the chain sustains the five-minute cadence
+      # around the clock instead of dying at the end of each window.
+      - name: Hand off to the next run
+        if: always()
         run: |
-          set -u
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Run past the hour rather than stopping short of it. concurrency
-          # cancel-in-progress means the next scheduled run replaces this one,
-          # so overlapping is handled for us, while stopping at 56 minutes left
-          # a gap whenever the next run started late — or, after a manual
-          # dispatch part way through an hour, a gap of up to 17 minutes.
-          END=$(( $(date +%s) + 65 * 60 ))
-
-          push_with_retry() {
-            for attempt in 1 2 3 4 5; do
-              if git push; then return 0; fi
-              echo "Push rejected, rebasing and retrying ($attempt/5)."
-              git pull --rebase origin main || return 1
-              sleep $(( attempt * 3 ))
-            done
-            return 1
-          }
-
-          while :; do
-            # The oracle mirror rides the same cycle: the site reads its slice
-            # from our own origin because content blockers drop the upstream host.
-            node scripts/update-oracle-mirror.mjs || echo "Oracle mirror failed this cycle."
-            if node scripts/update-watch-status.mjs; then
-              if ! git diff --quiet -- data/watch-status.json data/oracle-live.json; then
-                git add data/watch-status.json data/oracle-live.json
-                git commit -m "Update Apple Watch status and oracle mirror"
-                push_with_retry || echo "Push failed this cycle; will retry next cycle."
-              else
-                echo "No change this cycle."
-              fi
-            else
-              echo "Refresh script failed this cycle; will retry next cycle."
-            fi
-
-            NOW=$(date +%s)
-            [ "$NOW" -ge "$END" ] && break
-            REMAIN=$(( END - NOW ))
-            [ "$REMAIN" -lt 300 ] && break
-            sleep 300
-          done
-          echo "Cycle window complete."
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/update-watch-status.yml/dispatches" \
+            -d "{\"ref\":\"${{ github.ref_name }}\"}" \
+            && echo "handed off to the next watch-status run"

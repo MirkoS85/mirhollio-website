@@ -29,15 +29,7 @@ final class StatusService {
     func fetch() async throws -> WatchStatus {
         var lastError: Error?
 
-        do {
-            let status = try await fetch(from: cacheBusted(liveStatusURL))
-            cache(status)
-            return status
-        } catch {
-            lastError = error
-        }
-
-        for url in fallbackStatusURLs {
+        for url in [liveStatusURL] + fallbackStatusURLs {
             do {
                 let status = try await fetch(from: cacheBusted(url))
                 cache(status)
@@ -76,6 +68,20 @@ final class StatusService {
         return try JSONDecoder().decode(WatchStatus.self, from: data)
     }
 
+    // UNUSED, and must stay that way until it stops reading livePerformanceURL.
+    //
+    // That endpoint returns the whole provider list: 16MB, which is why the
+    // site mirrors a 200KB slice of it rather than reading it directly. Calling
+    // this would download and JSON-parse 16MB on the watch on every refresh -
+    // fine on a desktop, fatal in a widget extension, which watchOS holds to a
+    // tight memory ceiling and kills when it is passed. The complication would
+    // then freeze on its last good entry, which is the very symptom this was
+    // meant to cure.
+    //
+    // Freshness belongs in the pipeline instead: the publisher regenerates
+    // watch-status.json from the same upstream every five minutes, so the feed
+    // already carries FDC that current. Point this at data/oracle-live.json if
+    // an overlay is ever wanted - never at the raw endpoint.
     private func withLivePerformance(_ status: WatchStatus) async -> WatchStatus {
         guard let live = try? await fetchLivePerformance() else { return status }
         return merge(status, live: live)
@@ -183,7 +189,13 @@ final class StatusService {
         return WatchStatus(
             schema: status.schema,
             generatedAt: status.generatedAt,
-            updatedAt: ISO8601DateFormatter().string(from: Date()),
+            // Keep the feed's own timestamps. These describe how current the
+            // published payload is - the validator, epoch and delegation
+            // figures still come from it - and ContentView raises its "feed
+            // stale" alert off updatedAt. Stamping "now" here because the FTSO
+            // and FDC overlay is live would silence that alert and hide a dead
+            // pipeline. The overlay announces itself through sources.fdc.
+            updatedAt: status.updatedAt,
             provider: status.provider,
             summary: status.summary,
             validator: status.validator,
