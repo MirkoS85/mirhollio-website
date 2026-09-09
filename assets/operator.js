@@ -1443,9 +1443,14 @@ const MirhollioCore = (() => {
 
     const width = 1000;
     const height = 320;
-    const padLeft = 78;
-    const padRight = 72;
-    const padTop = 34;
+    const fs = (px) => fontUnits(svg, px, width);
+    const axisFont = fs(13);
+    // Leave room for the widest axis label instead of a fixed gutter.
+    const padLeft = Math.max(78, 14 + 7 * axisFont * 0.62);
+    const padRight = Math.max(72, 14 + 5 * axisFont * 0.62);
+    // Keep the second legend marker clear of the first label at any font size.
+    const legendGap = axisFont * 0.8 + "Vote power".length * axisFont * 0.62 + axisFont * 1.2;
+    const padTop = Math.max(34, axisFont * 1.5);
     const padBottom = 48;
     const plotW = width - padLeft - padRight;
     const plotH = height - padTop - padBottom;
@@ -1476,17 +1481,17 @@ const MirhollioCore = (() => {
       return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 41, 109,.16)" />`;
     }).join("");
     const leftLabels = [maxDelegated, (maxDelegated + minDelegated) / 2, minDelegated].map((value, index) => {
-      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom + 4;
-      return `<text x="${padLeft - 14}" y="${y}" text-anchor="end" fill="#5C6577" font-size="13" font-weight="850">${fmtCompact(value)}</text>`;
+      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom - 10;
+      return `<text x="${padLeft - 14}" y="${y}" text-anchor="end" fill="#5C6577" font-size="${axisFont}" font-weight="850">${fmtCompact(value)}</text>`;
     }).join("");
     const rightLabels = [maxDelegators, Math.round((maxDelegators + minDelegators) / 2), minDelegators].map((value, index) => {
-      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom + 4;
-      return `<text x="${width - padRight + 14}" y="${y}" text-anchor="start" fill="#5C6577" font-size="13" font-weight="850">${fmtNum(value, 0)}</text>`;
+      const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom - 10;
+      return `<text x="${width - padRight + 14}" y="${y}" text-anchor="start" fill="#5C6577" font-size="${axisFont}" font-weight="850">${fmtNum(value, 0)}</text>`;
     }).join("");
     const labelIndexes = [...new Set([0, Math.floor((points.length - 1) / 3), Math.floor((points.length - 1) * 2 / 3), points.length - 1])];
     const xLabels = labelIndexes.map(index => {
       const point = points[index];
-      return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#5C6577" font-size="13" font-weight="850">${formatChartMonth(point.timestamp)}</text>`;
+      return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#5C6577" font-size="${axisFont}" font-weight="850">${formatChartMonth(point.timestamp)}</text>`;
     }).join("");
     const markers = points.map((point, index) => `
       <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#ff296d" : "#37101d"}" stroke="#ff296d" stroke-width="2"></circle>
@@ -1509,11 +1514,11 @@ const MirhollioCore = (() => {
       <polyline points="${delegatorLine}" fill="none" stroke="#26a56c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
       ${markers}
       ${xLabels}
-      <g transform="translate(${padLeft},14)">
-        <circle cx="0" cy="0" r="5" fill="#ff296d"></circle>
-        <text x="12" y="5" fill="#5C6577" font-size="13" font-weight="900">Vote power</text>
-        <circle cx="122" cy="0" r="5" fill="#26a56c"></circle>
-        <text x="134" y="5" fill="#5C6577" font-size="13" font-weight="900">Delegators</text>
+      <g transform="translate(${padLeft},${axisFont * 0.75})">
+        <circle cx="0" cy="0" r="${axisFont * 0.32}" fill="#ff296d"></circle>
+        <text x="${axisFont * 0.8}" y="${axisFont * 0.36}" fill="#5C6577" font-size="${axisFont}" font-weight="900">Vote power</text>
+        <circle cx="${legendGap}" cy="0" r="${axisFont * 0.32}" fill="#26a56c"></circle>
+        <text x="${legendGap + axisFont * 0.8}" y="${axisFont * 0.36}" fill="#5C6577" font-size="${axisFont}" font-weight="900">Delegators</text>
       </g>
     `;
 
@@ -1746,9 +1751,11 @@ const MirhollioCore = (() => {
 
     const width = 1000;
     const height = 280;
-    const padX = 46;
+    const fs = (px) => fontUnits(svg, px, width);
+    const axisFont = fs(12);
+    const padX = Math.max(46, axisFont * 1.6);
     const padTop = 26;
-    const padBottom = 34;
+    const padBottom = Math.max(34, axisFont + 12);
     const minReward = Math.min(...series.map(item => item.reward));
     const maxReward = Math.max(...series.map(item => item.reward), 1);
     const avgReward = series.reduce((sum, item) => sum + item.reward, 0) / series.length;
@@ -1769,7 +1776,7 @@ const MirhollioCore = (() => {
       return `<line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="rgba(255,255,255,.10)" />`;
     }).join("");
     const labels = [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]].map(point => `
-      <text x="${point.x}" y="${height - 6}" text-anchor="middle" fill="#b8c1bd" font-size="12" font-weight="700">${point.epoch}</text>
+      <text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${point.epoch}</text>
     `).join("");
     const circles = points.map((point, index) => `
       <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#ff296d" : "#181616"}" stroke="rgba(255, 41, 109,.35)" stroke-width="1.5"></circle>
@@ -1790,8 +1797,8 @@ const MirhollioCore = (() => {
         </linearGradient>
       </defs>
       ${grid}
-      <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(maxReward, 0)}</text>
-      <text x="8" y="${height - padBottom}" fill="#b8c1bd" font-size="12" font-weight="700">${fmtNum(minReward, 0)}</text>
+      <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${fmtNum(maxReward, 0)}</text>
+      <text x="8" y="${height - padBottom - 6}" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${fmtNum(minReward, 0)}</text>
       <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 41, 109,.48)" stroke-dasharray="6 6" />
       <path d="${areaPath}" fill="url(#${gradientId}FillGrad)"></path>
       <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"></path>
@@ -1922,6 +1929,15 @@ const MirhollioCore = (() => {
 
   function isCompactChart() {
     return window.matchMedia("(max-width: 760px)").matches;
+  }
+
+  // Charts that draw in a fixed 1000-unit space are rendered into a ~330px
+  // panel, so a font-size of 13 units reaches the screen at ~4px. Convert a
+  // wanted CSS pixel size into the user units that produce it at this width.
+  function fontUnits(svg, cssPx, viewWidth) {
+    const rendered = svg.getBoundingClientRect().width;
+    if (!rendered) return cssPx;
+    return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
   }
 
   function measuredSvgSize(svg, fallbackWidth, fallbackHeight) {

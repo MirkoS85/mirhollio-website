@@ -48,7 +48,7 @@
       "stroke-dasharray": `${(c2 * periodPct) / 100} ${c2}`, transform: "rotate(-90 60 60)" }));
     const t1 = el("text", { x: 60, y: 56, "text-anchor": "middle", "font-size": 17, "font-weight": 800, fill: "#F4F4F8", "font-family": "Archivo, sans-serif" });
     t1.textContent = Math.round(fillPct) + "%";
-    const t2 = el("text", { x: 60, y: 72, "text-anchor": "middle", "font-size": 9, fill: MUT });
+    const t2 = el("text", { x: 60, y: 72, "text-anchor": "middle", "font-size": fontUnits(svg, 10, 120), fill: MUT });
     t2.textContent = daysLeft != null ? `full · ${daysLeft}d left` : "full";
     svg.append(t1, t2);
   }
@@ -56,6 +56,7 @@
   function strip(svg, weights, ourIdx, cutoff) {
     if (!svg) return;
     const n = weights.length, W = 1200, base = 78;
+    const fs = (px) => fontUnits(svg, px, W);
     const max = weights[0];
     weights.forEach((w, i) => {
       const h = Math.max(4, Math.pow(w / max, 0.5) * 64);
@@ -64,11 +65,17 @@
         fill: me ? MAG : DIM, ...(me ? { filter: "drop-shadow(0 0 6px rgba(255,46,99,.7))" } : {}) }));
     });
     svg.appendChild(el("line", { x1: 0, x2: W, y1: base, y2: base, stroke: "rgba(255,255,255,.12)" }));
-    const t = el("text", { x: Math.min((ourIdx * W) / n + 6, W - 220), y: 14, "font-size": 12, fill: MAGL, "font-family": mono });
-    t.textContent = `Mirhollio Core · #${ourIdx + 1}`;
+    const ourLabel = `Mirhollio Core · #${ourIdx + 1}`;
+    const ourLabelW = ourLabel.length * fs(11) * 0.62;
+    const t = el("text", { x: Math.min((ourIdx * W) / n + 6, W - ourLabelW), y: fs(11), "font-size": fs(11), fill: MAGL, "font-family": mono });
+    t.textContent = ourLabel;
     svg.appendChild(t);
+    // The 92-unit box was sized for 10-unit text; a legible label needs more
+    // room under the axis, and the element is height:auto so it can grow.
+    const endFont = fs(10);
+    svg.setAttribute("viewBox", `0 0 ${W} ${Math.max(92, base + endFont + 8)}`);
     for (const [x, lab, anch] of [[2, "#1", "start"], [W - 2, "#" + n, "end"]]) {
-      const tt = el("text", { x, y: 90, "font-size": 10, fill: MUT, "font-family": mono, "text-anchor": anch }); tt.textContent = lab; svg.appendChild(tt);
+      const tt = el("text", { x, y: base + endFont + 2, "font-size": endFont, fill: MUT, "font-family": mono, "text-anchor": anch }); tt.textContent = lab; svg.appendChild(tt);
     }
   }
 
@@ -88,17 +95,39 @@
     to.textContent = `${(rr.ours * 100).toFixed(2)}%`; svg.appendChild(to);
   }
 
+  // These charts draw in a 1000-unit space but render into a ~330px panel, so a
+  // font-size of 10 units lands on screen at ~3px. Convert a wanted CSS pixel
+  // size into the user units that actually produce it at the current width.
+  function fontUnits(svg, cssPx, viewWidth) {
+    const rendered = svg.getBoundingClientRect().width;
+    if (!rendered) return cssPx;
+    return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
+  }
+
+  // With labels at a legible size, every-bar ticks collide. Keep one in N so a
+  // label always has room for its own width.
+  function labelStride(count, slotUnits, labelUnits) {
+    if (slotUnits <= 0) return 1;
+    return Math.max(1, Math.ceil(labelUnits / slotUnits));
+  }
+
   function weightChart(svg, hist) {
     if (!svg || !hist.length) return;
-    const W = 1000, H = 300, L = 44, B = 34, T = 14;
+    const W = 1000, H = 300, T = 14;
+    const fs = (px) => fontUnits(svg, px, W);
+    // The gutters have to fit their own labels once the text is legible:
+    // otherwise the epoch row sits across the baseline it belongs under.
+    const L = Math.max(44, 6 + 4 * fs(10) * 0.62);
+    const B = Math.max(34, fs(10) + 14);
     const maxW = Math.max(...hist.map((h) => h.weight), 100);
     const maxBase = Math.max(...hist.map((h) => h.stakeM * 5 + h.wflrM));
     const gw = (W - L) / hist.length;
     for (const g of [0, 0.5, 1]) {
       const y = T + (H - T - B) * (1 - g);
       svg.appendChild(el("line", { x1: L, x2: W, y1: y, y2: y, stroke: "rgba(255,255,255,.07)" }));
-      const t = el("text", { x: L - 6, y: y + 3, "font-size": 10, fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(maxW * g); svg.appendChild(t);
+      const t = el("text", { x: L - 6, y: y + 3, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(maxW * g); svg.appendChild(t);
     }
+    const epochStride = labelStride(hist.length, gw, String(hist[hist.length - 1].epoch).length * fs(10) * 0.62 + 6);
     const pts = [];
     hist.forEach((h, i) => {
       const x = L + i * gw + gw / 2;
@@ -106,21 +135,25 @@
       const wh = Math.max(((h.wflrM) / maxBase) * (H - T - B) * 0.92, 2);
       svg.appendChild(el("rect", { x: x - 14, y: H - B - sh, width: 18, height: sh, rx: 2, fill: "#4A3540" }));
       svg.appendChild(el("rect", { x: x + 6, y: H - B - wh, width: 7, height: wh, rx: 2, fill: AMBER }));
-      const tl = el("text", { x, y: H - B + 16, "font-size": 10, fill: MUT, "font-family": mono, "text-anchor": "middle" }); tl.textContent = h.epoch; svg.appendChild(tl);
+      if (i % epochStride === 0 || i === hist.length - 1) {
+        const tl = el("text", { x, y: H - B + fs(10) + 4, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "middle" }); tl.textContent = h.epoch; svg.appendChild(tl);
+      }
       pts.push([x, T + (H - T - B) * (1 - h.weight / maxW), h.weight]);
     });
     svg.appendChild(el("polyline", { points: pts.map((p) => p[0] + "," + p[1]).join(" "), fill: "none", stroke: MAG, "stroke-width": 2.4, "stroke-linejoin": "round", filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
     pts.forEach((p, i) => {
       svg.appendChild(el("circle", { cx: p[0], cy: p[1], r: 3.6, fill: MAG }));
       if (i === 0 || i === pts.length - 1 || Math.abs(pts[Math.max(i-1,0)][2] - p[2]) > 15) {
-        const t = el("text", { x: p[0], y: p[1] - 9, "font-size": 11, "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" }); t.textContent = p[2].toFixed(1); svg.appendChild(t);
+        const t = el("text", { x: p[0], y: Math.max(p[1] - 9, T + fs(11)), "font-size": fs(11), "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" }); t.textContent = p[2].toFixed(1); svg.appendChild(t);
       }
     });
   }
 
   function expiryChart(svg, val) {
     if (!svg || !val) return;
-    const W = 1000, H = 260, L = 48, B = 30, T = 12;
+    const W = 1000, H = 260, B = 30, T = 12;
+    const fs = (px) => fontUnits(svg, px, W);
+    const L = Math.max(48, 6 + 4 * fs(10) * 0.62);
     const start = val.totalStakeM;
     const steps = val.expirySteps;
     if (!steps.length) return;
@@ -129,7 +162,7 @@
     const y = (v) => T + (H - T - B) * (1 - v / start);
     for (const g of [0, 0.5, 1]) {
       svg.appendChild(el("line", { x1: L, x2: W, y1: y(start * g), y2: y(start * g), stroke: "rgba(255,255,255,.07)" }));
-      const t = el("text", { x: L - 6, y: y(start * g) + 3, "font-size": 10, fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(start * g) + "M"; svg.appendChild(t);
+      const t = el("text", { x: L - 6, y: y(start * g) + 3, "font-size": fs(10), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(start * g) + "M"; svg.appendChild(t);
     }
     let d = `M${L},${y(start)}`; let cur = start;
     for (const s of steps) { d += ` H${Math.max(x(s.date), L)}`; cur = s.remainingM + (s.date < val.stakeEndsAt ? val.selfBondM : 0); d += ` V${y(Math.max(cur, 0))}`; }
@@ -138,10 +171,22 @@
     svg.appendChild(el("path", { d, fill: "none", stroke: MAG, "stroke-width": 2.4, filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
     const xe = x(val.stakeEndsAt);
     svg.appendChild(el("line", { x1: xe, x2: xe, y1: T, y2: y(0), stroke: AMBER, "stroke-dasharray": "4 4" }));
-    const t = el("text", { x: xe - 6, y: T + 12, "font-size": 11, fill: AMBER, "font-family": mono, "text-anchor": "end" });
-    t.textContent = val.stakeEndsAt + " — self-bond ends, renewal planned"; svg.appendChild(t);
-    for (const [d0, lab] of steps.filter((s, i) => i % 4 === 0).map((s) => [s.date, s.date.slice(5)])) {
-      const tt = el("text", { x: x(d0), y: H - B + 16, "font-size": 10, fill: MUT, "font-family": mono, "text-anchor": "middle" }); tt.textContent = lab; svg.appendChild(tt);
+    // At a legible size the full sentence no longer fits the panel, so keep the
+    // date and trim the prose, and hold the text inside the left edge.
+    const annFont = fs(9);
+    const annText = val.stakeEndsAt + " — self-bond ends";
+    const t = el("text", { x: Math.max(xe - 6, L + annText.length * annFont * 0.62), y: T + annFont, "font-size": annFont, fill: AMBER, "font-family": mono, "text-anchor": "end" });
+    t.textContent = annText; svg.appendChild(t);
+    // Dates are not evenly spaced, so drop any tick that would touch the last
+    // one drawn rather than keeping a fixed every-Nth rule.
+    const dateFont = fs(10);
+    const minGap = 5 * dateFont * 0.62 + dateFont;
+    let lastX = -Infinity;
+    for (const [d0, lab] of steps.map((s) => [s.date, s.date.slice(5)])) {
+      const tx = x(d0);
+      if (tx - lastX < minGap || tx > W - 4) continue;
+      lastX = tx;
+      const tt = el("text", { x: tx, y: H - B + dateFont + 4, "font-size": dateFont, fill: MUT, "font-family": mono, "text-anchor": "middle" }); tt.textContent = lab; svg.appendChild(tt);
     }
   }
 
@@ -641,9 +686,9 @@
     });
 })();
 
-/* Network rank (FTSO page): where this operator sits among the registered
-   voters by total registration weight — stake plus delegations, which is what
-   the signing policy actually ranks on. */
+/* Weight rank (FTSO page): position among the registered voters by total
+   registration weight — stake plus delegations. Named for what it measures
+   rather than "network rank", which reads as a standing rather than a metric. */
 (() => {
   const el = document.getElementById("ftso-rank");
   if (!el) return;
