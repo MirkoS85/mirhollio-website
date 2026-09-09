@@ -89,7 +89,7 @@
     svg.appendChild(el("rect", { x: 8, y: yy - 5, width: x(rr.ours) - 8, height: 10, rx: 5, fill: MAG, filter: "drop-shadow(0 0 7px rgba(255,46,99,.55))" }));
     svg.appendChild(el("circle", { cx: x(rr.ours), cy: yy, r: 6, fill: MAGL, stroke: "#17171d", "stroke-width": 2 }));
     svg.appendChild(el("line", { x1: x(rr.median), x2: x(rr.median), y1: yy - 13, y2: yy + 13, stroke: "rgba(255,255,255,.55)", "stroke-width": 2, "stroke-dasharray": "3 3" }));
-    const tm = el("text", { x: Math.min(x(rr.median) + 5, W - 90), y: yy + 26, "font-size": 10, fill: MUT, "font-family": mono });
+    const tm = el("text", { x: Math.min(x(rr.median) + 5, W - 96), y: yy + 26, "font-size": 11, fill: MUT, "font-family": mono });
     tm.textContent = `median ${(rr.median * 100).toFixed(2)}%`; svg.appendChild(tm);
     const to = el("text", { x: Math.min(x(rr.ours), W - 66), y: yy - 18, "font-size": 11, "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" });
     to.textContent = `${(rr.ours * 100).toFixed(2)}%`; svg.appendChild(to);
@@ -104,6 +104,15 @@
     return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
   }
 
+  // The panels are taller than the 1000x300 box these charts declare, so the
+  // drawing was letterboxed and a band of dead space sat above and below it.
+  // Derive the drawing height from the box the element actually occupies.
+  function fitHeight(svg, viewWidth, fallbackHeight) {
+    const b = svg.getBoundingClientRect();
+    if (!b.width || !b.height) return fallbackHeight;
+    return Math.round(viewWidth * (b.height / b.width));
+  }
+
   // With labels at a legible size, every-bar ticks collide. Keep one in N so a
   // label always has room for its own width.
   function labelStride(count, slotUnits, labelUnits) {
@@ -113,8 +122,11 @@
 
   function weightChart(svg, hist) {
     if (!svg || !hist.length) return;
-    const W = 1000, H = 300, T = 14;
+    const W = 1000;
+    const H = fitHeight(svg, W, 300);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     const fs = (px) => fontUnits(svg, px, W);
+    const T = Math.max(14, fs(11) + 6);
     // The gutters have to fit their own labels once the text is legible:
     // otherwise the epoch row sits across the baseline it belongs under.
     const L = Math.max(44, 6 + 4 * fs(10) * 0.62);
@@ -151,8 +163,12 @@
 
   function expiryChart(svg, val) {
     if (!svg || !val) return;
-    const W = 1000, H = 260, B = 30, T = 12;
+    const W = 1000;
+    const H = fitHeight(svg, W, 260);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     const fs = (px) => fontUnits(svg, px, W);
+    const T = Math.max(12, fs(10) + 6);
+    const B = Math.max(30, fs(10) + 14);
     const L = Math.max(48, 6 + 4 * fs(10) * 0.62);
     const start = val.totalStakeM;
     const steps = val.expirySteps;
@@ -703,7 +719,7 @@
       el.classList.remove("skeleton-value");
       el.removeAttribute("aria-busy");
       if (!el.parentElement.querySelector(".rank-of")) {
-        el.insertAdjacentHTML("afterend", `<em class="rank-of">of ${of} voters</em>`);
+        el.insertAdjacentHTML("afterend", `<em class="rank-of">of ${of} by weight</em>`);
       }
     })
     .catch(() => { el.textContent = "–"; });

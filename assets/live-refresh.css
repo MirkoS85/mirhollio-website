@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-30");
+@import url("operator.css?v=core-31");
 
 :root{
   color-scheme:dark;
@@ -4767,7 +4767,7 @@ tbody tr:hover td{
   .table-wrap-compact .ftso-delegator-table td:first-child{ text-align:left !important; }
   .table-wrap-compact .ftso-delegation-table thead th,
   .table-wrap-compact .ftso-delegator-table thead th{
-    font-size:10px !important; letter-spacing:.05em !important; text-transform:uppercase !important;
+    font-size:11px !important; letter-spacing:.05em !important; text-transform:uppercase !important;
     color:#6e727b !important; background:transparent !important; font-weight:800 !important;
     padding:8px 6px !important; border-bottom:1px solid rgba(255, 41, 109,.14) !important;
   }
@@ -5302,7 +5302,11 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .vps-foot span{color:var(--text);font-weight:700;}
 .vps-empty{margin:12px 0 0;font-size:13px;color:var(--muted);}
 @media (max-width:760px){
-  .vps-row{grid-template-columns:38px minmax(0,1fr) 30px;gap:8px;}
+  /* Each row is the tap target that opens its snapshot, and ten 20px-tall rows
+     stacked together are easy to mis-hit. The row spans the full width, so only
+     vertical precision is needed; 36px buys that without the 240px a full 44px
+     list would add to a page we are otherwise tightening. */
+  .vps-row{grid-template-columns:38px minmax(0,1fr) 30px;gap:8px;min-height:36px;}
   .vps-at{display:none;}
 }
 
@@ -5348,7 +5352,7 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   border:1px solid var(--line);border-radius:11px;
   background:rgba(255,255,255,.03);
 }
-.vps-detail dt{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.vps-detail dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;}
 .vps-detail dd{margin:3px 0 0;font-size:13.5px;font-weight:700;color:var(--ink,#fff);font-variant-numeric:tabular-nums;}
 .vps-detail-empty{margin:8px 4px 10px;font-size:12.5px;color:var(--muted);}
 

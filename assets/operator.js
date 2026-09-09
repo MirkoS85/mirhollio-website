@@ -1442,7 +1442,8 @@ const MirhollioCore = (() => {
     }
 
     const width = 1000;
-    const height = 320;
+    const height = fitHeight(svg, width, 320);
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     const fs = (px) => fontUnits(svg, px, width);
     const axisFont = fs(13);
     // Leave room for the widest axis label instead of a fixed gutter.
@@ -1750,11 +1751,11 @@ const MirhollioCore = (() => {
     }
 
     const width = 1000;
-    const height = 280;
+    const height = fitHeight(svg, width, 280);
     const fs = (px) => fontUnits(svg, px, width);
     const axisFont = fs(12);
     const padX = Math.max(46, axisFont * 1.6);
-    const padTop = 26;
+    const padTop = Math.max(26, axisFont + 6);
     const padBottom = Math.max(34, axisFont + 12);
     const minReward = Math.min(...series.map(item => item.reward));
     const maxReward = Math.max(...series.map(item => item.reward), 1);
@@ -1938,6 +1939,14 @@ const MirhollioCore = (() => {
     const rendered = svg.getBoundingClientRect().width;
     if (!rendered) return cssPx;
     return Math.round(cssPx * (viewWidth / rendered) * 10) / 10;
+  }
+
+  // Same reason as fontUnits: the element is taller than the 1000-unit box the
+  // chart declares, so without this the drawing is letterboxed inside it.
+  function fitHeight(svg, viewWidth, fallbackHeight) {
+    const b = svg.getBoundingClientRect();
+    if (!b.width || !b.height) return fallbackHeight;
+    return Math.round(viewWidth * (b.height / b.width));
   }
 
   function measuredSvgSize(svg, fallbackWidth, fallbackHeight) {
