@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-10T00:36:19.279Z",
+  "generatedAt": "2026-09-10T05:18:37.917Z",
   "position": {
     "epoch": 431,
     "voters": 100,
@@ -112,11 +112,11 @@
       0.01
     ],
     "ourIndex": 69,
-    "primaryPct": 44.49,
-    "secondaryPct": 98.62,
+    "primaryPct": 45.74,
+    "secondaryPct": 98.71,
     "availabilityPct": 100,
-    "medianPrimaryPct": 47.49,
-    "medianSecondaryPct": 95.92,
+    "medianPrimaryPct": 47.8,
+    "medianSecondaryPct": 95.62,
     "passes": 3,
     "eligible": true
   },
@@ -140,56 +140,56 @@
     ]
   },
   "validator": {
-    "totalStakeM": 89.24,
+    "totalStakeM": 90,
     "selfBondM": 6,
-    "delegators": 54,
+    "delegators": 55,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2026-10-19",
     "expirySteps": [
       {
-        "date": "2026-09-10",
-        "expiresM": 0.42,
-        "remainingM": 82.82
-      },
-      {
         "date": "2026-09-11",
         "expiresM": 2.51,
-        "remainingM": 80.31
+        "remainingM": 81.49
       },
       {
         "date": "2026-09-13",
         "expiresM": 0.05,
-        "remainingM": 80.25
+        "remainingM": 81.43
       },
       {
         "date": "2026-09-14",
         "expiresM": 13.99,
-        "remainingM": 66.26
+        "remainingM": 67.44
       },
       {
         "date": "2026-09-15",
         "expiresM": 1.26,
-        "remainingM": 65
+        "remainingM": 66.18
       },
       {
         "date": "2026-09-16",
         "expiresM": 2.76,
-        "remainingM": 62.24
+        "remainingM": 63.42
       },
       {
         "date": "2026-09-17",
         "expiresM": 7.87,
-        "remainingM": 54.37
+        "remainingM": 55.55
       },
       {
         "date": "2026-09-18",
         "expiresM": 0.05,
-        "remainingM": 54.32
+        "remainingM": 55.5
       },
       {
         "date": "2026-09-23",
         "expiresM": 0.12,
+        "remainingM": 55.38
+      },
+      {
+        "date": "2026-09-24",
+        "expiresM": 1.18,
         "remainingM": 54.2
       },
       {
