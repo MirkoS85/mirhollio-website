@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10T19:08:41.627Z",
+  "generatedAt": "2026-09-10T22:39:15.257Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -24,10 +24,10 @@
     }
   },
   "weights": {
-    "epoch": 431,
-    "totalWeight": 156166675.5806065,
-    "delegatedWeight": 66166988.83565518,
-    "cappedDelegatedWeight": 66166988.83565518,
+    "epoch": 432,
+    "totalWeight": 210992895.198402,
+    "delegatedWeight": 120993208.4534507,
+    "cappedDelegatedWeight": 120993208.4534507,
     "stakingWeight": 89999686.7449513,
     "feeBips": 2000,
     "source": "flare-systems-explorer"
