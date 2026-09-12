@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-12T11:15:57.461Z",
+  "generatedAt": "2026-09-12T15:50:04.173Z",
   "position": {
     "epoch": 432,
     "voters": 100,
@@ -112,11 +112,11 @@
       0.01
     ],
     "ourIndex": 68,
-    "primaryPct": 45.32,
-    "secondaryPct": 99.07,
+    "primaryPct": 44.59,
+    "secondaryPct": 99.29,
     "availabilityPct": 100,
-    "medianPrimaryPct": 45.93,
-    "medianSecondaryPct": 97.4,
+    "medianPrimaryPct": 46.25,
+    "medianSecondaryPct": 97.55,
     "passes": 3,
     "eligible": true
   },
@@ -140,9 +140,9 @@
     ]
   },
   "validator": {
-    "totalStakeM": 89.57,
+    "totalStakeM": 90,
     "selfBondM": 6,
-    "delegators": 56,
+    "delegators": 57,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2026-10-19",
@@ -150,46 +150,51 @@
       {
         "date": "2026-09-13",
         "expiresM": 0.05,
-        "remainingM": 83.51
+        "remainingM": 83.95
       },
       {
         "date": "2026-09-14",
         "expiresM": 13.99,
-        "remainingM": 69.52
+        "remainingM": 69.95
       },
       {
         "date": "2026-09-15",
         "expiresM": 1.26,
-        "remainingM": 68.26
+        "remainingM": 68.69
       },
       {
         "date": "2026-09-16",
         "expiresM": 2.76,
-        "remainingM": 65.5
+        "remainingM": 65.93
       },
       {
         "date": "2026-09-17",
         "expiresM": 7.87,
-        "remainingM": 57.63
+        "remainingM": 58.06
       },
       {
         "date": "2026-09-18",
         "expiresM": 0.05,
-        "remainingM": 57.58
+        "remainingM": 58.01
       },
       {
         "date": "2026-09-23",
         "expiresM": 0.12,
-        "remainingM": 57.46
+        "remainingM": 57.89
       },
       {
         "date": "2026-09-24",
         "expiresM": 1.18,
-        "remainingM": 56.28
+        "remainingM": 56.71
       },
       {
         "date": "2026-09-25",
         "expiresM": 7.05,
+        "remainingM": 49.66
+      },
+      {
+        "date": "2026-09-26",
+        "expiresM": 0.43,
         "remainingM": 49.23
       },
       {
