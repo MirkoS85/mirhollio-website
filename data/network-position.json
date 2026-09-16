@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-16T07:55:00.564Z",
+  "generatedAt": "2026-09-16T13:44:29.578Z",
   "position": {
     "epoch": 433,
     "voters": 100,
@@ -112,11 +112,11 @@
       0.01
     ],
     "ourIndex": 64,
-    "primaryPct": 44.85,
-    "secondaryPct": 98.52,
+    "primaryPct": 47.37,
+    "secondaryPct": 98.73,
     "availabilityPct": 100,
-    "medianPrimaryPct": 42.99,
-    "medianSecondaryPct": 96.87,
+    "medianPrimaryPct": 42.35,
+    "medianSecondaryPct": 96.88,
     "passes": 3,
     "eligible": true
   },
@@ -140,16 +140,16 @@
     ]
   },
   "validator": {
-    "totalStakeM": 88.97,
+    "totalStakeM": 88.91,
     "selfBondM": 6,
-    "delegators": 61,
+    "delegators": 60,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2026-10-19",
     "expirySteps": [
       {
         "date": "2026-09-16",
-        "expiresM": 2.71,
+        "expiresM": 2.66,
         "remainingM": 80.26
       },
       {
