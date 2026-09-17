@@ -8,9 +8,9 @@
     "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
    }
   ],
-  "signing_policy_address_balance": 3364.37,
-  "submit_signatures_address_balance": 3749.09,
-  "submit_address_balance": 3613.51,
+  "signing_policy_address_balance": 3362.93,
+  "submit_signatures_address_balance": 3749.03,
+  "submit_address_balance": 3613.4,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -23,8 +23,7 @@
    434,
    433,
    432,
-   431,
-   430
+   431
   ],
   "uptime_vote_re": [],
   "uptime_vote_hash": [],
@@ -36,37 +35,37 @@
   "node_ids": [
    "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   ],
-  "reward_epoch": 433,
-  "staking_weight": 8.956744583814358e+25,
+  "reward_epoch": 434,
+  "staking_weight": 8.93823712985842e+25,
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "delegation_fee_bips": 2000,
-  "w_nat_weight": 1.3396305208596121e+26,
-  "w_nat_capped_weight": 1.3396305208596121e+26,
-  "delegation_rate": 0.003144848024417216,
-  "weight": 2.235304979241048e+26,
-  "vote_power": 118462377669048830000,
+  "w_nat_weight": 1.1743089086612074e+26,
+  "w_nat_capped_weight": 1.1743089086612074e+26,
+  "delegation_rate": 0.0027591442373142054,
+  "weight": 2.0681326216470495e+26,
+  "vote_power": 115786309325179170000,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
   "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
-  "registration_weight": 118462370837503130000,
-  "normalized_weight": 383
+  "registration_weight": 115786300269887420000,
+  "normalized_weight": 379
  },
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1789669998,
-   "balance": 3954.57
+   "last_used": 1789678980,
+   "balance": 3954.56
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1789669934,
-   "balance": 3954.39
+   "last_used": 1789678972,
+   "balance": 3954.37
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1789669836,
-   "balance": 3955.28
+   "last_used": 1789679045,
+   "balance": 3955.27
   }
  ],
  "identity_address_balance": 107058.27,
