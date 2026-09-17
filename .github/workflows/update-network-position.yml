@@ -49,16 +49,33 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/network-position.json data/fse-entity.json data/fse-entity-ftso.json
           git commit -m "Update network position snapshot"
-          # Three workflows push to main, watch-status every five minutes, so a
-          # bare push loses the race whenever another lands first. Rebase and
-          # retry instead of failing the run and letting the feed go stale.
+          # Now only a backstop: the five-minute publisher loop refreshes these
+          # snapshots too. The push still has to be safe, and this one was not -
+          # `git push` alone fails on the detached HEAD actions/checkout leaves,
+          # and `git pull --rebase` conflicts because both sides rewrite the same
+          # generated JSON, which then killed the run on `|| exit 1`.
+          #
+          # These files are regenerated from scratch, so a losing commit holds
+          # nothing worth keeping: take the remote tip, rebuild on it, retry.
+          FILES="data/network-position.json data/fse-entity.json data/fse-entity-ftso.json"
           for attempt in 1 2 3 4 5; do
-            if git push; then
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
               echo "Pushed on attempt $attempt."
               exit 0
             fi
-            echo "Push rejected, rebasing and retrying ($attempt/5)."
-            git pull --rebase origin main || exit 1
+            echo "Push lost the race on attempt $attempt; resyncing and rebuilding."
+            git rebase --abort >/dev/null 2>&1
+            rm -rf .git/rebase-merge .git/rebase-apply
+            git fetch -q origin "${GITHUB_REF_NAME}" || exit 1
+            git checkout -q -B "${GITHUB_REF_NAME}" FETCH_HEAD || exit 1
+            git reset -q --hard FETCH_HEAD || exit 1
+            node scripts/update-network-position.mjs || exit 1
+            if git diff --quiet -- $FILES; then
+              echo "Nothing left to publish after resync."
+              exit 0
+            fi
+            git add $FILES
+            git commit -q -m "Update network position snapshot" || exit 1
             sleep $((attempt * 3))
           done
           echo "Push still failing after 5 attempts."

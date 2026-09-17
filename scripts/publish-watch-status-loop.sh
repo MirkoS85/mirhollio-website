@@ -26,7 +26,8 @@ set -uo pipefail
 BRANCH="${BRANCH:-${GITHUB_REF_NAME:-main}}"
 INTERVAL="${REFRESH_INTERVAL_SECONDS:-300}"
 WINDOW="${REFRESH_WINDOW_SECONDS:-3900}"
-FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json)
+FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json
+       data/network-position.json data/fse-entity.json data/fse-entity-ftso.json)
 
 # The delegation snapshot used to be published by its own workflow on a four-hour
 # cron, so the home page and the operator dashboard - which read it - showed a
@@ -35,6 +36,12 @@ FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json)
 # every third cycle (15 minutes) keeps upstream load sane while still being
 # sixteen times fresher than the cron it replaces.
 DELEGATION_EVERY="${DELEGATION_EVERY_CYCLES:-3}"
+
+# Network position and the two Flare Systems Explorer snapshots were on the same
+# kind of two-hour cron, which is where the FTSO 6h/24h figures were coming from
+# - so those could be two hours behind. Same treatment, but offset by one cycle
+# so the two heavier refreshes never land in the same one.
+POSITION_EVERY="${POSITION_EVERY_CYCLES:-3}"
 END=$(( $(date +%s) + WINDOW ))
 cycles=0
 published=0
@@ -65,13 +72,18 @@ attempt_publish() {
       || echo "  delegation snapshot failed this cycle"
   fi
 
+  if [ $(( cycles % POSITION_EVERY )) -eq 2 ]; then
+    node scripts/update-network-position.mjs >/dev/null \
+      || echo "  network position snapshot failed this cycle"
+  fi
+
   if git diff --quiet -- "${FILES[@]}"; then
     echo "  no change this cycle"
     return 2
   fi
 
   git add -- "${FILES[@]}"
-  git commit -q -m "Update watch status, oracle mirror and delegations" || return 1
+  git commit -q -m "Update live data snapshots" || return 1
 
   if git push -q origin "HEAD:${BRANCH}" 2>/dev/null; then
     echo "  published"
