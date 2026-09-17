@@ -26,7 +26,15 @@ set -uo pipefail
 BRANCH="${BRANCH:-${GITHUB_REF_NAME:-main}}"
 INTERVAL="${REFRESH_INTERVAL_SECONDS:-300}"
 WINDOW="${REFRESH_WINDOW_SECONDS:-3900}"
-FILES=(data/watch-status.json data/oracle-live.json)
+FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json)
+
+# The delegation snapshot used to be published by its own workflow on a four-hour
+# cron, so the home page and the operator dashboard - which read it - showed a
+# reward epoch one behind the live feed for hours at a time. It rides this loop
+# instead, but not every cycle: its refresh pulls the 16MB oracle payload, so
+# every third cycle (15 minutes) keeps upstream load sane while still being
+# sixteen times fresher than the cron it replaces.
+DELEGATION_EVERY="${DELEGATION_EVERY_CYCLES:-3}"
 END=$(( $(date +%s) + WINDOW ))
 cycles=0
 published=0
@@ -52,13 +60,18 @@ attempt_publish() {
   node scripts/update-oracle-mirror.mjs >/dev/null || echo "  oracle mirror failed"
   node scripts/update-watch-status.mjs >/dev/null || return 1
 
+  if [ $(( cycles % DELEGATION_EVERY )) -eq 1 ]; then
+    node scripts/update-ftso-delegations.mjs >/dev/null \
+      || echo "  delegation snapshot failed this cycle"
+  fi
+
   if git diff --quiet -- "${FILES[@]}"; then
     echo "  no change this cycle"
     return 2
   fi
 
   git add -- "${FILES[@]}"
-  git commit -q -m "Update Apple Watch status and oracle mirror" || return 1
+  git commit -q -m "Update watch status, oracle mirror and delegations" || return 1
 
   if git push -q origin "HEAD:${BRANCH}" 2>/dev/null; then
     echo "  published"
