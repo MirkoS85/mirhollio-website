@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-17T13:47:13.066Z",
+  "generatedAt": "2026-09-17T18:33:48.795Z",
   "position": {
     "epoch": 433,
     "voters": 100,
@@ -112,11 +112,11 @@
       0.01
     ],
     "ourIndex": 64,
-    "primaryPct": 45.68,
-    "secondaryPct": 98.16,
+    "primaryPct": 43.73,
+    "secondaryPct": 98.81,
     "availabilityPct": 100,
-    "medianPrimaryPct": 43.76,
-    "medianSecondaryPct": 95.75,
+    "medianPrimaryPct": 44.15,
+    "medianSecondaryPct": 96.2,
     "passes": 3,
     "eligible": true
   },
@@ -140,9 +140,9 @@
     ]
   },
   "validator": {
-    "totalStakeM": 89.7,
+    "totalStakeM": 90,
     "selfBondM": 6,
-    "delegators": 65,
+    "delegators": 66,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2026-10-19",
@@ -150,56 +150,56 @@
       {
         "date": "2026-09-17",
         "expiresM": 7.87,
-        "remainingM": 75.83
+        "remainingM": 76.13
       },
       {
         "date": "2026-09-18",
         "expiresM": 0.05,
-        "remainingM": 75.78
+        "remainingM": 76.08
       },
       {
         "date": "2026-09-23",
         "expiresM": 0.12,
-        "remainingM": 75.66
+        "remainingM": 75.96
       },
       {
         "date": "2026-09-24",
         "expiresM": 1.18,
-        "remainingM": 74.48
+        "remainingM": 74.78
       },
       {
         "date": "2026-09-25",
         "expiresM": 7.05,
-        "remainingM": 67.43
+        "remainingM": 67.73
       },
       {
         "date": "2026-09-26",
         "expiresM": 0.43,
-        "remainingM": 67
+        "remainingM": 67.3
       },
       {
         "date": "2026-09-27",
         "expiresM": 0.4,
-        "remainingM": 66.6
+        "remainingM": 66.9
       },
       {
         "date": "2026-09-28",
         "expiresM": 1.42,
-        "remainingM": 65.18
+        "remainingM": 65.47
       },
       {
         "date": "2026-09-29",
         "expiresM": 8.04,
-        "remainingM": 57.14
+        "remainingM": 57.44
       },
       {
         "date": "2026-09-30",
         "expiresM": 0.4,
-        "remainingM": 56.74
+        "remainingM": 57.03
       },
       {
         "date": "2026-10-01",
-        "expiresM": 4.12,
+        "expiresM": 4.41,
         "remainingM": 52.62
       },
       {
@@ -245,12 +245,6 @@
     ]
   },
   "weightHistory": [
-    {
-      "epoch": 424,
-      "wflrM": 5065280.88,
-      "stakeM": 89998947.02,
-      "weight": 98.53
-    },
     {
       "epoch": 425,
       "wflrM": 5044395.39,
@@ -304,9 +298,22 @@
       "wflrM": 133963052.08,
       "stakeM": 89567445.84,
       "weight": 118.46
+    },
+    {
+      "epoch": 434,
+      "wflrM": 117430890.87,
+      "stakeM": 89382371.3,
+      "weight": 115.79
     }
   ],
   "votePowerSnapshots": [
+    {
+      "epoch": 434,
+      "takenDuring": 433,
+      "block": 69979176,
+      "at": "2026-09-17T09:22:01.000Z",
+      "pct": 88.53
+    },
     {
       "epoch": 433,
       "takenDuring": 432,
