@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-09-18T12:07:38.721Z",
+  "generatedAt": "2026-09-18T12:28:47.540Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
-    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
+    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
     "delegators": "unavailable",
     "weights": "flare-systems-explorer"
   },
   "warnings": [
-    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774181259021&endTime=1789733259021&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
+    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774182528072&endTime=1789734528072&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
     "Reused existing Flare Base history because Oracle fallback was not newer",
     "52 delegator epoch snapshots failed",
     "Reused existing delegator snapshot for the current Flare Base epoch"
@@ -81,7 +81,7 @@
     },
     {
       "epoch": 398,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=398&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=398&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 399,
@@ -145,7 +145,7 @@
     },
     {
       "epoch": 414,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=414&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=414&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 415,
@@ -181,11 +181,11 @@
     },
     {
       "epoch": 423,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=423&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=423&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 424,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=424&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=424&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 425,
@@ -197,7 +197,7 @@
     },
     {
       "epoch": 427,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=427&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=427&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 428,
@@ -221,7 +221,7 @@
     },
     {
       "epoch": 433,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=433&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=433&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     }
   ],
   "insights": {
