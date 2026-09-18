@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-09-18T03:29:12.762Z",
+  "generatedAt": "2026-09-18T03:48:39.285Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
-    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
+    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
     "delegators": "unavailable",
     "weights": "flare-systems-explorer"
   },
   "warnings": [
-    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774150153062&endTime=1789702153062&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
+    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774151319623&endTime=1789703319623&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
     "Reused existing Flare Base history because Oracle fallback was not newer",
     "52 delegator epoch snapshots failed",
     "Reused existing delegator snapshot for the current Flare Base epoch"
@@ -85,7 +85,7 @@
     },
     {
       "epoch": 399,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=399&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=399&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 400,
@@ -121,7 +121,7 @@
     },
     {
       "epoch": 408,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=408&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=408&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 409,
@@ -129,7 +129,7 @@
     },
     {
       "epoch": 410,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=410&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=410&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 411,
@@ -173,7 +173,7 @@
     },
     {
       "epoch": 421,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=421&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=421&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 422,
@@ -185,7 +185,7 @@
     },
     {
       "epoch": 424,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=424&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=424&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 425,
