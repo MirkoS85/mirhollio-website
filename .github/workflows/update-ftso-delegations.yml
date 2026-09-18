@@ -1,9 +1,11 @@
 name: Update FTSO delegation snapshot
 
+# No schedule any more. The five-minute publisher loop
+# (scripts/publish-watch-status-loop.sh) refreshes this snapshot every third
+# cycle, so this workflow only ever raced it for the push and lost - three
+# failed runs in a day. Kept dispatchable by hand as a manual fallback.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 */4 * * *"
 
 permissions:
   contents: write
@@ -52,7 +54,11 @@ jobs:
               exit 0
             fi
             echo "Push lost the race on attempt $attempt; resyncing and rebuilding."
-            git rebase --abort >/dev/null 2>&1
+            # `|| true` matters: this step runs under `bash -e`, and
+            # `git rebase --abort` exits 128 when no rebase is in
+            # progress - which is the normal case - killing the step
+            # on the first lost race.
+            git rebase --abort >/dev/null 2>&1 || true
             rm -rf .git/rebase-merge .git/rebase-apply
             git fetch -q origin "${GITHUB_REF_NAME}" || exit 1
             git checkout -q -B "${GITHUB_REF_NAME}" FETCH_HEAD || exit 1

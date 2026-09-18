@@ -8,14 +8,12 @@ name: watchOS typecheck
 # This does not build or sign an app - installing to a watch still needs the
 # paired iPhone and the developer certificate.
 
+# Retired. The Apple Watch app is no longer maintained: Xcode was removed from
+# the author's Mac for disk space and the project was abandoned, so nothing
+# builds or installs it any more. No automatic triggers - the watch sources are
+# left in the tree for reference, and this stays dispatchable in case the
+# project is ever picked back up.
 on:
-  push:
-    paths:
-      - "watchos/**"
-      - ".github/workflows/watchos-typecheck.yml"
-  pull_request:
-    paths:
-      - "watchos/**"
   workflow_dispatch:
 
 permissions:

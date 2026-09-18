@@ -1,9 +1,11 @@
 name: Update network position
 
+# No schedule any more - same reason as the delegation workflow: the publisher
+# loop refreshes network position and the two Flare Systems Explorer snapshots
+# every third cycle, offset from the delegation refresh. Kept dispatchable by
+# hand as a manual fallback.
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "41 */2 * * *"
 
 permissions:
   contents: write
@@ -64,7 +66,11 @@ jobs:
               exit 0
             fi
             echo "Push lost the race on attempt $attempt; resyncing and rebuilding."
-            git rebase --abort >/dev/null 2>&1
+            # `|| true` matters: this step runs under `bash -e`, and
+            # `git rebase --abort` exits 128 when no rebase is in
+            # progress - which is the normal case - killing the step
+            # on the first lost race.
+            git rebase --abort >/dev/null 2>&1 || true
             rm -rf .git/rebase-merge .git/rebase-apply
             git fetch -q origin "${GITHUB_REF_NAME}" || exit 1
             git checkout -q -B "${GITHUB_REF_NAME}" FETCH_HEAD || exit 1
