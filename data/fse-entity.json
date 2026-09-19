@@ -8,7 +8,7 @@
     "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
    }
   ],
-  "signing_policy_address_balance": 3347.94,
+  "signing_policy_address_balance": 3347.78,
   "submit_signatures_address_balance": 3748.03,
   "submit_address_balance": 3611.99,
   "delegation_address_balance": 5077.95,
@@ -54,17 +54,17 @@
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1789799419,
+   "last_used": 1789799555,
    "balance": 3954.39
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1789799419,
+   "last_used": 1789799870,
    "balance": 3954.21
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1789799296,
+   "last_used": 1789799520,
    "balance": 3955.11
   }
  ],
