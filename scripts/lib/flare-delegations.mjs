@@ -64,6 +64,21 @@ const EXPLORER_MAX_PAGES = 40;
 // like a bug rather than like dust.
 const MIN_AMOUNT_WFLR = Number(process.env.DELEGATION_MIN_AMOUNT || 0.01);
 
+// Asking the explorer for all 70 million blocks at once earns a Cloudflare 504:
+// the query is too expensive for one request. It is walked backwards in windows
+// instead, and the window shrinks when a request times out.
+const EXPLORER_WINDOW = Number(process.env.DELEGATION_EXPLORER_WINDOW || 2_000_000);
+const EXPLORER_MIN_WINDOW = 100_000;
+
+// data/ftso-delegations.json has carried millisecond timestamps since Flare Base
+// wrote it, and the page reads them that way. Everything published here matches
+// that rather than introducing a second convention in the same file.
+function toMillis(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n < 1e11 ? Math.round(n * 1000) : Math.round(n);
+}
+
 const lower = value => String(value || "").toLowerCase();
 const isAddress = value => /^0x[0-9a-f]{40}$/.test(lower(value)) && !/^0x0+$/.test(lower(value));
 
@@ -139,62 +154,81 @@ function reportTopics(counts, indent = "    ") {
  * contract instead of the seventy thousand eth_getLogs calls the same range
  * would take at the RPCs' 1000-block ceiling.
  */
-async function discoverViaExplorer({ contracts, provider, deadline }) {
+async function discoverViaExplorer({ contracts, provider, cursor, window, deadline }) {
   const providerTopic = `0x${padAddress(provider)}`;
   const found = new Map();
   const errors = [];
-  let complete = true;
+  let at = cursor;
+  let span = Math.max(EXPLORER_MIN_WINDOW, window);
 
-  for (const contract of contracts) {
-    for (let page = 1; page <= EXPLORER_MAX_PAGES; page += 1) {
-      if (Date.now() > deadline) {
-        console.log(`  explorer: out of budget on ${contract} page ${page}`);
-        errors.push(`${contract} p${page}: out of budget`);
-        return { found, complete: false, errors };
-      }
-      const url = new URL(`${EXPLORER}/api`);
-      url.search = new URLSearchParams({
-        module: "logs",
-        action: "getLogs",
-        address: contract,
-        fromBlock: "0",
-        toBlock: "latest",
-        topic2: providerTopic,
-        page: String(page),
-        offset: String(EXPLORER_PAGE_SIZE)
-      }).toString();
-
-      let body;
-      try {
-        const res = await fetch(url, {
-          headers: { accept: "application/json" },
-          signal: AbortSignal.timeout(45_000)
-        });
-        const text = await res.text();
-        if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
-        body = JSON.parse(text);
-        if (body?.status === "0" && !/no logs found/i.test(String(body?.message || ""))) {
-          throw new Error(`explorer said: ${body.message} ${JSON.stringify(body.result).slice(0, 200)}`);
-        }
-      } catch (error) {
-        console.log(`  explorer: ${contract} page ${page} failed: ${error.message}`);
-        errors.push(`${contract} p${page}: ${error.message}`.slice(0, 300));
-        complete = false;
-        break;
-      }
-
-      const rows = Array.isArray(body?.result) ? body.result : [];
-      const counts = collectDelegators(rows, found);
-      console.log(`  explorer: ${contract} page ${page} -> ${rows.length} logs, ${found.size} addresses so far`);
-      if (page === 1) reportTopics(counts);
-      if (rows.length < EXPLORER_PAGE_SIZE) break;
-      if (page === EXPLORER_MAX_PAGES) {
-        console.log(`  explorer: ${contract} hit the page cap; history may be incomplete`);
-        complete = false;
-      }
+  const query = async (contract, from, to, page) => {
+    const url = new URL(`${EXPLORER}/api`);
+    url.search = new URLSearchParams({
+      module: "logs",
+      action: "getLogs",
+      address: contract,
+      fromBlock: String(from),
+      toBlock: String(to),
+      topic2: providerTopic,
+      page: String(page),
+      offset: String(EXPLORER_PAGE_SIZE)
+    }).toString();
+    const res = await fetch(url, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(45_000)
+    });
+    const text = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 120)}`);
+    const body = JSON.parse(text);
+    if (body?.status === "0" && !/no logs found/i.test(String(body?.message || ""))) {
+      throw new Error(`explorer said: ${body.message}`);
     }
+    return Array.isArray(body?.result) ? body.result : [];
+  };
+
+  while (at >= 0) {
+    if (Date.now() > deadline) {
+      console.log(`  explorer: out of budget at block ${at}`);
+      return { found, cursor: at, window: span, complete: false, errors };
+    }
+    const from = Math.max(0, at - span + 1);
+    let windowFailed = false;
+
+    for (const contract of contracts) {
+      for (let page = 1; page <= EXPLORER_MAX_PAGES; page += 1) {
+        let rows;
+        try {
+          rows = await query(contract, from, at, page);
+        } catch (error) {
+          errors.push(`${from}-${at} p${page}: ${error.message}`.slice(0, 220));
+          console.log(`  explorer: ${from}-${at} page ${page} failed: ${error.message}`);
+          windowFailed = true;
+          break;
+        }
+        const counts = collectDelegators(rows, found);
+        if (rows.length) console.log(`  explorer: ${from}-${at} page ${page} -> ${rows.length} logs, ${found.size} addresses so far`);
+        if (page === 1 && counts.size) reportTopics(counts);
+        if (rows.length < EXPLORER_PAGE_SIZE) break;
+      }
+      if (windowFailed) break;
+    }
+
+    if (windowFailed) {
+      // Too much to chew at once. Take a smaller bite of the same range rather
+      // than skipping it, and give up for this run if we are already at the
+      // smallest window the walk is worth doing in.
+      if (span <= EXPLORER_MIN_WINDOW) {
+        return { found, cursor: at, window: span, complete: false, errors };
+      }
+      span = Math.max(EXPLORER_MIN_WINDOW, Math.floor(span / 4));
+      console.log(`  explorer: narrowing the window to ${span} blocks`);
+      continue;
+    }
+
+    at = from - 1;
   }
-  return { found, complete, errors };
+
+  return { found, cursor: at, window: span, complete: true, errors };
 }
 
 /** The blocks since the last run, straight from the RPCs. Small by design. */
@@ -282,12 +316,22 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
   // Whole history, once. After it has succeeded there is nothing to repeat:
   // anything new arrives in the forward window below.
   let historyComplete = Boolean(state?.historyComplete);
+  let explorerCursor = Number.isFinite(state?.explorerCursor) ? state.explorerCursor : latest;
+  let explorerWindow = Number.isFinite(state?.explorerWindow) ? state.explorerWindow : EXPLORER_WINDOW;
   if (contracts.length && !historyComplete) {
-    const result = await discoverViaExplorer({ contracts, provider: providerAddress, deadline });
+    const result = await discoverViaExplorer({
+      contracts, provider: providerAddress,
+      cursor: explorerCursor, window: explorerWindow, deadline
+    });
     const added = mergeCandidates(candidates, result.found);
     historyComplete = result.complete;
-    discovery.explorer = { found: result.found.size, added, complete: result.complete, errors: result.errors };
-    console.log(`  explorer discovery: ${result.found.size} addresses, ${added} new, ${result.complete ? "complete" : "incomplete"}`);
+    explorerCursor = result.cursor;
+    explorerWindow = result.window;
+    discovery.explorer = {
+      found: result.found.size, added, complete: result.complete,
+      cursor: result.cursor, window: result.window, errors: result.errors
+    };
+    console.log(`  explorer discovery: ${result.found.size} addresses, ${added} new, ${result.complete ? "complete" : `down to block ${result.cursor}`}`);
   }
 
   // Everything since the last run.
@@ -313,11 +357,9 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
   for (const seed of seeds) {
     const key = lower(seed?.from ?? seed);
     if (!isAddress(key)) continue;
-    const known = Number(seed?.firstSeen);
+    const known = toMillis(seed?.firstSeen);
     const entry = candidates.get(key) || { firstBlock: null, seeded: true };
-    if (Number.isFinite(known) && known > 0) {
-      entry.firstSeen = Math.min(entry.firstSeen ?? Infinity, known);
-    }
+    if (known) entry.firstSeen = Math.min(entry.firstSeen ?? Infinity, known);
     candidates.set(key, entry);
   }
   if (!candidates.size) {
@@ -346,14 +388,19 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
 
   if (!active.length) return null;
 
-  const undated = active.filter(row => !Number.isFinite(row.meta.firstSeen) && Number.isFinite(row.meta.firstBlock));
+  // Only date a wallet from the block we found it in once the history walk has
+  // finished. Before that, all we have scanned is a window of recent blocks, so
+  // the first event we saw is the first event *we* saw - dating a two-year-old
+  // delegator from the day it happened to top up is worse than saying nothing.
+  const undated = historyComplete
+    ? active.filter(row => !Number.isFinite(row.meta.firstSeen) && Number.isFinite(row.meta.firstBlock))
+    : [];
   if (undated.length) {
     try {
       const stamps = await blockTimestamps(undated.map(row => row.meta.firstBlock));
       undated.forEach(row => {
-        const stamp = stamps.get(row.meta.firstBlock);
-        // Only ever move the date earlier: the block we found is the earliest
-        // we have *seen*, not necessarily the earliest there is.
+        const stamp = toMillis(stamps.get(row.meta.firstBlock));
+        // Only ever move the date earlier.
         if (stamp) row.meta.firstSeen = Math.min(row.meta.firstSeen ?? Infinity, stamp);
       });
     } catch (error) {
@@ -367,11 +414,11 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
     ? state.baseline
     : {
         epoch,
-        capturedAt: Math.floor(Date.now() / 1000),
+        capturedAt: Date.now(),
         amounts: Object.fromEntries(active.map(row => [row.address, row.amount]))
       };
 
-  const now = Math.floor(Date.now() / 1000);
+  const now = Date.now();
   const delegators = active
     .map(row => {
       const before = baseline.amounts?.[row.address];
@@ -396,6 +443,8 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
     chainHead: latest,
     scannedToBlock,
     historyComplete,
+    explorerCursor,
+    explorerWindow,
     discovery,
     candidates: Object.fromEntries(candidates),
     baseline
