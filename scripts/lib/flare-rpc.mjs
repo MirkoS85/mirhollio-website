@@ -5,16 +5,30 @@
 // library - every value this file touches is a uint256 or an address, both of
 // which are one 32-byte word.
 
-const ENDPOINTS = (process.env.FLARE_RPC_URLS || [
+const list = value => value.split(",").map(url => url.trim()).filter(Boolean);
+
+// Calls go to the official endpoint first.
+const ENDPOINTS = list(process.env.FLARE_RPC_URLS || [
   "https://flare-api.flare.network/ext/C/rpc",
+  "https://flare.public-rpc.com",
+  "https://rpc.ankr.com/flare",
+  "https://flare.rpc.thirdweb.com"
+].join(","));
+
+// Log scans do not, because the official endpoint caps eth_getLogs at 29 blocks
+// per request - measured, not assumed - and Flare is past 70 million blocks.
+// The others allow 1000, which is still small but workable for the incremental
+// window; whole-history discovery goes through an explorer instead.
+const LOG_ENDPOINTS = list(process.env.FLARE_LOG_RPC_URLS || [
+  "https://flare.public-rpc.com",
+  "https://rpc.ankr.com/flare",
   "https://flare.rpc.thirdweb.com",
-  "https://rpc.ftso.au/flare",
-  "https://flare.public-rpc.com"
-].join(",")).split(",").map(url => url.trim()).filter(Boolean);
+  "https://flare-api.flare.network/ext/C/rpc"
+].join(","));
 
 const TIMEOUT_MS = Number(process.env.FLARE_RPC_TIMEOUT_MS || 12000);
 
-let preferred = 0;
+const preferred = new Map();
 let nextId = 1;
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -37,16 +51,19 @@ async function post(endpoint, body) {
 }
 
 // Endpoints are tried starting from the last one that worked, so a single slow
-// provider costs one timeout per run rather than one per call.
-async function send(body) {
+// provider costs one timeout per run rather than one per call. The preference
+// is per pool: a good log endpoint is not necessarily the one calls should use.
+async function send(body, pool = ENDPOINTS) {
+  const key = pool === LOG_ENDPOINTS ? "logs" : "calls";
+  const start = preferred.get(key) || 0;
   const errors = [];
-  for (let hop = 0; hop < ENDPOINTS.length; hop += 1) {
-    const index = (preferred + hop) % ENDPOINTS.length;
-    const endpoint = ENDPOINTS[index];
+  for (let hop = 0; hop < pool.length; hop += 1) {
+    const index = (start + hop) % pool.length;
+    const endpoint = pool[index];
     for (let attempt = 1; attempt <= 2; attempt += 1) {
       try {
         const result = await post(endpoint, body);
-        preferred = index;
+        preferred.set(key, index);
         return result;
       } catch (error) {
         errors.push(`${new URL(endpoint).host}: ${error.message}`);
@@ -57,13 +74,15 @@ async function send(body) {
   throw new Error(`all Flare RPC endpoints failed (${errors.join("; ")})`);
 }
 
+export { LOG_ENDPOINTS };
+
 function unwrap(entry) {
   if (entry && entry.error) throw new Error(entry.error.message || JSON.stringify(entry.error));
   return entry ? entry.result : undefined;
 }
 
-export async function rpc(method, params = []) {
-  return unwrap(await send({ jsonrpc: "2.0", id: nextId++, method, params }));
+export async function rpc(method, params = [], pool = ENDPOINTS) {
+  return unwrap(await send({ jsonrpc: "2.0", id: nextId++, method, params }, pool));
 }
 
 /** One HTTP round-trip per `size` calls. Results come back in request order. */
@@ -129,7 +148,7 @@ export function ethCall(to, data, block = "latest") {
  * boundary when time runs out, so a caller can persist `reached` and resume
  * from there instead of re-scanning.
  */
-export async function getLogs({ address, topics, fromBlock, toBlock, span = 50000, deadline = null }) {
+export async function getLogs({ address, topics, fromBlock, toBlock, span = 1000, deadline = null }) {
   const logs = [];
   let cursor = BigInt(fromBlock);
   const end = BigInt(toBlock);
@@ -149,11 +168,11 @@ export async function getLogs({ address, topics, fromBlock, toBlock, span = 5000
         topics,
         fromBlock: blockTag(cursor),
         toBlock: blockTag(stop)
-      }]);
+      }], LOG_ENDPOINTS);
       logs.push(...(batch || []));
       cursor = stop + 1n;
     } catch (error) {
-      if (width <= 1000n) throw new Error(`eth_getLogs failed at block ${cursor}: ${error.message}`);
+      if (width <= 25n) throw new Error(`eth_getLogs failed at block ${cursor}: ${error.message}`);
       width /= 4n;
     }
   }

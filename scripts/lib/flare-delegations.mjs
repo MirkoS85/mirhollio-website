@@ -1,29 +1,32 @@
-// Read the delegator book straight off the Flare C-chain.
+// Read the delegator book off the Flare C-chain.
 //
-// Everything about who delegates to this provider used to come from
-// flare-base.io. That host has been answering 502 to the CI runner since
-// mid-September, which froze the delegator book a whole reward epoch behind
-// while the page still had to claim the numbers were current. An indexer going
-// down is a normal thing to happen; having no second way to read a number that
-// is sitting in public chain state is not.
+// flare-base.io has been answering 502 since mid-September. It was the only
+// source for who delegates here, so the published book froze - and a frozen
+// book is worse than no book: a probe against the chain found one wallet the
+// snapshot still credited with 18.3M WFLR that now delegates 2,599. An indexer
+// going down is normal; having no second way to read state anyone can read is
+// not.
 //
-// So this reads the chain directly:
+// The book needs two different answers, and they need different sources.
 //
-//   * WNat emits an event whose second indexed argument is the provider being
-//     delegated to. Every address that has ever delegated here appears in the
-//     first indexed argument of one of those logs, so scanning them gives the
-//     candidate set.
-//   * WNat.votePowerFromTo(delegator, provider) then gives each candidate's
-//     current delegated amount, and votePowerOf(provider) the total.
+//   Amounts. WNat.votePowerFromTo(delegator, provider) for each wallet and
+//   votePowerOf(provider) for the total. Plain eth_call, batched, works on
+//   every public endpoint. This is the part that matters and it is exact.
 //
-// The candidate scan is the slow part - it has to cover all of Flare's
-// history - so progress is kept in data/delegator-candidates.json and the
-// backfill walks a bounded distance backwards on each run. Until it reaches
-// genesis the book is seeded from the last published snapshot, so the page is
-// complete from the first run rather than after the backfill finishes.
+//   Discovery - which addresses to ask about. Delegations are announced by
+//   events, but not on WNat: a Flare VPToken keeps its vote-power bookkeeping
+//   in a separate VPContract and the events come from there, which is why a log
+//   scan against WNat turns up nothing but ERC-20 transfers. Worse, the public
+//   RPCs cap eth_getLogs at 1000 blocks per request (29 on the official one),
+//   and Flare is past 70 million blocks - so whole-history discovery over RPC
+//   would be seventy thousand requests. The block explorer answers the same
+//   query in one paginated call, so history goes through it and the RPC only
+//   covers the blocks since the last run.
 //
-// Unlike a Flare Base snapshot, this is *live*: it reflects the chain right
-// now, not the last reward-epoch vote-power block.
+// Discovery is therefore best-effort and never fatal. Seeded with the wallets
+// the previous snapshot knew, the book is correct for them from the first run;
+// discovery only adds wallets nobody had listed yet, and the page says while
+// that is still incomplete.
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
@@ -36,10 +39,13 @@ import { selector } from "./keccak.mjs";
 // Published by Flare and identical on every Flare network.
 const CONTRACT_REGISTRY = "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019";
 const WNAT_FALLBACK = "0x1D80c49BbBCd1C0911346656B529DF9E5c2F783d";
+const EXPLORER = process.env.FLARE_EXPLORER_URL || "https://flare-explorer.flare.network";
 
 const SEL_GET_CONTRACT = selector("getContractAddressByName(string)");
 const SEL_VOTE_POWER_FROM_TO = selector("votePowerFromTo(address,address)");
 const SEL_VOTE_POWER_OF = selector("votePowerOf(address)");
+const SEL_READ_VP_CONTRACT = selector("readVotePowerContract()");
+const SEL_WRITE_VP_CONTRACT = selector("writeVotePowerContract()");
 
 // ERC-20 Transfer also carries the recipient in topic 2, so it turns up in the
 // scan. Filtering it out keeps the candidate file honest; a stray address would
@@ -48,16 +54,13 @@ const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a
 
 const STATE_PATH = path.resolve("data/delegator-candidates.json");
 
-const FIRST_RUN_LOOKBACK = 200_000;     // ~4 days, enough to be useful immediately
-// The publisher loop runs this inside a five-minute cycle alongside two other
-// refreshes, so the history scan gets a slice rather than the whole cycle. Once
-// the backfill has reached genesis this is not spent at all: the forward scan
-// only covers the blocks since the last run.
-const BACKFILL_BUDGET_MS = Number(process.env.DELEGATION_BACKFILL_BUDGET_MS || 45_000);
-const LOG_SPAN = Number(process.env.DELEGATION_LOG_SPAN || 50_000);
-const BACKFILL_STEP_BLOCKS = Number(process.env.DELEGATION_BACKFILL_STEP || 500_000);
+const FIRST_RUN_LOOKBACK = Number(process.env.DELEGATION_FIRST_LOOKBACK || 50_000);
+const DISCOVERY_BUDGET_MS = Number(process.env.DELEGATION_DISCOVERY_BUDGET_MS || 45_000);
+const EXPLORER_PAGE_SIZE = 1000;
+const EXPLORER_MAX_PAGES = 40;
 
 const lower = value => String(value || "").toLowerCase();
+const isAddress = value => /^0x[0-9a-f]{40}$/.test(lower(value)) && !/^0x0+$/.test(lower(value));
 
 async function readState() {
   try {
@@ -72,63 +75,156 @@ async function writeState(state) {
   await writeFile(STATE_PATH, `${JSON.stringify(state, null, 2)}\n`);
 }
 
+const addressFromWord = word => `0x${String(word || "").replace(/^0x/, "").slice(-40).toLowerCase()}`;
+
 /** Ask the registry where WNat lives rather than trusting a pasted address. */
 async function resolveWNat() {
   const encodedName = Buffer.from("WNat", "utf8").toString("hex").padEnd(64, "0");
   const data = `${SEL_GET_CONTRACT}${(32).toString(16).padStart(64, "0")}${(4).toString(16).padStart(64, "0")}${encodedName}`;
   try {
     const [result] = await rpcBatch([ethCall(CONTRACT_REGISTRY, data)]);
-    const address = `0x${String(result || "").replace(/^0x/, "").slice(-40)}`;
-    if (/^0x[0-9a-f]{40}$/i.test(address) && !/^0x0+$/.test(address)) return address;
+    const address = addressFromWord(result);
+    if (isAddress(address)) return address;
   } catch (_) {
     // fall through
   }
-  return WNAT_FALLBACK;
+  return lower(WNAT_FALLBACK);
 }
 
 /**
- * Collect addresses that appear as the delegator in WNat logs aimed at this
- * provider, over one block range. Returns the addresses with the earliest
- * block each was seen in, and whether the range was covered completely.
+ * The contracts that actually emit delegation events. There are usually two
+ * (a read and a write VPContract) and they are sometimes the same; Flare has
+ * replaced them before, so any address ever seen is kept and re-scanned.
  */
-async function scanDelegators({ wnat, provider, fromBlock, toBlock, deadline, label }) {
-  const providerTopic = `0x${padAddress(provider)}`;
-  const found = new Map();
+async function resolveVpContracts(wnat, remembered = []) {
+  const found = new Set(remembered.map(lower).filter(isAddress));
+  try {
+    const results = await rpcBatch([
+      ethCall(wnat, SEL_READ_VP_CONTRACT),
+      ethCall(wnat, SEL_WRITE_VP_CONTRACT)
+    ]);
+    results.map(addressFromWord).filter(isAddress).forEach(address => found.add(address));
+  } catch (error) {
+    console.log(`  VPContract lookup failed: ${error.message}`);
+  }
+  return [...found];
+}
+
+function collectDelegators(logs, into) {
   const topicCounts = new Map();
-
-  // No filter on topic 0: any WNat event whose second indexed argument is this
-  // provider identifies a delegator, whatever the event is called. That keeps
-  // the scan from depending on one hashed event signature being right.
-  const { logs, reached, complete } = await getLogs({
-    address: wnat,
-    topics: [null, null, [providerTopic]],
-    fromBlock,
-    toBlock,
-    span: LOG_SPAN,
-    deadline
-  });
-
   for (const log of logs) {
     const topic0 = lower(log.topics?.[0]);
     topicCounts.set(topic0, (topicCounts.get(topic0) || 0) + 1);
     if (topic0 === TRANSFER_TOPIC) continue;
     const from = topicToAddress(log.topics?.[1]);
+    if (!isAddress(from)) continue;
     const block = Number(BigInt(log.blockNumber));
-    const seen = found.get(from);
-    if (seen == null || block < seen) found.set(from, block);
+    const seen = into.get(from);
+    if (seen == null || block < seen) into.set(from, block);
   }
+  return topicCounts;
+}
 
-  console.log(`  ${label} ${fromBlock}-${toBlock}: ${complete ? "complete" : `stopped at ${reached}`}, ${found.size} addresses`);
-  for (const [topic, count] of topicCounts) console.log(`    topic ${topic}: ${count} logs`);
-  return { found, reached: Number(reached), complete };
+function reportTopics(counts, indent = "    ") {
+  for (const [topic, count] of counts) console.log(`${indent}topic ${topic}: ${count} logs`);
+}
+
+/**
+ * Whole-history discovery through the block explorer. One paginated query per
+ * contract instead of the seventy thousand eth_getLogs calls the same range
+ * would take at the RPCs' 1000-block ceiling.
+ */
+async function discoverViaExplorer({ contracts, provider, deadline }) {
+  const providerTopic = `0x${padAddress(provider)}`;
+  const found = new Map();
+  let complete = true;
+
+  for (const contract of contracts) {
+    for (let page = 1; page <= EXPLORER_MAX_PAGES; page += 1) {
+      if (Date.now() > deadline) {
+        console.log(`  explorer: out of budget on ${contract} page ${page}`);
+        return { found, complete: false };
+      }
+      const url = new URL(`${EXPLORER}/api`);
+      url.search = new URLSearchParams({
+        module: "logs",
+        action: "getLogs",
+        address: contract,
+        fromBlock: "0",
+        toBlock: "latest",
+        topic2: providerTopic,
+        page: String(page),
+        offset: String(EXPLORER_PAGE_SIZE)
+      }).toString();
+
+      let body;
+      try {
+        const res = await fetch(url, {
+          headers: { accept: "application/json" },
+          signal: AbortSignal.timeout(45_000)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        body = await res.json();
+      } catch (error) {
+        console.log(`  explorer: ${contract} page ${page} failed: ${error.message}`);
+        complete = false;
+        break;
+      }
+
+      const rows = Array.isArray(body?.result) ? body.result : [];
+      const counts = collectDelegators(rows, found);
+      console.log(`  explorer: ${contract} page ${page} -> ${rows.length} logs, ${found.size} addresses so far`);
+      if (page === 1) reportTopics(counts);
+      if (rows.length < EXPLORER_PAGE_SIZE) break;
+      if (page === EXPLORER_MAX_PAGES) {
+        console.log(`  explorer: ${contract} hit the page cap; history may be incomplete`);
+        complete = false;
+      }
+    }
+  }
+  return { found, complete };
+}
+
+/** The blocks since the last run, straight from the RPCs. Small by design. */
+async function discoverViaRpc({ contracts, provider, fromBlock, toBlock, deadline }) {
+  const providerTopic = `0x${padAddress(provider)}`;
+  const found = new Map();
+  let reached = Number(toBlock);
+
+  for (const contract of contracts) {
+    try {
+      // No filter on topic 0: any event from the vote-power contract whose
+      // second indexed argument is this provider identifies a delegator,
+      // whatever the event happens to be called.
+      const result = await getLogs({
+        address: contract,
+        topics: [null, null, [providerTopic]],
+        fromBlock,
+        toBlock,
+        deadline
+      });
+      reportTopics(collectDelegators(result.logs, found));
+      if (!result.complete) reached = Math.min(reached, Number(result.reached));
+    } catch (error) {
+      console.log(`  rpc scan of ${contract} failed: ${error.message}`);
+      reached = Math.min(reached, Number(fromBlock) - 1);
+    }
+  }
+  return { found, reached };
 }
 
 function mergeCandidates(candidates, found) {
+  let added = 0;
   for (const [address, block] of found) {
     const existing = candidates.get(address);
-    if (!existing) candidates.set(address, { firstBlock: block });
-    else if (block < (existing.firstBlock ?? Infinity)) existing.firstBlock = block;
+    if (!existing) {
+      candidates.set(address, { firstBlock: block });
+      added += 1;
+    } else if (block < (existing.firstBlock ?? Infinity)) {
+      existing.firstBlock = block;
+    }
   }
+  return added;
 }
 
 /** Attach a wall-clock timestamp to the blocks we just discovered. */
@@ -148,65 +244,66 @@ async function blockTimestamps(blocks) {
 }
 
 /**
- * The live delegator book, or null if the chain could not be read.
+ * The live delegator book, or null if the chain could not be read at all.
  *
- * `seedAddresses` are delegators already known from another source; they are
- * probed alongside anything the scan turns up, so a partly-finished backfill
- * never makes the book look smaller than it is.
+ * `seedAddresses` are delegators already known from another source. They are
+ * probed alongside anything discovery turns up, so the book is right for them
+ * even on a run where discovery fails completely.
  */
 export async function readOnChainDelegators({ provider, seedAddresses = [], epoch = null }) {
   const providerAddress = lower(provider);
   const state = await readState();
+  const started = Date.now();
+  const deadline = started + DISCOVERY_BUDGET_MS;
+
   const wnat = state?.wnat || await resolveWNat();
   const latest = Number(BigInt(await rpc("eth_blockNumber")));
+  const contracts = await resolveVpContracts(wnat, state?.vpContracts || []);
   console.log(`  chain head ${latest}, WNat ${wnat}`);
+  console.log(`  vote-power contracts: ${contracts.join(", ") || "none resolved"}`);
 
   const candidates = new Map(
     Object.entries(state?.candidates || {}).map(([address, value]) => [lower(address), { ...value }])
   );
-  const started = Date.now();
+  const discovery = { explorer: null, rpc: null };
 
-  // Forward: everything since the last run. Small, and always completes.
+  // Whole history, once. After it has succeeded there is nothing to repeat:
+  // anything new arrives in the forward window below.
+  let historyComplete = Boolean(state?.historyComplete);
+  if (contracts.length && !historyComplete) {
+    const result = await discoverViaExplorer({ contracts, provider: providerAddress, deadline });
+    const added = mergeCandidates(candidates, result.found);
+    historyComplete = result.complete;
+    discovery.explorer = { found: result.found.size, added, complete: result.complete };
+    console.log(`  explorer discovery: ${result.found.size} addresses, ${added} new, ${result.complete ? "complete" : "incomplete"}`);
+  }
+
+  // Everything since the last run.
   const forwardFrom = Number.isFinite(state?.scannedToBlock)
     ? state.scannedToBlock + 1
     : Math.max(0, latest - FIRST_RUN_LOOKBACK);
-  let scannedToBlock = Number.isFinite(state?.scannedToBlock) ? state.scannedToBlock : forwardFrom - 1;
-
-  if (forwardFrom <= latest) {
-    const forward = await scanDelegators({
-      wnat, provider: providerAddress,
-      fromBlock: forwardFrom, toBlock: latest,
-      deadline: started + BACKFILL_BUDGET_MS, label: "forward"
+  let scannedToBlock = forwardFrom - 1;
+  if (contracts.length && forwardFrom <= latest) {
+    const result = await discoverViaRpc({
+      contracts, provider: providerAddress,
+      fromBlock: forwardFrom, toBlock: latest, deadline
     });
-    mergeCandidates(candidates, forward.found);
-    scannedToBlock = Math.max(scannedToBlock, forward.reached);
-  }
-
-  // Backward: history in fixed steps, committing only completed steps so an
-  // interrupted run resumes at a boundary instead of leaving a gap behind.
-  let backfilledFrom = Number.isFinite(state?.backfilledFromBlock)
-    ? state.backfilledFromBlock
-    : forwardFrom;
-  const deadline = started + BACKFILL_BUDGET_MS;
-  while (backfilledFrom > 0 && Date.now() < deadline) {
-    const windowStart = Math.max(0, backfilledFrom - BACKFILL_STEP_BLOCKS);
-    const backward = await scanDelegators({
-      wnat, provider: providerAddress,
-      fromBlock: windowStart, toBlock: backfilledFrom - 1,
-      deadline, label: "backfill"
-    });
-    mergeCandidates(candidates, backward.found);
-    if (!backward.complete) break;
-    backfilledFrom = windowStart;
+    const added = mergeCandidates(candidates, result.found);
+    scannedToBlock = Math.max(scannedToBlock, result.reached);
+    discovery.rpc = { from: forwardFrom, to: result.reached, found: result.found.size, added };
+    console.log(`  rpc discovery ${forwardFrom}-${result.reached}: ${result.found.size} addresses, ${added} new`);
   }
 
   for (const address of seedAddresses) {
     const key = lower(address);
-    if (key && !candidates.has(key)) candidates.set(key, { firstBlock: null, seeded: true });
+    if (isAddress(key) && !candidates.has(key)) candidates.set(key, { firstBlock: null, seeded: true });
   }
-  if (!candidates.size) return null;
+  if (!candidates.size) {
+    console.log("  no candidate addresses at all; nothing to read");
+    return null;
+  }
 
-  // Current delegated amount for every candidate, in one pass.
+  // ── the exact part: what each candidate delegates right now ───────────────
   const addresses = [...candidates.keys()];
   const amounts = await rpcBatch(addresses.map(address => ethCall(
     wnat,
@@ -221,23 +318,34 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
     if (!Number.isFinite(amount) || amount <= 0) return;
     active.push({ address, amount, meta: candidates.get(address) });
   });
-  console.log(`  ${active.length} active delegators of ${addresses.length} candidates, total ${total?.toFixed(0)} WFLR`);
+  const listed = active.reduce((sum, row) => sum + row.amount, 0);
+  console.log(`  ${active.length} active delegators of ${addresses.length} candidates`);
+  console.log(`  listed ${listed.toFixed(0)} of ${total?.toFixed(0)} WFLR total (${total ? ((listed / total) * 100).toFixed(2) : "?"}%)`);
 
-  // Timestamps only for the ones we have not dated yet.
+  if (!active.length) return null;
+
   const undated = active.filter(row => row.meta.firstSeen == null && Number.isFinite(row.meta.firstBlock));
   if (undated.length) {
-    const stamps = await blockTimestamps(undated.map(row => row.meta.firstBlock));
-    undated.forEach(row => {
-      const stamp = stamps.get(row.meta.firstBlock);
-      if (stamp) row.meta.firstSeen = stamp;
-    });
+    try {
+      const stamps = await blockTimestamps(undated.map(row => row.meta.firstBlock));
+      undated.forEach(row => {
+        const stamp = stamps.get(row.meta.firstBlock);
+        if (stamp) row.meta.firstSeen = stamp;
+      });
+    } catch (error) {
+      console.log(`  block timestamps failed: ${error.message}`);
+    }
   }
 
   // "Change" on the page means change within the current reward epoch, so a
   // baseline is captured the first time each epoch is seen.
   const baseline = state?.baseline?.epoch === epoch && epoch != null
     ? state.baseline
-    : { epoch, capturedAt: Math.floor(Date.now() / 1000), amounts: Object.fromEntries(active.map(row => [row.address, row.amount])) };
+    : {
+        epoch,
+        capturedAt: Math.floor(Date.now() / 1000),
+        amounts: Object.fromEntries(active.map(row => [row.address, row.amount]))
+      };
 
   const now = Math.floor(Date.now() / 1000);
   const delegators = active
@@ -260,22 +368,23 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
     generatedAt: new Date().toISOString(),
     provider: providerAddress,
     wnat,
+    vpContracts: contracts,
     chainHead: latest,
     scannedToBlock,
-    backfilledFromBlock: backfilledFrom,
-    backfillComplete: backfilledFrom <= 0,
-    candidates: Object.fromEntries([...candidates].map(([address, meta]) => [address, meta])),
+    historyComplete,
+    discovery,
+    candidates: Object.fromEntries(candidates),
     baseline
   });
 
   return {
     delegators,
     total,
+    listed,
     wnat,
+    vpContracts: contracts,
     chainHead: latest,
-    scannedToBlock,
-    backfilledFromBlock: backfilledFrom,
-    backfillComplete: backfilledFrom <= 0,
+    historyComplete,
     candidateCount: addresses.length
   };
 }

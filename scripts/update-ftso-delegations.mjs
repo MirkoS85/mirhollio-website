@@ -434,10 +434,11 @@ async function main() {
       blockNumber: chain.chainHead,
       wnat: chain.wnat,
       observedAt: generatedAt,
-      // False while the event scan is still walking back through history: the
-      // book is complete for anyone the previous source already knew about,
-      // but a very old delegator it never listed may still be missing.
-      historyScanComplete: Boolean(chain.backfillComplete)
+      // What the listed wallets add up to, against what the provider's vote
+      // power actually is. The two match once discovery has found everyone;
+      // until then the gap is the honest measure of what is missing.
+      listed: chain.listed,
+      historyScanComplete: Boolean(chain.historyComplete)
     } : null,
     weights,
     history,
@@ -452,7 +453,7 @@ async function main() {
   console.log(`Delegators: ${wallets.length} wallets from ${delegatorsSource}`);
   if (chain) {
     console.log(`Live on-chain total: ${chain.total?.toFixed(0)} WFLR at block ${chain.chainHead}`);
-    console.log(`Candidate scan: ${chain.candidateCount} addresses, history backfill ${chain.backfillComplete ? "complete" : `down to block ${chain.backfilledFromBlock}`}`);
+    console.log(`Candidate scan: ${chain.candidateCount} addresses, history discovery ${chain.historyComplete ? "complete" : "incomplete"}`);
   }
   if (warnings.length) console.warn(warnings.join("\n"));
 }

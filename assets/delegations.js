@@ -224,10 +224,15 @@
           kind: "chain",
           at: Date.parse(state.snapshot?.generatedAt) || null,
           block: num(live?.blockNumber),
-          // The event scan that finds delegators walks back through Flare's
-          // whole history and takes a few hours on first run. Until it is done
-          // the book can be missing a wallet that has not moved in years.
-          indexing: live ? live.historyScanComplete === false : false
+          // Discovery and the amounts come from different places: the amounts
+          // are exact, but a wallet nobody has listed yet is simply absent. The
+          // gap between what the rows add up to and the provider's actual vote
+          // power is the honest measure of that, so it is shown rather than
+          // left for someone to notice.
+          indexing: live ? live.historyScanComplete === false : false,
+          coverage: Number.isFinite(num(live?.listed)) && num(live?.delegated) > 0
+            ? num(live.listed) / num(live.delegated)
+            : null
         };
         return;
       }
@@ -283,10 +288,12 @@
 
     if (origin.kind === "chain") {
       const block = Number.isFinite(origin.block) ? ` · block ${fmtFull(origin.block)}` : "";
-      const indexing = origin.indexing ? " · still indexing older delegators" : "";
+      const short = Number.isFinite(origin.coverage) && origin.coverage < 0.995;
+      const covers = short ? ` · lists ${(origin.coverage * 100).toFixed(1)}% of delegated power` : "";
+      const indexing = origin.indexing ? " · still finding older delegators" : "";
       return {
-        text: `Read from the Flare chain${block} · ${when}${indexing}`,
-        tone: tone === "ok" ? "live" : tone
+        text: `Read from the Flare chain${block} · ${when}${covers}${indexing}`,
+        tone: short || origin.indexing ? "warn" : (tone === "ok" ? "live" : tone)
       };
     }
     if (origin.kind === "flare-base") {
