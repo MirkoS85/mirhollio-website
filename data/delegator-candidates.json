@@ -1,24 +1,27 @@
 {
-  "generatedAt": "2026-09-20T20:42:58.377Z",
+  "generatedAt": "2026-09-20T20:51:53.084Z",
   "provider": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "wnat": "0x1d80c49bbbcd1c0911346656b529df9e5c2f783d",
   "vpContracts": [
     "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c"
   ],
-  "chainHead": 70242999,
-  "scannedToBlock": 70242999,
+  "chainHead": 70243483,
+  "scannedToBlock": 70243483,
   "historyComplete": false,
   "discovery": {
     "explorer": {
       "found": 0,
       "added": 0,
-      "complete": false
+      "complete": false,
+      "errors": [
+        "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c p1: HTTP 504: {\"type\":\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-504/\",\"title\":\"Error 504: Gateway time-out\",\"status\":504,\"detail\":\"The origin web serve"
+      ]
     },
     "rpc": {
-      "from": 70192999,
-      "to": 70242999,
-      "found": 20,
-      "added": 20
+      "from": 70243000,
+      "to": 70243483,
+      "found": 4,
+      "added": 0
     }
   },
   "candidates": {
