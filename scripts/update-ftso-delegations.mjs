@@ -28,9 +28,9 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// The run that hung did so inside one of six upstream calls and the log could
-// not say which: the script printed nothing until the very end. Each stage now
-// announces itself with an elapsed time.
+// This script reaches half a dozen third-party hosts and used to print nothing
+// until the very end, so a slow run gave no clue which host was slow. Each
+// stage announces itself with an elapsed time.
 const STARTED_AT = Date.now();
 const step = message => console.log(`[${((Date.now() - STARTED_AT) / 1000).toFixed(1)}s] ${message}`);
 
@@ -61,10 +61,10 @@ function parseSemicolonRows(text) {
   });
 }
 
-// Node's fetch has no default timeout, and a host that accepts the connection
-// and then says nothing will hang the whole refresh - this job has no
-// timeout-minutes of its own, so that is measured in hours, not minutes. Every
-// request here gets a ceiling.
+// Node's fetch has no default timeout, so a host that accepts the connection
+// and then says nothing would hang the whole refresh. That matters here beyond
+// this workflow: the five-minute publisher loop shells out to this script, and
+// it publishes every other feed on the site. Every request gets a ceiling.
 const FLARE_BASE_TIMEOUT_MS = Number(process.env.FLARE_BASE_TIMEOUT_MS || 25_000);
 const ORACLE_TIMEOUT_MS = Number(process.env.ORACLE_TIMEOUT_MS || 90_000);
 

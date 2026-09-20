@@ -70,7 +70,8 @@ attempt_publish() {
 
   # Hard ceiling per refresh. These reach half a dozen third-party hosts, and a
   # host that accepts the connection and then goes quiet would otherwise stall
-  # this loop - which publishes every other feed on the site as well.
+  # this loop - which publishes every other feed on the site as well. The
+  # scripts have their own request timeouts; this is the belt to that braces.
   if [ $(( cycles % DELEGATION_EVERY )) -eq 1 ]; then
     timeout 180 node scripts/update-ftso-delegations.mjs >/dev/null \
       || echo "  delegation snapshot failed this cycle"
