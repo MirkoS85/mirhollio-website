@@ -12,7 +12,7 @@ const ENDPOINTS = (process.env.FLARE_RPC_URLS || [
   "https://flare.public-rpc.com"
 ].join(",")).split(",").map(url => url.trim()).filter(Boolean);
 
-const TIMEOUT_MS = Number(process.env.FLARE_RPC_TIMEOUT_MS || 20000);
+const TIMEOUT_MS = Number(process.env.FLARE_RPC_TIMEOUT_MS || 12000);
 
 let preferred = 0;
 let nextId = 1;

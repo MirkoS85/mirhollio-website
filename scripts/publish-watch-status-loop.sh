@@ -65,16 +65,19 @@ reset_to_remote() {
 
 # 0 = published, 1 = failed, 2 = nothing to publish, 3 = lost the race (retryable).
 attempt_publish() {
-  node scripts/update-oracle-mirror.mjs >/dev/null || echo "  oracle mirror failed"
-  node scripts/update-watch-status.mjs >/dev/null || return 1
+  timeout 120 node scripts/update-oracle-mirror.mjs >/dev/null || echo "  oracle mirror failed"
+  timeout 120 node scripts/update-watch-status.mjs >/dev/null || return 1
 
+  # Hard ceiling per refresh. These reach half a dozen third-party hosts, and a
+  # host that accepts the connection and then goes quiet would otherwise stall
+  # this loop - which publishes every other feed on the site as well.
   if [ $(( cycles % DELEGATION_EVERY )) -eq 1 ]; then
-    node scripts/update-ftso-delegations.mjs >/dev/null \
+    timeout 180 node scripts/update-ftso-delegations.mjs >/dev/null \
       || echo "  delegation snapshot failed this cycle"
   fi
 
   if [ $(( cycles % POSITION_EVERY )) -eq 2 ]; then
-    node scripts/update-network-position.mjs >/dev/null \
+    timeout 180 node scripts/update-network-position.mjs >/dev/null \
       || echo "  network position snapshot failed this cycle"
   fi
 

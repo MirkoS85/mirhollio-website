@@ -28,6 +28,12 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// The run that hung did so inside one of six upstream calls and the log could
+// not say which: the script printed nothing until the very end. Each stage now
+// announces itself with an elapsed time.
+const STARTED_AT = Date.now();
+const step = message => console.log(`[${((Date.now() - STARTED_AT) / 1000).toFixed(1)}s] ${message}`);
+
 // Every reuse used to append another "-cache" to whatever the previous run
 // wrote, so after a long outage data/ftso-delegations.json carried a source of
 // "flare-base-cache-cache-cache-..." a couple of hundred deep. One suffix says
@@ -55,8 +61,16 @@ function parseSemicolonRows(text) {
   });
 }
 
-async function fetchText(url) {
+// Node's fetch has no default timeout, and a host that accepts the connection
+// and then says nothing will hang the whole refresh - this job has no
+// timeout-minutes of its own, so that is measured in hours, not minutes. Every
+// request here gets a ceiling.
+const FLARE_BASE_TIMEOUT_MS = Number(process.env.FLARE_BASE_TIMEOUT_MS || 25_000);
+const ORACLE_TIMEOUT_MS = Number(process.env.ORACLE_TIMEOUT_MS || 90_000);
+
+async function fetchText(url, timeoutMs = FLARE_BASE_TIMEOUT_MS) {
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       "accept": "text/csv,text/plain,application/json;q=0.8,*/*;q=0.5",
       "user-agent": "MirSFlr delegation snapshot updater"
@@ -67,8 +81,9 @@ async function fetchText(url) {
   return text;
 }
 
-async function fetchJson(url) {
+async function fetchJson(url, timeoutMs = FLARE_BASE_TIMEOUT_MS) {
   const res = await fetch(url, {
+    signal: AbortSignal.timeout(timeoutMs),
     headers: {
       "accept": "application/json",
       "user-agent": "MirSFlr delegation snapshot updater"
@@ -286,6 +301,7 @@ async function main() {
   let weightsSource = "unavailable";
 
   try {
+    step("Flare Systems Explorer weights");
     weights = await fetchFseWeights();
     weightsSource = "flare-systems-explorer";
   } catch (error) {
@@ -298,13 +314,15 @@ async function main() {
   }
 
   try {
+    step("Flare Base history");
     history = await fetchFlareBaseHistory();
   } catch (error) {
     warnings.push(`Flare Base history failed: ${error.message}`);
   }
 
   try {
-    const provider = findMirSFlrProvider(await fetchJson(ORACLE_PROVIDERS_URL));
+    step("Oracle daemon providers payload");
+    const provider = findMirSFlrProvider(await fetchJson(ORACLE_PROVIDERS_URL, ORACLE_TIMEOUT_MS));
     const oracleRows = oracleHistoryRows(provider);
     if (!history.length || Number(oracleRows[oracleRows.length - 1]?.epoch || 0) > Number(history[history.length - 1]?.epoch || 0)) {
       history = oracleRows;
@@ -345,7 +363,7 @@ async function main() {
   let chain = null;
   const failedDelegatorEpochs = [];
 
-  console.log("Reading the delegator book from the Flare C-chain");
+  step("Delegator book from the Flare C-chain");
   try {
     chain = await readOnChainDelegators({
       provider: TARGET_DELEGATION,
@@ -367,6 +385,7 @@ async function main() {
   // with per-epoch delegator snapshots, so it is still worth asking when the
   // RPC path is unavailable.
   if (!wallets.length) {
+    step("Falling back to per-epoch Flare Base delegator snapshots");
     const epochs = [...new Set(history.map(row => Number(row.epoch)).filter(Number.isFinite))]
       .slice(-MAX_DELEGATOR_EPOCHS);
     const snapshotRows = [];
@@ -425,6 +444,7 @@ async function main() {
     delegators: wallets
   };
 
+  step("Writing snapshot");
   await mkdir(path.dirname(OUT_PATH), { recursive: true });
   await writeFile(OUT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
   console.log(`Wrote ${OUT_PATH}`);
