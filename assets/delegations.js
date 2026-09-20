@@ -1,15 +1,20 @@
 /* Delegation explorer.
  *
- * Data comes from two places and they age very differently, so the page says
- * which one it is showing rather than presenting everything as "live":
+ * Numbers arrive from three places that age very differently, so every block on
+ * the page says which one it is showing rather than presenting all of them as
+ * "live":
  *
- *   - flare-base.io, fetched straight from the browser. This is the only source
- *     for the delegator book. It has been returning 502 to our CI runners for
- *     about a week, which is why the committed snapshot froze at epoch 433 - but
- *     a browser on a home connection is a different client, so it is tried first
- *     and often works when the runner cannot.
- *   - /data/ftso-delegations.json, republished by the pipeline every 15 minutes.
- *     Always there, never fresher than its own generatedAt.
+ *   - /data/ftso-delegations.json, republished every 15 minutes. When its
+ *     source.delegators is "flare-chain" the delegator book in it was read
+ *     straight off WNat by the pipeline, which makes it both the freshest and
+ *     the most trustworthy option - so it is preferred, not a fallback.
+ *   - flare-base.io, fetched from the browser. Still the only source with
+ *     per-reward-epoch history, so it is tried first for the charts. It has
+ *     been returning 502 to our CI runners since mid-September; a browser on a
+ *     home connection is a different client and often gets through where the
+ *     runner does not.
+ *   - the published snapshot's own history array, when flare-base is down
+ *     everywhere.
  *
  * Every block carries the age and origin of what it is showing. A number with no
  * provenance is what made the rest of this site untrustworthy.
@@ -176,7 +181,7 @@
         .sort((a, b) => a.epoch - b.epoch);
       if (!rows.length) throw new Error("empty");
       state.history = rows;
-      state.historyOrigin = { live: true, at: Date.now() };
+      state.historyOrigin = { kind: "flare-base", at: Date.now() };
       return;
     } catch (_) {
       // Fall back to the committed snapshot and say so.
@@ -186,10 +191,48 @@
       .map((r) => ({ epoch: num(r.epoch), delegated: num(r.delegated), delegators: num(r.delegators) }))
       .filter((r) => Number.isFinite(r.epoch) && Number.isFinite(r.delegated))
       .sort((a, b) => a.epoch - b.epoch);
-    state.historyOrigin = { live: false, at: Date.parse(state.snapshot?.generatedAt) || null };
+    state.historyOrigin = {
+      kind: "snapshot",
+      label: "Flare Base unreachable — showing published snapshot",
+      at: Date.parse(state.snapshot?.generatedAt) || null
+    };
+  }
+
+  function snapshotDelegatorRows() {
+    const rows = Array.isArray(state.snapshot?.delegators) ? state.snapshot.delegators : [];
+    return rows
+      .map((r) => ({
+        from: r.from,
+        amount: num(r.amount),
+        share: num(r.share),
+        delta: num(r.delta),
+        firstSeen: num(r.firstSeen)
+      }))
+      .filter((r) => r.from && Number.isFinite(r.amount));
   }
 
   async function loadDelegators() {
+    // The pipeline reads WNat directly. When that worked, it beats anything the
+    // browser can fetch: it is chain state rather than an indexer's view of it,
+    // and it is at most one refresh old.
+    const live = state.snapshot?.live;
+    if (state.snapshot?.source?.delegators === "flare-chain") {
+      const rows = snapshotDelegatorRows();
+      if (rows.length) {
+        state.delegators = rows;
+        state.delegatorsOrigin = {
+          kind: "chain",
+          at: Date.parse(state.snapshot?.generatedAt) || null,
+          block: num(live?.blockNumber),
+          // The event scan that finds delegators walks back through Flare's
+          // whole history and takes a few hours on first run. Until it is done
+          // the book can be missing a wallet that has not moved in years.
+          indexing: live ? live.historyScanComplete === false : false
+        };
+        return;
+      }
+    }
+
     const epoch = state.history.length
       ? state.history[state.history.length - 1].epoch
       : epochNow();
@@ -214,23 +257,16 @@
       const total = rows.reduce((sum, r) => sum + r.amount, 0);
       rows.forEach((r) => { r.share = total > 0 ? (r.amount / total) * 100 : null; });
       state.delegators = rows;
-      state.delegatorsOrigin = { live: true, at: Date.now(), epoch };
+      state.delegatorsOrigin = { kind: "flare-base", at: Date.now(), epoch };
       return;
     } catch (_) {
       // Fall back to the committed snapshot and say so.
     }
-    const rows = Array.isArray(state.snapshot?.delegators) ? state.snapshot.delegators : [];
-    state.delegators = rows
-      .map((r) => ({
-        from: r.from,
-        amount: num(r.amount),
-        share: num(r.share),
-        delta: num(r.delta),
-        firstSeen: num(r.firstSeen)
-      }))
-      .filter((r) => r.from && Number.isFinite(r.amount));
+
+    state.delegators = snapshotDelegatorRows();
     state.delegatorsOrigin = {
-      live: false,
+      kind: "snapshot",
+      label: "Live sources unreachable — showing published snapshot",
       at: Date.parse(state.snapshot?.generatedAt) || null,
       epoch: state.snapshot?.insights?.latestEpoch ?? null
     };
@@ -240,16 +276,23 @@
   function describeOrigin(origin) {
     if (!origin) return { text: "Source unavailable", tone: "down" };
     const age = origin.at ? Date.now() - origin.at : null;
-    if (origin.live) {
-      return { text: `Live from Flare Base · ${fmtAge(age)}`, tone: "live" };
-    }
-    // The published snapshot: honest about both what it is and how old.
-    const tone = age == null ? "down" : age > 6 * 3600e3 ? "down" : age > 45 * 60e3 ? "warn" : "ok";
     const when = age == null ? "age unknown" : fmtAge(age);
-    return {
-      text: `Flare Base unreachable — showing published snapshot · ${when}`,
-      tone
-    };
+    // Anything under a refresh interval is current; past that, say so loudly
+    // rather than letting a frozen pipeline look healthy.
+    const tone = age == null ? "down" : age > 6 * 3600e3 ? "down" : age > 45 * 60e3 ? "warn" : "ok";
+
+    if (origin.kind === "chain") {
+      const block = Number.isFinite(origin.block) ? ` · block ${fmtFull(origin.block)}` : "";
+      const indexing = origin.indexing ? " · still indexing older delegators" : "";
+      return {
+        text: `Read from the Flare chain${block} · ${when}${indexing}`,
+        tone: tone === "ok" ? "live" : tone
+      };
+    }
+    if (origin.kind === "flare-base") {
+      return { text: `Live from Flare Base · ${when}`, tone: "live" };
+    }
+    return { text: `${origin.label || "Published snapshot"} · ${when}`, tone };
   }
 
   function paintFreshness(key, origin) {
@@ -500,11 +543,31 @@
   // ── headline + snapshot ───────────────────────────────────────────────────
   function renderHeadline() {
     const latest = state.history.length ? state.history[state.history.length - 1] : null;
-    // The live signing-policy weight is the truest "delegated right now"; the
-    // history tail is the fallback when the pipeline snapshot is missing.
-    const delegated = Number.isFinite(state.weights?.delegatedWeight)
-      ? state.weights.delegatedWeight
-      : latest?.delegated;
+    const live = state.snapshot?.live;
+    // Three answers to "how much is delegated", in descending order of how
+    // directly they were measured: WNat's own vote power right now, the signing
+    // policy weight for the current epoch, and the tail of the history series.
+    let delegated = num(live?.delegated);
+    let origin = Number.isFinite(delegated)
+      ? {
+          kind: "chain",
+          at: Date.parse(state.snapshot?.generatedAt) || null,
+          block: num(live?.blockNumber)
+        }
+      : null;
+
+    if (!Number.isFinite(delegated) && Number.isFinite(state.weights?.delegatedWeight)) {
+      delegated = state.weights.delegatedWeight;
+      origin = {
+        kind: "snapshot",
+        label: "Signing policy weight via Flare Systems Explorer",
+        at: Date.parse(state.snapshot?.generatedAt) || null
+      };
+    }
+    if (!Number.isFinite(delegated)) {
+      delegated = latest?.delegated;
+      origin = state.historyOrigin;
+    }
 
     el("delegatedWflr").textContent = fmtAmount(delegated, 2);
     el("delegatedWflr").title = `${fmtFull(delegated)} WFLR`;
@@ -518,9 +581,7 @@
     const bounds = epochBounds();
     el("epoch").textContent = bounds ? bounds.current : "—";
 
-    paintFreshness("power", state.weights
-      ? { live: false, at: Date.parse(state.snapshot?.generatedAt) || null }
-      : state.historyOrigin);
+    paintFreshness("power", origin);
   }
 
   function renderSnapshot() {

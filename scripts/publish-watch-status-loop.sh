@@ -27,7 +27,8 @@ BRANCH="${BRANCH:-${GITHUB_REF_NAME:-main}}"
 INTERVAL="${REFRESH_INTERVAL_SECONDS:-300}"
 WINDOW="${REFRESH_WINDOW_SECONDS:-3900}"
 FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json
-       data/network-position.json data/fse-entity.json data/fse-entity-ftso.json)
+       data/network-position.json data/fse-entity.json data/fse-entity-ftso.json
+       data/delegator-candidates.json)
 
 # The delegation snapshot used to be published by its own workflow on a four-hour
 # cron, so the home page and the operator dashboard - which read it - showed a

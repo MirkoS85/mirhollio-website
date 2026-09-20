@@ -3,6 +3,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { readOnChainDelegators } from "./lib/flare-delegations.mjs";
+
 const TARGET_DELEGATION = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
 const TARGET_VOTER = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
 const TARGET_VOTER_CHECKSUM = "0xb5A081dEc72c8C87256b7e14cFAdcbc342bDeac3";
@@ -24,6 +26,15 @@ function urlWithParams(baseUrl, params) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Every reuse used to append another "-cache" to whatever the previous run
+// wrote, so after a long outage data/ftso-delegations.json carried a source of
+// "flare-base-cache-cache-cache-..." a couple of hundred deep. One suffix says
+// everything the field needs to say.
+function cachedLabel(source, fallback) {
+  const base = String(source || fallback || "unknown").replace(/(-cache)+$/, "");
+  return `${base}-cache`;
 }
 
 async function readExistingSnapshot() {
@@ -281,7 +292,7 @@ async function main() {
     warnings.push(`Flare Systems Explorer weights failed: ${error.message}`);
     if (existingSnapshot?.weights) {
       weights = existingSnapshot.weights;
-      weightsSource = `${existingSnapshot.source?.weights || "flare-systems-explorer"}-cache`;
+      weightsSource = cachedLabel(existingSnapshot.source?.weights, "flare-systems-explorer");
       warnings.push("Reused existing weight snapshot after FSE failure");
     }
   }
@@ -314,37 +325,75 @@ async function main() {
     && existingLatestEpoch >= latestEpoch
   ) {
     history = existingHistory;
-    historySource = `${existingHistorySource}-cache`;
+    historySource = cachedLabel(existingHistorySource, "flare-base");
     warnings.push("Reused existing Flare Base history because Oracle fallback was not newer");
   }
 
   if (!history.length) throw new Error("No delegation history could be loaded");
 
-  const epochs = [...new Set(history.map(row => Number(row.epoch)).filter(Number.isFinite))]
-    .slice(-MAX_DELEGATOR_EPOCHS);
-  const snapshotRows = [];
+  const currentEpoch = Number(history[history.length - 1]?.epoch);
+  const seedAddresses = (Array.isArray(existingSnapshot?.delegators) ? existingSnapshot.delegators : [])
+    .map(row => String(row?.from || "").toLowerCase())
+    .filter(Boolean);
+
+  // The chain first. Flare Base is an indexer in front of state that anyone can
+  // read, and it has been down for CI for a week; WNat answers the same
+  // question directly and answers it for right now rather than for the last
+  // vote-power block.
+  let wallets = [];
+  let delegatorsSource = "unavailable";
+  let chain = null;
   const failedDelegatorEpochs = [];
 
-  for (const epoch of epochs) {
-    try {
-      snapshotRows.push(...await fetchDelegatorsAt(epoch));
-      await sleep(120);
-    } catch (error) {
-      failedDelegatorEpochs.push({ epoch, error: error.message });
+  console.log("Reading the delegator book from the Flare C-chain");
+  try {
+    chain = await readOnChainDelegators({
+      provider: TARGET_DELEGATION,
+      seedAddresses,
+      epoch: Number.isFinite(currentEpoch) ? currentEpoch : null
+    });
+    if (chain?.delegators?.length) {
+      wallets = chain.delegators;
+      delegatorsSource = "flare-chain";
+    } else {
+      warnings.push("On-chain delegator read returned no active delegators");
     }
+  } catch (error) {
+    warnings.push(`On-chain delegator read failed: ${error.message}`);
+    console.warn(`  failed: ${error.message}`);
   }
 
-  if (failedDelegatorEpochs.length) {
-    warnings.push(`${failedDelegatorEpochs.length} delegator epoch snapshots failed`);
+  // Flare Base stays as the fallback, not the default. It is the only source
+  // with per-epoch delegator snapshots, so it is still worth asking when the
+  // RPC path is unavailable.
+  if (!wallets.length) {
+    const epochs = [...new Set(history.map(row => Number(row.epoch)).filter(Number.isFinite))]
+      .slice(-MAX_DELEGATOR_EPOCHS);
+    const snapshotRows = [];
+
+    for (const epoch of epochs) {
+      try {
+        snapshotRows.push(...await fetchDelegatorsAt(epoch));
+        await sleep(120);
+      } catch (error) {
+        failedDelegatorEpochs.push({ epoch, error: error.message });
+      }
+    }
+
+    if (failedDelegatorEpochs.length) {
+      warnings.push(`${failedDelegatorEpochs.length} delegator epoch snapshots failed`);
+    }
+
+    wallets = summarizeWallets(snapshotRows, history);
+    if (wallets.length) delegatorsSource = "flare-base";
   }
 
-  let wallets = summarizeWallets(snapshotRows, history);
   if (!wallets.length && Array.isArray(existingSnapshot?.delegators) && existingSnapshot.delegators.length) {
     const existingWalletEpoch = Number(existingSnapshot?.insights?.latestEpoch);
-    const currentEpoch = Number(history[history.length - 1]?.epoch);
     if (Number.isFinite(existingWalletEpoch) && existingWalletEpoch === currentEpoch) {
       wallets = existingSnapshot.delegators;
-      warnings.push("Reused existing delegator snapshot for the current Flare Base epoch");
+      delegatorsSource = cachedLabel(existingSnapshot?.source?.delegators, "unknown");
+      warnings.push("Reused the previous delegator snapshot for the current epoch");
     }
   }
   const payload = {
@@ -354,12 +403,23 @@ async function main() {
     rangeDays: HISTORY_DAYS,
     source: {
       history: historySource,
-      delegators: snapshotRows.length ? "flare-base" : "unavailable",
+      delegators: delegatorsSource,
       weights: weightsSource
     },
     warnings,
     failedDelegatorEpochs,
     insights: buildInsights(history, wallets),
+    live: chain ? {
+      delegated: chain.total,
+      delegators: chain.delegators.length,
+      blockNumber: chain.chainHead,
+      wnat: chain.wnat,
+      observedAt: generatedAt,
+      // False while the event scan is still walking back through history: the
+      // book is complete for anyone the previous source already knew about,
+      // but a very old delegator it never listed may still be missing.
+      historyScanComplete: Boolean(chain.backfillComplete)
+    } : null,
     weights,
     history,
     delegators: wallets
@@ -369,7 +429,11 @@ async function main() {
   await writeFile(OUT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
   console.log(`Wrote ${OUT_PATH}`);
   console.log(`History: ${history.length} rows from ${historySource}`);
-  console.log(`Delegators: ${wallets.length} current wallets from ${snapshotRows.length} snapshot rows`);
+  console.log(`Delegators: ${wallets.length} wallets from ${delegatorsSource}`);
+  if (chain) {
+    console.log(`Live on-chain total: ${chain.total?.toFixed(0)} WFLR at block ${chain.chainHead}`);
+    console.log(`Candidate scan: ${chain.candidateCount} addresses, history backfill ${chain.backfillComplete ? "complete" : `down to block ${chain.backfilledFromBlock}`}`);
+  }
   if (warnings.length) console.warn(warnings.join("\n"));
 }
 
