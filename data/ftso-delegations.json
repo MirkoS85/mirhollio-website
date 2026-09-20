@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-09-20T12:39:11.674Z",
+  "generatedAt": "2026-09-20T12:59:09.802Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
   "source": {
-    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
+    "history": "flare-base-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache-cache",
     "delegators": "unavailable",
     "weights": "flare-systems-explorer"
   },
   "warnings": [
-    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774355951914&endTime=1789907951914&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
+    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1774357150057&endTime=1789909150057&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
     "Reused existing Flare Base history because Oracle fallback was not newer",
     "52 delegator epoch snapshots failed",
     "Reused existing delegator snapshot for the current Flare Base epoch"
@@ -113,11 +113,11 @@
     },
     {
       "epoch": 406,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=406&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=406&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 407,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=407&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=407&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 408,
@@ -217,11 +217,11 @@
     },
     {
       "epoch": 432,
-      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=432&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=432&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     },
     {
       "epoch": 433,
-      "error": "Request failed 502: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=433&page=1&pageSize=200&sortField=amount&sortOrder=desc"
+      "error": "Request failed 504: https://flare-base.io/api/delegations/getDelegatorsAt/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&epochId=433&page=1&pageSize=200&sortField=amount&sortOrder=desc"
     }
   ],
   "insights": {
