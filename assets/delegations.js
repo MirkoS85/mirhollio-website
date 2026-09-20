@@ -277,6 +277,29 @@
     };
   }
 
+  /**
+   * The charts come from Flare Base, which only ever publishes finished reward
+   * epochs, while the headline is read off the chain right now. With nothing
+   * joining them the page showed 95.02M above a chart ending at 133.96M and
+   * left the reader to reconcile the two. The live reading is appended as the
+   * current epoch's point instead, drawn provisionally, so the chart tells the
+   * same story the headline does.
+   */
+  function appendLivePoint() {
+    const live = state.snapshot?.live;
+    const delegated = num(live?.delegated);
+    const bounds = epochBounds();
+    const last = state.history[state.history.length - 1];
+    if (!Number.isFinite(delegated) || !bounds || !last) return;
+    if (!(bounds.current > last.epoch)) return;
+    state.history = state.history.concat({
+      epoch: bounds.current,
+      delegated,
+      delegators: num(live?.delegators),
+      provisional: true
+    });
+  }
+
   // ── freshness labels ──────────────────────────────────────────────────────
   function describeOrigin(origin) {
     if (!origin) return { text: "Source unavailable", tone: "down" };
@@ -343,8 +366,22 @@
     const x = (i) => padL + (i * (W - padL - padR)) / (rows.length - 1);
     const y = (v) => padT + (1 - (v - lo) / (hi - lo || 1)) * (H - padT - padB);
 
-    const line = rows.map((r, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(accessor(r)).toFixed(1)}`).join("");
+    const point = (r, i) => `${x(i).toFixed(1)},${y(accessor(r)).toFixed(1)}`;
+    const line = rows.map((r, i) => `${i === 0 ? "M" : "L"}${point(r, i)}`).join("");
     const area = `${line}L${x(rows.length - 1).toFixed(1)},${H - padB}L${padL},${H - padB}Z`;
+
+    // The last point can be the live reading rather than a settled epoch. It is
+    // drawn dashed and hollow so it is not mistaken for a closed measurement.
+    const last = rows[rows.length - 1];
+    const provisional = Boolean(last?.provisional) && rows.length > 1;
+    const settled = provisional
+      ? rows.slice(0, -1).map((r, i) => `${i === 0 ? "M" : "L"}${point(r, i)}`).join("")
+      : line;
+    const pending = provisional
+      ? `<path d="M${point(rows[rows.length - 2], rows.length - 2)}L${point(last, rows.length - 1)}"
+              fill="none" stroke="${opts.color}" stroke-width="2" stroke-dasharray="5 4"
+              stroke-linecap="round" opacity=".85"/>`
+      : "";
 
     // Direct-label the most recent point only; a number on every point is noise.
     const lastX = x(rows.length - 1);
@@ -358,10 +395,12 @@
         </linearGradient>
       </defs>
       <path d="${area}" fill="url(#dxfill-${key})"/>
-      <path d="${line}" fill="none" stroke="${opts.color}" stroke-width="2"
+      <path d="${settled}" fill="none" stroke="${opts.color}" stroke-width="2"
             stroke-linejoin="round" stroke-linecap="round"/>
+      ${pending}
       <circle cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4"
-              fill="${opts.color}" stroke="var(--surface)" stroke-width="2"/>
+              fill="${provisional ? "var(--surface)" : opts.color}"
+              stroke="${provisional ? opts.color : "var(--surface)"}" stroke-width="2"/>
       <line class="dx-crosshair" data-dx-crosshair="${key}" x1="0" y1="${padT}" x2="0" y2="${H - padB}" opacity="0"/>
     `;
 
@@ -433,18 +472,19 @@
   function renderCharts() {
     drawChart("power", (r) => r.delegated, {
       color: "#FF2E63",
-      tip: (r) => `${fmtFull(r.delegated)} WFLR`
+      tip: (r) => `${fmtFull(r.delegated)} WFLR${r.provisional ? " (now)" : ""}`
     });
     drawChart("count", (r) => r.delegators, {
       color: "#9AA0AF",
       axis: (v) => Math.round(v).toLocaleString("en-US"),
-      tip: (r) => `${fmtFull(r.delegators)} delegators`
+      tip: (r) => `${fmtFull(r.delegators)} delegators${r.provisional ? " (now)" : ""}`
     });
 
     const rows = visibleHistory();
     const vals = rows.map((r) => r.delegated).filter(Number.isFinite);
     if (vals.length) {
-      el("chartLatest").textContent = `${fmtAmount(vals[vals.length - 1])} WFLR`;
+      const live = rows[rows.length - 1]?.provisional;
+      el("chartLatest").textContent = `${fmtAmount(vals[vals.length - 1])} WFLR${live ? " · now" : ""}`;
       el("chartPeak").textContent = `${fmtAmount(Math.max(...vals))} WFLR`;
       el("chartLow").textContent = `${fmtAmount(Math.min(...vals))} WFLR`;
     }
@@ -492,17 +532,21 @@
       const seen = Number.isFinite(r.firstSeen)
         ? new Date(r.firstSeen).toLocaleDateString(undefined, { month: "short", day: "numeric" })
         : "—";
+      // The column names are carried on the cells so the narrow layout can
+      // rearrange them: six columns do not fit a phone, and letting the table
+      // squeeze instead made every row 235px tall and the page eight screens
+      // long.
       return `
         <tr>
-          <td class="dx-rank">${i + 1}</td>
-          <td><a class="dx-wallet" href="${EXPLORER_ADDRESS}${encodeURIComponent(r.from)}" target="_blank" rel="noopener" title="${escapeHtml(r.from)}">${escapeHtml(shortAddress(r.from))}</a></td>
-          <td class="dx-num"><strong>${fmtAmount(r.amount)}</strong></td>
-          <td class="dx-num">
+          <td class="dx-rank" data-dx-col="rank">${i + 1}</td>
+          <td data-dx-col="wallet"><a class="dx-wallet" href="${EXPLORER_ADDRESS}${encodeURIComponent(r.from)}" target="_blank" rel="noopener" title="${escapeHtml(r.from)}">${escapeHtml(shortAddress(r.from))}</a></td>
+          <td class="dx-num" data-dx-col="amount"><strong>${fmtAmount(r.amount)}</strong></td>
+          <td class="dx-num" data-dx-col="share">
             <span class="dx-share"><i style="width:${Math.min(100, Math.max(0, r.share ?? 0)).toFixed(1)}%"></i></span>
             ${fmtPct(r.share)}
           </td>
-          <td class="dx-num">${change}</td>
-          <td class="dx-num dx-dim">${seen}</td>
+          <td class="dx-num" data-dx-col="change">${change}</td>
+          <td class="dx-num dx-dim" data-dx-col="seen">${seen}</td>
         </tr>`;
     }).join("");
 
@@ -643,6 +687,7 @@
     await loadSnapshot();
     await loadHistory();
     await loadDelegators();
+    appendLivePoint();
     renderAll();
   }
 

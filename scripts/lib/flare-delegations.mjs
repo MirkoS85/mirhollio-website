@@ -159,13 +159,16 @@ function reportTopics(counts, indent = "    ") {
  * contract instead of the seventy thousand eth_getLogs calls the same range
  * would take at the RPCs' 1000-block ceiling.
  */
-async function discoverViaExplorer({ contracts, provider, cursor, window, floor = 0, deadline }) {
+async function discoverViaExplorer({ contracts, provider, cursor, window, streak: startStreak = 0, floor = 0, deadline }) {
   const providerTopic = `0x${padAddress(provider)}`;
   const found = new Map();
   const errors = [];
   let at = cursor;
   let span = Math.max(EXPLORER_MIN_WINDOW, window);
-  let streak = 0;
+  // The streak carries across runs. One window is about all that fits in a
+  // run's budget, so a counter that reset each time would never reach the
+  // threshold and the window would stay at whatever size one timeout left it.
+  let streak = startStreak;
 
   const query = async (contract, from, to, page) => {
     const url = new URL(`${EXPLORER}/api`);
@@ -195,7 +198,7 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, floor 
   while (at >= floor) {
     if (Date.now() > deadline) {
       console.log(`  explorer: out of budget at block ${at}`);
-      return { found, cursor: at, window: span, complete: false, errors };
+      return { found, cursor: at, window: span, streak, complete: false, errors };
     }
     const from = Math.max(floor, at - span + 1);
     let windowFailed = false;
@@ -224,7 +227,7 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, floor 
       // than skipping it, and give up for this run if we are already at the
       // smallest window the walk is worth doing in.
       if (span <= EXPLORER_MIN_WINDOW) {
-        return { found, cursor: at, window: span, complete: false, errors };
+        return { found, cursor: at, window: span, streak: 0, complete: false, errors };
       }
       span = Math.max(EXPLORER_MIN_WINDOW, Math.floor(span / 4));
       streak = 0;
@@ -245,7 +248,7 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, floor 
     at = from - 1;
   }
 
-  return { found, cursor: at, window: span, complete: true, errors };
+  return { found, cursor: at, window: span, streak, complete: true, errors };
 }
 
 /** The blocks since the last run, straight from the RPCs. Small by design. */
@@ -363,6 +366,7 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
   let explorerCursor = Number.isFinite(state?.explorerCursor) ? state.explorerCursor : latest;
   let explorerWindow = Number.isFinite(state?.explorerWindow) ? state.explorerWindow : EXPLORER_WINDOW;
   let historyFloorBlock = Number.isFinite(state?.historyFloorBlock) ? state.historyFloorBlock : null;
+  let explorerStreak = Number.isFinite(state?.explorerStreak) ? state.explorerStreak : 0;
   if (contracts.length && !historyComplete) {
     const knownDates = [...candidates.values()]
       .map(meta => Number(meta.firstSeen))
@@ -379,12 +383,13 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
 
     const result = await discoverViaExplorer({
       contracts, provider: providerAddress,
-      cursor: explorerCursor, window: explorerWindow, floor, deadline
+      cursor: explorerCursor, window: explorerWindow, streak: explorerStreak, floor, deadline
     });
     const added = mergeCandidates(candidates, result.found);
     historyComplete = result.complete;
     explorerCursor = result.cursor;
     explorerWindow = result.window;
+    explorerStreak = result.streak;
     discovery.explorer = {
       found: result.found.size, added, complete: result.complete,
       cursor: result.cursor, window: result.window, errors: result.errors
@@ -503,6 +508,7 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
     historyComplete,
     explorerCursor,
     explorerWindow,
+    explorerStreak,
     historyFloorBlock,
     discovery,
     candidates: Object.fromEntries(candidates),

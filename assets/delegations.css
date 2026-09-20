@@ -271,3 +271,48 @@
   left:0;right:0;bottom:0;
   display:flex;justify-content:space-between;
 }
+
+/* ── the book on a phone ────────────────────────────────────────────────────
+   Six columns cannot fit 390px. Left to squeeze, every row wrapped to 235px
+   and the page ran to eight screens, so below 640px each wallet becomes a
+   three-line block instead: who, how much, and how it is moving. */
+@media (max-width:640px){
+  .dx-table-wrap{overflow-x:visible}
+  .dx-table thead{
+    position:absolute;width:1px;height:1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap;
+  }
+  .dx-table,
+  .dx-table tbody,
+  .dx-table tr,
+  .dx-table td{display:block;width:auto}
+
+  .dx-table tr{
+    display:grid;
+    grid-template-columns:26px minmax(0,1fr) auto;
+    grid-template-areas:
+      "rank   wallet wallet"
+      "amount amount change"
+      "share  share  seen";
+    gap:5px 10px;
+    align-items:center;
+    padding:12px 2px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .dx-table tr:hover td{background:none}
+  .dx-table td{padding:0;border:0}
+
+  [data-dx-col="rank"]{grid-area:rank}
+  [data-dx-col="wallet"]{grid-area:wallet;text-align:left}
+  [data-dx-col="amount"]{grid-area:amount;text-align:left}
+  [data-dx-col="amount"] strong{font-size:17px;letter-spacing:-.01em}
+  [data-dx-col="change"]{grid-area:change;text-align:right}
+  [data-dx-col="share"]{grid-area:share;display:flex;align-items:center;gap:8px;text-align:left}
+  [data-dx-col="seen"]{grid-area:seen;text-align:right}
+
+  /* The empty state and the show-all button are single full-width cells. */
+  .dx-table tr:has(> .dx-empty),
+  .dx-more-row{display:block}
+  .dx-more-row td,
+  .dx-empty{display:block;width:100%}
+}
