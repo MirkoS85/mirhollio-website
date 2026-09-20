@@ -1,26 +1,23 @@
 {
-  "generatedAt": "2026-09-20T20:58:43.826Z",
+  "generatedAt": "2026-09-20T21:00:53.416Z",
   "provider": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "wnat": "0x1d80c49bbbcd1c0911346656b529df9e5c2f783d",
   "vpContracts": [
     "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c"
   ],
-  "chainHead": 70243822,
+  "chainHead": 70243930,
   "scannedToBlock": 70243483,
   "historyComplete": false,
-  "explorerCursor": 70243822,
+  "explorerCursor": 69993822,
   "explorerWindow": 125000,
   "discovery": {
     "explorer": {
-      "found": 0,
-      "added": 0,
+      "found": 33,
+      "added": 4,
       "complete": false,
-      "cursor": 70243822,
+      "cursor": 69993822,
       "window": 125000,
-      "errors": [
-        "68243823-70243822 p1: HTTP 504: {\"type\":\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-504/\",\"",
-        "69743823-70243822 p1: HTTP 504: {\"type\":\"https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-504/\",\""
-      ]
+      "errors": []
     },
     "rpc": {
       "from": 70243484,
@@ -31,31 +28,31 @@
   },
   "candidates": {
     "0x589689984a06e4640593edec64e415c415940c7f": {
-      "firstBlock": 70193058,
+      "firstBlock": 69993924,
       "firstSeen": 1789209701000
     },
     "0x9f6c46f190351275e47d7ad8d3f2c9487569211e": {
-      "firstBlock": 70193058,
+      "firstBlock": 69993825,
       "firstSeen": 1789208643000
     },
     "0x2245643ef115500777c82d9de237232a930f14e2": {
-      "firstBlock": 70193348,
+      "firstBlock": 70131891,
       "firstSeen": 1789209116000
     },
     "0xe0b9dac33219a84be0b40510198a3e599be383eb": {
-      "firstBlock": 70194101,
+      "firstBlock": 69994705,
       "firstSeen": 1789209388000
     },
     "0x30c8ac3c668598a844219696faf078eaff528053": {
-      "firstBlock": 70194364,
+      "firstBlock": 70119631,
       "firstSeen": 1789209115000
     },
     "0x9af682206ee6f6651cb09ca0decd169b2e861d06": {
-      "firstBlock": 70194733,
+      "firstBlock": 69994325,
       "firstSeen": 1789188631000
     },
     "0x488d13f980609a38565cc8bddc6987f069c65749": {
-      "firstBlock": 70196432,
+      "firstBlock": 69994053,
       "firstSeen": 1789203237000
     },
     "0x0e31d09c472d1fb4b1823882818dcdd8d2742c03": {
@@ -67,11 +64,11 @@
       "firstSeen": 1785414405000
     },
     "0x9b02b549d85b68aa144475c3809d6c7449fbcdf5": {
-      "firstBlock": 70207932,
+      "firstBlock": 70129117,
       "firstSeen": 1788582104000
     },
     "0xcbc6149792f2a2db74f7c359bc0ebe1fa4dddd18": {
-      "firstBlock": 70208778,
+      "firstBlock": 69994601,
       "firstSeen": 1789185559000
     },
     "0x1fbd5e8d302a516c8c50897847c53c297fb2a5c6": {
@@ -91,7 +88,7 @@
       "firstSeen": 1788885734000
     },
     "0x0c2e666025e4821b3862d8b9350ba836df558064": {
-      "firstBlock": 70224278,
+      "firstBlock": 70126054,
       "firstSeen": 1789154659000
     },
     "0xedd263228ff90c4ad2a64376988edaa52ab8a60a": {
@@ -120,7 +117,7 @@
       "firstSeen": 1788727915000
     },
     "0xc8c285090b0fdedc8d1e24ed002c62b75ef7e2bc": {
-      "firstBlock": null,
+      "firstBlock": 70127845,
       "seeded": true,
       "firstSeen": 1788754493000
     },
@@ -145,7 +142,7 @@
       "firstSeen": 1785423192000
     },
     "0xd9b3e70c06b2b4651c406c152df393be16bf256d": {
-      "firstBlock": null,
+      "firstBlock": 70130033,
       "seeded": true,
       "firstSeen": 1788241982000
     },
@@ -160,12 +157,12 @@
       "firstSeen": 1786367811000
     },
     "0x80b561b37a3c217f2e05af21f24e0476e319c957": {
-      "firstBlock": null,
+      "firstBlock": 70127576,
       "seeded": true,
       "firstSeen": 1788755061000
     },
     "0xdce5096c9b3dbe93dd64652562286c6900133cd7": {
-      "firstBlock": null,
+      "firstBlock": 70136340,
       "seeded": true,
       "firstSeen": 1788275966000
     },
@@ -230,7 +227,7 @@
       "firstSeen": 1788578730000
     },
     "0x3a38d716290b65969a219ad1a29644ee1ab630d6": {
-      "firstBlock": null,
+      "firstBlock": 70144035,
       "seeded": true,
       "firstSeen": 1788263688000
     },
@@ -290,12 +287,12 @@
       "firstSeen": 1788564269000
     },
     "0xcfab1baf26e44ac39a55444a00fc8da2ce87d8a5": {
-      "firstBlock": null,
+      "firstBlock": 69995443,
       "seeded": true,
       "firstSeen": 1789207148000
     },
     "0xb2d31f4e7dc076e184b475bd1a8b62f4ca8c5ec0": {
-      "firstBlock": null,
+      "firstBlock": 70140532,
       "seeded": true,
       "firstSeen": 1788675075000
     },
@@ -335,7 +332,7 @@
       "firstSeen": 1788373792000
     },
     "0x9dea656af4979b64ed1902f3bde78dcd8af79b77": {
-      "firstBlock": null,
+      "firstBlock": 70128392,
       "seeded": true,
       "firstSeen": 1788596958000
     },
@@ -385,7 +382,7 @@
       "firstSeen": 1788708884000
     },
     "0x13fceb0fcd22e290152b2b10ebd921ef79064f6d": {
-      "firstBlock": null,
+      "firstBlock": 70136692,
       "seeded": true,
       "firstSeen": 1788591145000
     },
@@ -400,7 +397,7 @@
       "firstSeen": 1789160897000
     },
     "0x82d56f103b5971d4210c503d746c73603d9b2e80": {
-      "firstBlock": null,
+      "firstBlock": 70127576,
       "seeded": true,
       "firstSeen": 1788595908000
     },
@@ -410,7 +407,7 @@
       "firstSeen": 1788742077000
     },
     "0x9b3173b90dd9db94ffecb9ada2108db47f9309af": {
-      "firstBlock": null,
+      "firstBlock": 70126054,
       "seeded": true,
       "firstSeen": 1776878866000
     },
@@ -505,7 +502,7 @@
       "firstSeen": 1788420519000
     },
     "0x994dafca0ee6cfbbec788302649fa3d032b9bc7b": {
-      "firstBlock": null,
+      "firstBlock": 70129330,
       "seeded": true,
       "firstSeen": 1788540724000
     },
@@ -515,7 +512,7 @@
       "firstSeen": 1788557787000
     },
     "0x3b0dd9f12bfffc3826b2ba65dc1093ee4ed3b155": {
-      "firstBlock": null,
+      "firstBlock": 70134926,
       "seeded": true,
       "firstSeen": 1788555675000
     },
@@ -645,7 +642,7 @@
       "firstSeen": 1788364502000
     },
     "0xed8b2a1d1bc80f70bea9ae4b11cd5baac64888d7": {
-      "firstBlock": null,
+      "firstBlock": 70141184,
       "seeded": true,
       "firstSeen": 1788733928000
     },
@@ -725,12 +722,12 @@
       "firstSeen": 1788560631000
     },
     "0x6bb7f0e32d8e7bf2afad9a86f65495d4d74db5d2": {
-      "firstBlock": null,
+      "firstBlock": 70119506,
       "seeded": true,
       "firstSeen": 1789162736000
     },
     "0x7521453c83b0cb2c86471b4418e7aa40f568ebef": {
-      "firstBlock": null,
+      "firstBlock": 70138742,
       "seeded": true,
       "firstSeen": 1788533548000
     },
@@ -780,12 +777,12 @@
       "firstSeen": 1785796393000
     },
     "0xb702fe2efed24fc2ac44a6c9ff30599c61dc9f76": {
-      "firstBlock": null,
+      "firstBlock": 70143855,
       "seeded": true,
       "firstSeen": 1788556511000
     },
     "0xe7762b1218093abd164b6d1f9ded780e7c7f8c3b": {
-      "firstBlock": null,
+      "firstBlock": 70143135,
       "seeded": true,
       "firstSeen": 1789173761000
     },
@@ -805,7 +802,7 @@
       "firstSeen": 1788587343000
     },
     "0x2d41e0bc6408316b2452a8ef665ba6d6225bc275": {
-      "firstBlock": null,
+      "firstBlock": 70120034,
       "seeded": true,
       "firstSeen": 1788560226000
     },
@@ -858,6 +855,18 @@
       "firstBlock": null,
       "seeded": true,
       "firstSeen": 1788885957000
+    },
+    "0xb068ef10556722ed5673db1bb6775e2672c8f873": {
+      "firstBlock": 70119115
+    },
+    "0x8896fa6f4b97b2e67c514ec1163eca9d45b7865d": {
+      "firstBlock": 70137661
+    },
+    "0xacf281443bf9ceb33a98ba48436654a452169bb9": {
+      "firstBlock": 70141040
+    },
+    "0x1bb2518791d7f5e5a893836c3e85eb6009bb8716": {
+      "firstBlock": 70143976
     }
   },
   "baseline": {
