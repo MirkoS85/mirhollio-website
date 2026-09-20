@@ -113,20 +113,21 @@ globalThis.fetch = async (url, init = {}) => {
 
   if (href.includes("/api?") && href.includes("module=logs")) {
     explorerCalls += 1;
-    if (fail.explorer) return { ok: false, status: 502, json: async () => ({}) };
+    if (fail.explorer) return { ok: false, status: 502, text: async () => "Bad Gateway", json: async () => ({}) };
     const params = new URL(href).searchParams;
     const contract = params.get("address").toLowerCase();
     const page = Number(params.get("page"));
     const rows = page > 1 ? [] : HISTORY_LOGS
       .filter(l => l.contract === contract)
       .map(l => ({ blockNumber: `0x${l.block.toString(16)}`, topics: [l.topic0, `0x${pad(l.from)}`, `0x${pad(PROVIDER)}`] }));
-    return { ok: true, status: 200, json: async () => ({ status: rows.length ? "1" : "0", result: rows }) };
+    const payload = { status: rows.length ? "1" : "0", message: rows.length ? "OK" : "No logs found", result: rows };
+    return { ok: true, status: 200, text: async () => JSON.stringify(payload), json: async () => payload };
   }
 
   const body = JSON.parse(init.body);
   if (Array.isArray(body)) batchCalls += 1;
   const result = Array.isArray(body) ? body.map(handleRpc) : handleRpc(body);
-  return { ok: true, status: 200, json: async () => result };
+  return { ok: true, status: 200, text: async () => JSON.stringify(result), json: async () => result };
 };
 
 const dir = await mkdtemp(path.join(tmpdir(), "dx-"));
@@ -136,26 +137,26 @@ const statePath = path.join(dir, "data/delegator-candidates.json");
 const readStateFile = async () => JSON.parse(await readFile(statePath, "utf8"));
 
 console.log("=== run 1: explorer history + rpc forward window ===");
-const first = await readOnChainDelegators({ provider: PROVIDER, seedAddresses: [SEED], epoch: 434 });
+const first = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000 }], epoch: 434 });
 const state1 = await readStateFile();
 const explorerAfterFirst = explorerCalls;
 
 console.log("\n=== run 2: history already complete, explorer not queried again ===");
-const second = await readOnChainDelegators({ provider: PROVIDER, seedAddresses: [SEED], epoch: 434 });
+const second = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000 }], epoch: 434 });
 const explorerAfterSecond = explorerCalls;
 
 console.log("\n=== run 3: a delegator tops up inside the same reward epoch ===");
 AMOUNTS[addr(1)] = 1_800_000n * 10n ** 18n;
-const third = await readOnChainDelegators({ provider: PROVIDER, seedAddresses: [SEED], epoch: 434 });
+const third = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000 }], epoch: 434 });
 const toppedUp = third.delegators.find(d => d.from === addr(1));
 
 console.log("\n=== run 4: new reward epoch re-captures the baseline ===");
-const rolled = await readOnChainDelegators({ provider: PROVIDER, seedAddresses: [SEED], epoch: 435 });
+const rolled = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000 }], epoch: 435 });
 
 console.log("\n=== run 5: both discovery paths down - the book must survive ===");
 fail.explorer = true;
 fail.rpcLogs = true;
-const degraded = await readOnChainDelegators({ provider: PROVIDER, seedAddresses: [SEED], epoch: 435 });
+const degraded = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000 }], epoch: 435 });
 
 const names = first.delegators.map(d => d.from);
 const checks = [
@@ -164,6 +165,7 @@ const checks = [
   ["explorer found the ancient delegator", names.includes(addr(2))],
   ["rpc forward scan found the recent delegator", names.includes(addr(1))],
   ["seed address carried through", names.includes(SEED)],
+  ["seed keeps its own first-seen date", first.delegators.find(d => d.from === SEED).firstSeen === 1700000000],
   ["transfer-only address excluded", !names.includes(addr(3))],
   ["earliest block wins for a repeat delegator", first.delegators.find(d => d.from === addr(1)).firstBlock === HEAD - 1000],
   ["firstSeen dated from the block", Number.isFinite(first.delegators.find(d => d.from === addr(2)).firstSeen)],

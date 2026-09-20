@@ -59,6 +59,11 @@ const DISCOVERY_BUDGET_MS = Number(process.env.DELEGATION_DISCOVERY_BUDGET_MS ||
 const EXPLORER_PAGE_SIZE = 1000;
 const EXPLORER_MAX_PAGES = 40;
 
+// A revoked delegation can leave a few wei behind. Those wallets are not
+// delegators in any sense a reader cares about, and a row reading "0.00" looks
+// like a bug rather than like dust.
+const MIN_AMOUNT_WFLR = Number(process.env.DELEGATION_MIN_AMOUNT || 0.01);
+
 const lower = value => String(value || "").toLowerCase();
 const isAddress = value => /^0x[0-9a-f]{40}$/.test(lower(value)) && !/^0x0+$/.test(lower(value));
 
@@ -137,13 +142,15 @@ function reportTopics(counts, indent = "    ") {
 async function discoverViaExplorer({ contracts, provider, deadline }) {
   const providerTopic = `0x${padAddress(provider)}`;
   const found = new Map();
+  const errors = [];
   let complete = true;
 
   for (const contract of contracts) {
     for (let page = 1; page <= EXPLORER_MAX_PAGES; page += 1) {
       if (Date.now() > deadline) {
         console.log(`  explorer: out of budget on ${contract} page ${page}`);
-        return { found, complete: false };
+        errors.push(`${contract} p${page}: out of budget`);
+        return { found, complete: false, errors };
       }
       const url = new URL(`${EXPLORER}/api`);
       url.search = new URLSearchParams({
@@ -163,10 +170,15 @@ async function discoverViaExplorer({ contracts, provider, deadline }) {
           headers: { accept: "application/json" },
           signal: AbortSignal.timeout(45_000)
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        body = await res.json();
+        const text = await res.text();
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
+        body = JSON.parse(text);
+        if (body?.status === "0" && !/no logs found/i.test(String(body?.message || ""))) {
+          throw new Error(`explorer said: ${body.message} ${JSON.stringify(body.result).slice(0, 200)}`);
+        }
       } catch (error) {
         console.log(`  explorer: ${contract} page ${page} failed: ${error.message}`);
+        errors.push(`${contract} p${page}: ${error.message}`.slice(0, 300));
         complete = false;
         break;
       }
@@ -182,7 +194,7 @@ async function discoverViaExplorer({ contracts, provider, deadline }) {
       }
     }
   }
-  return { found, complete };
+  return { found, complete, errors };
 }
 
 /** The blocks since the last run, straight from the RPCs. Small by design. */
@@ -250,7 +262,7 @@ async function blockTimestamps(blocks) {
  * probed alongside anything discovery turns up, so the book is right for them
  * even on a run where discovery fails completely.
  */
-export async function readOnChainDelegators({ provider, seedAddresses = [], epoch = null }) {
+export async function readOnChainDelegators({ provider, seeds = [], epoch = null }) {
   const providerAddress = lower(provider);
   const state = await readState();
   const started = Date.now();
@@ -274,7 +286,7 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
     const result = await discoverViaExplorer({ contracts, provider: providerAddress, deadline });
     const added = mergeCandidates(candidates, result.found);
     historyComplete = result.complete;
-    discovery.explorer = { found: result.found.size, added, complete: result.complete };
+    discovery.explorer = { found: result.found.size, added, complete: result.complete, errors: result.errors };
     console.log(`  explorer discovery: ${result.found.size} addresses, ${added} new, ${result.complete ? "complete" : "incomplete"}`);
   }
 
@@ -294,9 +306,19 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
     console.log(`  rpc discovery ${forwardFrom}-${result.reached}: ${result.found.size} addresses, ${added} new`);
   }
 
-  for (const address of seedAddresses) {
-    const key = lower(address);
-    if (isAddress(key) && !candidates.has(key)) candidates.set(key, { firstBlock: null, seeded: true });
+  // Seeds bring their own first-seen dates. Those matter: a wallet that has
+  // delegated here for two years shows up in the forward window the moment it
+  // tops up, and dating it from that block would have the table claim it
+  // arrived today.
+  for (const seed of seeds) {
+    const key = lower(seed?.from ?? seed);
+    if (!isAddress(key)) continue;
+    const known = Number(seed?.firstSeen);
+    const entry = candidates.get(key) || { firstBlock: null, seeded: true };
+    if (Number.isFinite(known) && known > 0) {
+      entry.firstSeen = Math.min(entry.firstSeen ?? Infinity, known);
+    }
+    candidates.set(key, entry);
   }
   if (!candidates.size) {
     console.log("  no candidate addresses at all; nothing to read");
@@ -315,7 +337,7 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
   const active = [];
   addresses.forEach((address, index) => {
     const amount = fromWei(decodeUint(amounts[index]));
-    if (!Number.isFinite(amount) || amount <= 0) return;
+    if (!Number.isFinite(amount) || amount < MIN_AMOUNT_WFLR) return;
     active.push({ address, amount, meta: candidates.get(address) });
   });
   const listed = active.reduce((sum, row) => sum + row.amount, 0);
@@ -324,13 +346,15 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
 
   if (!active.length) return null;
 
-  const undated = active.filter(row => row.meta.firstSeen == null && Number.isFinite(row.meta.firstBlock));
+  const undated = active.filter(row => !Number.isFinite(row.meta.firstSeen) && Number.isFinite(row.meta.firstBlock));
   if (undated.length) {
     try {
       const stamps = await blockTimestamps(undated.map(row => row.meta.firstBlock));
       undated.forEach(row => {
         const stamp = stamps.get(row.meta.firstBlock);
-        if (stamp) row.meta.firstSeen = stamp;
+        // Only ever move the date earlier: the block we found is the earliest
+        // we have *seen*, not necessarily the earliest there is.
+        if (stamp) row.meta.firstSeen = Math.min(row.meta.firstSeen ?? Infinity, stamp);
       });
     } catch (error) {
       console.log(`  block timestamps failed: ${error.message}`);
@@ -355,7 +379,7 @@ export async function readOnChainDelegators({ provider, seedAddresses = [], epoc
         from: row.address,
         amount: row.amount,
         share: total ? (row.amount / total) * 100 : null,
-        firstSeen: row.meta.firstSeen ?? null,
+        firstSeen: Number.isFinite(row.meta.firstSeen) ? row.meta.firstSeen : null,
         lastSeen: now,
         firstBlock: row.meta.firstBlock ?? null,
         delta: Number.isFinite(before) ? row.amount - before : null,

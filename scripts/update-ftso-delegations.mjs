@@ -350,9 +350,12 @@ async function main() {
   if (!history.length) throw new Error("No delegation history could be loaded");
 
   const currentEpoch = Number(history[history.length - 1]?.epoch);
-  const seedAddresses = (Array.isArray(existingSnapshot?.delegators) ? existingSnapshot.delegators : [])
-    .map(row => String(row?.from || "").toLowerCase())
-    .filter(Boolean);
+  // Carry the addresses *and* their first-seen dates: those were measured by
+  // whichever source published them and cannot be recovered from a forward-only
+  // scan of recent blocks.
+  const seeds = (Array.isArray(existingSnapshot?.delegators) ? existingSnapshot.delegators : [])
+    .map(row => ({ from: String(row?.from || "").toLowerCase(), firstSeen: Number(row?.firstSeen) }))
+    .filter(row => row.from);
 
   // The chain first. Flare Base is an indexer in front of state that anyone can
   // read, and it has been down for CI for a week; WNat answers the same
@@ -367,7 +370,7 @@ async function main() {
   try {
     chain = await readOnChainDelegators({
       provider: TARGET_DELEGATION,
-      seedAddresses,
+      seeds,
       epoch: Number.isFinite(currentEpoch) ? currentEpoch : null
     });
     if (chain?.delegators?.length) {
