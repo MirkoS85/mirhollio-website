@@ -31,13 +31,13 @@ jobs:
 
       - name: Commit snapshot
         run: |
-          if git diff --quiet -- data/ftso-delegations.json; then
+          if git diff --quiet -- data/ftso-delegations.json data/delegator-candidates.json; then
             echo "No delegation snapshot changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ftso-delegations.json
+          git add data/ftso-delegations.json data/delegator-candidates.json
           git commit -m "Update FTSO delegation snapshot"
           # This is now only a backstop: the five-minute publisher loop refreshes
           # this snapshot every third cycle. It still has to push safely, and the
@@ -64,11 +64,11 @@ jobs:
             git checkout -q -B "${GITHUB_REF_NAME}" FETCH_HEAD || exit 1
             git reset -q --hard FETCH_HEAD || exit 1
             node scripts/update-ftso-delegations.mjs || exit 1
-            if git diff --quiet -- data/ftso-delegations.json; then
+            if git diff --quiet -- data/ftso-delegations.json data/delegator-candidates.json; then
               echo "Nothing left to publish after resync."
               exit 0
             fi
-            git add data/ftso-delegations.json
+            git add data/ftso-delegations.json data/delegator-candidates.json
             git commit -q -m "Update FTSO delegation snapshot" || exit 1
             sleep $((attempt * 3))
           done

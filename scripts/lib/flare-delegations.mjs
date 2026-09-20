@@ -49,7 +49,11 @@ const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a
 const STATE_PATH = path.resolve("data/delegator-candidates.json");
 
 const FIRST_RUN_LOOKBACK = 200_000;     // ~4 days, enough to be useful immediately
-const BACKFILL_BUDGET_MS = Number(process.env.DELEGATION_BACKFILL_BUDGET_MS || 60_000);
+// The publisher loop runs this inside a five-minute cycle alongside two other
+// refreshes, so the history scan gets a slice rather than the whole cycle. Once
+// the backfill has reached genesis this is not spent at all: the forward scan
+// only covers the blocks since the last run.
+const BACKFILL_BUDGET_MS = Number(process.env.DELEGATION_BACKFILL_BUDGET_MS || 45_000);
 const LOG_SPAN = Number(process.env.DELEGATION_LOG_SPAN || 50_000);
 const BACKFILL_STEP_BLOCKS = Number(process.env.DELEGATION_BACKFILL_STEP || 500_000);
 
