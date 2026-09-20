@@ -1,0 +1,23 @@
+name: Probe delegation sources
+
+# Read-only diagnostics. The delegator book needs a source that can list every
+# address that has ever delegated to us; the official RPC caps eth_getLogs at 30
+# blocks, so the alternatives have to be measured from a runner rather than
+# guessed at. Writes nothing, pushes nothing - it only prints what each host can
+# do. Dispatch by hand when the delegation pipeline needs re-diagnosing.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/probe-delegation-sources.mjs
