@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-20T13:50:28.638Z",
+  "generatedAt": "2026-09-20T14:11:25.327Z",
   "position": {
     "epoch": 434,
     "voters": 99,
@@ -111,11 +111,11 @@
       0.01
     ],
     "ourIndex": 67,
-    "primaryPct": 48.52,
-    "secondaryPct": 99.07,
+    "primaryPct": 48.9,
+    "secondaryPct": 98.98,
     "availabilityPct": 100,
-    "medianPrimaryPct": 40.47,
-    "medianSecondaryPct": 96.49,
+    "medianPrimaryPct": 40.56,
+    "medianSecondaryPct": 96.38,
     "passes": 3,
     "eligible": true
   },
@@ -138,245 +138,68 @@
       0.00904
     ]
   },
-  "validator": {
-    "totalStakeM": 89.99,
-    "selfBondM": 6,
-    "delegators": 78,
-    "uptime": 100,
-    "connected": true,
-    "stakeEndsAt": "2026-10-19",
-    "expirySteps": [
-      {
-        "date": "2026-09-23",
-        "expiresM": 0.12,
-        "remainingM": 83.87
-      },
-      {
-        "date": "2026-09-24",
-        "expiresM": 1.18,
-        "remainingM": 82.69
-      },
-      {
-        "date": "2026-09-25",
-        "expiresM": 7.05,
-        "remainingM": 75.64
-      },
-      {
-        "date": "2026-09-26",
-        "expiresM": 0.43,
-        "remainingM": 75.21
-      },
-      {
-        "date": "2026-09-27",
-        "expiresM": 0.4,
-        "remainingM": 74.81
-      },
-      {
-        "date": "2026-09-28",
-        "expiresM": 1.42,
-        "remainingM": 73.38
-      },
-      {
-        "date": "2026-09-29",
-        "expiresM": 8.04,
-        "remainingM": 65.35
-      },
-      {
-        "date": "2026-09-30",
-        "expiresM": 0.4,
-        "remainingM": 64.94
-      },
-      {
-        "date": "2026-10-01",
-        "expiresM": 5.15,
-        "remainingM": 59.79
-      },
-      {
-        "date": "2026-10-02",
-        "expiresM": 4.62,
-        "remainingM": 55.17
-      },
-      {
-        "date": "2026-10-03",
-        "expiresM": 1.78,
-        "remainingM": 53.39
-      },
-      {
-        "date": "2026-10-04",
-        "expiresM": 6.42,
-        "remainingM": 46.98
-      },
-      {
-        "date": "2026-10-09",
-        "expiresM": 0.15,
-        "remainingM": 46.83
-      },
-      {
-        "date": "2026-10-12",
-        "expiresM": 0.34,
-        "remainingM": 46.49
-      },
-      {
-        "date": "2026-10-14",
-        "expiresM": 0.05,
-        "remainingM": 46.43
-      },
-      {
-        "date": "2026-10-16",
-        "expiresM": 1.14,
-        "remainingM": 45.29
-      },
-      {
-        "date": "2026-10-18",
-        "expiresM": 21.13,
-        "remainingM": 24.16
-      },
-      {
-        "date": "2026-10-19",
-        "expiresM": 24.16,
-        "remainingM": 0
-      }
-    ]
-  },
+  "validator": null,
   "weightHistory": [
     {
       "epoch": 425,
-      "wflrM": 5044395.39,
-      "stakeM": 89998947.02,
-      "weight": 98.52
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 426,
-      "wflrM": 4254243.17,
-      "stakeM": 89998947.02,
-      "weight": 98.39
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 427,
-      "wflrM": 4254882.03,
-      "stakeM": 69848947.02,
-      "weight": 81.53
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 428,
-      "wflrM": 4702727.79,
-      "stakeM": 32546685.41,
-      "weight": 46.55
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 429,
-      "wflrM": 4707663.62,
-      "stakeM": 46712516.28,
-      "weight": 60.65
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 430,
-      "wflrM": 5528420.22,
-      "stakeM": 61984324.34,
-      "weight": 74.85
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 431,
-      "wflrM": 66166988.84,
-      "stakeM": 89999686.74,
-      "weight": 108.29
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 432,
-      "wflrM": 120993208.45,
-      "stakeM": 89999686.74,
-      "weight": 116.81
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 433,
-      "wflrM": 133963052.08,
-      "stakeM": 89567445.84,
-      "weight": 118.46
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     },
     {
       "epoch": 434,
-      "wflrM": 117430890.87,
-      "stakeM": 89382371.3,
-      "weight": 115.79
+      "wflrM": 0,
+      "stakeM": 0,
+      "weight": 0
     }
   ],
-  "votePowerSnapshots": [
-    {
-      "epoch": 434,
-      "takenDuring": 433,
-      "block": 69979176,
-      "at": "2026-09-17T09:22:01.000Z",
-      "pct": 88.53
-    },
-    {
-      "epoch": 433,
-      "takenDuring": 432,
-      "block": 69602281,
-      "at": "2026-09-12T10:41:41.000Z",
-      "pct": 47.26
-    },
-    {
-      "epoch": 432,
-      "takenDuring": 431,
-      "block": 69258478,
-      "at": "2026-09-07T21:34:48.000Z",
-      "pct": 17.36
-    },
-    {
-      "epoch": 431,
-      "takenDuring": 430,
-      "block": 69065040,
-      "at": "2026-09-05T08:40:53.000Z",
-      "pct": 44.86
-    },
-    {
-      "epoch": 430,
-      "takenDuring": 429,
-      "block": 68692853,
-      "at": "2026-08-31T12:36:27.000Z",
-      "pct": 6.68
-    },
-    {
-      "epoch": 429,
-      "takenDuring": 428,
-      "block": 68659072,
-      "at": "2026-08-31T01:52:34.000Z",
-      "pct": 93.9
-    },
-    {
-      "epoch": 428,
-      "takenDuring": 427,
-      "block": 68274379,
-      "at": "2026-08-26T02:16:27.000Z",
-      "pct": 51.52
-    },
-    {
-      "epoch": 427,
-      "takenDuring": 426,
-      "block": 67930566,
-      "at": "2026-08-21T16:35:38.000Z",
-      "pct": 25.71
-    },
-    {
-      "epoch": 426,
-      "takenDuring": 425,
-      "block": 67820078,
-      "at": "2026-08-20T06:36:36.000Z",
-      "pct": 85.25
-    },
-    {
-      "epoch": 425,
-      "takenDuring": 424,
-      "block": 67374696,
-      "at": "2026-08-14T09:12:49.000Z",
-      "pct": 16.92
-    },
-    {
-      "epoch": 424,
-      "takenDuring": 423,
-      "block": 67280307,
-      "at": "2026-08-13T02:53:45.000Z",
-      "pct": 80.83
-    }
-  ]
+  "votePowerSnapshots": []
 }
