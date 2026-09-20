@@ -5389,3 +5389,20 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
     white-space:nowrap;
   }
 }
+
+/* Entry point to the delegation explorer, sitting in the FTSO hero tile row. */
+.hero-live-link{
+  text-decoration:none;
+  border:1px solid rgba(255,46,99,.35);
+  background:linear-gradient(180deg,rgba(255,46,99,.14),rgba(255,46,99,.05));
+  transition:border-color .15s ease,transform .15s ease;
+}
+.hero-live-link:hover{border-color:var(--pink);transform:translateY(-1px)}
+.hero-live-link strong{color:var(--pink)}
+
+.ftso-delegation-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+}

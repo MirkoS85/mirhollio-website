@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mirhollio Core Delegation Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap">
+
+  <meta name="description" content="Live WFLR delegation to Mirhollio Core: delegated vote power, the delegator book, epoch-by-epoch history, and the next reward-epoch snapshot." />
+  <meta name="theme-color" content="#0A0A0E" />
+  <link rel="preconnect" href="https://flare-base.io">
+  <link rel="dns-prefetch" href="//flare-base.io">
+  <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
+  <link rel="preload" as="fetch" href="/data/ftso-delegations.json?v=core-33" crossorigin="anonymous">
+  <link rel="canonical" href="https://www.mirhollio.com/ftso/delegations/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Mirhollio Core Delegation Explorer" />
+  <meta property="og:description" content="Live WFLR delegation, the delegator book, and the next reward-epoch snapshot for Mirhollio Core." />
+  <meta property="og:url" content="https://www.mirhollio.com/ftso/delegations/" />
+  <meta property="og:image" content="https://www.mirhollio.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mirhollio Core Delegation Explorer" />
+  <meta name="twitter:description" content="Live WFLR delegation and delegator book for Mirhollio Core." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/og-image.jpg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="64x64" href="../../favicon-64x64.png?v=2">
+  <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon-full.png">
+  <link rel="manifest" href="../../app.webmanifest">
+  <link rel="stylesheet" href="../../assets/live-refresh.css?v=core-33" />
+  <link rel="stylesheet" href="../../assets/delegations.css?v=core-33" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="../../"><img src="../../logo.png?v=2" alt="Mirhollio Core logo"><span class="brand-name">Mirhollio Core<small class="former">formerly MirSFlr</small></span></a><a class="btn primary" href="../../addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="../../">Home</a><a href="../">FTSO</a><a href="./" aria-current="page">Delegation</a><a href="../../validator/">Validator</a><a href="../../epochs/">Epochs</a><a href="../../addresses/">Addresses</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div>
+        <a class="brand" href="../../"><img src="../../logo.png?v=2" alt="Mirhollio Core logo"><span class="brand-name">Mirhollio Core<small class="former">formerly MirSFlr</small></span></a>
+        <nav class="nav" aria-label="Primary navigation"><a href="../../">Home</a><a href="../">FTSO provider</a><a href="./" aria-current="page">Delegation</a><a href="../../validator/">Validator node</a><a href="../../epochs/">Epoch history</a><a href="../../addresses/">Addresses</a><a href="../../performance/">Performance</a></nav>
+      </div>
+      <p class="side-note">Independent Flare validator and FTSO provider.<em>Formerly known as MirSFlr.</em></p>
+    </aside>
+    <main>
+
+      <!-- Headline: the number that matters most, then when it is next locked in. -->
+      <section class="section dx-hero-section">
+        <div class="inner">
+          <a class="dx-back" href="../">&#8592; FTSO provider</a>
+
+          <div class="dx-hero">
+            <div class="dx-hero-main">
+              <span class="dx-kicker">Delegated to Mirhollio Core</span>
+              <strong class="dx-hero-figure" data-dx="delegatedWflr">—</strong>
+              <span class="dx-hero-unit">WFLR</span>
+              <p class="dx-hero-sub">
+                <span data-dx="delegatorCount">—</span> delegators ·
+                fee <span data-dx="fee">—</span> ·
+                epoch <span data-dx="epoch">—</span>
+              </p>
+              <p class="dx-source" data-dx-freshness="power">Loading…</p>
+            </div>
+
+            <!-- The question every delegator actually asks: when does my stake count? -->
+            <div class="dx-snapshot" data-dx-state="loading">
+              <span class="dx-kicker">Next snapshot</span>
+              <strong class="dx-snapshot-count" data-dx="snapshotCountdown">—</strong>
+              <span class="dx-snapshot-when" data-dx="snapshotWhen">—</span>
+              <div class="dx-snapshot-track" role="img" aria-label="Progress through the current reward epoch">
+                <i data-dx-bar="epochProgress"></i>
+              </div>
+              <p class="dx-snapshot-note">
+                Vote power is sampled once per reward epoch. Delegate before the
+                snapshot and you earn from epoch <span data-dx="nextEpoch">—</span>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Two single-series charts, never one dual-axis chart: the measures
+           differ in scale by six orders of magnitude. -->
+      <section class="section">
+        <div class="inner">
+          <article class="dx-card">
+            <div class="dx-card-head">
+              <div>
+                <strong>Delegated vote power</strong>
+                <small>WFLR delegated to this provider, per reward epoch</small>
+              </div>
+              <div class="dx-range" role="group" aria-label="Chart range">
+                <button type="button" data-dx-range="12">12</button>
+                <button type="button" data-dx-range="26">26</button>
+                <button type="button" data-dx-range="0" aria-pressed="true">All</button>
+              </div>
+            </div>
+            <div class="dx-chart-wrap">
+              <svg class="dx-chart" data-dx-chart="power" viewBox="0 0 1000 300" preserveAspectRatio="none" role="img" aria-label="Delegated vote power per reward epoch"></svg>
+              <div class="dx-tooltip" data-dx-tooltip="power" hidden></div>
+            </div>
+            <div class="dx-chart-foot">
+              <span>Latest <strong data-dx="chartLatest">—</strong></span>
+              <span>Peak <strong data-dx="chartPeak">—</strong></span>
+              <span>Low <strong data-dx="chartLow">—</strong></span>
+              <span class="dx-source" data-dx-freshness="history">—</span>
+            </div>
+          </article>
+
+          <article class="dx-card">
+            <div class="dx-card-head">
+              <div>
+                <strong>Delegator count</strong>
+                <small>How many wallets delegate, per reward epoch</small>
+              </div>
+            </div>
+            <div class="dx-chart-wrap dx-chart-wrap-short">
+              <svg class="dx-chart" data-dx-chart="count" viewBox="0 0 1000 150" preserveAspectRatio="none" role="img" aria-label="Delegator count per reward epoch"></svg>
+              <div class="dx-tooltip" data-dx-tooltip="count" hidden></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- The delegator book. -->
+      <section class="section">
+        <div class="inner">
+          <article class="dx-card">
+            <div class="dx-card-head">
+              <div>
+                <strong>Delegator book</strong>
+                <small>Every wallet delegating at the latest snapshot</small>
+              </div>
+              <div class="dx-tools">
+                <label class="dx-search">
+                  <span class="visually-hidden">Filter by address</span>
+                  <input type="search" data-dx="search" placeholder="Filter address…" autocomplete="off" spellcheck="false">
+                </label>
+                <div class="dx-range" role="group" aria-label="Sort delegators">
+                  <button type="button" data-dx-sort="amount" aria-pressed="true">Size</button>
+                  <button type="button" data-dx-sort="delta">Change</button>
+                  <button type="button" data-dx-sort="firstSeen">Newest</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="dx-concentration">
+              <div class="dx-conc-bar" role="img" data-dx="concentrationLabel" aria-label="Share of delegated power by wallet size"></div>
+              <p class="dx-conc-note">
+                Top wallet holds <strong data-dx="whaleShare">—</strong> of delegated power.
+                Top 5 hold <strong data-dx="top5Share">—</strong>.
+              </p>
+            </div>
+
+            <div class="dx-table-wrap">
+              <table class="dx-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Wallet</th>
+                    <th scope="col" class="dx-num">Delegated</th>
+                    <th scope="col" class="dx-num">Share</th>
+                    <th scope="col" class="dx-num">Change</th>
+                    <th scope="col" class="dx-num">First seen</th>
+                  </tr>
+                </thead>
+                <tbody data-dx="delegatorRows">
+                  <tr><td colspan="6" class="dx-empty">Loading delegator book…</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="dx-chart-foot">
+              <span data-dx="delegatorShown">—</span>
+              <span class="dx-source" data-dx-freshness="delegators">—</span>
+              <a class="dx-link" href="https://flare-base.io/flare/delegations/votepower-history?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&amp;range=last-180d" target="_blank" rel="noopener">Cross-check on Flare Base &#8599;</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../../assets/delegations.js?v=core-33"></script>
+  <script src="../../assets/pwa.js?v=core-33"></script>
+</body>
+</html>
