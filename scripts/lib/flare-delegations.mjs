@@ -236,8 +236,8 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, floor 
     // for this provider - so a window that was too wide in a busy stretch is
     // fine in a quiet one. Widen again once the current size has proved itself.
     streak += 1;
-    if (streak >= 3 && span < EXPLORER_WINDOW) {
-      span = Math.min(EXPLORER_WINDOW, span * 2);
+    if (streak >= 2 && span < EXPLORER_WINDOW) {
+      span = Math.min(EXPLORER_WINDOW, span * 4);
       streak = 0;
       console.log(`  explorer: widening the window to ${span} blocks`);
     }

@@ -82,12 +82,27 @@ attempt_publish() {
       || echo "  network position snapshot failed this cycle"
   fi
 
-  if git diff --quiet -- "${FILES[@]}"; then
+  # Only stage what exists. A refresh that could not reach its upstream leaves
+  # its file unwritten, and naming a missing path makes `git add` exit 128 -
+  # which would turn one unreachable host into a failed publish for every other
+  # feed in the same cycle. Staging first also means an untracked new file is
+  # noticed; `git diff` on the working tree cannot see one.
+  local present=()
+  local file
+  for file in "${FILES[@]}"; do
+    [ -e "$file" ] && present+=("$file")
+  done
+  if [ ${#present[@]} -eq 0 ]; then
+    echo "  nothing was produced this cycle"
+    return 2
+  fi
+
+  git add -- "${present[@]}" || return 1
+  if git diff --cached --quiet; then
     echo "  no change this cycle"
     return 2
   fi
 
-  git add -- "${FILES[@]}"
   git commit -q -m "Update live data snapshots" || return 1
 
   if git push -q origin "HEAD:${BRANCH}" 2>/dev/null; then
