@@ -35,9 +35,12 @@ const SEED = "0x00000000000000000000000000000000000000bb";
 // Ancient delegator: only the explorer's whole-history query finds this one.
 // Recent delegator: inside the forward window, so the RPC scan finds it.
 // Transfer-only address: must be filtered out.
+// Old enough that only the explorer's history walk reaches it, but inside the
+// window where a delegation to this provider could plausibly exist.
+const ANCIENT_BLOCK = HEAD - 20_000_000;
 const HISTORY_LOGS = [
-  { block: 3_000_000, topic0: DELEGATE, from: addr(2), contract: VP_READ },
-  { block: 3_000_100, topic0: TRANSFER, from: addr(3), contract: VP_READ }
+  { block: ANCIENT_BLOCK, topic0: DELEGATE, from: addr(2), contract: VP_READ },
+  { block: ANCIENT_BLOCK + 100, topic0: TRANSFER, from: addr(3), contract: VP_READ }
 ];
 const RECENT_LOGS = [
   { block: HEAD - 1000, topic0: DELEGATE, from: addr(1), contract: VP_WRITE },
@@ -173,6 +176,10 @@ const checks = [
   ["timestamps are milliseconds, as the rest of the file is", first.delegators.every(d => d.firstSeen == null || d.firstSeen > 1e11)],
   ["explorer walked in windows, never the whole chain at once",
     explorerWindows.length > 1 && explorerWindows.every(([from, to]) => to - from + 1 <= 2_000_000)],
+  // Walking below the earliest delegation that could exist is wasted work, so
+  // the floor has to actually stop the walk short of genesis.
+  ["history walk stopped at the floor, not genesis",
+    Math.min(...explorerWindows.map(([from]) => from)) > 0],
   ["transfer-only address excluded", !names.includes(addr(3))],
   ["earliest block wins for a repeat delegator", first.delegators.find(d => d.from === addr(1)).firstBlock === HEAD - 1000],
   ["firstSeen dated from the block once history is complete", Number.isFinite(first.delegators.find(d => d.from === addr(2)).firstSeen)],

@@ -70,6 +70,11 @@ const MIN_AMOUNT_WFLR = Number(process.env.DELEGATION_MIN_AMOUNT || 0.01);
 const EXPLORER_WINDOW = Number(process.env.DELEGATION_EXPLORER_WINDOW || 2_000_000);
 const EXPLORER_MIN_WINDOW = 100_000;
 
+// Most of Flare's history predates this provider entirely, and no amount of
+// walking will find a delegation that could not have happened. The walk stops
+// a margin before the earliest delegation anything has ever recorded here.
+const HISTORY_MARGIN_DAYS = Number(process.env.DELEGATION_HISTORY_MARGIN_DAYS || 120);
+
 // data/ftso-delegations.json has carried millisecond timestamps since Flare Base
 // wrote it, and the page reads them that way. Everything published here matches
 // that rather than introducing a second convention in the same file.
@@ -154,12 +159,13 @@ function reportTopics(counts, indent = "    ") {
  * contract instead of the seventy thousand eth_getLogs calls the same range
  * would take at the RPCs' 1000-block ceiling.
  */
-async function discoverViaExplorer({ contracts, provider, cursor, window, deadline }) {
+async function discoverViaExplorer({ contracts, provider, cursor, window, floor = 0, deadline }) {
   const providerTopic = `0x${padAddress(provider)}`;
   const found = new Map();
   const errors = [];
   let at = cursor;
   let span = Math.max(EXPLORER_MIN_WINDOW, window);
+  let streak = 0;
 
   const query = async (contract, from, to, page) => {
     const url = new URL(`${EXPLORER}/api`);
@@ -186,12 +192,12 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, deadli
     return Array.isArray(body?.result) ? body.result : [];
   };
 
-  while (at >= 0) {
+  while (at >= floor) {
     if (Date.now() > deadline) {
       console.log(`  explorer: out of budget at block ${at}`);
       return { found, cursor: at, window: span, complete: false, errors };
     }
-    const from = Math.max(0, at - span + 1);
+    const from = Math.max(floor, at - span + 1);
     let windowFailed = false;
 
     for (const contract of contracts) {
@@ -221,8 +227,19 @@ async function discoverViaExplorer({ contracts, provider, cursor, window, deadli
         return { found, cursor: at, window: span, complete: false, errors };
       }
       span = Math.max(EXPLORER_MIN_WINDOW, Math.floor(span / 4));
+      streak = 0;
       console.log(`  explorer: narrowing the window to ${span} blocks`);
       continue;
+    }
+
+    // Log density varies enormously across history - most of it holds nothing
+    // for this provider - so a window that was too wide in a busy stretch is
+    // fine in a quiet one. Widen again once the current size has proved itself.
+    streak += 1;
+    if (streak >= 3 && span < EXPLORER_WINDOW) {
+      span = Math.min(EXPLORER_WINDOW, span * 2);
+      streak = 0;
+      console.log(`  explorer: widening the window to ${span} blocks`);
     }
 
     at = from - 1;
@@ -273,6 +290,33 @@ function mergeCandidates(candidates, found) {
   return added;
 }
 
+/**
+ * The block below which a delegation to this provider cannot exist, worked out
+ * from the earliest one anything has recorded plus a wide margin. The block
+ * rate is measured from two real blocks rather than assumed, because a wrong
+ * constant here would silently truncate the search.
+ */
+async function historyFloor(chainHead, earliestMillis) {
+  if (!Number.isFinite(earliestMillis) || earliestMillis <= 0) return 0;
+  const probe = Math.max(0, chainHead - 1_000_000);
+  try {
+    const [top, older] = await rpcBatch([
+      { method: "eth_getBlockByNumber", params: [`0x${BigInt(chainHead).toString(16)}`, false] },
+      { method: "eth_getBlockByNumber", params: [`0x${BigInt(probe).toString(16)}`, false] }
+    ]);
+    const topTime = Number(BigInt(top.timestamp)) * 1000;
+    const olderTime = Number(BigInt(older.timestamp)) * 1000;
+    const msPerBlock = (topTime - olderTime) / (chainHead - probe);
+    if (!(msPerBlock > 0)) return 0;
+    const target = earliestMillis - HISTORY_MARGIN_DAYS * 86_400_000;
+    const floor = Math.floor(chainHead - (topTime - target) / msPerBlock);
+    return Math.max(0, floor);
+  } catch (error) {
+    console.log(`  block-rate probe failed, walking to genesis: ${error.message}`);
+    return 0;
+  }
+}
+
 /** Attach a wall-clock timestamp to the blocks we just discovered. */
 async function blockTimestamps(blocks) {
   const unique = [...new Set(blocks)].filter(Number.isFinite);
@@ -318,10 +362,24 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
   let historyComplete = Boolean(state?.historyComplete);
   let explorerCursor = Number.isFinite(state?.explorerCursor) ? state.explorerCursor : latest;
   let explorerWindow = Number.isFinite(state?.explorerWindow) ? state.explorerWindow : EXPLORER_WINDOW;
+  let historyFloorBlock = Number.isFinite(state?.historyFloorBlock) ? state.historyFloorBlock : null;
   if (contracts.length && !historyComplete) {
+    const knownDates = [...candidates.values()]
+      .map(meta => Number(meta.firstSeen))
+      .filter(value => Number.isFinite(value) && value > 0);
+    const seedDates = seeds
+      .map(seed => toMillis(seed?.firstSeen))
+      .filter(Boolean);
+    const earliest = Math.min(...knownDates, ...seedDates, Infinity);
+    const floor = Number.isFinite(state?.historyFloorBlock)
+      ? state.historyFloorBlock
+      : await historyFloor(latest, Number.isFinite(earliest) ? earliest : null);
+    historyFloorBlock = floor;
+    console.log(`  history floor: block ${floor}${floor ? "" : " (genesis)"}`);
+
     const result = await discoverViaExplorer({
       contracts, provider: providerAddress,
-      cursor: explorerCursor, window: explorerWindow, deadline
+      cursor: explorerCursor, window: explorerWindow, floor, deadline
     });
     const added = mergeCandidates(candidates, result.found);
     historyComplete = result.complete;
@@ -445,6 +503,7 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
     historyComplete,
     explorerCursor,
     explorerWindow,
+    historyFloorBlock,
     discovery,
     candidates: Object.fromEntries(candidates),
     baseline
