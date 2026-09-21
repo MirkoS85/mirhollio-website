@@ -22,7 +22,7 @@
 (function () {
   "use strict";
 
-  const SNAPSHOT_URL = "/data/ftso-delegations.json?v=core-33";
+  const SNAPSHOT_URL = "/data/ftso-delegations.json?v=core-34";
   const FB_HISTORY = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
   const FB_DELEGATORS = "https://flare-base.io/api/delegations/getDelegatorsAt/flare";
   const DELEGATION_ADDRESS = "0xad9105bef5e5df2eacbe2de9037a96695b00cade";
@@ -46,7 +46,9 @@
     snapshot: null,
     weights: null,
     range: 0,
-    sort: "amount",
+    sort: "amount-desc",
+    filter: "all",
+    pinned: null,
     search: "",
     showAll: false
   };
@@ -200,13 +202,20 @@
 
   function snapshotDelegatorRows() {
     const rows = Array.isArray(state.snapshot?.delegators) ? state.snapshot.delegators : [];
-    return rows
+    // Wallets that left are published separately - they are not delegators any
+    // more, so they cannot sit in the live list - but the book still has to be
+    // able to show them, or "four left this epoch" has no answer to "which four".
+    const gone = Array.isArray(state.snapshot?.departed) ? state.snapshot.departed : [];
+    return rows.concat(gone)
       .map((r) => ({
         from: r.from,
-        amount: num(r.amount),
+        amount: num(r.amount) ?? 0,
+        previous: num(r.previous),
         share: num(r.share),
         delta: num(r.delta),
-        firstSeen: num(r.firstSeen)
+        firstSeen: num(r.firstSeen),
+        joined: Boolean(r.joined),
+        departed: Boolean(r.departed)
       }))
       .filter((r) => r.from && Number.isFinite(r.amount));
   }
@@ -466,7 +475,44 @@
 
     svg.addEventListener("pointermove", move);
     svg.addEventListener("pointerleave", leave);
-    svg.addEventListener("pointerdown", move);
+    // Tapping pins the reading. A tooltip that only exists while the pointer is
+    // held over a point is unusable on a touch screen, which is where most of
+    // this page is read.
+    svg.addEventListener("pointerdown", (event) => {
+      move(event);
+      pinEpoch(rows[pick(event)]?.epoch);
+    });
+  }
+
+  // ── a pinned epoch ────────────────────────────────────────────────────────
+  function pinEpoch(epoch) {
+    state.pinned = Number.isFinite(epoch) && state.pinned === epoch ? null : epoch;
+    renderPinned();
+  }
+
+  function renderPinned() {
+    const box = $(".dx-pinned");
+    if (!box) return;
+    const row = state.history.find((r) => r.epoch === state.pinned);
+    if (!row) { box.hidden = true; return; }
+
+    const index = state.history.indexOf(row);
+    const before = index > 0 ? state.history[index - 1] : null;
+    const delta = before ? row.delegated - before.delegated : null;
+    const moved = Number.isFinite(delta) && Math.abs(delta) >= MOVED;
+    const change = moved
+      ? `<span class="${delta > 0 ? "dx-up" : "dx-down"}">${delta > 0 ? "▲ +" : "▼ −"}${fmtAmount(Math.abs(delta))}</span>`
+      : '<span class="dx-flat">no change</span>';
+
+    box.hidden = false;
+    box.innerHTML = `
+      <b>Epoch ${row.epoch}${row.provisional ? " (in progress)" : ""}</b>
+      <span><strong>${fmtAmount(row.delegated)}</strong> WFLR</span>
+      <span>${Number.isFinite(row.delegators) ? `<strong>${fmtFull(row.delegators)}</strong> delegators` : ""}</span>
+      <span>${change} vs epoch ${before ? before.epoch : "—"}</span>
+      <button type="button" class="dx-unpin" data-dx="unpin">Clear</button>`;
+    const clear = el("unpin");
+    if (clear) clear.addEventListener("click", () => { state.pinned = null; renderPinned(); });
   }
 
   function renderCharts() {
@@ -490,108 +536,182 @@
     }
   }
 
-  // ── delegator book ────────────────────────────────────────────────────────
-  function sortedDelegators() {
-    const q = state.search.trim().toLowerCase();
-    let rows = state.delegators.slice();
-    if (q) rows = rows.filter((r) => String(r.from).toLowerCase().includes(q));
-    const key = state.sort;
-    rows.sort((a, b) => {
-      if (key === "delta") return (b.delta ?? -Infinity) - (a.delta ?? -Infinity);
-      if (key === "firstSeen") return (b.firstSeen ?? 0) - (a.firstSeen ?? 0);
-      return (b.amount ?? 0) - (a.amount ?? 0);
-    });
-    return rows;
+  // ── the book ──────────────────────────────────────────────────────────────
+
+  // A wallet counts as having moved only if the move is big enough to be worth
+  // a reader's attention; dust from a rounding difference is not news.
+  const MOVED = 1;
+
+  const GROUPS = {
+    all: () => true,
+    joined: (r) => r.joined && !r.departed,
+    increased: (r) => Number.isFinite(r.delta) && r.delta >= MOVED && !r.joined,
+    decreased: (r) => Number.isFinite(r.delta) && r.delta <= -MOVED && !r.departed,
+    departed: (r) => r.departed
+  };
+
+  function whaleCut() {
+    const live = state.delegators.filter((r) => !r.departed);
+    if (!live.length) return Infinity;
+    const sorted = live.map((r) => r.amount).sort((a, b) => b - a);
+    return sorted[Math.max(0, Math.ceil(sorted.length * 0.01) - 1)];
+  }
+
+  function groupCount(key) {
+    if (key === "whales") {
+      const cut = whaleCut();
+      return state.delegators.filter((r) => !r.departed && r.amount >= cut).length;
+    }
+    return state.delegators.filter(GROUPS[key] || (() => true)).length;
+  }
+
+  function filteredDelegators() {
+    const term = state.search.trim().toLowerCase();
+    let rows = state.delegators;
+
+    if (state.filter === "whales") {
+      const cut = whaleCut();
+      rows = rows.filter((r) => !r.departed && r.amount >= cut);
+    } else if (state.filter !== "all") {
+      rows = rows.filter(GROUPS[state.filter] || (() => true));
+    } else {
+      // Departed wallets are history, not holdings: they belong under their own
+      // filter, not mixed into a list the totals are read from.
+      rows = rows.filter((r) => !r.departed);
+    }
+
+    if (term) rows = rows.filter((r) => r.from.toLowerCase().includes(term));
+
+    const [key, dir] = state.sort.split("-");
+    const sign = dir === "asc" ? 1 : -1;
+    const value = (r) => {
+      if (key === "firstSeen") return Number.isFinite(r.firstSeen) ? r.firstSeen : (dir === "asc" ? Infinity : -Infinity);
+      if (key === "delta") return Number.isFinite(r.delta) ? r.delta : 0;
+      if (key === "share") return Number.isFinite(r.share) ? r.share : 0;
+      return r.departed ? (r.previous || 0) : r.amount;
+    };
+    return rows.slice().sort((a, b) => (value(a) - value(b)) * sign);
+  }
+
+  function rowMarkup(r, index, cut) {
+    const tag = r.departed
+      ? '<span class="dx-tag gone">left</span>'
+      : r.joined
+        ? '<span class="dx-tag new">new</span>'
+        : (r.amount >= cut ? '<span class="dx-tag whale">top 1%</span>' : "");
+
+    let change = '<span class="dx-change flat">no change</span>';
+    if (r.departed) {
+      change = `<span class="dx-change down">&#9660; withdrew ${fmtAmount(r.previous || 0)}</span>`;
+    } else if (Number.isFinite(r.delta) && Math.abs(r.delta) >= MOVED) {
+      const up = r.delta > 0;
+      change = `<span class="dx-change ${up ? "up" : "down"}">${up ? "&#9650; +" : "&#9660; &minus;"}${fmtAmount(Math.abs(r.delta))}</span>`;
+    } else if (r.joined) {
+      change = '<span class="dx-change up">&#9650; joined this epoch</span>';
+    }
+
+    const since = Number.isFinite(r.firstSeen)
+      ? `since ${new Date(r.firstSeen).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          ...(new Date(r.firstSeen).getFullYear() === new Date().getFullYear() ? {} : { year: "numeric" })
+        })}`
+      : "not yet dated";
+
+    const shown = r.departed ? (r.previous || 0) : r.amount;
+    const pct = Math.min(100, Math.max(0, r.share ?? 0));
+
+    return `
+      <li class="dx-row${r.departed ? " is-departed" : ""}">
+        <span class="dx-rank">${String(index + 1).padStart(2, "0")}</span>
+        <span class="dx-who">
+          <a class="dx-wallet" href="${EXPLORER_ADDRESS}${encodeURIComponent(r.from)}" target="_blank" rel="noopener"
+             title="${escapeHtml(r.from)}">${escapeHtml(shortAddress(r.from))}</a>${tag}
+          <small class="dx-since">${since}</small>
+        </span>
+        <span class="dx-amount">${fmtAmount(shown)}<u>WFLR</u></span>
+        <span class="dx-meter">
+          <span class="dx-bar"><i style="width:${pct.toFixed(1)}%"></i></span>
+          <span class="dx-pct">${r.departed ? "&mdash;" : fmtPct(r.share)}</span>
+        </span>
+        ${change}
+      </li>`;
   }
 
   function renderDelegators() {
-    const body = el("delegatorRows");
-    if (!body) return;
-    const rows = sortedDelegators();
+    const list = el("delegatorRows");
+    if (!list) return;
+    const rows = filteredDelegators();
+    const cut = whaleCut();
 
     if (!rows.length) {
-      body.innerHTML = `<tr><td colspan="6" class="dx-empty">${
-        state.search ? "No wallet matches that filter." : "No delegator data available."
-      }</td></tr>`;
+      list.innerHTML = `<li class="dx-empty">${
+        state.search ? "No wallet matches that search."
+          : state.filter === "all" ? "No delegator data available."
+          : "No wallet is in that group this epoch."
+      }</li>`;
       el("delegatorShown").textContent = "0 wallets";
       return;
     }
 
-    // 168 rows rendered flat made the table 81% of the page. Show the wallets
-    // that actually carry the weight; the rest stay one click away.
+    // 137 rows rendered flat made the page eight screens long. Show the wallets
+    // that carry the weight; the rest stay one tap away.
     const PAGE = 25;
     const capped = state.showAll || state.search ? rows : rows.slice(0, PAGE);
-
-    body.innerHTML = capped.map((r, i) => {
-      // Change is status-coloured but never colour alone - the sign carries it.
-      let change = '<span class="dx-flat">—</span>';
-      if (Number.isFinite(r.delta) && Math.abs(r.delta) >= 1) {
-        const up = r.delta > 0;
-        change = `<span class="dx-delta ${up ? "up" : "down"}">${up ? "▲ +" : "▼ −"}${fmtAmount(Math.abs(r.delta))}</span>`;
-      }
-      const seen = Number.isFinite(r.firstSeen)
-        ? new Date(r.firstSeen).toLocaleDateString(undefined, { month: "short", day: "numeric" })
-        : "—";
-      // The column names are carried on the cells so the narrow layout can
-      // rearrange them: six columns do not fit a phone, and letting the table
-      // squeeze instead made every row 235px tall and the page eight screens
-      // long.
-      return `
-        <tr>
-          <td class="dx-rank" data-dx-col="rank">${i + 1}</td>
-          <td data-dx-col="wallet"><a class="dx-wallet" href="${EXPLORER_ADDRESS}${encodeURIComponent(r.from)}" target="_blank" rel="noopener" title="${escapeHtml(r.from)}">${escapeHtml(shortAddress(r.from))}</a></td>
-          <td class="dx-num" data-dx-col="amount"><strong>${fmtAmount(r.amount)}</strong></td>
-          <td class="dx-num" data-dx-col="share">
-            <span class="dx-share"><i style="width:${Math.min(100, Math.max(0, r.share ?? 0)).toFixed(1)}%"></i></span>
-            ${fmtPct(r.share)}
-          </td>
-          <td class="dx-num" data-dx-col="change">${change}</td>
-          <td class="dx-num dx-dim" data-dx-col="seen">${seen}</td>
-        </tr>`;
-    }).join("");
+    list.innerHTML = capped.map((r, i) => rowMarkup(r, i, cut)).join("");
 
     if (!state.showAll && !state.search && rows.length > PAGE) {
-      body.insertAdjacentHTML("beforeend", `
-        <tr class="dx-more-row">
-          <td colspan="6">
-            <button type="button" class="dx-more" data-dx="showAll">
-              Show all ${rows.length} wallets
-            </button>
-          </td>
-        </tr>`);
+      list.insertAdjacentHTML("beforeend", `
+        <li class="dx-more-row">
+          <button type="button" class="dx-more" data-dx="showAll">Show all ${rows.length} wallets</button>
+        </li>`);
       const more = el("showAll");
       if (more) more.addEventListener("click", () => { state.showAll = true; renderDelegators(); });
     }
 
-    const total = state.delegators.length;
-    const shown = capped.length;
-    el("delegatorShown").textContent = shown === total
-      ? `${total} wallets`
-      : `${shown} of ${total} wallets`;
+    const label = state.filter === "all" ? "wallets" : `in "${$(`[data-dx-filter="${state.filter}"]`)?.textContent.trim() || state.filter}"`;
+    el("delegatorShown").textContent = capped.length === rows.length
+      ? `${rows.length} ${label}`
+      : `${capped.length} of ${rows.length} ${label}`;
+  }
+
+  function renderChips() {
+    $$("[data-dx-filter]").forEach((btn) => {
+      const key = btn.dataset.dxFilter;
+      btn.setAttribute("aria-pressed", String(key === state.filter));
+      if (key !== "all") {
+        const n = groupCount(key);
+        btn.disabled = n === 0;
+        btn.title = `${n} wallet${n === 1 ? "" : "s"}`;
+      }
+    });
+    $$("[data-dx-flow]").forEach((btn) => {
+      btn.setAttribute("aria-pressed", String(btn.dataset.dxFlow === state.filter));
+    });
   }
 
   function renderConcentration() {
-    const rows = state.delegators.slice().sort((a, b) => (b.amount ?? 0) - (a.amount ?? 0));
     const bar = $(".dx-conc-bar");
-    if (!bar) return;
-    const total = rows.reduce((s, r) => s + (r.amount ?? 0), 0);
-    if (!total) { bar.innerHTML = ""; return; }
+    const live = state.delegators.filter((r) => !r.departed);
+    if (!bar || !live.length) return;
+    const total = live.reduce((sum, r) => sum + r.amount, 0);
+    if (!total) return;
 
-    const top = rows.slice(0, 5);
-    const rest = total - top.reduce((s, r) => s + r.amount, 0);
-    const segs = top.map((r, i) => ({ pct: (r.amount / total) * 100, i }));
-    if (rest > 0) segs.push({ pct: (rest / total) * 100, i: -1 });
+    const top = live.slice().sort((a, b) => b.amount - a.amount).slice(0, 5);
+    const segs = top.map((r) => ({ pct: (r.amount / total) * 100 }));
+    const rest = Math.max(0, 100 - segs.reduce((s, x) => s + x.pct, 0));
+    bar.innerHTML = segs.map((s, i) => `<i class="w${i}" style="width:${s.pct.toFixed(2)}%"></i>`).join("")
+      + (rest > 0.2 ? `<i class="rest" style="width:${rest.toFixed(2)}%"></i>` : "");
 
-    // A 2px surface gap between adjacent fills keeps the segments legible.
-    bar.innerHTML = segs.map((s) => `<i class="${s.i === -1 ? "rest" : `w${s.i}`}" style="width:${s.pct.toFixed(2)}%"></i>`).join("");
-
+    const top5 = segs.reduce((s, x) => s + x.pct, 0);
     el("whaleShare").textContent = fmtPct(segs[0]?.pct);
-    el("top5Share").textContent = fmtPct(top.reduce((s, r) => s + (r.amount / total) * 100, 0));
+    el("top5Share").textContent = fmtPct(top5);
+    el("tailCount").textContent = Math.max(0, live.length - 5).toLocaleString("en-US");
     bar.setAttribute("aria-label",
-      `Top wallet ${fmtPct(segs[0]?.pct)}, top five ${fmtPct(top.reduce((s, r) => s + (r.amount / total) * 100, 0))} of delegated power`);
+      `Top wallet ${fmtPct(segs[0]?.pct)}, top five ${fmtPct(top5)} of delegated power`);
   }
 
-  // ── headline + snapshot ───────────────────────────────────────────────────
+  // ── headline, epoch and flow ────────────────────────────────────────────────
   function renderHeadline() {
     const latest = state.history.length ? state.history[state.history.length - 1] : null;
     const live = state.snapshot?.live;
@@ -600,11 +720,7 @@
     // policy weight for the current epoch, and the tail of the history series.
     let delegated = num(live?.delegated);
     let origin = Number.isFinite(delegated)
-      ? {
-          kind: "chain",
-          at: Date.parse(state.snapshot?.generatedAt) || null,
-          block: num(live?.blockNumber)
-        }
+      ? { kind: "chain", at: Date.parse(state.snapshot?.generatedAt) || null, block: num(live?.blockNumber) }
       : null;
 
     if (!Number.isFinite(delegated) && Number.isFinite(state.weights?.delegatedWeight)) {
@@ -620,50 +736,137 @@
       origin = state.historyOrigin;
     }
 
-    el("delegatedWflr").textContent = fmtAmount(delegated, 2);
+    el("delegatedWflr").textContent = `${fmtAmount(delegated, 2)}`;
     el("delegatedWflr").title = `${fmtFull(delegated)} WFLR`;
 
-    const count = state.delegators.length || latest?.delegators;
-    el("delegatorCount").textContent = Number.isFinite(count) ? fmtFull(count) : "—";
+    const net = num(live?.flow?.netChange);
+    const netEl = el("delegatedDelta");
+    if (netEl) {
+      if (Number.isFinite(net) && Math.abs(net) >= MOVED) {
+        const up = net > 0;
+        netEl.className = up ? "dx-up" : "dx-down";
+        netEl.textContent = `${up ? "▲ +" : "▼ −"}${fmtAmount(Math.abs(net))} WFLR`;
+      } else {
+        netEl.className = "dx-flat";
+        netEl.textContent = "No net change";
+      }
+    }
+
+    const count = state.delegators.filter((r) => !r.departed).length || latest?.delegators;
+    el("delegatorCount").textContent = Number.isFinite(count) ? fmtFull(count) : "-";
+
+    const summary = el("flowSummary");
+    if (summary) {
+      const joined = state.delegators.filter(GROUPS.joined).length;
+      const left = state.delegators.filter(GROUPS.departed).length;
+      summary.textContent = joined || left
+        ? `${joined} joined, ${left} left this epoch`
+        : "Unchanged this epoch";
+    }
 
     const bips = state.weights?.feeBips;
-    el("fee").textContent = Number.isFinite(bips) ? `${(bips / 100).toFixed(0)}%` : "—";
+    el("fee").textContent = Number.isFinite(bips) ? `${(bips / 100).toFixed(0)}%` : "-";
 
     const bounds = epochBounds();
-    el("epoch").textContent = bounds ? bounds.current : "—";
+    el("epoch").textContent = bounds ? bounds.current : "-";
+    if (bounds) el("epochRemaining").textContent = `${fmtRemaining(bounds.remaining)} until the snapshot`;
 
     paintFreshness("power", origin);
   }
 
+  function renderFlow() {
+    const flow = state.snapshot?.live?.flow;
+    const rows = state.delegators;
+    const sum = (predicate, pick) => rows.filter(predicate).reduce((s, r) => s + Math.abs(pick(r) || 0), 0);
+
+    const parts = [
+      ["flowJoined", "flowJoinedAmt", "joined", GROUPS.joined, (r) => r.amount],
+      ["flowUp", "flowUpAmt", "increased", GROUPS.increased, (r) => r.delta],
+      ["flowDown", "flowDownAmt", "decreased", GROUPS.decreased, (r) => r.delta],
+      ["flowLeft", "flowLeftAmt", "departed", GROUPS.departed, (r) => r.previous]
+    ];
+    parts.forEach(([countKey, amountKey, group, predicate, pick]) => {
+      const n = rows.filter(predicate).length;
+      const node = el(countKey);
+      if (node) node.textContent = Number.isFinite(n) ? String(n) : "-";
+      const amount = el(amountKey);
+      if (amount) amount.textContent = n ? `${fmtAmount(sum(predicate, pick))} WFLR` : "—";
+      const stat = $(`[data-dx-flow="${group}"]`);
+      if (stat) stat.dataset.dxEmpty = String(n === 0);
+    });
+
+    const net = num(flow?.netChange);
+    const netEl = el("flowNet");
+    if (netEl) {
+      const moved = Number.isFinite(net) && Math.abs(net) >= MOVED;
+      netEl.className = moved ? (net > 0 ? "dx-up" : "dx-down") : "dx-flat";
+      netEl.textContent = moved
+        ? `${net > 0 ? "+" : "−"}${fmtAmount(Math.abs(net))} WFLR`
+        : "unchanged";
+    }
+    const since = el("flowSince");
+    if (since) {
+      const at = num(flow?.baselineAt);
+      since.textContent = Number.isFinite(at)
+        ? `, ${fmtAge(Date.now() - at)}`
+        : "";
+    }
+  }
+
   function renderSnapshot() {
     const bounds = epochBounds();
-    const card = $(".dx-snapshot");
+    const card = $(".dx-countdown");
     if (!bounds || !card) return;
     el("snapshotCountdown").textContent = fmtRemaining(bounds.remaining);
     el("snapshotWhen").textContent = new Date(bounds.end * 1000)
-      .toLocaleString(undefined, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+      .toLocaleString(undefined, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
     el("nextEpoch").textContent = bounds.current + 1;
+    el("epochInline").textContent = bounds.current;
+    el("epochProgressPct").textContent = `${(bounds.progress * 100).toFixed(0)}%`;
     const bar = $('[data-dx-bar="epochProgress"]');
     if (bar) bar.style.width = `${(bounds.progress * 100).toFixed(1)}%`;
     card.dataset.dxState = bounds.remaining < 6 * 3600 ? "soon" : "ok";
+    if (el("epochRemaining")) el("epochRemaining").textContent = `${fmtRemaining(bounds.remaining)} until the snapshot`;
   }
 
   // ── wiring ────────────────────────────────────────────────────────────────
+  function setFilter(key) {
+    state.filter = state.filter === key && key !== "all" ? "all" : key;
+    state.showAll = false;
+    renderChips();
+    renderDelegators();
+  }
+
   function bindControls() {
+    // The chart range uses the site's own toggle, so it carries the site's
+    // active state rather than a second convention for the same thing.
     $$("[data-dx-range]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.range = Number(btn.dataset.dxRange) || 0;
-        $$("[data-dx-range]").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+        $$("[data-dx-range]").forEach((b) => b.classList.toggle("active", b === btn));
         renderCharts();
       });
     });
-    $$("[data-dx-sort]").forEach((btn) => {
+
+    $$("[data-dx-filter]").forEach((btn) => {
+      btn.addEventListener("click", () => setFilter(btn.dataset.dxFilter));
+    });
+    $$("[data-dx-flow]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        state.sort = btn.dataset.dxSort;
-        $$("[data-dx-sort]").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-        renderDelegators();
+        setFilter(btn.dataset.dxFlow);
+        document.querySelector(".dx-book")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
+
+    const sort = el("sort");
+    if (sort) {
+      sort.addEventListener("change", () => {
+        state.sort = sort.value;
+        state.showAll = false;
+        renderDelegators();
+      });
+    }
+
     const search = el("search");
     if (search) {
       search.addEventListener("input", () => {
@@ -676,8 +879,11 @@
   function renderAll() {
     renderHeadline();
     renderSnapshot();
+    renderFlow();
     renderCharts();
+    renderPinned();
     renderConcentration();
+    renderChips();
     renderDelegators();
     paintFreshness("history", state.historyOrigin);
     paintFreshness("delegators", state.delegatorsOrigin);

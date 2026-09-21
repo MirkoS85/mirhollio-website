@@ -14,6 +14,19 @@ const ORACLE_PROVIDERS_URL = "https://api.oracle-daemon.com/v2/flare/providers";
 const FSE_ENTITY_URL = `https://flare-systems-explorer.flare.network/backend-url/api/v0/entity/${TARGET_VOTER_CHECKSUM}`;
 const OUT_PATH = path.resolve("data/ftso-delegations.json");
 const HISTORY_DAYS = 180;
+
+// Reward epochs run on a fixed cadence from a known anchor. The site derives
+// the current one this way everywhere else; taking it from the tail of the
+// history series instead would follow whatever the slowest feed last published
+// - which is how the epoch baseline ended up labelled 433 while 434 was running.
+const EPOCH_ANCHOR = 428;
+const EPOCH_ANCHOR_TIME = 1787857200;
+const EPOCH_LENGTH_SECONDS = 302400;
+
+function currentRewardEpoch(now = Date.now()) {
+  const elapsed = Math.floor(now / 1000) - EPOCH_ANCHOR_TIME;
+  return EPOCH_ANCHOR + Math.floor(elapsed / EPOCH_LENGTH_SECONDS);
+}
 const MAX_DELEGATOR_EPOCHS = 80;
 
 function urlWithParams(baseUrl, params) {
@@ -349,7 +362,10 @@ async function main() {
 
   if (!history.length) throw new Error("No delegation history could be loaded");
 
-  const currentEpoch = Number(history[history.length - 1]?.epoch);
+  // The epoch the chain is in right now, not the last one a feed finished
+  // publishing: the delegator book is live, so its baseline has to be too.
+  const currentEpoch = currentRewardEpoch();
+  const publishedEpoch = Number(history[history.length - 1]?.epoch);
   // Carry the addresses *and* their first-seen dates: those were measured by
   // whichever source published them and cannot be recovered from a forward-only
   // scan of recent blocks.
@@ -412,7 +428,7 @@ async function main() {
 
   if (!wallets.length && Array.isArray(existingSnapshot?.delegators) && existingSnapshot.delegators.length) {
     const existingWalletEpoch = Number(existingSnapshot?.insights?.latestEpoch);
-    if (Number.isFinite(existingWalletEpoch) && existingWalletEpoch === currentEpoch) {
+    if (Number.isFinite(existingWalletEpoch) && existingWalletEpoch === publishedEpoch) {
       wallets = existingSnapshot.delegators;
       delegatorsSource = cachedLabel(existingSnapshot?.source?.delegators, "unknown");
       warnings.push("Reused the previous delegator snapshot for the current epoch");

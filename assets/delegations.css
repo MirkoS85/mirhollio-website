@@ -1,82 +1,65 @@
 /* Delegation explorer.
-   Inherits the site shell from live-refresh.css; everything here is scoped to
-   .dx- so it cannot leak into the other pages. */
+ *
+ * The shell, sections, cards, metrics and toggles all come from
+ * live-refresh.css - this page uses the site's components rather than a private
+ * set that merely resembles them, which is what made the first version feel
+ * like a different site. Everything here is scoped to .dx- and covers only what
+ * the site does not already have: the breadcrumb, the epoch-flow panel, the
+ * charts, and the delegator book.
+ */
 
 .visually-hidden{
   position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
   clip:rect(0 0 0 0);white-space:nowrap;border:0;
 }
 
-.dx-back{
-  display:inline-flex;align-items:center;gap:6px;
-  margin-bottom:18px;
-  color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;
+/* ── breadcrumb ─────────────────────────────────────────────────────────────
+   A sub-page needs to say where it sits, and give a way back that is bigger
+   than a bare arrow. Each ancestor is its own tap target at 44px. */
+.dx-crumbs{
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px;
+  margin:0 0 18px;
+  font-size:12.5px;font-weight:700;
 }
-.dx-back:hover{color:var(--ink)}
-
-/* ── headline ──────────────────────────────────────────────────────────── */
-.dx-hero{
-  display:grid;
-  grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
-  gap:18px;
-  align-items:stretch;
+.dx-crumbs a,
+.dx-crumbs b{
+  display:inline-flex;align-items:center;
+  min-height:32px;padding:0 10px;
+  border-radius:999px;
+  text-decoration:none;
 }
-
-.dx-hero-main,
-.dx-snapshot{
-  padding:26px 26px 24px;
-  border:1px solid var(--line);
-  border-radius:16px;
-  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));
-}
-
-.dx-hero-main{
-  position:relative;
-  overflow:hidden;
-}
-
-/* A single restrained accent wash - the figure carries the page, not chrome. */
-.dx-hero-main::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(120% 120% at 100% 0%,rgba(255,46,99,.10),transparent 60%);
-}
-
-.dx-kicker{
-  display:block;
+.dx-crumbs a{
   color:var(--muted);
-  font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  transition:color .15s ease, border-color .15s ease, background .15s ease;
 }
+.dx-crumbs a:hover{color:var(--ink);border-color:rgba(255,46,99,.35);background:rgba(255,46,99,.08)}
+.dx-crumbs b{color:var(--ink);background:rgba(255,46,99,.14);border:1px solid rgba(255,46,99,.30)}
+.dx-crumbs span{color:var(--muted-2)}
 
-.dx-hero-figure{
-  display:block;
-  margin-top:10px;
-  font-family:"Archivo",system-ui,sans-serif;
-  font-size:clamp(44px,7vw,76px);
-  font-weight:800;
-  line-height:.95;
-  letter-spacing:-.02em;
-  color:var(--ink);
-  font-variant-numeric:tabular-nums;
+/* ── headline ─────────────────────────────────────────────────────────────── */
+/* The hero tiles are the site's own .hero-live-tile; these only add the
+   supporting line under a value, and give the headline figure more room than
+   the four beside it. */
+.hero-live-tile small{
+  display:block;margin-top:6px;
+  color:var(--muted-2);font-size:11.5px;font-weight:600;line-height:1.45;
 }
+/* No column span: the strip is an auto-fit grid, so a tile that takes two
+   slots pushes the last one onto a row of its own. The headline figure earns
+   its prominence from type size instead. */
+.dx-tile-lead strong{font-size:clamp(26px,2.6vw,34px) !important;letter-spacing:-.03em;color:var(--ink)}
+.dx-tile-lead{border-color:rgba(255,46,99,.22)}
 
-.dx-hero-unit{
-  display:inline-block;margin-top:4px;
-  color:var(--pink);
-  font-size:15px;font-weight:800;letter-spacing:.06em;
-}
+.dx-up{color:var(--green);font-weight:800}
+.dx-down{color:var(--danger);font-weight:800}
+.dx-flat{color:var(--muted-2);font-weight:700}
 
-.dx-hero-sub{
-  margin:12px 0 0;
-  color:var(--text);
-  font-size:14px;
-}
-.dx-hero-sub span{font-weight:700}
-
-/* ── provenance line: every block says where its numbers came from ─────── */
+/* ── provenance: every block says where its numbers came from ─────────────── */
 .dx-source{
-  display:block;
-  margin:12px 0 0;
-  font-size:11.5px;font-weight:600;
+  display:block;margin:16px 0 0;
+  font-size:11.5px;font-weight:600;line-height:1.5;
   color:var(--muted-2);
 }
 .dx-source[data-tone="live"]{color:var(--green)}
@@ -84,83 +67,112 @@
 .dx-source[data-tone="warn"]{color:var(--yellow)}
 .dx-source[data-tone="down"]{color:var(--danger)}
 
-/* ── snapshot countdown ────────────────────────────────────────────────── */
-.dx-snapshot{display:flex;flex-direction:column}
+/* ── the epoch in progress ────────────────────────────────────────────────── */
+.dx-epoch-grid{
+  display:grid;
+  grid-template-columns:minmax(0,320px) minmax(0,1fr);
+  gap:14px;
+  align-items:stretch;
+}
 
-.dx-snapshot-count{
-  display:block;margin-top:10px;
-  font-family:"Archivo",system-ui,sans-serif;
-  font-size:clamp(30px,4vw,42px);font-weight:800;line-height:1;
-  color:var(--ink);
+.dx-countdown{
+  display:flex;flex-direction:column;
+  min-height:0;
+}
+.dx-countdown b{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.dx-countdown strong{
+  margin-top:10px;
+  font-size:clamp(30px,4.4vw,42px);
+  letter-spacing:-.03em;line-height:1;
   font-variant-numeric:tabular-nums;
 }
-.dx-snapshot[data-dx-state="soon"] .dx-snapshot-count{color:var(--yellow)}
+.dx-countdown[data-dx-state="soon"] strong{color:var(--yellow)}
+.dx-countdown p{margin:8px 0 0;color:var(--muted);font-size:12.5px;font-weight:600}
+.dx-countdown small{display:block;margin-top:10px;color:var(--muted-2);font-size:11.5px}
+/* The site's .card carries a 196px floor for tiles that hold one big number;
+   this one holds four things and does not need the padding under them. */
+.dx-countdown{min-height:0}
 
-.dx-snapshot-when{
-  display:block;margin-top:6px;
-  color:var(--muted);font-size:12.5px;font-weight:600;
-}
-
-.dx-snapshot-track{
-  margin:16px 0 12px;height:6px;border-radius:999px;
+/* The two cards sit in one grid row, so this one is stretched to the taller
+   card's height. Pushing the bar to the bottom fills that rather than leaving
+   a third of the card empty. */
+.dx-track{
+  margin:auto 0 0;height:6px;border-radius:999px;
   background:rgba(255,255,255,.08);overflow:hidden;
 }
-.dx-snapshot-track i{
+.dx-track i{
   display:block;height:100%;border-radius:999px;
   background:linear-gradient(90deg,var(--pink),#FF6B93);
   transition:width .6s ease;
 }
 
-.dx-snapshot-note{
-  margin:auto 0 0;color:var(--muted);font-size:12px;line-height:1.5;
-}
-.dx-snapshot-note span{color:var(--ink);font-weight:700}
+.dx-flow-card{min-height:0;padding:0;overflow:hidden}
 
-/* ── cards ─────────────────────────────────────────────────────────────── */
-.dx-card{
-  margin-top:18px;padding:22px;
-  border:1px solid var(--line);border-radius:16px;
-  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.012));
+.dx-flow{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:1px;
+  background:var(--line);
+}
+/* Each figure is also the filter for that group - the obvious question after
+   "four wallets left" is "which four". */
+.dx-flow-stat{
+  display:block;padding:16px 14px;
+  border:0;border-top:2px solid transparent;
+  background:var(--surface);
+  color:inherit;font:inherit;text-align:left;cursor:pointer;
+  transition:background .15s ease, border-color .15s ease;
+}
+.dx-flow-stat:hover{background:var(--surface-2)}
+.dx-flow-stat[aria-pressed="true"]{border-top-color:var(--pink);background:rgba(255,46,99,.10)}
+.dx-flow-stat span{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.dx-flow-stat strong{
+  display:block;margin-top:8px;
+  font-family:"Archivo",system-ui,sans-serif;
+  font-size:26px;font-weight:800;line-height:1;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.dx-flow-stat small{display:block;margin-top:5px;color:var(--muted-2);font-size:11.5px;font-variant-numeric:tabular-nums}
+.dx-flow-stat[data-dx-flow="joined"] strong,
+.dx-flow-stat[data-dx-flow="increased"] strong{color:var(--green)}
+.dx-flow-stat[data-dx-flow="decreased"] strong,
+.dx-flow-stat[data-dx-flow="departed"] strong{color:var(--danger)}
+.dx-flow-stat[data-dx-empty="true"] strong{color:var(--muted-2)}
+
+.dx-flow-net{
+  margin:0;padding:14px 18px;
+  border-top:1px solid var(--line);
+  color:var(--muted);font-size:12.5px;
+}
+/* The site styles `b` inside a card as a standalone label: block-level, pink,
+   uppercase, letter-spaced, with a 38px gutter for the info button. Inside a
+   sentence that puts every value on its own line in the wrong colour, so the
+   inline ones have to opt out explicitly. */
+.dx-countdown small b,
+.hero-live-tile small b,
+.dx-flow-net b,
+.section-side b,
+.dx-conc-note b{
+  display:inline;
+  margin:0;padding:0;
+  color:var(--text);font-size:inherit;font-weight:800;
+  letter-spacing:normal;text-transform:none;
+  font-variant-numeric:tabular-nums;
 }
 
-.dx-card-head{
-  display:flex;flex-wrap:wrap;gap:12px;
-  align-items:flex-start;justify-content:space-between;
-  margin-bottom:16px;
-}
-.dx-card-head strong{display:block;font-size:15px;color:var(--ink)}
-.dx-card-head small{display:block;margin-top:3px;color:var(--muted);font-size:12px}
+.dx-flow-net b.dx-up{color:var(--green)}
+.dx-flow-net b.dx-down{color:var(--danger)}
+.dx-flow-net b.dx-flat{color:var(--muted-2)}
+.dx-flow-hint{display:block;margin-top:4px;color:var(--muted-2);font-size:11.5px}
 
-.dx-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* The site's toggle is built for two options; the chart range has three. */
+.dx-toggle-3{grid-template-columns:repeat(3,minmax(44px,1fr))}
 
-.dx-range{
-  display:inline-flex;gap:2px;padding:3px;
-  border:1px solid var(--line);border-radius:999px;
-  background:rgba(255,255,255,.03);
-}
-.dx-range button{
-  min-height:28px;padding:0 12px;border:0;border-radius:999px;
-  background:transparent;color:var(--muted);
-  font:inherit;font-size:12px;font-weight:700;cursor:pointer;
-}
-.dx-range button[aria-pressed="true"]{background:var(--pink);color:#fff}
-.dx-range button:hover:not([aria-pressed="true"]){color:var(--ink)}
-
-.dx-search input{
-  min-height:34px;padding:0 12px;width:min(200px,42vw);
-  border:1px solid var(--line);border-radius:999px;
-  background:rgba(255,255,255,.03);color:var(--ink);
-  font:inherit;font-size:12.5px;
-}
-.dx-search input::placeholder{color:var(--muted-2)}
-.dx-search input:focus{outline:2px solid var(--pink);outline-offset:1px}
-
-/* ── charts ────────────────────────────────────────────────────────────── */
-.dx-chart-wrap{position:relative;width:100%;height:clamp(200px,28vw,300px)}
-.dx-chart-wrap-short{height:clamp(110px,15vw,150px)}
+/* ── charts ───────────────────────────────────────────────────────────────── */
+.dx-chart-wrap{position:relative;width:100%;height:clamp(200px,26vw,290px);margin-top:16px}
+.dx-chart-wrap-short{height:clamp(110px,14vw,150px)}
 .dx-chart{display:block;width:100%;height:100%;overflow:visible}
 .dx-chart-empty{fill:var(--muted-2);font-size:14px}
-
 .dx-crosshair{stroke:rgba(255,255,255,.28);stroke-width:1;stroke-dasharray:3 3}
 
 .dx-tooltip{
@@ -174,87 +186,6 @@
 .dx-tooltip b{display:block;font-size:11px;color:var(--muted)}
 .dx-tooltip span{display:block;margin-top:2px;font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
 
-.dx-chart-foot{
-  display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;
-  margin-top:14px;padding-top:12px;border-top:1px solid var(--line);
-  color:var(--muted);font-size:12px;
-}
-.dx-chart-foot strong{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
-.dx-chart-foot .dx-source{margin:0;margin-left:auto;text-align:right}
-
-.dx-link{color:var(--pink);font-size:12px;font-weight:700;text-decoration:none}
-.dx-link:hover{text-decoration:underline}
-
-/* ── concentration bar ─────────────────────────────────────────────────── */
-.dx-concentration{margin-bottom:16px}
-
-.dx-conc-bar{
-  display:flex;height:12px;border-radius:999px;overflow:hidden;
-  background:rgba(255,255,255,.05);
-}
-/* 2px surface gaps keep adjacent fills readable without outlines. */
-.dx-conc-bar i{display:block;height:100%;border-right:2px solid var(--bg)}
-.dx-conc-bar i:last-child{border-right:0}
-.dx-conc-bar i.w0{background:#FF2E63}
-.dx-conc-bar i.w1{background:#FF6B93}
-.dx-conc-bar i.w2{background:#FF9DBB}
-.dx-conc-bar i.w3{background:#C9738C}
-.dx-conc-bar i.w4{background:#8E5A69}
-.dx-conc-bar i.rest{background:rgba(255,255,255,.16)}
-
-.dx-conc-note{margin:10px 0 0;color:var(--muted);font-size:12.5px}
-.dx-conc-note strong{color:var(--ink);font-weight:800}
-
-/* ── delegator table ───────────────────────────────────────────────────── */
-.dx-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-
-.dx-table{width:100%;border-collapse:collapse;font-size:13px}
-.dx-table th{
-  padding:8px 10px;text-align:left;
-  color:var(--muted);font-size:11px;font-weight:800;
-  letter-spacing:.05em;text-transform:uppercase;
-  border-bottom:1px solid var(--line);white-space:nowrap;
-}
-.dx-table td{
-  padding:10px;border-bottom:1px solid rgba(255,255,255,.05);
-  color:var(--text);vertical-align:middle;
-}
-.dx-table tr:hover td{background:rgba(255,255,255,.025)}
-.dx-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.dx-rank{color:var(--muted-2);font-weight:700;width:40px}
-.dx-dim{color:var(--muted)}
-.dx-empty{padding:26px 10px;text-align:center;color:var(--muted)}
-
-.dx-wallet{color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;text-decoration:none}
-.dx-wallet:hover{color:var(--pink);text-decoration:underline}
-
-.dx-share{
-  display:inline-block;width:52px;height:5px;margin-right:8px;
-  border-radius:999px;background:rgba(255,255,255,.09);
-  vertical-align:middle;overflow:hidden;
-}
-.dx-share i{display:block;height:100%;background:var(--pink);border-radius:999px}
-
-/* Status colour never travels alone - the arrow and sign carry the meaning. */
-.dx-delta{font-weight:700}
-.dx-delta.up{color:var(--green)}
-.dx-delta.down{color:var(--danger)}
-.dx-flat{color:var(--muted-2)}
-
-@media (max-width:900px){
-  .dx-hero{grid-template-columns:minmax(0,1fr)}
-  .dx-chart-foot .dx-source{margin-left:0;text-align:left;width:100%}
-}
-
-.dx-more-row td{padding:0;border-bottom:0}
-.dx-more{
-  width:100%;min-height:44px;
-  border:0;border-top:1px solid var(--line);
-  background:transparent;color:var(--pink);
-  font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;
-}
-.dx-more:hover{background:rgba(255,46,99,.07)}
-
 /* Axis labels are HTML, not SVG <text>: the plots use preserveAspectRatio="none"
    and would stretch any text horizontally along with the data. */
 .dx-axis{position:absolute;pointer-events:none;color:var(--muted-2);font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums}
@@ -263,56 +194,242 @@
   display:flex;flex-direction:column;justify-content:space-between;
   align-items:flex-end;text-align:right;
 }
-.dx-axis-y span{
-  padding:0 2px;border-radius:3px;
-  background:linear-gradient(90deg,transparent,var(--surface) 35%);
+.dx-axis-y span{padding:0 2px;border-radius:3px;background:linear-gradient(90deg,transparent,var(--surface) 35%)}
+.dx-axis-x{left:0;right:0;bottom:0;display:flex;justify-content:space-between}
+
+/* A pinned epoch: the tooltip answers "what was this point" while the pointer
+   is on it, which is no answer at all on a touch screen. Tapping a point keeps
+   the reading until another is tapped. */
+.dx-pinned{
+  display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;
+  margin-top:14px;padding:10px 12px;
+  border:1px solid rgba(255,46,99,.28);
+  border-radius:12px;
+  background:rgba(255,46,99,.07);
+  color:var(--muted);font-size:12.5px;
 }
-.dx-axis-x{
-  left:0;right:0;bottom:0;
-  display:flex;justify-content:space-between;
+.dx-pinned[hidden]{display:none}
+.dx-pinned b{color:var(--ink);font-weight:800}
+.dx-pinned span{font-variant-numeric:tabular-nums}
+.dx-pinned strong{
+  display:inline;margin:0;
+  color:var(--ink);font-size:inherit;font-weight:800;letter-spacing:normal;
+  font-variant-numeric:tabular-nums;
+}
+.dx-unpin{
+  margin-left:auto;min-height:28px;padding:0 10px;
+  border:0;border-radius:999px;background:transparent;
+  color:var(--pink);font:inherit;font-size:12px;font-weight:800;cursor:pointer;
+}
+.dx-unpin:hover{background:rgba(255,46,99,.12)}
+
+.dx-foot{
+  display:flex;flex-wrap:wrap;gap:14px;align-items:baseline;
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  color:var(--muted);font-size:12px;
+}
+.dx-foot strong{
+  display:inline;margin:0;
+  color:var(--ink);font-size:inherit;font-weight:700;letter-spacing:normal;
+  font-variant-numeric:tabular-nums;
+}
+.dx-foot .dx-source{margin:0;margin-left:auto;text-align:right}
+.dx-link{color:var(--pink);font-size:12px;font-weight:700;text-decoration:none}
+.dx-link:hover{text-decoration:underline}
+
+/* ── the book ─────────────────────────────────────────────────────────────── */
+.dx-book{padding:0;overflow:hidden}
+.dx-book .panel-head small{font-variant-numeric:tabular-nums}
+
+.dx-controls{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding:14px 18px;
+  border-bottom:1px solid var(--line);
 }
 
-/* ── the book on a phone ────────────────────────────────────────────────────
-   Six columns cannot fit 390px. Left to squeeze, every row wrapped to 235px
-   and the page ran to eight screens, so below 640px each wallet becomes a
-   three-line block instead: who, how much, and how it is moving. */
-@media (max-width:640px){
-  .dx-table-wrap{overflow-x:visible}
-  .dx-table thead{
-    position:absolute;width:1px;height:1px;overflow:hidden;
-    clip:rect(0 0 0 0);white-space:nowrap;
+.dx-search{flex:1 1 200px;min-width:0}
+.dx-search input{
+  width:100%;min-height:44px;padding:0 14px;
+  border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.03);color:var(--ink);
+  font:inherit;font-size:13px;
+}
+.dx-search input::placeholder{color:var(--muted-2)}
+.dx-search input:focus{outline:2px solid var(--pink);outline-offset:1px}
+
+.dx-chips{display:flex;flex-wrap:wrap;gap:6px}
+.dx-chip{
+  min-height:36px;padding:0 13px;
+  border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.03);color:var(--muted);
+  font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:color .15s ease, border-color .15s ease, background .15s ease;
+}
+.dx-chip:hover{color:var(--ink)}
+.dx-chip[aria-pressed="true"]{
+  color:#fff;border-color:#ff296d;
+  background:linear-gradient(180deg,#ff296d,#ff296d);
+  box-shadow:0 10px 22px rgba(255,41,109,.20);
+}
+.dx-chip[disabled]{opacity:.38;cursor:default}
+.dx-chip[disabled]:hover{color:var(--muted)}
+
+.dx-sort select{
+  min-height:44px;padding:0 34px 0 14px;
+  border:1px solid var(--line);border-radius:999px;
+  background:rgba(255,255,255,.03)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239AA0AF' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat right 14px center;
+  color:var(--ink);font:inherit;font-size:12.5px;font-weight:600;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+}
+.dx-sort select:focus{outline:2px solid var(--pink);outline-offset:1px}
+
+/* ── concentration ────────────────────────────────────────────────────────── */
+.dx-concentration{padding:16px 18px;border-bottom:1px solid var(--line)}
+.dx-conc-bar{display:flex;height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.05)}
+/* 2px surface gaps keep adjacent fills readable without outlines. */
+.dx-conc-bar i{display:block;height:100%;border-right:2px solid var(--surface)}
+.dx-conc-bar i:last-child{border-right:0}
+.dx-conc-bar i.w0{background:#FF2E63}
+.dx-conc-bar i.w1{background:#FF6B93}
+.dx-conc-bar i.w2{background:#FF9DBB}
+.dx-conc-bar i.w3{background:#C9738C}
+.dx-conc-bar i.w4{background:#8E5A69}
+.dx-conc-bar i.rest{background:rgba(255,255,255,.16)}
+.dx-conc-note{margin:10px 0 0;color:var(--muted);font-size:12.5px;line-height:1.6}
+/* The site sizes every `strong` inside a .card as a 28px display figure on its
+   own line. Inside a sentence that turns one line of prose into five. */
+.dx-conc-note strong{
+  display:inline;margin:0;
+  color:var(--ink);font-size:inherit;font-weight:800;letter-spacing:normal;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── the wallet list ──────────────────────────────────────────────────────── */
+/* A six-column table was unreadable at both widths: on a phone every row
+   wrapped to 235px, and on a desktop the eye had to cross five columns to
+   answer one question. Each wallet is a two-line block instead - identity and
+   size on the first line, weight and movement on the second - which reads the
+   same at 390px and 1440px. */
+.dx-list{list-style:none;margin:0;padding:0}
+
+.dx-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  grid-template-areas:
+    "rank wallet amount"
+    "rank meter  change";
+  gap:7px 14px;
+  align-items:center;
+  padding:14px 18px;
+  border-bottom:1px solid rgba(255,255,255,.055);
+  transition:background .12s ease;
+}
+.dx-row:last-child{border-bottom:0}
+.dx-row:hover{background:rgba(255,255,255,.022)}
+.dx-row.is-departed{opacity:.72}
+
+.dx-rank{
+  grid-area:rank;
+  color:var(--muted-2);font-size:12px;font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+
+.dx-who{grid-area:wallet;min-width:0}
+.dx-wallet{
+  color:var(--ink);text-decoration:none;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13px;letter-spacing:-.01em;
+}
+.dx-wallet:hover{color:var(--pink);text-decoration:underline}
+.dx-since{display:block;margin-top:3px;color:var(--muted-2);font-size:11.5px}
+
+.dx-tag{
+  display:inline-block;margin-left:8px;padding:2px 7px;
+  border-radius:999px;vertical-align:middle;
+  font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+}
+.dx-tag.new{background:rgba(53,199,126,.16);color:var(--green)}
+.dx-tag.gone{background:rgba(255,98,66,.16);color:var(--danger)}
+.dx-tag.whale{background:rgba(255,46,99,.14);color:#FF87A6}
+
+.dx-amount{
+  grid-area:amount;text-align:right;white-space:nowrap;
+  font-family:"Archivo",system-ui,sans-serif;
+  font-size:17px;font-weight:800;letter-spacing:-.02em;
+  color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.dx-amount u{display:block;margin-top:2px;color:var(--muted-2);font-size:10.5px;font-weight:700;text-decoration:none;letter-spacing:.06em}
+
+.dx-meter{grid-area:meter;display:flex;align-items:center;gap:9px;min-width:0}
+.dx-bar{
+  flex:1 1 auto;max-width:170px;height:5px;
+  border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;
+}
+.dx-bar i{display:block;height:100%;border-radius:999px;background:var(--pink)}
+.dx-pct{color:var(--muted);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* Status colour never travels alone - the arrow and sign carry the meaning. */
+.dx-change{
+  grid-area:change;text-align:right;white-space:nowrap;
+  font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.dx-change.up{color:var(--green)}
+.dx-change.down{color:var(--danger)}
+.dx-change.flat{color:var(--muted-2)}
+
+.dx-empty{padding:34px 18px;text-align:center;color:var(--muted);font-size:13px}
+.dx-more{
+  width:100%;min-height:50px;
+  border:0;border-top:1px solid var(--line);
+  background:transparent;color:var(--pink);
+  font:inherit;font-size:13px;font-weight:800;cursor:pointer;
+}
+.dx-more:hover{background:rgba(255,46,99,.07)}
+
+.dx-book .dx-foot{margin:0;padding:14px 18px;border-top:1px solid var(--line)}
+
+@media (min-width:900px){
+  .dx-row{
+    grid-template-columns:38px minmax(210px,1.25fr) minmax(120px,1fr) 118px 146px;
+    grid-template-areas:"rank wallet meter amount change";
+    gap:0 18px;
+    padding:11px 18px;
   }
-  .dx-table,
-  .dx-table tbody,
-  .dx-table tr,
-  .dx-table td{display:block;width:auto}
+  .dx-since{display:inline;margin:0 0 0 10px;font-size:11px;white-space:nowrap}
+  .dx-amount{font-size:15px}
+  .dx-amount u{display:inline;margin:0 0 0 4px;font-size:10px}
+  .dx-bar{max-width:none}
+}
 
-  .dx-table tr{
-    display:grid;
-    grid-template-columns:26px minmax(0,1fr) auto;
-    grid-template-areas:
-      "rank   wallet wallet"
-      "amount amount change"
-      "share  share  seen";
-    gap:5px 10px;
-    align-items:center;
-    padding:12px 2px;
-    border-bottom:1px solid rgba(255,255,255,.06);
+/* ── narrow ───────────────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  .dx-epoch-grid{grid-template-columns:minmax(0,1fr)}
+  .dx-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dx-metric-lead{grid-column:span 2}
+}
+
+@media (max-width:620px){
+  .dx-crumbs{font-size:12px}
+  .dx-row{
+    grid-template-columns:28px minmax(0,1fr) auto;
+    padding:13px 14px;
+    gap:6px 10px;
   }
-  .dx-table tr:hover td{background:none}
-  .dx-table td{padding:0;border:0}
-
-  [data-dx-col="rank"]{grid-area:rank}
-  [data-dx-col="wallet"]{grid-area:wallet;text-align:left}
-  [data-dx-col="amount"]{grid-area:amount;text-align:left}
-  [data-dx-col="amount"] strong{font-size:17px;letter-spacing:-.01em}
-  [data-dx-col="change"]{grid-area:change;text-align:right}
-  [data-dx-col="share"]{grid-area:share;display:flex;align-items:center;gap:8px;text-align:left}
-  [data-dx-col="seen"]{grid-area:seen;text-align:right}
-
-  /* The empty state and the show-all button are single full-width cells. */
-  .dx-table tr:has(> .dx-empty),
-  .dx-more-row{display:block}
-  .dx-more-row td,
-  .dx-empty{display:block;width:100%}
+  .dx-amount{font-size:16px}
+  .dx-bar{max-width:none}
+  .dx-controls{padding:12px 14px;gap:8px}
+  .dx-search{flex-basis:100%}
+  .dx-sort{flex:1 1 100%}
+  .dx-sort select{width:100%}
+  /* Scrolling these hid "Top 1%" off the right edge with nothing to say it was
+     there. Six chips wrap to two rows and everything stays reachable. */
+  .dx-chips{width:100%;flex-wrap:wrap}
+  .dx-chip{flex:1 1 auto;min-width:0}
+  .dx-concentration,
+  .dx-book .dx-foot{padding:14px}
+  .dx-foot .dx-source{margin-left:0;text-align:left;width:100%}
+  .dx-flow-stat{padding:13px 12px}
+  .dx-flow-stat strong{font-size:22px}
 }
