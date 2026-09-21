@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-21T04:59:34.511Z",
+  "generatedAt": "2026-09-21T05:15:23.370Z",
   "position": {
     "epoch": 434,
     "voters": 99,
@@ -111,11 +111,11 @@
       0.01
     ],
     "ourIndex": 67,
-    "primaryPct": 51.58,
-    "secondaryPct": 98.7,
+    "primaryPct": 51.41,
+    "secondaryPct": 98.58,
     "availabilityPct": 100,
-    "medianPrimaryPct": 40.08,
-    "medianSecondaryPct": 96.36,
+    "medianPrimaryPct": 39.98,
+    "medianSecondaryPct": 96.35,
     "passes": 3,
     "eligible": true
   },
@@ -240,12 +240,6 @@
   },
   "weightHistory": [
     {
-      "epoch": 425,
-      "wflrM": 5044395.39,
-      "stakeM": 89998947.02,
-      "weight": 98.52
-    },
-    {
       "epoch": 426,
       "wflrM": 4254243.17,
       "stakeM": 89998947.02,
@@ -298,9 +292,22 @@
       "wflrM": 117430890.87,
       "stakeM": 89382371.3,
       "weight": 115.79
+    },
+    {
+      "epoch": 435,
+      "wflrM": 98467092.64,
+      "stakeM": 83374475.62,
+      "weight": 108.16
     }
   ],
   "votePowerSnapshots": [
+    {
+      "epoch": 435,
+      "takenDuring": 434,
+      "block": 70044902,
+      "at": "2026-09-18T06:10:55.000Z",
+      "pct": 13.31
+    },
     {
       "epoch": 434,
       "takenDuring": 433,
