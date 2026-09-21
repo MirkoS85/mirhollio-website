@@ -441,8 +441,12 @@ async function main() {
       // power actually is. The two match once discovery has found everyone;
       // until then the gap is the honest measure of what is missing.
       listed: chain.listed,
-      historyScanComplete: Boolean(chain.historyComplete)
+      historyScanComplete: Boolean(chain.historyComplete),
+      // Who moved during the reward epoch in progress, measured against a
+      // baseline captured the first time this epoch was seen.
+      flow: chain.flow
     } : null,
+    departed: chain ? chain.departed : [],
     weights,
     history,
     delegators: wallets

@@ -488,15 +488,52 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
       return {
         from: row.address,
         amount: row.amount,
+        previous: Number.isFinite(before) ? before : null,
         share: total ? (row.amount / total) * 100 : null,
         firstSeen: Number.isFinite(row.meta.firstSeen) ? row.meta.firstSeen : null,
         lastSeen: now,
         firstBlock: row.meta.firstBlock ?? null,
         delta: Number.isFinite(before) ? row.amount - before : null,
+        // Nothing at the epoch baseline and something now: this wallet arrived
+        // during the epoch in progress.
+        joined: !Number.isFinite(before) || before < MIN_AMOUNT_WFLR,
         hasPriorSnapshot: Number.isFinite(before)
       };
     })
     .sort((a, b) => b.amount - a.amount);
+
+  // Wallets that were delegating at the epoch baseline and are not any more.
+  // They drop out of `active` entirely, so without this the page can show that
+  // the total fell without being able to say who left - which is exactly the
+  // question an operator asks first.
+  const stillHere = new Set(active.map(row => row.address));
+  const departed = Object.entries(baseline.amounts || {})
+    .filter(([address, amount]) => !stillHere.has(address) && Number(amount) >= MIN_AMOUNT_WFLR)
+    .map(([address, amount]) => ({
+      from: address,
+      amount: 0,
+      previous: Number(amount),
+      share: 0,
+      delta: -Number(amount),
+      firstSeen: Number.isFinite(candidates.get(address)?.firstSeen) ? candidates.get(address).firstSeen : null,
+      lastSeen: now,
+      joined: false,
+      departed: true,
+      hasPriorSnapshot: true
+    }))
+    .sort((a, b) => b.previous - a.previous);
+
+  const flow = {
+    epoch,
+    baselineAt: baseline.capturedAt ?? null,
+    joined: delegators.filter(row => row.joined).length,
+    departed: departed.length,
+    increased: delegators.filter(row => Number.isFinite(row.delta) && row.delta >= MIN_AMOUNT_WFLR).length,
+    decreased: delegators.filter(row => Number.isFinite(row.delta) && row.delta <= -MIN_AMOUNT_WFLR).length,
+    netChange: delegators.reduce((sum, row) => sum + (Number(row.delta) || 0), 0)
+      - departed.reduce((sum, row) => sum + row.previous, 0)
+  };
+  console.log(`  epoch ${epoch} flow: +${flow.joined} joined, -${flow.departed} left, ${flow.increased} up, ${flow.decreased} down, net ${Math.round(flow.netChange)} WFLR`);
 
   await writeState({
     generatedAt: new Date().toISOString(),
@@ -517,6 +554,8 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
 
   return {
     delegators,
+    departed,
+    flow,
     total,
     listed,
     wnat,

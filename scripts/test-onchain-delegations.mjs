@@ -165,6 +165,16 @@ fail.explorer = true;
 fail.rpcLogs = true;
 const degraded = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000000 }], epoch: 435 });
 
+// Epoch 435 is the one the previous run captured a baseline for; asking about
+// a different epoch would re-capture the baseline from the post-exit state and
+// there would be nothing to compare against.
+console.log("\n=== a delegator leaves entirely ===");
+AMOUNTS[addr(2)] = 0n;
+const afterExit = await readOnChainDelegators({ provider: PROVIDER, seeds: [{ from: SEED, firstSeen: 1700000000000 }], epoch: 435 });
+console.log("departed:", afterExit.departed.map(d => `${d.from} was ${Math.round(d.previous)}`));
+console.log("flow:", JSON.stringify(afterExit.flow));
+AMOUNTS[addr(2)] = 250_000n * 10n ** 18n;
+
 const names = first.delegators.map(d => d.from);
 const checks = [
   ["registry resolved WNat", first.wnat === WNAT],
@@ -197,7 +207,15 @@ const checks = [
   ["delta tracks a top-up within the epoch", Math.abs(toppedUp.delta - 300000) < 1],
   ["delta resets when the reward epoch rolls", rolled.delegators.find(d => d.from === addr(1)).delta === 0],
   ["book survives total discovery failure", degraded !== null && degraded.delegators.length === first.delegators.length],
-  ["amounts still exact when discovery is down", degraded.delegators.find(d => d.from === addr(1)).amount === 1_800_000]
+  ["amounts still exact when discovery is down", degraded.delegators.find(d => d.from === addr(1)).amount === 1_800_000],
+  // A wallet that leaves vanishes from the live read entirely, so without the
+  // departed list the page could show the total falling and not say who moved.
+  ["a wallet that left is reported, not silently dropped",
+    afterExit.departed.some(d => d.from === addr(2) && Math.round(d.previous) === 250000)],
+  ["the departed wallet is gone from the active book",
+    !afterExit.delegators.some(d => d.from === addr(2))],
+  ["flow counts the departure", afterExit.flow.departed === 1],
+  ["net change reflects the money that left", afterExit.flow.netChange <= -250000 + 1]
 ];
 
 console.log("\n=== checks ===");
