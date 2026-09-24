@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-09-24T01:13:12.053Z",
+  "generatedAt": "2026-09-24T01:28:40.982Z",
   "position": {
     "epoch": 435,
     "voters": 98,
@@ -110,11 +110,11 @@
       0.01
     ],
     "ourIndex": 69,
-    "primaryPct": 51.7,
-    "secondaryPct": 99.16,
+    "primaryPct": 51.68,
+    "secondaryPct": 99.19,
     "availabilityPct": 100,
-    "medianPrimaryPct": 40.11,
-    "medianSecondaryPct": 97.59,
+    "medianPrimaryPct": 40.12,
+    "medianSecondaryPct": 97.6,
     "passes": 3,
     "eligible": true
   },
@@ -138,9 +138,9 @@
     ]
   },
   "validator": {
-    "totalStakeM": 89.91,
+    "totalStakeM": 90,
     "selfBondM": 6,
-    "delegators": 77,
+    "delegators": 78,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2026-10-19",
@@ -148,61 +148,66 @@
       {
         "date": "2026-09-24",
         "expiresM": 1.1,
-        "remainingM": 82.81
+        "remainingM": 82.9
       },
       {
         "date": "2026-09-25",
         "expiresM": 7.05,
-        "remainingM": 75.76
+        "remainingM": 75.85
       },
       {
         "date": "2026-09-26",
         "expiresM": 0.43,
-        "remainingM": 75.33
+        "remainingM": 75.42
       },
       {
         "date": "2026-09-27",
         "expiresM": 0.4,
-        "remainingM": 74.93
+        "remainingM": 75.02
       },
       {
         "date": "2026-09-28",
         "expiresM": 1.42,
-        "remainingM": 73.51
+        "remainingM": 73.59
       },
       {
         "date": "2026-09-29",
         "expiresM": 8.04,
-        "remainingM": 65.47
+        "remainingM": 65.56
       },
       {
         "date": "2026-09-30",
         "expiresM": 0.4,
-        "remainingM": 65.07
+        "remainingM": 65.16
       },
       {
         "date": "2026-10-01",
         "expiresM": 5.15,
-        "remainingM": 59.92
+        "remainingM": 60
       },
       {
         "date": "2026-10-02",
         "expiresM": 4.62,
-        "remainingM": 55.29
+        "remainingM": 55.38
       },
       {
         "date": "2026-10-03",
         "expiresM": 1.78,
-        "remainingM": 53.52
+        "remainingM": 53.6
       },
       {
         "date": "2026-10-04",
         "expiresM": 6.42,
-        "remainingM": 47.1
+        "remainingM": 47.19
       },
       {
         "date": "2026-10-07",
         "expiresM": 0.12,
+        "remainingM": 47.06
+      },
+      {
+        "date": "2026-10-08",
+        "expiresM": 0.09,
         "remainingM": 46.98
       },
       {
