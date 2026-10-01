@@ -24,6 +24,10 @@
   async function price() {
     const svg = $("np-price-spark"); if (!svg) return;
     const panel = svg.closest(".panel");
+    // Reading the feed can take several seconds. An em-dash in a card the
+    // height of the two beside it reads as broken, so say what is happening.
+    panel?.classList.add("panel-loading");
+    $("np-price-sub").textContent = "reading the FTSO feed\u2026";
 
     // The value comes from the FTSOv2 feed, read on-chain by operator.js, which
     // loads first on every page. That is the oracle this provider helps run, it
@@ -66,20 +70,40 @@
       // Nothing could be read at all. A dead card the size of the two beside it
       // reads as a broken site, so it steps out of the row instead.
       panel?.setAttribute("hidden", "");
+      panel?.classList.remove("panel-loading");
       return;
     }
 
-    $("np-price").textContent = "$" + last.toFixed(5);
-    $("np-price-sub").textContent = Number.isFinite(spot)
-      ? "from the FTSO feed \u00b7 on-chain"
-      : "market data \u00b7 7 days";
+    // The nav reads the stored currency preference, so this card has to as
+    // well - otherwise the same coin carries a dollar price here and a euro
+    // price two centimetres away. operator.js owns both and announces changes.
+    panel?.classList.remove("panel-loading");
+    let delta = null;
+    if (series && series.length > 2) delta = ((last - series[0]) / series[0]) * 100;
 
-    if (series && series.length > 2) {
-      const first = series[0];
-      const d = ((last - first) / first) * 100;
+    function draw(state) {
+      const cur = state?.currency === "EUR" ? "EUR" : "USD";
+      const converted = cur === "USD" ? last : state?.prices?.EUR;
+      const value = Number.isFinite(converted) ? converted : last;
+      const sym = Number.isFinite(converted) && cur === "EUR" ? "\u20ac" : "$";
+      $("np-price").textContent = sym + value.toFixed(5);
+      $("np-price-sub").textContent = Number.isFinite(spot)
+        ? "from the FTSO feed \u00b7 on-chain"
+        : "market data \u00b7 7 days";
+    }
+    draw(window.__flrPriceState);
+    addEventListener("flr-price", (e) => draw(e.detail));
+
+    // Hand the seven-day move to anything else that wants it - the ticker does.
+    try {
+      window.__flrPriceState = Object.assign({ prices: {}, currency: "USD" }, window.__flrPriceState, { delta7d: delta });
+      dispatchEvent(new CustomEvent("flr-price", { detail: window.__flrPriceState }));
+    } catch (_) { /* nothing else needs it badly enough to fail here */ }
+
+    if (delta != null) {
       const chip = $("np-price-delta");
-      chip.textContent = (d >= 0 ? "\u25b2 +" : "\u25bc ") + d.toFixed(1) + "% 7D";
-      chip.style.color = d >= 0 ? "#35C77E" : RED;
+      chip.textContent = (delta >= 0 ? "\u25b2 +" : "\u25bc ") + delta.toFixed(1) + "% 7D";
+      chip.style.color = delta >= 0 ? "#35C77E" : RED;
       spark(svg, series.concat(Number.isFinite(spot) ? [spot] : []));
     } else {
       // A price with no history is still worth showing; the sparkline is not.
@@ -589,11 +613,70 @@
       }
       render();
     }).catch(render);
-    fetch("https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=21600").then((r) => r.json()).then((c) => {
-      const rows = c.slice(0, 28).reverse(); const cl = rows.map((x) => x[4]);
-      S.price = cl[cl.length - 1]; S.delta = ((cl[cl.length - 1] - cl[0]) / cl[0]) * 100; render();
-    }).catch(render);
+    // The price used to come from a second Coinbase call that duplicated the
+    // one the hero card makes - and when Coinbase was unreachable the ticker
+    // read "FLR ..." forever. It now takes whatever the shared price state has
+    // (the FTSOv2 on-chain feed first, exchanges after) and redraws on change.
+    function takePrice(detail) {
+      const price = detail?.prices?.USD ?? window.__flrPriceUsd;
+      if (Number.isFinite(price)) S.price = price;
+      if (Number.isFinite(detail?.delta7d)) S.delta = detail.delta7d;
+      render();
+    }
+    addEventListener("flr-price", (e) => takePrice(e.detail));
+    takePrice(window.__flrPriceState);
     render(); setInterval(render, 30000);
+
+    /* --- watchdog ---------------------------------------------------------
+       The band was reported dead on a phone. The cause found here was a bare
+       :hover pause latching on touch, now fixed in CSS, but a marquee that
+       silently stops is bad enough to be worth a second line of defence: if
+       the compositor is not actually advancing the transform, drive it from
+       rAF instead. Honours reduced motion and stops while off-screen. */
+    const track = document.getElementById("ticker-track");
+    if (track && !reduced) {
+      const shift = () => {
+        const m = new DOMMatrixReadOnly(getComputedStyle(track).transform);
+        return m.m41;
+      };
+      let raf = 0, last = 0, x = 0, span = 0, visible = true;
+      const SPEED = 62; // px per second, the rate the 46s keyframe worked out to
+      function loop(now) {
+        if (!visible) { raf = 0; return; }
+        if (last) {
+          x -= (SPEED * (now - last)) / 1000;
+          if (!span) span = track.getBoundingClientRect().width / 2;
+          if (span && x <= -span) x += span;
+          track.style.transform = `translate3d(${x.toFixed(2)}px,0,0)`;
+        }
+        last = now;
+        raf = requestAnimationFrame(loop);
+      }
+      function takeOver() {
+        if (track.classList.contains("ticker-js")) return;
+        track.classList.add("ticker-js");
+        span = track.getBoundingClientRect().width / 2;
+        last = 0; raf = requestAnimationFrame(loop);
+      }
+      const io = new IntersectionObserver((e) => {
+        visible = e[0].isIntersecting && !document.hidden;
+        if (visible && track.classList.contains("ticker-js") && !raf) { last = 0; raf = requestAnimationFrame(loop); }
+        if (!visible && raf) { cancelAnimationFrame(raf); raf = 0; }
+      });
+      io.observe(track);
+      document.addEventListener("visibilitychange", () => {
+        visible = !document.hidden && track.getBoundingClientRect().bottom > 0;
+        if (visible && track.classList.contains("ticker-js") && !raf) { last = 0; raf = requestAnimationFrame(loop); }
+      });
+      // Two samples a second apart. 62px/s means a working ticker has moved
+      // tens of pixels by then; anything under 2px is stalled.
+      const a = shift();
+      setTimeout(() => {
+        if (document.hidden) return;
+        if (track.getBoundingClientRect().bottom <= 0) return;
+        if (Math.abs(shift() - a) < 2) takeOver();
+      }, 1100);
+    }
   }
 })();
 

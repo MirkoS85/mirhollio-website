@@ -225,6 +225,11 @@
     if (mobileNav && !mobileNav.querySelector(".mobile-live")) {
       mobileNav.appendChild(createShellLiveStats("mobile-live"));
     }
+
+    // These rows are born empty. If operator.js already wrote the epoch and
+    // the status before this ran - which is what happened on every page but
+    // the home page - nothing would ever fill them again.
+    window.__replayFields?.();
   }
 
   function bindMobileNav() {
@@ -312,7 +317,9 @@
     button.className = "back-to-top";
     button.type = "button";
     button.setAttribute("aria-label", "Back to top");
-    button.textContent = "Top";
+    // A solid pink "Top" pill sat on top of whatever was being read. An arrow
+    // in a glass disc says the same thing and gets out of the way.
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 19V6M12 5l-7 7M12 5l7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     document.body.appendChild(button);
 
     function update() {

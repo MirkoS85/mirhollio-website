@@ -302,16 +302,35 @@ const MirhollioCore = (() => {
     return /^0x0{40}$/i.test(String(addr || ""));
   }
 
+  /* Every value written to a data-field, kept so a field that arrives in the
+     DOM after its value did can still be filled. live-refresh.js injects the
+     Epoch / FTSO status rows into the nav, and when that injection lost the
+     race those two rows sat on "-" and "Loading" for the life of the page -
+     on every sub-page, which is where the report came from. */
+  const fieldValues = Object.create(null);
+
+  function writeField(el, value) {
+    el.textContent = value;
+    el.classList.remove("skeleton-value");
+    el.removeAttribute("aria-busy");
+  }
+
   function setText(key, value) {
     // A field can be claimed by the widget that owns its comparison context;
     // see the reward rate, which must match the median and rank beside it.
     if (document.querySelector(`[data-field="${key}"][data-locked="1"]`)) return;
-    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
-      el.textContent = value;
-      el.classList.remove("skeleton-value");
-      el.removeAttribute("aria-busy");
+    fieldValues[key] = value;
+    document.querySelectorAll(`[data-field="${key}"]`).forEach(el => writeField(el, value));
+  }
+
+  /** Fill fields that were added to the page after their value was written. */
+  function replayFields(root = document) {
+    root.querySelectorAll("[data-field]").forEach(el => {
+      const key = el.getAttribute("data-field");
+      if (key in fieldValues && !el.hasAttribute("data-locked")) writeField(el, fieldValues[key]);
     });
   }
+  window.__replayFields = replayFields;
 
   function setFieldTitle(key, value) {
     document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
@@ -582,6 +601,17 @@ const MirhollioCore = (() => {
     });
     if (providerData) renderRewardChart(providerData);
     if (validatorData) renderValidatorRewardChart(Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null);
+    broadcastPrice();
+  }
+
+  /* One price, one currency, everywhere. The hero card on the home page used
+     to show USD while the nav beside it showed the stored EUR preference, so
+     the same coin had two prices on screen at once. Both now read this. */
+  function broadcastPrice() {
+    try {
+      window.__flrPriceState = { prices: { ...prices }, currency: activePriceCurrency };
+      window.dispatchEvent(new CustomEvent("flr-price", { detail: window.__flrPriceState }));
+    } catch (_) { /* CustomEvent unavailable; the fields are already written */ }
   }
 
   function fmtFiat(flrAmount, currency = activePriceCurrency) {
@@ -1577,36 +1607,19 @@ const MirhollioCore = (() => {
       `;
     }
 
-    const showTooltip = target => {
-      if (!tooltip) return;
-      const point = points[Number(target.getAttribute("data-delegation-index"))];
-      if (!point) return;
-      const wrap = svg.parentElement;
-      if (!wrap) return;
-      const wrapRect = wrap.getBoundingClientRect();
-      const svgRect = svg.getBoundingClientRect();
-      const x = ((point.x / width) * svgRect.width) + (svgRect.left - wrapRect.left);
-      const y = ((point.delegatedY / height) * svgRect.height) + (svgRect.top - wrapRect.top);
-      tooltip.innerHTML = `
+    bindChartTip({
+      svg,
+      tooltip,
+      html: index => {
+        const point = points[index];
+        if (!point) return null;
+        return `
         <strong>#${escapeHtml(point.epoch)}</strong>
         <span>${fmtNum(point.delegated, 0)} WFLR</span>
         <span class="${Number(point.delta) < 0 ? "delegation-delta-negative" : "delegation-delta-positive"}">${point.delta == null ? "First point" : fmtSignedCompact(point.delta, " WFLR")}</span>
         <small>${fmtNum(point.delegators, 0)} delegators · ${formatShortDate(point.timestamp)}</small>
       `;
-      tooltip.style.left = `${Math.max(8, Math.min(wrapRect.width - 190, x - 92))}px`;
-      tooltip.style.top = `${Math.max(8, y - 92)}px`;
-      tooltip.classList.add("show");
-    };
-    const hideTooltip = () => tooltip?.classList.remove("show");
-    svg.querySelectorAll("[data-delegation-index]").forEach(marker => {
-      marker.addEventListener("mouseenter", () => showTooltip(marker));
-      marker.addEventListener("focus", () => showTooltip(marker));
-      marker.addEventListener("mouseleave", hideTooltip);
-      marker.addEventListener("blur", hideTooltip);
-      marker.addEventListener("touchstart", event => {
-        event.preventDefault();
-        showTooltip(marker);
-      }, { passive: false });
+      }
     });
     const wrap = svg.parentElement;
     const shouldAutoScroll = wrap
@@ -1803,6 +1816,194 @@ const MirhollioCore = (() => {
     }, "");
   }
 
+  const CHART_TIP_HOLD_MS = 7000;
+
+  /* --------------------------------------------------------------------------
+     Chart tooltips.
+
+     Every chart used to carry its own copy of this logic, and every copy hid
+     the tooltip on touchend: lift your finger and the number you tapped for
+     was gone. The compact variants also hid it on a 1.6s timer, and all of
+     them positioned it with `point.x / viewBoxWidth * renderedWidth`, which is
+     only correct for preserveAspectRatio="none" - on the charts that letterbox
+     the tip pointed somewhere else and ran off the right edge.
+
+     One controller now, for all of them. A mouse gets hover tracking. A touch
+     pins the reading for seven seconds and a drag scrubs along the series, so
+     points can be compared without lifting; each new point restarts the seven
+     seconds, and a tap anywhere else dismisses it. Position comes from the
+     SVG's own screen matrix, so it is right whatever the aspect ratio does,
+     and it is clamped inside the chart frame.
+     -------------------------------------------------------------------------- */
+  function bindChartTip({ svg, tooltip, html, dot, className = "" }) {
+    if (!svg || !tooltip) return;
+    const wrap = svg.parentElement;
+    if (!wrap) return;
+
+    if (svg.__chartTipOff) svg.__chartTipOff();
+
+    const anchors = Array.from(svg.querySelectorAll("[data-chart-index], [data-delegation-index]"))
+      .map(node => {
+        const index = Number(node.getAttribute("data-chart-index") ?? node.getAttribute("data-delegation-index"));
+        const target = (dot && node.querySelector(dot)) || node;
+        let box;
+        try { box = target.getBBox(); } catch (_) { return null; }
+        return { index, node, x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      })
+      .filter(anchor => anchor && Number.isFinite(anchor.index))
+      .sort((a, b) => a.x - b.x);
+    if (!anchors.length) return;
+
+    const NS = "http://www.w3.org/2000/svg";
+    const layer = document.createElementNS(NS, "g");
+    layer.setAttribute("class", "chart-focus-layer");
+    layer.setAttribute("pointer-events", "none");
+    const rule = document.createElementNS(NS, "line");
+    rule.setAttribute("class", "chart-focus-rule");
+    const halo = document.createElementNS(NS, "circle");
+    halo.setAttribute("class", "chart-focus-halo");
+    halo.setAttribute("r", "9");
+    layer.appendChild(rule);
+    layer.appendChild(halo);
+    svg.appendChild(layer);
+
+    const box = svg.viewBox?.baseVal;
+    const vbTop = box?.y ?? 0;
+    const vbBottom = (box?.y ?? 0) + (box?.height ?? 0);
+    const fine = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+
+    let holdTimer = 0;
+    let activeIndex = -1;
+    let dragging = false;
+
+    const toWrap = (x, y) => {
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return null;
+      const point = new DOMPoint(x, y).matrixTransform(ctm);
+      const rect = wrap.getBoundingClientRect();
+      return { x: point.x - rect.left + wrap.scrollLeft, y: point.y - rect.top + wrap.scrollTop };
+    };
+
+    const nearest = (clientX, clientY) => {
+      const ctm = svg.getScreenCTM();
+      if (!ctm) return null;
+      const local = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+      let best = anchors[0];
+      let bestDistance = Infinity;
+      for (const anchor of anchors) {
+        const distance = Math.abs(anchor.x - local.x);
+        if (distance < bestDistance) { bestDistance = distance; best = anchor; }
+      }
+      return best;
+    };
+
+    function hide() {
+      window.clearTimeout(holdTimer);
+      holdTimer = 0;
+      activeIndex = -1;
+      tooltip.style.display = "none";
+      tooltip.classList.remove("show");
+      layer.classList.remove("on");
+    }
+
+    function show(anchor, hold) {
+      const markup = html(anchor.index, anchor.node);
+      if (markup == null) return;
+      activeIndex = anchor.index;
+      tooltip.className = `chart-tooltip${className ? ` ${className}` : ""} show`;
+      tooltip.innerHTML = markup;
+      tooltip.style.display = "block";
+
+      const at = toWrap(anchor.x, anchor.y);
+      if (at) {
+        const width = tooltip.offsetWidth || 150;
+        const height = tooltip.offsetHeight || 72;
+        const frameW = wrap.clientWidth || wrap.getBoundingClientRect().width;
+        const frameH = wrap.clientHeight || wrap.getBoundingClientRect().height;
+        const left = Math.max(8, Math.min(at.x - width / 2, Math.max(8, frameW - width - 8)));
+        // Above the point by default; below it when there is no room above.
+        let top = at.y - height - 16;
+        if (top < 8) top = Math.min(at.y + 20, Math.max(8, frameH - height - 8));
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${Math.max(8, top)}px`;
+      }
+
+      rule.setAttribute("x1", anchor.x);
+      rule.setAttribute("x2", anchor.x);
+      rule.setAttribute("y1", vbTop);
+      rule.setAttribute("y2", vbBottom);
+      halo.setAttribute("cx", anchor.x);
+      halo.setAttribute("cy", anchor.y);
+      layer.classList.add("on");
+
+      window.clearTimeout(holdTimer);
+      holdTimer = hold ? window.setTimeout(hide, CHART_TIP_HOLD_MS) : 0;
+    }
+
+    const off = [];
+    const on = (target, type, handler, options) => {
+      target.addEventListener(type, handler, options);
+      off.push(() => target.removeEventListener(type, handler, options));
+    };
+
+    on(svg, "pointerdown", event => {
+      const anchor = nearest(event.clientX, event.clientY);
+      if (!anchor) return;
+      dragging = true;
+      show(anchor, event.pointerType !== "mouse");
+    });
+
+    on(svg, "pointermove", event => {
+      const track = dragging || (fine && event.pointerType === "mouse");
+      if (!track) return;
+      const anchor = nearest(event.clientX, event.clientY);
+      if (anchor && anchor.index !== activeIndex) show(anchor, event.pointerType !== "mouse");
+      else if (anchor && dragging && event.pointerType !== "mouse") {
+        window.clearTimeout(holdTimer);
+        holdTimer = window.setTimeout(hide, CHART_TIP_HOLD_MS);
+      }
+    });
+
+    const stopDrag = () => { dragging = false; };
+    on(svg, "pointerup", stopDrag);
+    on(svg, "pointercancel", stopDrag);
+    on(svg, "pointerleave", event => {
+      dragging = false;
+      if (event.pointerType === "mouse") hide();
+    });
+
+    anchors.forEach(anchor => {
+      on(anchor.node, "focus", () => {
+        // A tap focuses the marker under the finger, and that focus lands
+        // after the pointer has already pinned the reading. Treating it as a
+        // keyboard focus dropped the seven-second hold, so the tooltip still
+        // vanished on lift - the original complaint, one layer down.
+        // :focus-visible is exactly the "arrived by keyboard" signal.
+        let keyboard = true;
+        try { keyboard = anchor.node.matches(":focus-visible"); } catch (_) { keyboard = anchor.index !== activeIndex; }
+        if (!keyboard) return;
+        show(anchor, false);
+      });
+      on(anchor.node, "blur", () => {
+        // Leave a pinned reading alone; a pointer put it there, not focus.
+        if (holdTimer) return;
+        hide();
+      });
+    });
+
+    on(document, "pointerdown", event => {
+      if (!svg.contains(event.target)) hide();
+    }, true);
+    on(window, "resize", hide, { passive: true });
+
+    svg.__chartTipOff = () => {
+      off.forEach(remove => remove());
+      window.clearTimeout(holdTimer);
+      svg.__chartTipOff = null;
+    };
+    hide();
+  }
+
   function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }) {
     if (!svg) return;
 
@@ -1869,53 +2070,17 @@ const MirhollioCore = (() => {
       ${labels}
     `;
 
-    const showTooltip = target => {
-        const point = points[Number(target.getAttribute("data-chart-index"))];
-        if (!tooltip || !point) return;
-        const wrap = svg.parentElement;
-        if (!wrap) return;
-        const wrapRect = wrap.getBoundingClientRect();
-        const svgRect = svg.getBoundingClientRect();
-        const anchorLeft = (point.x / width) * svgRect.width + (svgRect.left - wrapRect.left) + wrap.scrollLeft;
-        const anchorTop = (point.y / height) * svgRect.height + (svgRect.top - wrapRect.top) + wrap.scrollTop;
-        tooltip.innerHTML = typeof tooltipHtml === "function"
+    bindChartTip({
+      svg,
+      tooltip,
+      className: typeof tooltipHtml === "function" ? "validator-reward-tooltip" : "",
+      html: index => {
+        const point = points[index];
+        if (!point) return null;
+        return typeof tooltipHtml === "function"
           ? tooltipHtml(point)
-          : `Epoch ${point.epoch}<br>${rewardWithFiat(point.reward)}`;
-        tooltip.classList.toggle("validator-reward-tooltip", typeof tooltipHtml === "function");
-        tooltip.style.display = "block";
-        const tooltipWidth = tooltip.offsetWidth || 140;
-        const tooltipHeight = tooltip.offsetHeight || 74;
-        const minLeft = wrap.scrollLeft + 8;
-        const maxLeft = wrap.scrollLeft + (wrap.clientWidth || wrapRect.width) - tooltipWidth - 8;
-        const minTop = wrap.scrollTop + 8;
-        const maxTop = wrap.scrollTop + (wrap.clientHeight || wrapRect.height) - tooltipHeight - 8;
-        tooltip.style.left = `${Math.max(minLeft, Math.min(anchorLeft - tooltipWidth / 2, Math.max(minLeft, maxLeft)))}px`;
-        tooltip.style.top = `${Math.max(minTop, Math.min(anchorTop - tooltipHeight - 12, Math.max(minTop, maxTop)))}px`;
-    };
-    const hideTooltip = () => {
-      if (tooltip) tooltip.style.display = "none";
-    };
-
-    svg.querySelectorAll("[data-chart-index]").forEach(target => {
-      target.addEventListener("mouseenter", () => {
-        showTooltip(target);
-      });
-      target.addEventListener("focus", () => {
-        showTooltip(target);
-      });
-      target.addEventListener("click", event => {
-        event.preventDefault();
-        showTooltip(target);
-      });
-      target.addEventListener("touchstart", event => {
-        event.preventDefault();
-        showTooltip(target);
-      }, { passive: false });
-      target.addEventListener("mouseleave", hideTooltip);
-      target.addEventListener("blur", hideTooltip);
-      document.addEventListener("click", event => {
-        if (!svg.contains(event.target)) hideTooltip();
-      });
+          : `<strong>${rewardWithFiat(point.reward)}</strong><span>Epoch ${point.epoch}</span>`;
+      }
     });
 
     if (summary && last) {
@@ -2108,46 +2273,15 @@ const MirhollioCore = (() => {
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${area}${line}${markers}${labels}`;
 
-    let tooltipTimer = 0;
-    const showTooltip = target => {
-      if (!tooltip) return;
-      const index = Number(target.getAttribute("data-chart-index"));
-      const value = series[index];
-      if (!Number.isFinite(value)) return;
-      const rect = target.querySelector(".hourly-dot")?.getBoundingClientRect();
-      const wrapRect = svg.parentElement.getBoundingClientRect();
-      if (!rect) return;
-      tooltip.innerHTML = `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
-      tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 12, wrapRect.width - (compact ? 118 : 138)))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 10, wrapRect.height - (compact ? 82 : 106)))}px`;
-      if (compact) {
-        window.clearTimeout(tooltipTimer);
-        tooltipTimer = window.setTimeout(hideTooltip, 1600);
+    bindChartTip({
+      svg,
+      tooltip,
+      dot: ".hourly-dot",
+      html: index => {
+        const value = series[index];
+        if (!Number.isFinite(value)) return null;
+        return `<strong>${pct(value)}</strong><span>${metricLabel}</span><small>${hourlyAvailabilityLabel(index, series.length)}</small>`;
       }
-    };
-    const hideTooltip = () => {
-      window.clearTimeout(tooltipTimer);
-      if (tooltip) tooltip.style.display = "none";
-    };
-
-    svg.querySelectorAll("[data-chart-index]").forEach(target => {
-      target.addEventListener("mouseenter", () => showTooltip(target));
-      target.addEventListener("focus", () => showTooltip(target));
-      target.addEventListener("click", event => {
-        event.preventDefault();
-        showTooltip(target);
-      });
-      target.addEventListener("touchstart", event => {
-        event.preventDefault();
-        showTooltip(target);
-      }, { passive: false });
-      target.addEventListener("touchend", () => {
-        tooltipTimer = window.setTimeout(hideTooltip, 500);
-      }, { passive: true });
-      target.addEventListener("touchcancel", hideTooltip, { passive: true });
-      target.addEventListener("mouseleave", hideTooltip);
-      target.addEventListener("blur", hideTooltip);
     });
 
     if (summary) {
@@ -2277,44 +2411,10 @@ const MirhollioCore = (() => {
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.innerHTML = `${grid}${legend}${lines}${hitTargets}${labels}`;
 
-    let tooltipTimer = 0;
-    const showTooltip = target => {
-      if (!tooltip) return;
-      const index = Number(target.getAttribute("data-chart-index"));
-      if (!Number.isFinite(index)) return;
-      const rect = target.getBoundingClientRect();
-      const wrapRect = svg.parentElement.getBoundingClientRect();
-      tooltip.innerHTML = `${series.map(item => `<span><b>${pct(item.values[index])}</b> ${item.label}</span>`).join("")}<small>${hourlyAvailabilityLabel(index, count)}</small>`;
-      tooltip.style.display = "block";
-      tooltip.style.left = `${Math.max(8, Math.min(rect.left - wrapRect.left - 12, wrapRect.width - (compact ? 136 : 188)))}px`;
-      tooltip.style.top = `${Math.max(8, Math.min(rect.top - wrapRect.top + 10, wrapRect.height - (compact ? 112 : 116)))}px`;
-      if (compact) {
-        window.clearTimeout(tooltipTimer);
-        tooltipTimer = window.setTimeout(hideTooltip, 1800);
-      }
-    };
-    const hideTooltip = () => {
-      window.clearTimeout(tooltipTimer);
-      if (tooltip) tooltip.style.display = "none";
-    };
-
-    svg.querySelectorAll("[data-chart-index]").forEach(target => {
-      target.addEventListener("mouseenter", () => showTooltip(target));
-      target.addEventListener("focus", () => showTooltip(target));
-      target.addEventListener("click", event => {
-        event.preventDefault();
-        showTooltip(target);
-      });
-      target.addEventListener("touchstart", event => {
-        event.preventDefault();
-        showTooltip(target);
-      }, { passive: false });
-      target.addEventListener("touchend", () => {
-        tooltipTimer = window.setTimeout(hideTooltip, 500);
-      }, { passive: true });
-      target.addEventListener("touchcancel", hideTooltip, { passive: true });
-      target.addEventListener("mouseleave", hideTooltip);
-      target.addEventListener("blur", hideTooltip);
+    bindChartTip({
+      svg,
+      tooltip,
+      html: index => `${series.map(item => `<span><b>${pct(item.values[index])}</b> ${item.label}</span>`).join("")}<small>${hourlyAvailabilityLabel(index, count)}</small>`
     });
 
     if (summary) {

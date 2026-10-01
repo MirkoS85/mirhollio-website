@@ -1311,17 +1311,44 @@ h1{
   line-height:1.58;
 }
 
+/* The badge was grown to 44px so a thumb could hit it, and at that size it
+   dominated every card it sat on. The ring is back to a 20px dot; the 44px
+   target is an invisible pseudo-element around it, so the tap area is still
+   legal and nothing else moves. */
 .info-tip{
-  top:10px;
-  right:10px;
+  top:12px;
+  right:12px;
+  width:20px;
+  height:20px;
+  border-color:rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+  color:#7e828c;
+  box-shadow:none;
+  font-size:11px;
+  font-weight:600;
+  line-height:1;
+  opacity:.72;
+  transition:opacity .18s ease,color .18s ease,border-color .18s ease;
+  z-index:30;
+}
+
+.info-tip::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
   width:44px;
   height:44px;
-  border-color:rgba(255, 41, 109,.14);
-  background:#0B0A0F;
-  color:#868a93;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
-  font-size:12px;
-  z-index:30;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+}
+
+.info-tip:hover,
+.info-tip:focus-visible,
+.info-tip.info-touch-active{
+  opacity:1;
+  color:var(--pink);
+  border-color:rgba(255,46,99,.45);
 }
 
 .info-tip span{
@@ -1348,31 +1375,44 @@ h1{
 
 .back-to-top{
   position:fixed;
-  right:max(18px, env(safe-area-inset-right));
-  bottom:max(18px, env(safe-area-inset-bottom));
+  right:max(16px, env(safe-area-inset-right));
+  bottom:max(16px, env(safe-area-inset-bottom));
   z-index:70;
-  min-width:58px;
-  min-height:48px;
-  padding:0 16px;
-  border:1px solid rgba(255, 41, 109,.18);
-  border-radius:999px;
-  background:rgba(251, 116, 159,.9);
-  color:#37101d;
-  box-shadow:0 18px 40px rgba(251, 116, 159,.24);
-  font-size:13px;
-  font-weight:950;
-  letter-spacing:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:46px;
+  height:46px;
+  padding:0;
+  border:1px solid rgba(255,46,99,.4);
+  border-radius:50%;
+  background:rgba(16,14,20,.72);
+  color:var(--pink);
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
   opacity:0;
   pointer-events:none;
-  transform:translateY(10px);
-  transition:opacity .18s ease, transform .18s ease;
-  backdrop-filter:blur(16px);
+  transform:translateY(10px) scale(.9);
+  transition:opacity .2s ease, transform .2s ease, background .2s ease;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+
+.back-to-top svg{
+  width:19px;
+  height:19px;
+  display:block;
+}
+
+.back-to-top:hover,
+.back-to-top:focus-visible{
+  background:rgba(255,46,99,.92);
+  color:#fff;
 }
 
 .back-to-top.is-visible{
   opacity:1;
   pointer-events:auto;
-  transform:translateY(0);
+  transform:translateY(0) scale(1);
 }
 
 .pull-refresh-indicator{
@@ -2527,12 +2567,12 @@ tbody tr:hover td{
   z-index:8;
   display:none;
   width:max-content;
-  max-width:180px;
-  padding:10px 12px 9px;
-  border-color:rgba(255, 41, 109,.16);
-  border-radius:12px;
-  background:rgba(22,22,30,0.96);
-  box-shadow:0 14px 32px rgba(251, 116, 159,.13);
+  max-width:min(230px, calc(100% - 16px));
+  padding:11px 13px 10px;
+  border:1px solid rgba(255,46,99,.3);
+  border-radius:14px;
+  background:rgba(16,14,20,.97);
+  box-shadow:0 18px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.04) inset;
   backdrop-filter:blur(16px);
   color:var(--ink);
   font-family:inherit;
@@ -2541,10 +2581,54 @@ tbody tr:hover td{
   line-height:1.18;
   pointer-events:none;
   white-space:normal;
+  /* Each new point replaces the contents in place; without this the tip
+     teleports across the chart while you drag along the series. */
+  transition:left .13s ease,top .13s ease,opacity .13s ease;
 }
 
 .chart-tooltip.show{
   display:block;
+  animation:chart-tip-in .14s ease-out;
+}
+
+@keyframes chart-tip-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* The point the tip is reading, marked on the chart itself: a hairline down
+   the series and a ring on the value. Without it a pinned tooltip gives no
+   clue which point it belongs to. */
+.chart-focus-layer{
+  opacity:0;
+  transition:opacity .14s ease;
+}
+
+.chart-focus-layer.on{
+  opacity:1;
+}
+
+.chart-focus-rule{
+  stroke:rgba(255,46,99,.45);
+  stroke-width:1.4;
+  stroke-dasharray:4 5;
+}
+
+.chart-focus-halo{
+  fill:none;
+  stroke:#ff296d;
+  stroke-width:2.4;
+  filter:drop-shadow(0 0 7px rgba(255,46,99,.75));
+}
+
+/* A horizontal drag scrubs the series; a vertical one still scrolls the page.
+   None of these chart frames scroll sideways, so nothing is lost. */
+.reward-chart,
+.hourly-chart{
+  touch-action:pan-y;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .chart-tooltip,
+  .chart-focus-layer{transition:none;}
+  .chart-tooltip.show{animation:none;}
 }
 
 .chart-tooltip strong,
@@ -2966,12 +3050,15 @@ tbody tr:hover td{
     min-height:48px;
   }
 
+  .hourly-chart-grid{
+    grid-template-columns:1fr;
+  }
+
   .panel-mini-grid,
   .split-metrics,
-  .hourly-chart-grid,
   .delegation-flow-summary,
   .delegator-summary{
-    grid-template-columns:1fr;
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
   .metric-grid,
@@ -3073,10 +3160,8 @@ tbody tr:hover td{
   }
 
   .info-tip{
-    width:44px;
-    height:44px;
-    top:4px;
-    right:4px;
+    top:10px;
+    right:10px;
   }
 
   .reward-chart{
@@ -3425,7 +3510,6 @@ tbody tr:hover td{
 
 @media (max-width:420px){
   .home-snap-metrics{
-    grid-template-columns:1fr;
     min-height:0;
     grid-template-rows:none;
   }
@@ -3579,12 +3663,28 @@ tbody tr:hover td{
   }
 
   .metric-grid,
-  .cards,
-  .split-metrics,
-  .panel-mini-grid,
-  .address-grid,
   .flow{
     grid-template-columns:1fr !important;
+  }
+
+  .cards,
+  .cards.two,
+  .cards.three,
+  .split-metrics,
+  .panel-mini-grid,
+  .address-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  /* A card that carries a chart, a table or a pill strip still needs the
+     full width; only the label-and-number tiles pair up. */
+  .cards .panel-wide-card,
+  .panel-mini-grid .panel-wide-card,
+  .cards .card.uptime-wide,
+  .cards .card:has(.uptime-pills),
+  .cards .card:has(table),
+  .cards .card:has(.reward-chart-wrap){
+    grid-column:1 / -1;
   }
 
   .section{
@@ -4414,6 +4514,7 @@ tbody tr:hover td{
   .metric span,
   .snap-metric span,
   .compact-stat b,
+  article.card > b,
   .currency-control span,
   .mini-label,
   .chart-panel .mini-label,
@@ -4442,8 +4543,21 @@ tbody tr:hover td{
 
   .metric span,
   .snap-metric span,
-  .compact-stat b{
+  .compact-stat b,
+  article.card > b{
     line-height:1.2;
+  }
+
+  /* "46.51K" with "FLR" dropped onto its own line below cost a whole row of
+     height in every tile that carries a unit. Inline, like the metric tiles
+     on the FTSO page already do it. */
+  article.card > strong .metric-unit,
+  .compact-stat strong .metric-unit{
+    display:inline;
+    margin-top:0;
+    margin-left:.26em;
+    font-size:.5em;
+    vertical-align:baseline;
   }
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
@@ -5025,14 +5139,29 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 
 @keyframes orb-spin{to{transform:rotate(360deg);}}
 @keyframes orb-breathe{0%,100%{opacity:.82;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
-.ticker-band{overflow:hidden;border-top:1px solid rgba(255,46,99,.16);border-bottom:1px solid rgba(255,46,99,.16);background:rgba(255,46,99,.035);margin:0;}
-.ticker-track{display:flex;white-space:nowrap;width:max-content;animation:ticker-run 46s linear infinite;}
-.ticker-band:hover .ticker-track{animation-play-state:paused;}
+.ticker-band{position:relative;overflow:hidden;border-top:1px solid rgba(255,46,99,.16);border-bottom:1px solid rgba(255,46,99,.16);background:rgba(255,46,99,.035);margin:0;}
+/* Soft edges, so a word leaving the band fades instead of being guillotined
+   mid-letter. The band sits on the page background, not on the card surface. */
+.ticker-band::before,.ticker-band::after{content:"";position:absolute;top:0;bottom:0;width:44px;z-index:2;pointer-events:none;}
+.ticker-band::before{left:0;background:linear-gradient(90deg,var(--bg) 10%,transparent);}
+.ticker-band::after{right:0;background:linear-gradient(270deg,var(--bg) 10%,transparent);}
+/* will-change + backface promote the track to its own layer: without it iOS
+   Safari has been seen to drop the animation entirely on a long marquee. */
+.ticker-track{display:flex;white-space:nowrap;width:max-content;will-change:transform;backface-visibility:hidden;animation:ticker-run 46s linear infinite;}
+/* This pause used to be a bare :hover. On a touch screen :hover sticks to
+   whatever was last tapped, so one tap on the band froze the ticker for good
+   - which is exactly how it was being reported. Fine pointers only. */
+@media (hover:hover) and (pointer:fine){
+  .ticker-band:hover .ticker-track{animation-play-state:paused;}
+}
+/* Set when the JS watchdog finds the CSS animation is not advancing and takes
+   over with requestAnimationFrame. */
+.ticker-track.ticker-js{animation:none !important;}
 .ticker-seg{padding:9px 0 9px 28px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
 .ticker-seg b{color:var(--text);font-weight:600;}
 .ticker-seg em{font-style:normal;color:var(--pink);}
 .ticker-seg .up{color:var(--green);} .ticker-seg .down{color:var(--danger);}
-@keyframes ticker-run{to{transform:translateX(-50%);}}
+@keyframes ticker-run{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
 .band-divider{max-width:var(--max);margin:0 auto;padding:0 24px;height:22px;display:flex;align-items:center;position:relative;}
 .band-divider::before{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,46,99,.38) 18%,rgba(255,46,99,.38) 82%,transparent);}
 .band-divider i{position:absolute;left:50%;top:50%;width:7px;height:7px;transform:translate(-50%,-50%) rotate(45deg);background:var(--pink);box-shadow:0 0 12px rgba(255,46,99,.75);animation:orb-breathe 3.4s ease-in-out infinite;}
@@ -5066,7 +5195,7 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 @media (max-width:1120px){.hero-mark{display:none;}}
 @media (min-width:1121px){.home-hero-copy{padding-right:220px;}}
 /* === core-12: proof sekcija, fragmenti na podstraneh, bullet === */
-.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;}
 .proof-tile{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;}
 .proof-tile .pv{font-family:Archivo,sans-serif;font-size:40px;font-weight:800;line-height:1;letter-spacing:-.02em;}
 .proof-tile .pl{font-size:13px;font-weight:600;color:var(--text);margin-top:10px;}
@@ -5163,14 +5292,8 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   .brand{min-height:44px;}
   .table-link,
   .delegator-address-link{display:inline-flex;align-items:center;min-height:44px;}
-  /* .info-tip already asks for 44px, but operator.css's more specific
-     `.metric .info-tip` pins it to 26px. Keep the badge visually 26px and
-     grow only the hit box: content-box sizing plus padding, cancelled by a
-     negative margin so surrounding layout does not move. */
-  /* .info-tip already asks for 44px; operator.css's more specific
-     `.metric .info-tip` pins it to 26px. Padding tricks leave the 1px ring
-     drawn on the outer box, so just honour the intended size on touch. */
-  .metric .info-tip{width:44px;height:44px;font-size:14px;}
+  /* The badge keeps its 20px ring everywhere; .info-tip::after carries the
+     44px target, so there is nothing left to override here. */
 
   /* --- Legibility floor. The brand sub-label was set as low as 8px by
          .mobile-row/.mobile-top rules, so match their specificity. --- */
