@@ -310,6 +310,9 @@ const MirhollioCore = (() => {
   const fieldValues = Object.create(null);
 
   function writeField(el, value) {
+    // A count-up animation owns this element's text until it finishes; let
+    // the new value win rather than have a stale last frame overwrite it.
+    el.__countCancel?.();
     el.textContent = value;
     el.classList.remove("skeleton-value");
     el.removeAttribute("aria-busy");
@@ -331,6 +334,8 @@ const MirhollioCore = (() => {
     });
   }
   window.__replayFields = replayFields;
+  /** The last value written for a field, for scripts that render beside us. */
+  window.__fieldValue = key => fieldValues[key];
 
   function setFieldTitle(key, value) {
     document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {

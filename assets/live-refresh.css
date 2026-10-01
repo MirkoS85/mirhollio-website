@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-32");
+@import url("operator.css?v=core-35");
 
 :root{
   color-scheme:dark;
@@ -1330,6 +1330,14 @@ h1{
   opacity:.72;
   transition:opacity .18s ease,color .18s ease,border-color .18s ease;
   z-index:30;
+}
+
+/* operator.css, which this file imports at the top, pins `.metric .info-tip`
+   to 26px and wins on specificity. The badge is one size everywhere. */
+.metric .info-tip{
+  width:20px;
+  height:20px;
+  font-size:11px;
 }
 
 .info-tip::after{
@@ -4560,6 +4568,26 @@ tbody tr:hover td{
     vertical-align:baseline;
   }
 
+  /* An inline unit has no whitespace before it, so there is nothing for the
+     line to break at. A zero-width space gives the browser the option: one
+     line when the value fits, unit underneath when it does not. */
+  .metric-unit::before{
+    content:"\200B";
+  }
+
+  /* The tighten pass sets these; they existed only for .metric before. */
+  article.card > strong.metric-tight,
+  .compact-stat > strong.metric-tight{
+    font-size:21px;
+    letter-spacing:-.04em;
+  }
+
+  article.card > strong.metric-ultra-tight,
+  .compact-stat > strong.metric-ultra-tight{
+    font-size:19px;
+    letter-spacing:-.05em;
+  }
+
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
   .snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
     display:inline-flex;
@@ -5707,4 +5735,195 @@ a.table-more{display:flex;align-items:center;justify-content:center;text-decorat
   .site-foot{padding:22px 16px 34px}
   .qa summary{padding:16px}
   .qa-body{padding:16px 16px 16px}
+}
+
+/* ===========================================================================
+   core-35: motion layer
+
+   The page was correct and static. Everything below is presentation only -
+   it never changes a number, and every rule here is switched off wholesale
+   under prefers-reduced-motion at the end of the block.
+   =========================================================================== */
+
+/* --- reading progress -----------------------------------------------------
+   A hairline across the top that fills as you scroll. The pages are long
+   (the FTSO page is eight screens on a phone) and nothing said how far in
+   you were. --- */
+.scroll-progress{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:2px;
+  z-index:95;
+  pointer-events:none;
+  background:linear-gradient(90deg,#ff2e63,#ff7aa2 55%,#ffb86b);
+  transform:scaleX(var(--progress,0));
+  transform-origin:0 50%;
+  opacity:0;
+  transition:opacity .25s ease;
+}
+
+.scroll-progress.on{
+  opacity:.9;
+}
+
+/* --- entrance -------------------------------------------------------------
+   Blocks rise into place the first time they are scrolled to, staggered
+   inside a grid so a row of tiles arrives as a row and not as a block. The
+   class is removed once the transition ends, so no transform is left on the
+   element - a lingering one would become the containing block for the
+   position:fixed info tips. --- */
+.reveal{
+  opacity:0;
+  transform:translate3d(0,18px,0);
+}
+
+.reveal-in{
+  opacity:1;
+  transform:none;
+  transition:opacity .52s cubic-bezier(.22,.61,.36,1) var(--reveal-delay,0s),
+             transform .52s cubic-bezier(.22,.61,.36,1) var(--reveal-delay,0s);
+}
+
+/* --- hero aurora ----------------------------------------------------------
+   Two slow, very low-contrast washes behind the headline. They sit under the
+   data-ray canvas and above the flat background. --- */
+.home-hero::before,
+.hero.compact::before{
+  content:"";
+  position:absolute;
+  inset:-30% -10% auto -30%;
+  height:120%;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(42% 46% at 18% 28%, rgba(255,46,99,.20), transparent 70%),
+    radial-gradient(38% 42% at 76% 12%, rgba(255,138,92,.12), transparent 72%);
+  filter:blur(26px);
+  animation:aurora 22s ease-in-out infinite alternate;
+}
+
+@keyframes aurora{
+  0%{transform:translate3d(0,0,0) scale(1);opacity:.85;}
+  50%{transform:translate3d(3%,2%,0) scale(1.06);opacity:1;}
+  100%{transform:translate3d(-2%,-3%,0) scale(1.02);opacity:.8;}
+}
+
+/* --- section headings -----------------------------------------------------
+   A short gradient rule above each heading, so sections read as sections
+   when you are thumbing past them at speed. --- */
+.section-title h2{
+  position:relative;
+}
+
+.section-title h2::before{
+  content:"";
+  position:absolute;
+  top:-13px;
+  left:0;
+  width:44px;
+  height:3px;
+  border-radius:3px;
+  background:linear-gradient(90deg,#ff2e63,rgba(255,46,99,0));
+}
+
+/* The status dot already pulses; see statusPulse above. */
+
+/* --- touch feedback -------------------------------------------------------
+   Nothing acknowledged a tap on a phone, because every state the cards had
+   was a :hover state. --- */
+@media (hover:none){
+  article.card:active,
+  .proof-tile:active,
+  .hero-live-tile:active,
+  .panel:active,
+  .why-card:active,
+  .snap-metric:active{
+    transform:scale(.985);
+    transition:transform .08s ease;
+  }
+}
+
+.btn,
+.hero-live-link{
+  transition:transform .14s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.btn:active,
+.hero-live-link:active{
+  transform:scale(.97);
+}
+
+/* --- card edge light ------------------------------------------------------
+   A one-pixel gradient along the top edge, brighter on the card you are
+   pointing at. It replaces nothing; it just gives the grids an edge. --- */
+article.card,
+.proof-tile,
+.hero-live-tile,
+.panel{
+  position:relative;
+}
+
+article.card::before,
+.proof-tile::before,
+.hero-live-tile::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:14px;
+  right:14px;
+  height:1px;
+  border-radius:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,46,99,.5),transparent);
+  opacity:.25;
+  transition:opacity .22s ease;
+  pointer-events:none;
+}
+
+article.card:hover::before,
+.proof-tile:hover::before,
+.hero-live-tile:hover::before{
+  opacity:.9;
+}
+
+/* The star tile on the home page carries the strongest number on the site. */
+.proof-tile.star::before{
+  opacity:.85;
+}
+
+/* --- the price card while it reads the feed ------------------------------- */
+.panel-loading .p-big{
+  color:transparent;
+  background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.17),rgba(255,255,255,.07));
+  background-size:280% 100%;
+  border-radius:8px;
+  animation:panel-shimmer 1.5s linear infinite;
+}
+
+@keyframes panel-shimmer{
+  to{background-position:-280% 0;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal,
+  .reveal-in{opacity:1 !important;transform:none !important;transition:none !important;}
+  .home-hero::before,
+  .hero.compact::before,
+  .panel-loading .p-big{animation:none !important;}
+  .scroll-progress{display:none;}
+  .btn:active,
+  .hero-live-link:active,
+  article.card:active,
+  .proof-tile:active,
+  .hero-live-tile:active,
+  .panel:active,
+  .why-card:active,
+  .snap-metric:active{transform:none;}
+}
+
+/* Anchors and the back-to-top glide rather than jump. The button already
+   asked for smooth behaviour explicitly; hash links did not. */
+@media (prefers-reduced-motion:no-preference){
+  html{scroll-behavior:smooth;}
 }

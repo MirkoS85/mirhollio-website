@@ -21,8 +21,10 @@
     root.querySelectorAll(targets.join(", ")).forEach(el => {
       if (el.classList.contains("pre-reg-value")) return;
       el.classList.remove("metric-tight", "metric-ultra-tight");
-      if (el.querySelector(".metric-unit")) return;
 
+      // A value with a unit used to be exempt, because the unit sat on its own
+      // line and the number alone always fitted. The unit is inline now, so
+      // "19,777.45 FLR" has to be measured whole or it runs past the card.
       const raw = (el.textContent || "").replace(/\s+/g, "");
       if (raw.length >= 10) {
         el.classList.add(raw.length >= 12 ? "metric-ultra-tight" : "metric-tight");
@@ -522,6 +524,188 @@
     // Keep page navigation direct. The previous fade-out made sidebar clicks feel slow.
   }
 
+  /* =========================================================================
+     Motion layer.
+
+     Presentation only. Nothing here reads, derives or alters a value; the
+     count-up ends on exactly the string that was already on the page, and
+     operator.js cancels a running one before it writes a new value (see
+     writeField). All of it is off under prefers-reduced-motion.
+     ========================================================================= */
+
+  const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /** A hairline across the top that fills as the page scrolls. */
+  function bindScrollProgress() {
+    if (REDUCED || document.querySelector(".scroll-progress")) return;
+    const bar = document.createElement("div");
+    bar.className = "scroll-progress";
+    bar.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bar);
+
+    let queued = false;
+    function update() {
+      queued = false;
+      const doc = document.documentElement;
+      const span = doc.scrollHeight - window.innerHeight;
+      const ratio = span > 160 ? Math.min(1, Math.max(0, window.scrollY / span)) : 0;
+      bar.style.setProperty("--progress", ratio.toFixed(4));
+      bar.classList.toggle("on", span > 160 && window.scrollY > 24);
+    }
+    const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    update();
+  }
+
+  /* Blocks that rise into place on first sight. Grid children are staggered
+     so a row of tiles arrives as a row. */
+  const REVEAL_GROUPS = [
+    ".section > .inner > .section-title",
+    ".hero-panels > .panel",
+    ".hero-live-strip > *",
+    ".proof-grid > *",
+    ".cards > *",
+    ".panel-mini-grid > *",
+    ".home-snap-metrics > *",
+    ".why-grid > *",
+    ".address-grid > *",
+    ".chart-panel",
+    ".validator-panel > .panel-wide-card",
+    ".flow > .step",
+    ".qa",
+    ".cta-band"
+  ];
+
+  function bindReveal() {
+    if (REDUCED || !("IntersectionObserver" in window)) return;
+
+    const seen = new WeakSet();
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const node = entry.target;
+        observer.unobserve(node);
+        node.classList.add("reveal-in");
+        // Take the class off once it has played. A transform left on an
+        // ancestor turns it into the containing block for the position:fixed
+        // info tips, which would then open in the wrong place.
+        const clear = () => {
+          node.classList.remove("reveal", "reveal-in");
+          node.style.removeProperty("--reveal-delay");
+        };
+        node.addEventListener("transitionend", clear, { once: true });
+        window.setTimeout(clear, 1400);
+      }
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.04 });
+
+    REVEAL_GROUPS.forEach(selector => {
+      const groups = new Map();
+      document.querySelectorAll(selector).forEach(node => {
+        if (seen.has(node) || node.closest(".reveal")) return;
+        seen.add(node);
+        const parent = node.parentElement;
+        const position = groups.get(parent) ?? 0;
+        groups.set(parent, position + 1);
+        // Anything already on screen at load skips the entrance: a block that
+        // faded in under the user's thumb would read as a glitch.
+        const box = node.getBoundingClientRect();
+        if (box.top < window.innerHeight * 0.9) return;
+        node.classList.add("reveal");
+        if (position) node.style.setProperty("--reveal-delay", `${Math.min(position, 5) * 0.06}s`);
+        observer.observe(node);
+      });
+    });
+  }
+
+  /* Numbers that climb to their value the first time they are seen. The value
+     is never computed here - the final frame writes back the exact string that
+     was already rendered, and the grouping and decimal separators are taken
+     from the locale the page is formatted in. */
+  const COUNT_SELECTORS = [".proof-tile .pv", ".p-big", ".hero-live-tile strong", ".metric > strong", ".compact-stat > strong", "article.card > strong"];
+
+  function localeSeparators() {
+    try {
+      const parts = new Intl.NumberFormat().formatToParts(12345.6);
+      return {
+        group: parts.find(part => part.type === "group")?.value ?? ",",
+        decimal: parts.find(part => part.type === "decimal")?.value ?? "."
+      };
+    } catch (_) {
+      return { group: ",", decimal: "." };
+    }
+  }
+
+  function bindCountUp() {
+    if (REDUCED || !("IntersectionObserver" in window)) return;
+    const { group, decimal } = localeSeparators();
+
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        run(entry.target);
+      }
+    }, { threshold: 0.3 });
+
+    function parse(text) {
+      // Leading symbol ($, #, ~), the number, then whatever trails it (%, M,
+      // " FLR"). Ratios, addresses and dates are left alone.
+      if (/[/:]|0x/.test(text)) return null;
+      const escape = ch => ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const pattern = new RegExp(`^([^0-9+-]*)([+-]?[0-9${escape(group)}${escape(decimal)}]*[0-9])(.*)$`, "s");
+      const match = text.match(pattern);
+      if (!match) return null;
+      const [, prefix, digits, suffix] = match;
+      const decimals = digits.includes(decimal) ? digits.length - digits.lastIndexOf(decimal) - 1 : 0;
+      const value = Number(digits.split(group).join("").replace(decimal, "."));
+      if (!Number.isFinite(value) || value === 0 || Math.abs(value) > 1e12) return null;
+      return { prefix, suffix, decimals, value };
+    }
+
+    function run(node) {
+      const final = node.textContent;
+      const parsed = parse(final.trim());
+      if (!parsed) return;
+      const format = new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: parsed.decimals,
+        maximumFractionDigits: parsed.decimals
+      });
+
+      let cancelled = false;
+      // operator.js calls this before writing a new value, so a live update
+      // during the animation wins instead of being overwritten by the last
+      // frame of a stale one.
+      node.__countCancel = () => { cancelled = true; node.__countCancel = null; };
+
+      const DURATION = 680;
+      const started = performance.now();
+      function frame(now) {
+        if (cancelled) return;
+        const t = Math.min(1, (now - started) / DURATION);
+        const eased = 1 - Math.pow(1 - t, 3);
+        if (t >= 1) {
+          node.textContent = final;
+          node.__countCancel = null;
+          return;
+        }
+        node.textContent = parsed.prefix + format.format(parsed.value * eased) + parsed.suffix;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    COUNT_SELECTORS.forEach(selector => {
+      document.querySelectorAll(selector).forEach(node => {
+        if (node.dataset.counted) return;
+        const text = node.textContent.trim();
+        if (!text || text === "-" || text === "\u2013") return;
+        node.dataset.counted = "1";
+        observer.observe(node);
+      });
+    });
+  }
+
   function boot() {
     formatFlrUnits();
     simplifyConditionDots();
@@ -538,6 +722,11 @@
     syncLatestHistoryScroll();
     bindPullToRefresh();
     bindPageTransitions();
+    bindScrollProgress();
+    bindReveal();
+    // Values arrive asynchronously; counting up a dash is pointless, so this
+    // runs once the first render has had a chance to land.
+    window.setTimeout(bindCountUp, 1200);
 
     const observer = new MutationObserver(mutations => {
       for (const mutation of mutations) {

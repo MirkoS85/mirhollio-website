@@ -365,7 +365,32 @@
     if ($("pf-avail") && p.availabilityPct != null) $("pf-avail").textContent = p.availabilityPct.toFixed(1).replace(".0", "") + "%";
     if ($("pf-passes") && p.passes != null) { $("pf-passes").textContent = p.passes + "/3";
       $("pf-passes-sub").textContent = p.eligible ? "eligible for rewards" : "minimal conditions"; }
-    if ($("pf-uptime") && val && val.uptime != null) $("pf-uptime").textContent = val.uptime.toFixed(1) + "%";
+    // Two definitions of "uptime" were on this page at once: the P-chain's
+    // current flag, which reads 100%, and the average across recent reward
+    // epochs, which reads 99.75%. Side by side they looked like one of them
+    // was wrong. The average is the conservative one and the one the rest of
+    // the site quotes, so it wins here; the P-chain figure only fills in if
+    // operator.js could not produce an average.
+    if ($("pf-uptime")) {
+      const node = $("pf-uptime");
+      const sub = node.parentElement?.querySelector(".ps");
+      const fallback = val && val.uptime != null ? val.uptime.toFixed(1) + "%" : null;
+      let waited = 0;
+      const settle = () => {
+        const avg = window.__fieldValue?.("validatorUptimeAvg");
+        if (avg && avg !== "-") {
+          node.textContent = avg;
+          if (sub) sub.textContent = "average, recent epochs";
+          return;
+        }
+        if ((waited += 250) > 8000) {
+          if (fallback) node.textContent = fallback;
+          return;
+        }
+        setTimeout(settle, 250);
+      };
+      settle();
+    }
     if ($("np-f-cond") && p) $("np-f-cond").textContent = `${p.passes ?? "-"} passes held, availability ${p.availabilityPct != null ? p.availabilityPct.toFixed(1) : "-"}%, eligible for rewards.`;
     // subpage charts
     weightChart(document.querySelector("svg[data-render='np-weight-chart']"), np.weightHistory || []);
@@ -597,7 +622,13 @@
       if (S.stake) parts.push(`validator stake <b>${S.stake}M FLR</b>${S.days != null ? ` · renews in ${S.days}d` : ""}`);
       // Was a hardcoded 100%. The validator card on this same page showed the
       // measured figure, so the two disagreed in plain sight.
-      if (S.uptime != null) parts.push(`uptime <b>${S.uptime.toFixed(1)}%</b>`);
+      // Two definitions of uptime existed on this page: the P-chain's current
+      // flag (100%) and the average across recent reward epochs (99.75%). The
+      // average is what the rest of the site quotes, so it wins whenever
+      // operator.js has produced one - which is usually after this first ran.
+      const avg = Number.parseFloat(String(window.__fieldValue?.("validatorUptimeAvg") ?? ""));
+      const uptime = Number.isFinite(avg) ? avg : S.uptime;
+      if (uptime != null) parts.push(`uptime <b>${uptime.toFixed(1)}%</b>`);
       parts.push(`<em>formerly MirSFlr</em>`);
       const html = parts.map((p) => esc(p)).join('<span style="color:var(--pink);padding:0 14px">◆</span>');
       segA.innerHTML = html; segB.innerHTML = html;
