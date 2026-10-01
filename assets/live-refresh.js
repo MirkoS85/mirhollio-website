@@ -2,7 +2,12 @@
   const targets = [
     ".metric strong",
     ".card strong",
-    ".validator-foot strong"
+    ".validator-foot strong",
+    // These two were left out, so "1.53M FLR" stayed one run of text and
+    // broke at the space - the unit dropped to a second line at full size
+    // instead of sitting small beside the figure.
+    ".hero-live-tile strong",
+    ".snap-metric strong"
   ];
 
   function formatFlrUnits(root = document) {

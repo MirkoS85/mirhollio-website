@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-35");
+@import url("operator.css?v=core-36");
 
 :root{
   color-scheme:dark;
@@ -58,7 +58,7 @@ body::before{
   left:-120px;
   width:360px;
   height:360px;
-  background:rgba(255, 41, 109,.17);
+  background:rgba(255, 46, 99,.17);
 }
 
 body::after{
@@ -115,7 +115,7 @@ body::after{
   overflow-y:hidden;
   margin-top:12px;
   padding:6px;
-  border:1px solid rgba(255, 41, 109,.12);
+  border:1px solid rgba(255, 46, 99,.12);
   border-radius:20px;
   background:rgba(22,22,30,0.46);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
@@ -142,18 +142,18 @@ body::after{
 .mobile-links a:hover{
   color:var(--ink);
   background:rgba(22,22,30,0.72);
-  border-color:rgba(255, 41, 109,.12);
+  border-color:rgba(255, 46, 99,.12);
   transform:none;
   box-shadow:none;
 }
 
 .mobile-links a[aria-current="page"]{
   color:#FFFFFF;
-  border-color:#ff296d;
-  background:linear-gradient(180deg, #ff296d 0%, #ff296d 100%);
+  border-color:#FF2E63;
+  background:linear-gradient(180deg, #FF2E63 0%, #FF2E63 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.18),
-    0 10px 22px rgba(255, 41, 109,.18);
+    0 10px 22px rgba(255, 46, 99,.18);
 }
 
 .site-shell{
@@ -174,7 +174,7 @@ body::after{
   background:
     linear-gradient(180deg, rgba(22,22,30,0.82), rgba(24, 12, 18,.72)),
     linear-gradient(160deg, rgba(24, 12, 18,.42), transparent 46%);
-  box-shadow:0 28px 80px rgba(255, 41, 109,.13);
+  box-shadow:0 28px 80px rgba(255, 46, 99,.13);
   backdrop-filter:blur(20px);
 }
 
@@ -223,7 +223,7 @@ body::after{
   width:44px;
   height:44px;
   border-radius:12px;
-  box-shadow:0 12px 28px rgba(255, 41, 109,.14);
+  box-shadow:0 12px 28px rgba(255, 46, 99,.14);
 }
 
 .nav{
@@ -244,7 +244,7 @@ body::after{
 
 .nav a{
   color:#d1d2d6;
-  border-color:rgba(255, 41, 109,.16);
+  border-color:rgba(255, 46, 99,.16);
   background:rgba(22,22,30,0.78);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
 }
@@ -253,22 +253,22 @@ body::after{
 .btn.ghost:hover,
 .copy-row .btn:hover{
   transform:translateY(-1px);
-  border-color:rgba(255, 41, 109,.24);
+  border-color:rgba(255, 46, 99,.24);
   box-shadow:0 14px 26px rgba(251, 116, 159,.08);
 }
 
 .btn.primary,
 .toggle-btn.active{
   color:#fff;
-  border-color:#ff296d;
-  background:linear-gradient(180deg, #ff296d, #ff296d);
-  box-shadow:0 18px 34px rgba(255, 41, 109,.22);
+  border-color:#FF2E63;
+  background:linear-gradient(180deg, #FF2E63, #FF2E63);
+  box-shadow:0 18px 34px rgba(255, 46, 99,.22);
 }
 
 .btn.primary:hover,
 .toggle-btn.active:hover{
   transform:translateY(-1px);
-  box-shadow:0 22px 38px rgba(255, 41, 109,.24);
+  box-shadow:0 22px 38px rgba(255, 46, 99,.24);
 }
 
 .nav a[aria-current="page"]{
@@ -284,14 +284,14 @@ body::after{
   color:var(--ink);
   border-color:transparent;
   border-left-color:var(--pink);
-  background:rgba(255, 41, 109,.045);
+  background:rgba(255, 46, 99,.045);
   box-shadow:none;
 }
 
 .btn.ghost,
 .toggle-btn,
 .copy-row .btn{
-  border-color:rgba(255, 41, 109,.14);
+  border-color:rgba(255, 46, 99,.14);
   background:rgba(22,22,30,0.76);
 }
 
@@ -309,7 +309,7 @@ body::after{
   gap:10px;
   margin-top:18px;
   padding:14px;
-  border:1px solid rgba(255, 41, 109,.12);
+  border:1px solid rgba(255, 46, 99,.12);
   border-radius:18px;
   background:rgba(22,22,30,0.58);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
@@ -371,7 +371,7 @@ body::after{
   justify-content:center;
   margin-top:12px;
   padding:10px 13px;
-  border:1px solid rgba(255, 41, 109,.16);
+  border:1px solid rgba(255, 46, 99,.16);
   border-radius:16px;
   background:rgba(22,22,30,0.72);
   color:var(--ink);
@@ -389,8 +389,8 @@ body::after{
 }
 
 .install-app-button:hover{
-  color:#ff296d;
-  border-color:rgba(255, 41, 109,.34);
+  color:#FF2E63;
+  border-color:rgba(255, 46, 99,.34);
   background:rgba(22,22,30,0.88);
 }
 
@@ -402,7 +402,7 @@ main{
   background:
     linear-gradient(180deg, rgba(24, 12, 18,.84), rgba(24, 12, 18,.74)),
     linear-gradient(135deg, rgba(255,255,255,.14), transparent);
-  box-shadow:0 28px 80px rgba(255, 41, 109,.13);
+  box-shadow:0 28px 80px rgba(255, 46, 99,.13);
   backdrop-filter:blur(20px);
 }
 
@@ -412,7 +412,7 @@ main::before{
   inset:0 0 auto;
   height:220px;
   background:
-    radial-gradient(circle at 0 0, rgba(255, 41, 109,.15), transparent 48%),
+    radial-gradient(circle at 0 0, rgba(255, 46, 99,.15), transparent 48%),
     linear-gradient(180deg, rgba(255,255,255,.24), transparent);
   pointer-events:none;
 }
@@ -493,7 +493,7 @@ h1{
   gap:10px;
   width:100%;
   padding:14px;
-  border:1px solid rgba(255, 41, 109,.12);
+  border:1px solid rgba(255, 46, 99,.12);
   border-radius:24px;
   background:rgba(22,22,30,0.46);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
@@ -534,14 +534,14 @@ h1{
 .kicker{
   gap:10px;
   margin-bottom:16px;
-  color:#ff296d;
+  color:#FF2E63;
   letter-spacing:.1em;
 }
 
 .kicker::before{
   width:10px;
   height:10px;
-  box-shadow:0 0 0 7px rgba(255, 41, 109,.1);
+  box-shadow:0 0 0 7px rgba(255, 46, 99,.1);
 }
 
 .lead{
@@ -713,12 +713,12 @@ h1{
 
 .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"],
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]{
-  color:#ff296d;
+  color:#FF2E63;
 }
 
 .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before,
 .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]::before{
-  box-shadow:0 0 0 5px rgba(255, 41, 109,.10);
+  box-shadow:0 0 0 5px rgba(255, 46, 99,.10);
 }
 
 .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"],
@@ -741,28 +741,28 @@ h1{
 }
 
 .decision-btn{
-  color:#ff296d !important;
-  border:1px solid #ff296d !important;
+  color:#FF2E63 !important;
+  border:1px solid #FF2E63 !important;
   background:linear-gradient(180deg, #0B0A0F 0%, #0B0A0F 100%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.12),
     0 0 0 1px rgba(255,255,255,.12),
-    0 14px 30px rgba(255, 41, 109,.18) !important;
+    0 14px 30px rgba(255, 46, 99,.18) !important;
 }
 
 .decision-btn:hover{
   color:#fb749f !important;
-  border-color:#ff296d !important;
+  border-color:#FF2E63 !important;
   background:linear-gradient(180deg, #0B0A0F 0%, #0B0A0F 100%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.12),
     0 0 0 1px rgba(255,255,255,.12),
-    0 18px 34px rgba(255, 41, 109,.22) !important;
+    0 18px 34px rgba(255, 46, 99,.22) !important;
 }
 
 .home-snap-actions .decision-btn{
   color:#fb749f !important;
-  border:1px solid rgba(255, 41, 109,.30) !important;
+  border:1px solid rgba(255, 46, 99,.30) !important;
   background:transparent !important;
   box-shadow:none !important;
 }
@@ -779,8 +779,8 @@ h1{
 
 .home-snap-actions .decision-btn:hover,
 .home-snap-actions .decision-btn:focus-visible{
-  color:#ff296d !important;
-  border-color:rgba(255, 41, 109,.42) !important;
+  color:#FF2E63 !important;
+  border-color:rgba(255, 46, 99,.42) !important;
   background:rgba(22,22,30,0.34) !important;
   box-shadow:none !important;
 }
@@ -792,12 +792,12 @@ h1{
 .install-app-button:focus-visible,
 .toggle-btn:focus-visible,
 .info-tip:focus-visible{
-  outline:2px solid #ff296d;
+  outline:2px solid #FF2E63;
   outline-offset:3px;
 }
 
 :focus-visible{
-  outline:2px solid #ff296d;
+  outline:2px solid #FF2E63;
   outline-offset:3px;
 }
 
@@ -839,7 +839,7 @@ h1{
 }
 
 .contact-card-copy span{
-  color:#ff296d;
+  color:#FF2E63;
   font-size:14px;
   line-height:1.45;
 }
@@ -1015,7 +1015,7 @@ h1{
 .delegate-list p{
   margin:6px 0 0;
   max-width:320px;
-  color:#ff296d;
+  color:#FF2E63;
   font-size:14px;
   line-height:1.45;
 }
@@ -1046,7 +1046,7 @@ h1{
 .section-title p,
 .section-side p{
   max-width:640px;
-  color:#ff296d;
+  color:#FF2E63;
   font-size:17px;
   line-height:1.6;
 }
@@ -1202,7 +1202,7 @@ h1{
   color:transparent !important;
   overflow:hidden;
   vertical-align:middle;
-  background:linear-gradient(90deg, rgba(255, 41, 109,.22) 25%, rgba(22,22,30,0.72) 50%, rgba(255, 41, 109,.22) 75%);
+  background:linear-gradient(90deg, rgba(255, 46, 99,.22) 25%, rgba(22,22,30,0.72) 50%, rgba(255, 46, 99,.22) 75%);
   background-size:220% 100%;
   animation:skeletonShimmer 1.35s ease-in-out infinite;
 }
@@ -1218,7 +1218,7 @@ h1{
   max-width:130px;
   height:14px;
   border-radius:999px;
-  background:linear-gradient(90deg, rgba(255, 41, 109,.22) 25%, rgba(22,22,30,0.72) 50%, rgba(255, 41, 109,.22) 75%);
+  background:linear-gradient(90deg, rgba(255, 46, 99,.22) 25%, rgba(22,22,30,0.72) 50%, rgba(255, 46, 99,.22) 75%);
   background-size:220% 100%;
   animation:skeletonShimmer 1.35s ease-in-out infinite;
 }
@@ -1274,7 +1274,7 @@ h1{
   flex:0 0 auto;
   border-radius:999px;
   background:#0B0A0F;
-  box-shadow:0 0 0 6px rgba(255, 41, 109,.05);
+  box-shadow:0 0 0 6px rgba(255, 46, 99,.05);
 }
 
 .metric strong.pre-reg-value .pre-reg-pill.ok{
@@ -1282,7 +1282,7 @@ h1{
 }
 
 .metric strong.pre-reg-value .pre-reg-pill.bad{
-  background:linear-gradient(180deg, #ff296d, #ff296d);
+  background:linear-gradient(180deg, #FF2E63, #FF2E63);
 }
 
 .metric strong.pre-reg-value .pre-reg-pill.unknown{
@@ -1438,9 +1438,9 @@ h1{
   padding:0;
   border:1px solid rgba(255,255,255,.12);
   border-radius:999px;
-  background:rgba(255, 41, 109,.96);
+  background:rgba(255, 46, 99,.96);
   color:#FFFFFF;
-  box-shadow:0 14px 30px rgba(255, 41, 109,.25);
+  box-shadow:0 14px 30px rgba(255, 46, 99,.25);
   opacity:var(--pull-refresh-progress);
   pointer-events:none;
   transform:
@@ -1460,7 +1460,7 @@ h1{
 }
 
 .pull-refresh-indicator.is-ready{
-  box-shadow:0 16px 34px rgba(255, 41, 109,.32);
+  box-shadow:0 16px 34px rgba(255, 46, 99,.32);
 }
 
 .pull-refresh-indicator.is-refreshing span{
@@ -1536,7 +1536,7 @@ h1{
 
 .panel-eyebrow{
   margin-bottom:10px;
-  color:#ff296d;
+  color:#FF2E63;
   font-size:11px;
   font-weight:900;
   letter-spacing:.12em;
@@ -1634,7 +1634,7 @@ h1{
   width:100%;
   min-height:42px;
   padding:0 38px 0 14px;
-  border:1px solid rgba(255, 41, 109,.16);
+  border:1px solid rgba(255, 46, 99,.16);
   border-radius:999px;
   appearance:none;
   background:
@@ -1674,7 +1674,7 @@ h1{
   min-height:62px;
   align-content:center;
   padding:10px 12px;
-  border:1px solid rgba(255, 41, 109,.12);
+  border:1px solid rgba(255, 46, 99,.12);
   border-radius:16px;
   background:rgba(22,22,30,0.62);
   color:#8f939c;
@@ -1746,7 +1746,7 @@ h1{
   height:34px;
   flex:0 0 auto;
   display:block;
-  border:1px solid rgba(255, 41, 109,.24);
+  border:1px solid rgba(255, 46, 99,.24);
   border-radius:999px;
   background:rgba(22,22,30,0.62);
   font-size:0;
@@ -1761,8 +1761,8 @@ h1{
   left:50%;
   width:7.5px;
   height:7.5px;
-  border-right:1.9px solid #ff296d;
-  border-bottom:1.9px solid #ff296d;
+  border-right:1.9px solid #FF2E63;
+  border-bottom:1.9px solid #FF2E63;
   border-radius:0 0 1.5px 0;
   /* -58% nudges the chevron back over the true centre; a plain -50% leaves it
      looking pushed right because the shape's mass sits on its outer corner. */
@@ -1770,14 +1770,14 @@ h1{
 }
 
 .ftso-delegation-toggle:hover i{
-  border-color:rgba(255, 41, 109,.42);
-  background:rgba(255, 41, 109,.09);
+  border-color:rgba(255, 46, 99,.42);
+  background:rgba(255, 46, 99,.09);
 }
 
 .ftso-delegation-card[open] .ftso-delegation-toggle i{
   transform:rotate(90deg);
-  background:rgba(255, 41, 109,.15);
-  border-color:rgba(255, 41, 109,.5);
+  background:rgba(255, 46, 99,.15);
+  border-color:rgba(255, 46, 99,.5);
 }
 
 .ftso-delegation-content{
@@ -1790,7 +1790,7 @@ h1{
 
 .panel-link,
 .table-link{
-  color:#ff296d;
+  color:#FF2E63;
   font-weight:900;
   text-decoration:none;
 }
@@ -1798,7 +1798,7 @@ h1{
 .panel-link{
   flex:0 0 auto;
   padding:9px 12px;
-  border:1px solid rgba(255, 41, 109,.22);
+  border:1px solid rgba(255, 46, 99,.22);
   border-radius:999px;
   background:rgba(22,22,30,0.62);
   font-size:12px;
@@ -1806,7 +1806,7 @@ h1{
 
 .panel-link:hover,
 .table-link:hover{
-  color:#ff296d;
+  color:#FF2E63;
 }
 
 .delegation-flow-summary{
@@ -1824,7 +1824,7 @@ h1{
   min-height:62px;
   align-content:center;
   padding:10px 12px;
-  border:1px solid rgba(255, 41, 109,.12);
+  border:1px solid rgba(255, 46, 99,.12);
   border-radius:16px;
   background:rgba(22,22,30,0.62);
   color:#8f939c;
@@ -1856,7 +1856,7 @@ h1{
   gap:5px;
   margin:18px;
   padding:16px 18px;
-  border:1px solid rgba(255, 41, 109,.14);
+  border:1px solid rgba(255, 46, 99,.14);
   border-radius:18px;
   background:linear-gradient(180deg, rgba(22,22,30,0.78), rgba(24, 12, 18,.62));
 }
@@ -1888,7 +1888,7 @@ h1{
   min-height:108px;
   align-content:center;
   padding:16px;
-  border:1px solid rgba(255, 41, 109,.13);
+  border:1px solid rgba(255, 46, 99,.13);
   border-radius:18px;
   background:rgba(22,22,30,0.76);
   box-shadow:0 14px 30px rgba(251, 116, 159,.05);
@@ -1936,12 +1936,12 @@ h1{
 }
 
 .delegation-insights [data-risk="warn"]{
-  border-color:rgba(255, 41, 109,.28);
+  border-color:rgba(255, 46, 99,.28);
   background:linear-gradient(180deg, rgba(22,22,30,0.82), rgba(24, 12, 18,.78));
 }
 
 .delegation-insights [data-risk="warn"] strong{
-  color:#ff296d;
+  color:#FF2E63;
 }
 
 .table-section-head{
@@ -1970,7 +1970,7 @@ h1{
 
 .ftso-delegation-card .table-wrap-compact{
   margin:0 18px 24px;
-  border:1px solid rgba(255, 41, 109,.13);
+  border:1px solid rgba(255, 46, 99,.13);
   border-radius:20px;
   background:rgba(22,22,30,0.82);
   box-shadow:0 16px 34px rgba(251, 116, 159,.06);
@@ -1989,7 +1989,7 @@ h1{
 }
 
 .ftso-delegation-card .delegator-table thead th{
-  border-bottom:1px solid rgba(255, 41, 109,.14);
+  border-bottom:1px solid rgba(255, 46, 99,.14);
   background:rgba(24, 12, 18,.34);
   color:#8c9994;
   font-size:12px;
@@ -1998,7 +1998,7 @@ h1{
 
 .ftso-delegation-card .delegator-table tbody th,
 .ftso-delegation-card .delegator-table tbody td{
-  border-bottom:1px solid rgba(255, 41, 109,.09);
+  border-bottom:1px solid rgba(255, 46, 99,.09);
   font-size:15px;
   font-weight:760;
 }
@@ -2006,7 +2006,7 @@ h1{
 .ftso-delegation-card .delegator-table td small{
   display:block;
   margin-top:2px;
-  color:#796b74;
+  color:var(--muted);
   font-size:11px;
   font-weight:760;
 }
@@ -2030,7 +2030,7 @@ h1{
 }
 
 .delegation-flow-zero{
-  color:#ff296d;
+  color:#FF2E63;
   font-weight:900;
 }
 
@@ -2040,7 +2040,7 @@ h1{
 }
 
 .delegation-delta-negative{
-  color:#ff296d;
+  color:#FF2E63;
   font-weight:950;
 }
 
@@ -2072,14 +2072,14 @@ h1{
 
 .entity-address-table code{
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color:#ff296d;
+  color:#FF2E63;
   font-size:13px;
   font-weight:850;
   word-break:break-all;
 }
 
 .balance-empty{
-  color:#72656c;
+  color:var(--muted);
 }
 
 .address-detail-toggle{
@@ -2088,20 +2088,20 @@ h1{
 
 .delegator-address{
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  color:#ff296d;
+  color:#FF2E63;
   font-size:13px;
   font-weight:850;
 }
 
 .delegator-address-link{
   text-decoration:none;
-  border-bottom:1px solid rgba(255, 41, 109,.28);
+  border-bottom:1px solid rgba(255, 46, 99,.28);
 }
 
 .delegator-address-link:hover,
 .delegator-address-link:focus-visible{
-  color:#ff296d;
-  border-bottom-color:#ff296d;
+  color:#FF2E63;
+  border-bottom-color:#FF2E63;
 }
 
 .mobile-field-label{
@@ -2184,7 +2184,7 @@ h1{
   display:block;
   font-size:0;
   line-height:0;
-  box-shadow:0 0 0 6px rgba(255, 41, 109,.05);
+  box-shadow:0 0 0 6px rgba(255, 46, 99,.05);
 }
 
 .condition-dots span::before{
@@ -2197,7 +2197,7 @@ h1{
 }
 
 .condition-dots span.ok{background:linear-gradient(180deg, #56bc82, #41a76c)}
-.condition-dots span.bad{background:linear-gradient(180deg, #ff296d, #ff296d)}
+.condition-dots span.bad{background:linear-gradient(180deg, #FF2E63, #FF2E63)}
 .condition-dots span.unknown{background:#0B0A0F}
 
 .condition-history-panel{
@@ -2229,7 +2229,7 @@ h1{
 .condition-history-header th{
   border-bottom:1px solid var(--line);
   background:rgba(24, 12, 18,.46);
-  color:#ff296d;
+  color:#FF2E63;
   font-size:13px;
   font-weight:900;
   letter-spacing:0;
@@ -2253,7 +2253,7 @@ h1{
 }
 
 .condition-mark.bad{
-  background:linear-gradient(180deg, #ff296d, #ff296d);
+  background:linear-gradient(180deg, #FF2E63, #FF2E63);
 }
 
 .condition-mark.unknown{
@@ -2278,7 +2278,7 @@ h1{
   gap:0;
   min-height:44px;
   padding:4px;
-  border:1px solid rgba(255, 41, 109,.18);
+  border:1px solid rgba(255, 46, 99,.18);
   border-radius:999px;
   background:rgba(22,22,30,0.64);
   box-shadow:
@@ -2313,10 +2313,10 @@ h1{
 .toggle-btn.active:hover{
   color:#fff !important;
   border-color:transparent !important;
-  background:linear-gradient(180deg, #ff296d 0%, #ff296d 100%) !important;
+  background:linear-gradient(180deg, #FF2E63 0%, #FF2E63 100%) !important;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.12),
-    0 7px 16px rgba(255, 41, 109,.24);
+    0 7px 16px rgba(255, 46, 99,.24);
   transform:none;
 }
 
@@ -2353,7 +2353,7 @@ h1{
   width:38px;
   height:38px;
   border-radius:12px;
-  box-shadow:0 12px 22px rgba(255, 41, 109,.18);
+  box-shadow:0 12px 22px rgba(255, 46, 99,.18);
 }
 
 .step strong{
@@ -2382,7 +2382,7 @@ table{
   align-items:center;
   justify-content:center;
   padding:18px;
-  border:1px dashed rgba(255, 41, 109,.2);
+  border:1px dashed rgba(255, 46, 99,.2);
   border-radius:16px;
   background:rgba(24, 12, 18,.72);
   color:#8f939c;
@@ -2399,10 +2399,10 @@ table{
   width:100%;
   margin-top:8px;
   padding:12px 14px;
-  border:1px solid rgba(255, 41, 109,.28);
+  border:1px solid rgba(255, 46, 99,.28);
   border-radius:16px;
   background:rgba(24, 12, 18,.78);
-  color:#ff296d !important;
+  color:#FF2E63 !important;
   font-size:14px;
   font-weight:760;
   line-height:1.4;
@@ -2452,7 +2452,7 @@ td{
 
 thead th{
   background:rgba(24, 12, 18,.46);
-  color:#91848c;
+  color:var(--muted);
 }
 
 tbody th{
@@ -2489,7 +2489,7 @@ tbody tr:hover td{
   border:1px solid var(--line);
   border-radius:22px;
   background:
-    radial-gradient(circle at top, rgba(255, 41, 109,.12), transparent 54%),
+    radial-gradient(circle at top, rgba(255, 46, 99,.12), transparent 54%),
     linear-gradient(180deg, rgba(22,22,30,0.92), rgba(24, 12, 18,.8));
 }
 
@@ -2505,7 +2505,7 @@ tbody tr:hover td{
   margin:0 auto;
   padding:18px 22px 14px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 41, 109,.10), transparent 46%),
+    radial-gradient(circle at 50% 0%, rgba(255, 46, 99,.10), transparent 46%),
     linear-gradient(180deg, rgba(22,22,30,0.94), rgba(24, 12, 18,.84));
 }
 
@@ -2562,7 +2562,7 @@ tbody tr:hover td{
 }
 
 .performance-hit-target:focus{
-  stroke:rgba(255, 41, 109,.34);
+  stroke:rgba(255, 46, 99,.34);
   stroke-width:2;
 }
 
@@ -2621,7 +2621,7 @@ tbody tr:hover td{
 
 .chart-focus-halo{
   fill:none;
-  stroke:#ff296d;
+  stroke:#FF2E63;
   stroke-width:2.4;
   filter:drop-shadow(0 0 7px rgba(255,46,99,.75));
 }
@@ -2715,7 +2715,7 @@ tbody tr:hover td{
 
 .ftso-delegation-chart-wrap{
   background:
-    radial-gradient(circle at top, rgba(255, 41, 109,.10), transparent 54%),
+    radial-gradient(circle at top, rgba(255, 46, 99,.10), transparent 54%),
     linear-gradient(180deg, rgba(22,22,30,0.94), rgba(24, 12, 18,.84));
 }
 
@@ -2749,30 +2749,30 @@ tbody tr:hover td{
   height:12px;
   flex:0 0 auto;
   border-radius:999px;
-  border:1px solid rgba(255, 41, 109,.16);
+  border:1px solid rgba(255, 46, 99,.16);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
 }
 
 .availability-scale .scale-line{
   height:4px;
   border:0;
-  background:#ff296d;
+  background:#FF2E63;
   box-shadow:none;
 }
 
 .availability-scale .scale-target{
   height:4px;
   border:0;
-  background:repeating-linear-gradient(90deg, #ff296d 0 6px, transparent 6px 11px);
+  background:repeating-linear-gradient(90deg, #FF2E63 0 6px, transparent 6px 11px);
   box-shadow:none;
 }
 
 .availability-scale .scale-latest{
   width:13px;
   height:13px;
-  border:2px solid #ff296d;
-  background:#ff296d;
-  box-shadow:0 0 0 3px rgba(255, 41, 109,.12);
+  border:2px solid #FF2E63;
+  background:#FF2E63;
+  box-shadow:0 0 0 3px rgba(255, 46, 99,.12);
 }
 
 .bars{
@@ -2794,17 +2794,17 @@ tbody tr:hover td{
 .bar-track,
 .reward-chart-wrap,
 .uptime-pills span{
-  background:rgba(255, 41, 109,.08);
+  background:rgba(255, 46, 99,.08);
 }
 
 .bar-track{
   height:14px;
-  border-color:rgba(255, 41, 109,.12);
+  border-color:rgba(255, 46, 99,.12);
   border-radius:999px;
   background:
-    linear-gradient(180deg, rgba(255, 41, 109,.09), rgba(255, 41, 109,.03)),
+    linear-gradient(180deg, rgba(255, 46, 99,.09), rgba(255, 46, 99,.03)),
     rgba(22,22,30,0.74);
-  box-shadow:inset 0 1px 3px rgba(255, 41, 109,.08);
+  box-shadow:inset 0 1px 3px rgba(255, 46, 99,.08);
 }
 
 .bar-track.green{
@@ -2814,7 +2814,7 @@ tbody tr:hover td{
 }
 
 .bar-fill{
-  background:linear-gradient(90deg, #ff296d, #ff296d);
+  background:linear-gradient(90deg, #FF2E63, #FF2E63);
 }
 
 .bar-track.green .bar-fill{
@@ -2976,7 +2976,7 @@ tbody tr:hover td{
     gap:6px;
     overflow:visible;
     padding:5px;
-    border:1px solid rgba(255, 41, 109,.12);
+    border:1px solid rgba(255, 46, 99,.12);
     border-radius:18px;
     background:rgba(22,22,30,0.46);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
@@ -3625,15 +3625,15 @@ tbody tr:hover td{
 
   .home-snap-actions .decision-btn{
     color:var(--ink) !important;
-    border:1px solid rgba(255, 41, 109,.24) !important;
+    border:1px solid rgba(255, 46, 99,.24) !important;
     background:transparent !important;
     box-shadow:none !important;
   }
 
   .home-snap-actions .decision-btn:hover,
   .home-snap-actions .decision-btn:focus-visible{
-    color:#ff296d !important;
-    border-color:rgba(255, 41, 109,.42) !important;
+    color:#FF2E63 !important;
+    border-color:rgba(255, 46, 99,.42) !important;
     background:rgba(22,22,30,0.34) !important;
     box-shadow:none !important;
   }
@@ -3679,9 +3679,14 @@ tbody tr:hover td{
   .cards.two,
   .cards.three,
   .split-metrics,
-  .panel-mini-grid,
-  .address-grid{
+  .panel-mini-grid{
     grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+
+  /* A full 42-character address plus a copy button does not fit in half a
+     phone; these stay one per row. */
+  .address-grid{
+    grid-template-columns:1fr !important;
   }
 
   /* A card that carries a chart, a table or a pill strip still needs the
@@ -3689,7 +3694,6 @@ tbody tr:hover td{
   .cards .panel-wide-card,
   .panel-mini-grid .panel-wide-card,
   .cards .card.uptime-wide,
-  .cards .card:has(.uptime-pills),
   .cards .card:has(table),
   .cards .card:has(.reward-chart-wrap){
     grid-column:1 / -1;
@@ -3847,7 +3851,7 @@ tbody tr:hover td{
 
   .ftso-delegation-table tbody tr{
     padding:12px 14px;
-    border:1px solid rgba(255, 41, 109,.12);
+    border:1px solid rgba(255, 46, 99,.12);
     border-radius:16px;
     background:rgba(22,22,30,0.78);
     box-shadow:0 12px 24px rgba(251, 116, 159,.045);
@@ -3868,7 +3872,7 @@ tbody tr:hover td{
     align-items:center;
     gap:4px 10px;
     padding:13px 14px;
-    border:1px solid rgba(255, 41, 109,.12);
+    border:1px solid rgba(255, 46, 99,.12);
     box-shadow:0 12px 24px rgba(251, 116, 159,.045);
   }
 
@@ -3882,8 +3886,8 @@ tbody tr:hover td{
     padding:0;
     border:0;
     border-radius:999px;
-    background:rgba(255, 41, 109,.11);
-    color:#ff296d;
+    background:rgba(255, 46, 99,.11);
+    color:#FF2E63;
     font-size:14px;
     font-weight:950;
   }
@@ -3920,7 +3924,7 @@ tbody tr:hover td{
   .ftso-delegator-table .mobile-field-label{
     display:inline;
     margin-right:5px;
-    color:#6e727b;
+    color:var(--muted);
     font-weight:800;
   }
 
@@ -4031,7 +4035,7 @@ tbody tr:hover td{
   }
 
   .condition-history-table td:first-child{
-    color:#ff296d;
+    color:#FF2E63;
     font-size:15px;
     font-weight:900;
     letter-spacing:.03em;
@@ -4090,7 +4094,7 @@ tbody tr:hover td{
     flex-direction:column;
     gap:5px;
     flex:0 0 auto;
-    border:1px solid rgba(255, 41, 109,.15);
+    border:1px solid rgba(255, 46, 99,.15);
     border-radius:14px;
     background:rgba(22,22,30,0.72);
     color:var(--ink);
@@ -4137,7 +4141,7 @@ tbody tr:hover td{
     max-height:360px;
     margin-top:12px;
     padding:8px !important;
-    border-color:rgba(255, 41, 109,.12) !important;
+    border-color:rgba(255, 46, 99,.12) !important;
     background:rgba(22,22,30,0.52);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
     opacity:1;
@@ -4146,10 +4150,10 @@ tbody tr:hover td{
 
 
   .mobile-links a[aria-current="page"]{
-    border-color:#ff296d;
-    background:linear-gradient(180deg, #ff296d 0%, #ff296d 100%);
+    border-color:#FF2E63;
+    background:linear-gradient(180deg, #FF2E63 0%, #FF2E63 100%);
     color:#FFFFFF;
-    box-shadow:0 10px 22px rgba(255, 41, 109,.16);
+    box-shadow:0 10px 22px rgba(255, 46, 99,.16);
   }
 }
 
@@ -4169,7 +4173,7 @@ tbody tr:hover td{
     width:100% !important;
     max-width:100% !important;
     padding:calc(env(safe-area-inset-top, 0px) + 8px) 14px 9px;
-    border-bottom:1px solid rgba(255, 41, 109,.13);
+    border-bottom:1px solid rgba(255, 46, 99,.13);
     background:rgba(24, 12, 18,.98);
     box-shadow:0 12px 28px rgba(251, 116, 159,.10);
   }
@@ -4234,7 +4238,7 @@ tbody tr:hover td{
     max-height:330px;
     margin-top:10px;
     padding:8px !important;
-    border-color:rgba(255, 41, 109,.13) !important;
+    border-color:rgba(255, 46, 99,.13) !important;
     background:rgba(22,22,30,0.64) !important;
     opacity:1;
     pointer-events:auto;
@@ -4495,7 +4499,7 @@ tbody tr:hover td{
   .condition-history-table th:first-child,
   .condition-history-table td:first-child{
     width:174px !important;
-    color:#ff296d !important;
+    color:#FF2E63 !important;
     font-size:12px !important;
     font-weight:900;
     white-space:normal !important;
@@ -4503,7 +4507,7 @@ tbody tr:hover td{
   }
 
   .condition-history-table td:first-child{
-    color:#ff296d !important;
+    color:#FF2E63 !important;
   }
 
   .condition-mark{
@@ -4632,12 +4636,12 @@ tbody tr:hover td{
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"],
   .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]{
-    color:#ff296d !important;
+    color:#FF2E63 !important;
   }
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="bad"]::before,
   .snap-metric strong[data-field="validatorConnected"][data-mobile-status="bad"]::before{
-    box-shadow:0 0 0 5px rgba(255, 41, 109,.10);
+    box-shadow:0 0 0 5px rgba(255, 46, 99,.10);
   }
 
   .snap-metric strong[data-field="preRegisteredStatus"][data-mobile-status="unknown"],
@@ -4656,18 +4660,18 @@ tbody tr:hover td{
     justify-content:flex-start;
     padding-left:10px !important;
     color:var(--ink) !important;
-    border-color:rgba(255, 41, 109,.12) !important;
+    border-color:rgba(255, 46, 99,.12) !important;
     border-left:3px solid var(--pink) !important;
-    background:rgba(255, 41, 109,.06) !important;
+    background:rgba(255, 46, 99,.06) !important;
     box-shadow:none !important;
   }
 
   .mobile-links a[aria-current="page"]:hover,
   .mobile-links a[aria-current="page"]:focus-visible{
     color:var(--ink) !important;
-    border-color:rgba(255, 41, 109,.16) !important;
+    border-color:rgba(255, 46, 99,.16) !important;
     border-left-color:var(--pink) !important;
-    background:rgba(255, 41, 109,.08) !important;
+    background:rgba(255, 46, 99,.08) !important;
     box-shadow:none !important;
   }
 }
@@ -4702,7 +4706,7 @@ tbody tr:hover td{
     padding:8px 10px;
     border-radius:11px;
     background:rgba(22,22,30,0.62);
-    border:1px solid rgba(255, 41, 109,.11);
+    border:1px solid rgba(255, 46, 99,.11);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
   }
 
@@ -4782,7 +4786,7 @@ tbody tr:hover td{
     grid-template-areas:none !important;
     gap:0;
     padding:15px 16px !important;
-    border:1px solid rgba(255, 41, 109,.13);
+    border:1px solid rgba(255, 46, 99,.13);
     border-radius:18px;
     background:rgba(22,22,30,0.82);
     box-shadow:0 12px 26px rgba(251, 116, 159,.05);
@@ -4802,7 +4806,7 @@ tbody tr:hover td{
     height:auto !important;
     padding:9px 0 !important;
     border:0 !important;
-    border-bottom:1px solid rgba(255, 41, 109,.11) !important;
+    border-bottom:1px solid rgba(255, 46, 99,.11) !important;
     border-radius:0 !important;
     background:transparent !important;
     box-shadow:none !important;
@@ -4833,7 +4837,7 @@ tbody tr:hover td{
 
   .ftso-delegation-table th[data-label="Epoch"],
   .ftso-delegator-table th[data-label="#"]{
-    color:#ff296d;
+    color:#FF2E63;
     font-size:24px;
     font-weight:950;
   }
@@ -4874,7 +4878,7 @@ tbody tr:hover td{
   .ftso-delegator-table td[data-label="Last seen"] small{
     display:block;
     margin:2px 0 0;
-    color:#6e727b;
+    color:var(--muted);
     font-size:11px;
   }
 
@@ -4900,7 +4904,7 @@ tbody tr:hover td{
 
   .ftso-delegator-table th[data-label="#"]{
     height:auto !important;
-    color:#ff296d;
+    color:#FF2E63;
     font-size:22px;
     line-height:1.1;
   }
@@ -4931,7 +4935,7 @@ tbody tr:hover td{
   .ftso-delegation-card .table-wrap-compact{
     overflow-x:auto !important; -webkit-overflow-scrolling:touch;
     background:rgba(22,22,30,0.82) !important;
-    border:1px solid rgba(255, 41, 109,.12) !important;
+    border:1px solid rgba(255, 46, 99,.12) !important;
     border-radius:16px !important;
     box-shadow:0 12px 24px rgba(251, 116, 159,.05) !important;
     padding:2px 12px !important; margin:0 14px 18px !important;
@@ -4948,7 +4952,7 @@ tbody tr:hover td{
   .table-wrap-compact .ftso-delegation-table tbody tr,
   .table-wrap-compact .ftso-delegator-table tbody tr{
     display:table-row !important; grid-template-columns:none !important; grid-template-areas:none !important;
-    padding:0 !important; border:0 !important; border-bottom:1px solid rgba(255, 41, 109,.10) !important;
+    padding:0 !important; border:0 !important; border-bottom:1px solid rgba(255, 46, 99,.10) !important;
     border-radius:0 !important; background:transparent !important; box-shadow:none !important;
   }
   .table-wrap-compact .ftso-delegation-table th,
@@ -4966,9 +4970,9 @@ tbody tr:hover td{
   .table-wrap-compact .ftso-delegator-table td:first-child{ text-align:left !important; }
   .table-wrap-compact .ftso-delegation-table thead th,
   .table-wrap-compact .ftso-delegator-table thead th{
-    font-size:11px !important; letter-spacing:.05em !important; text-transform:uppercase !important;
-    color:#6e727b !important; background:transparent !important; font-weight:800 !important;
-    padding:8px 6px !important; border-bottom:1px solid rgba(255, 41, 109,.14) !important;
+    font-size:11.5px !important; letter-spacing:.03em !important; text-transform:none !important;
+    color:var(--muted) !important; background:transparent !important; font-weight:500 !important;
+    padding:8px 6px !important; border-bottom:1px solid rgba(255, 46, 99,.14) !important;
   }
   .table-wrap-compact .ftso-delegation-table th::before,
   .table-wrap-compact .ftso-delegation-table td::before,
@@ -4978,7 +4982,7 @@ tbody tr:hover td{
   .table-wrap-compact .ftso-delegator-table .mobile-field-label{ display:none !important; }
   .table-wrap-compact .ftso-delegator-table th[data-label="#"]{
     width:auto !important; height:auto !important; padding:9px 6px !important; border-radius:0 !important;
-    background:transparent !important; color:#6e727b !important; font-size:12.5px !important;
+    background:transparent !important; color:var(--muted) !important; font-size:12.5px !important;
     font-weight:800 !important; display:table-cell !important; place-items:initial !important;
   }
   .table-wrap-compact .ftso-delegator-table td[data-label="Amount"],
@@ -5595,7 +5599,7 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
     align-items:center;
     justify-content:center;
     padding:7px 10px;
-    border:1px solid rgba(255, 41, 109,.11);
+    border:1px solid rgba(255, 46, 99,.11);
     border-radius:11px;
     background:rgba(22,22,30,0.58);
     font-size:12px;
@@ -5730,6 +5734,14 @@ a.table-more{display:flex;align-items:center;justify-content:center;text-decorat
 }
 .site-foot p{margin:0 0 6px;max-width:72ch}
 .site-foot a{color:var(--muted);text-decoration:underline}
+/* The links inside the sentence are exempt from the target-size rule; this
+   one stands alone in its own paragraph and is not. */
+.site-foot p:last-child a{
+  display:inline-flex;
+  align-items:center;
+  min-height:44px;
+  padding-right:8px;
+}
 .site-foot a:hover{color:var(--ink)}
 @media (max-width:620px){
   .site-foot{padding:22px 16px 34px}
@@ -5926,4 +5938,1045 @@ article.card:hover::before,
    asked for smooth behaviour explicitly; hash links did not. */
 @media (prefers-reduced-motion:no-preference){
   html{scroll-behavior:smooth;}
+}
+
+/* ===========================================================================
+   core-36: DESIGN SYSTEM
+
+   What this block is for
+   ----------------------
+   The stylesheet above grew by accretion over many rounds, and the result was
+   measurable: on one page the h1 was 47.5px while the h2 under it was 56px;
+   eight different roles sat between 11px and 13px at weights 400, 600, 700,
+   850, 860, 900 and 950; the body font carried the tile values while the
+   display font carried the decoration; and not one number on the site used
+   tabular figures, so every live value jittered as it updated.
+
+   This block states the visual language once, at the end, where it wins by
+   order. It changes no colour token and no logo. Everything here is type,
+   space, shape, surface and state.
+   =========================================================================== */
+
+:root{
+  /* --- type scale ------------------------------------------------------
+     One ratio, fluid between a 360px phone and a 1440px desktop, so there
+     are no step changes at a breakpoint. */
+  --t-display: clamp(34px, 6.6vw, 64px);
+  --t-h2:      clamp(27px, 4.6vw, 44px);
+  --t-h3:      clamp(18px, 1.9vw, 23px);
+  --t-lead:    clamp(15.5px, 1.4vw, 19px);
+  --t-body:    clamp(14.5px, 1.1vw, 16.5px);
+  --t-small:   13px;
+  --t-micro:   11.5px;
+
+  /* Data is its own scale. These are the numbers people came for. */
+  --t-data-xl: clamp(32px, 5vw, 42px);
+  --t-data-l:  clamp(22px, 2.5vw, 26px);
+  --t-data-m:  18px;
+
+  /* --- space ----------------------------------------------------------- */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:22px;
+  --s-6:30px; --s-7:42px; --s-8:58px; --s-9:80px;
+
+  /* --- shape ------------------------------------------------------------ */
+  --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:24px;
+
+  /* --- surfaces ---------------------------------------------------------
+     Four steps, all mixed from the existing background and the existing
+     pink. No new hues. */
+  --elev-0:#0A0A0E;
+  --elev-1:rgba(255,255,255,.028);
+  --elev-2:rgba(255,255,255,.047);
+  --edge-1:rgba(255,255,255,.085);
+  --edge-2:rgba(255,255,255,.14);
+  --edge-pink:rgba(255,46,99,.34);
+
+  /* --- fonts ------------------------------------------------------------ */
+  --f-display:"Archivo","Public Sans",system-ui,sans-serif;
+  --f-text:"Public Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+/* --- headings -------------------------------------------------------------
+   The page title is now the largest thing on the page, which it was not. --- */
+h1,
+.hero h1,
+.hero.compact h1,
+.home-hero h1{
+  font-family:var(--f-display);
+  font-size:var(--t-display) !important;
+  font-weight:800;
+  line-height:.98 !important;
+  letter-spacing:-.035em;
+  text-wrap:balance;
+}
+
+h2,
+.section-title h2{
+  font-family:var(--f-display);
+  font-size:var(--t-h2) !important;
+  font-weight:800;
+  line-height:1.03 !important;
+  letter-spacing:-.03em;
+  text-wrap:balance;
+}
+
+h3{
+  font-family:var(--f-display);
+  font-size:var(--t-h3);
+  font-weight:700;
+  line-height:1.16;
+  letter-spacing:-.018em;
+}
+
+.lead,
+.hero .lead,
+.section-side p{
+  font-family:var(--f-text);
+  font-size:var(--t-lead) !important;
+  line-height:1.5;
+  max-width:58ch;
+  text-wrap:pretty;
+}
+
+main p{
+  font-size:var(--t-body);
+  line-height:1.6;
+  max-width:68ch;
+  text-wrap:pretty;
+}
+
+/* --- the instrument language ----------------------------------------------
+   Every label on the site is now one thing: mono, small, muted, no shouting.
+   Uppercase labels were being set at eight weights and wrapped in the
+   two-column tile grid; mono at 11.5px is narrower than uppercase text at the
+   same size and reads as an instrument panel, which is what this site is. --- */
+.metric > span,
+.snap-metric > span,
+.hero-live-tile > span,
+.compact-stat > b,
+article.card > b,
+.proof-tile .pl,
+.p-head,
+.mini-label,
+.chart-panel .mini-label,
+.panel-head .mini-label,
+.address-stat span,
+.validator-stat span,
+.validator-foot span,
+.delegator-summary span,
+.kicker,
+thead th{
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+  letter-spacing:.03em !important;
+  text-transform:none !important;
+  line-height:1.35 !important;
+  color:var(--muted) !important;
+}
+
+/* The kicker is the one label that keeps a little authority. */
+.kicker{
+  color:var(--pink) !important;
+  font-weight:600 !important;
+  letter-spacing:.09em !important;
+  text-transform:uppercase !important;
+}
+
+/* --- values ---------------------------------------------------------------
+   Display face, tabular figures. Tabular is not decoration: without it every
+   digit has its own width, so a live value shifts the ones beside it on each
+   update and the count-up animation visibly wobbles. --- */
+.metric > strong,
+.snap-metric > strong,
+.hero-live-tile > strong,
+.compact-stat > strong,
+article.card > strong,
+.proof-tile .pv,
+.p-big,
+.stat-value,
+.metric-value,
+.dx-amount,
+.dx-flow-stat strong,
+tbody td,
+tbody th{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1,"ss01" 1;
+}
+
+.metric > strong,
+.snap-metric > strong,
+.hero-live-tile > strong,
+.compact-stat > strong,
+article.card > strong{
+  font-family:var(--f-display) !important;
+  font-size:var(--t-data-l) !important;
+  font-weight:800 !important;
+  line-height:1.02 !important;
+  letter-spacing:-.03em !important;
+  color:var(--ink);
+}
+
+.proof-tile .pv,
+.p-big{
+  font-family:var(--f-display) !important;
+  font-size:var(--t-data-xl) !important;
+  font-weight:800 !important;
+  line-height:.98 !important;
+  letter-spacing:-.035em !important;
+}
+
+/* --- footnotes ------------------------------------------------------------
+   A note under a value was being set at 15px, almost the size of body copy,
+   which made the tiles read as paragraphs with a number on top. --- */
+.metric > p,
+.compact-stat > p,
+article.card > p,
+.proof-tile .ps,
+.p-sub{
+  font-family:var(--f-text) !important;
+  font-size:12.5px !important;
+  line-height:1.4 !important;
+  color:var(--muted) !important;
+  max-width:42ch;
+}
+
+/* --- tables ---------------------------------------------------------------
+   Body cells were 12px on a phone and 16px on a desktop - a third larger for
+   the same content. One size, and figures that line up in a column. --- */
+tbody td,
+tbody th{
+  font-size:13.5px !important;
+  line-height:1.45 !important;
+}
+
+/* --- controls -------------------------------------------------------------
+   Buttons and nav links were 12/13px at weight 850-860, which is a weight no
+   font has; the browser was synthesising it. --- */
+.btn,
+.nav a,
+.mobile-links a,
+.toggle-btn,
+.decision-btn{
+  font-family:var(--f-text) !important;
+  font-size:13.5px !important;
+  font-weight:650 !important;
+  letter-spacing:0 !important;
+}
+
+/* --- one tile, six names --------------------------------------------------
+   .metric, .compact-stat, article.card, .snap-metric, .hero-live-tile and
+   .proof-tile were six boxes with six backgrounds, six radii, six paddings
+   and two different reading orders - the proof tiles put the number above its
+   label, everything else put it below. They are one box now. The markup is
+   untouched; the order is fixed with flex, not with HTML. --- */
+.metric,
+.compact-stat,
+article.card,
+.snap-metric,
+.hero-live-tile,
+.proof-tile{
+  display:flex;
+  flex-direction:column;
+  /* Not flex-start: that sizes each child to its min-content width, and a
+     value like "1.46%" then renders one character per line. */
+  align-items:stretch;
+  gap:var(--s-2);
+  min-height:0;
+  padding:16px 18px !important;
+  border:1px solid var(--edge-1) !important;
+  border-radius:var(--r-lg) !important;
+  background:var(--elev-1) !important;
+  box-shadow:none !important;
+  transition:border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+/* Only one of the six puts its value above its label in the markup: the
+   proof tiles. Reordering just those is enough, and it avoids a catch-all
+   order rule that would also reshuffle cards holding a chart or a form. */
+.proof-tile .pl{order:1}
+.proof-tile .pv{order:2}
+.proof-tile .ps{order:3}
+
+.metric > span,
+.snap-metric > span,
+.hero-live-tile > span,
+.compact-stat > b,
+article.card > b,
+.proof-tile .pl{
+  margin:0 !important;
+  padding-right:26px; /* clears the info badge in the corner */
+}
+
+.metric > strong,
+.snap-metric > strong,
+.hero-live-tile > strong,
+.compact-stat > strong,
+article.card > strong,
+.proof-tile .pv,
+.metric > p,
+.compact-stat > p,
+article.card > p,
+.proof-tile .ps{
+  margin:0 !important;
+}
+
+/* The info badge is positioned, so it must not take part in the flex flow. */
+.info-tip{
+  position:absolute !important;
+}
+
+/* A card that holds a chart, a table or a form is a container, not a tile:
+   it keeps the shell and drops the tile's column rhythm. `article.card` is
+   one class plus one element, so the reset has to carry two classes. */
+article.card.panel-wide-card,
+article.card.delegation-summary-card,
+article.card.dx-book,
+article.card.dx-countdown,
+article.card.contact-card{
+  display:block;
+}
+
+/* The star tile keeps its emphasis, now as a pink wash rather than a
+   different box. */
+.proof-tile.star{
+  border-color:var(--edge-pink) !important;
+  background:linear-gradient(180deg, rgba(255,46,99,.10), rgba(255,46,99,.03)) !important;
+}
+
+.proof-tile.star .pv{
+  color:var(--pink);
+  text-shadow:0 0 28px rgba(255,46,99,.45);
+}
+
+/* A tile that is a link says so. */
+.hero-live-link{
+  border-color:var(--edge-pink) !important;
+  background:linear-gradient(180deg, rgba(255,46,99,.11), rgba(255,46,99,.03)) !important;
+}
+
+.hero-live-link strong{
+  color:var(--pink) !important;
+}
+
+@media (hover:hover){
+  .metric:hover,
+  .compact-stat:hover,
+  article.card:hover,
+  .snap-metric:hover,
+  .hero-live-tile:hover,
+  .proof-tile:hover{
+    border-color:var(--edge-2) !important;
+    background:var(--elev-2) !important;
+  }
+}
+
+/* Cards that hold a chart, a table or a long block are containers, not
+   tiles: they keep the tile's shell but not its centred rhythm. */
+.panel-wide-card,
+.chart-panel,
+.validator-panel,
+.status-panel,
+.delegation-summary-card{
+  border-radius:var(--r-xl) !important;
+}
+
+.panel-wide-card{
+  display:block;
+  padding:18px 20px !important;
+}
+
+/* --- hero ----------------------------------------------------------------- */
+/* On wide screens the only sentence that says what this site is was set to
+   display:none, leaving a headline and three number panels and no sentence.
+   It comes back, held to a readable measure beside the brand mark. */
+@media (min-width:1180px){
+  .home-hero .lead{
+    display:block;
+    max-width:46ch;
+    margin-top:var(--s-4);
+  }
+
+  /* The mark sits in the right third of the hero. Holding the copy column
+     short keeps the headline off it instead of running under the ring. */
+  .home-hero h1,
+  .hero.compact h1{
+    max-width:640px;
+    font-size:clamp(44px, 4.2vw, 58px) !important;
+  }
+
+  .home-hero-copy{
+    max-width:680px;
+  }
+
+  /* 104px of gauge beside a four-line caption forced the caption to wrap
+     after two or three words. */
+  .p-gauge-row svg{
+    width:88px;
+    height:88px;
+    flex:0 0 88px;
+  }
+}
+
+/* --- vertical rhythm ------------------------------------------------------
+   Section padding was set in six places between 28px and 72px. One step. --- */
+.section > .inner{
+  padding-top:34px !important;
+  padding-bottom:34px !important;
+}
+
+.section-title{
+  margin-bottom:var(--s-5);
+}
+
+@media (min-width:981px){
+  .section > .inner{
+    padding-top:48px !important;
+    padding-bottom:48px !important;
+  }
+}
+
+/* The hero carries its own breathing room; the section around it was adding
+   a second helping. */
+.home-hero-section > .inner{
+  padding-bottom:18px !important;
+}
+
+@media (min-width:981px){
+  .home-hero-section > .inner{
+    padding-bottom:26px !important;
+  }
+}
+
+/* --- numbered sections ----------------------------------------------------
+   CSS counters, so no page markup changes. The number gives a long page a
+   spine: on a phone the FTSO page is seven screens and every heading looked
+   like the first one. --- */
+main{
+  counter-reset:section;
+}
+
+main .section:not(.home-hero-section):not(.contact-section){
+  counter-increment:section;
+}
+
+.section-title h2::before{
+  content:counter(section, decimal-leading-zero);
+  position:static;
+  display:block;
+  width:auto;
+  height:auto;
+  margin-bottom:var(--s-2);
+  border-radius:0;
+  background:none;
+  font-family:var(--f-mono);
+  font-size:var(--t-micro);
+  font-weight:500;
+  letter-spacing:.14em;
+  line-height:1;
+  color:var(--pink);
+  opacity:.8;
+}
+
+.home-hero-section .section-title h2::before,
+.contact-section .section-title h2::before{
+  content:none;
+}
+
+/* --- status chips ---------------------------------------------------------
+   `.condition-dots span` had accumulated six rules across the stylesheet -
+   36px, 16px, 14px, 40x40, then twice 40x20 marked - and the last of them
+   set font-size:0 on the chip while putting a 13px tick in its ::after, so
+   the tick sat half outside a pill four times wider than the glyph. Stated
+   once: a round chip, the mark centred in it, sized like everything else. --- */
+.condition-dots{
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:8px !important;
+  align-items:center;
+}
+
+.condition-dots span,
+.condition-dots.compact span{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  width:28px !important;
+  height:28px !important;
+  padding:0 !important;
+  border-radius:50% !important;
+  border:1.5px solid var(--edge-1) !important;
+  background:var(--elev-2) !important;
+  box-shadow:none !important;
+  font-size:0 !important;
+  line-height:1 !important;
+  flex:0 0 auto;
+}
+
+.condition-dots span::after{
+  font-family:var(--f-text);
+  font-size:14px !important;
+  font-weight:700;
+  line-height:1;
+}
+
+.condition-dots span.ok{
+  border-color:rgba(53,199,126,.65) !important;
+  background:rgba(53,199,126,.14) !important;
+}
+.condition-dots span.ok::after{content:"\2713";color:var(--green);}
+
+.condition-dots span.bad{
+  border-color:rgba(255,98,66,.7) !important;
+  background:rgba(255,98,66,.14) !important;
+}
+.condition-dots span.bad::after{content:"\2715";color:var(--danger);}
+
+.condition-dots span.unknown{
+  border-color:var(--edge-1) !important;
+  background:var(--elev-1) !important;
+}
+.condition-dots span.unknown::after{content:"\2013";color:var(--muted-2);}
+
+/* The pre-registration pill is the same chip with a label beside it, not a
+   40x20 lozenge in a size nothing else on the page uses. */
+.metric strong.pre-reg-value,
+strong.pre-reg-value{
+  display:inline-flex !important;
+  align-items:center;
+  gap:9px;
+  min-height:28px;
+}
+
+.metric strong.pre-reg-value .pre-reg-pill,
+strong.pre-reg-value .pre-reg-pill{
+  display:inline-flex !important;
+  align-items:center;
+  justify-content:center;
+  width:28px !important;
+  height:28px !important;
+  border-radius:50% !important;
+  font-size:0;
+}
+
+strong.pre-reg-value .pre-reg-pill::after{
+  font-size:14px;
+  font-weight:700;
+  line-height:1;
+}
+
+strong.pre-reg-value .pre-reg-pill.ok{
+  background:rgba(53,199,126,.14) !important;
+  border:1.5px solid rgba(53,199,126,.65) !important;
+  box-shadow:none !important;
+}
+strong.pre-reg-value .pre-reg-pill.ok::after{content:"\2713";color:var(--green);}
+
+strong.pre-reg-value .pre-reg-pill.bad{
+  background:rgba(255,98,66,.14) !important;
+  border:1.5px solid rgba(255,98,66,.7) !important;
+}
+strong.pre-reg-value .pre-reg-pill.bad::after{content:"\2715";color:var(--danger);}
+
+strong.pre-reg-value .pre-reg-pill.unknown{
+  background:var(--elev-1) !important;
+  border:1.5px solid var(--edge-1) !important;
+}
+strong.pre-reg-value .pre-reg-pill.unknown::after{content:"\2013";color:var(--muted-2);}
+
+/* --- epoch pills ---------------------------------------------------------- */
+.uptime-pills{
+  display:flex !important;
+  flex-wrap:wrap;
+  gap:8px !important;
+}
+
+.uptime-pills span{
+  display:inline-flex !important;
+  flex-direction:column;
+  gap:2px;
+  padding:7px 11px !important;
+  border:1px solid var(--edge-1) !important;
+  border-radius:var(--r-sm) !important;
+  background:var(--elev-1) !important;
+  font-family:var(--f-mono) !important;
+  font-size:11.5px !important;
+  font-variant-numeric:tabular-nums;
+  line-height:1.25 !important;
+}
+
+/* --- charts ---------------------------------------------------------------
+   Axis labels were set in four different greys, none of them the site's own,
+   at weights of 700 to 900 that the body face does not have, so the browser
+   was synthesising them. They now use the same mono label as every other
+   label on the site, in the same muted colour. --- */
+.reward-chart text,
+.hourly-chart text,
+.ftso-delegation-chart text,
+.spark text,
+.np-strip text{
+  font-family:var(--f-mono) !important;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+.reward-chart-wrap{
+  border-color:var(--edge-1) !important;
+  border-radius:var(--r-xl) !important;
+}
+
+/* The chart frame had a radial pink wash behind it that competed with the
+   series drawn on top. One flat surface, like every other container. */
+.reward-chart-wrap,
+.ftso-delegation-chart-wrap,
+.hourly-chart-wrap{
+  background:var(--elev-1) !important;
+}
+
+.chart-panel,
+.validator-panel,
+.status-panel{
+  border-color:var(--edge-1) !important;
+  background:var(--elev-1) !important;
+}
+
+.panel-head{
+  border-bottom:1px solid var(--edge-1);
+}
+
+.panel-head strong{
+  font-family:var(--f-display);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+
+.chart-summary{
+  font-family:var(--f-mono);
+  font-size:var(--t-micro);
+  font-variant-numeric:tabular-nums;
+}
+
+.chart-summary strong{
+  font-family:var(--f-display);
+  font-variant-numeric:tabular-nums;
+}
+
+/* --- the explorer tile ----------------------------------------------------
+   "Explorer →" at the data size wrapped, and the arrow landed on a line of
+   its own. It is a link, not a reading, so it takes link-sized type. --- */
+.hero-live-link strong{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  font-family:var(--f-text) !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+  letter-spacing:0 !important;
+  white-space:nowrap;
+}
+
+/* --- the shell ------------------------------------------------------------
+   The sidebar links were seven stacked buttons competing with the page. They
+   read as navigation now: a quiet list, with the current page marked. --- */
+@media (min-width:981px){
+  .nav a{
+    border:0 !important;
+    background:transparent !important;
+    border-radius:var(--r-sm) !important;
+    padding:9px 12px !important;
+    color:var(--muted) !important;
+    box-shadow:none !important;
+  }
+
+  .nav a:hover{
+    background:var(--elev-1) !important;
+    color:var(--ink) !important;
+  }
+
+  .nav a[aria-current="page"]{
+    background:var(--elev-2) !important;
+    color:var(--ink) !important;
+    box-shadow:inset 2px 0 0 var(--pink) !important;
+  }
+
+  .side-live{
+    font-family:var(--f-mono);
+    font-size:var(--t-micro);
+    font-variant-numeric:tabular-nums;
+  }
+}
+
+/* --- buttons --------------------------------------------------------------
+   Four button treatments existed; this is one, in two weights. --- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:44px;
+  padding:0 18px !important;
+  border-radius:999px !important;
+  border:1px solid var(--edge-2) !important;
+  background:var(--elev-1) !important;
+  color:var(--ink) !important;
+  line-height:1 !important;
+}
+
+.btn:hover{
+  border-color:var(--edge-pink) !important;
+  background:var(--elev-2) !important;
+}
+
+.btn.primary{
+  border-color:transparent !important;
+  background:var(--pink) !important;
+  color:#17060C !important;
+  font-weight:750 !important;
+}
+
+.btn.primary:hover{
+  background:#ff4e7b !important;
+}
+
+/* --- depth ----------------------------------------------------------------
+   A single film of noise over the whole page. Flat dark surfaces band badly
+   on OLED phones, and at 2.5% this is the cheapest fix there is: one 120x120
+   tile, no request, no repaint. --- */
+body::after{
+  content:"";
+  /* An earlier mobile rule hides both body pseudo-elements; the decorative
+     blur stays hidden there, the grain does not. */
+  display:block !important;
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  width:auto;
+  height:auto;
+  top:0; right:0; bottom:0; left:0;
+  border-radius:0;
+  filter:none;
+  opacity:.025;
+  mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  background-size:120px 120px;
+}
+
+/* --- the mobile header ----------------------------------------------------
+   `.mobile-row .btn{display:none}` hid the site's only call to action on the
+   width where most people read it. It comes back as a compact pill; below
+   420px the brand drops its sub-label to make room, and the row is checked
+   to fit at 360px. --- */
+@media (max-width:980px){
+  /* The row was a three-column grid with the toggle in column 1 and the
+     brand pinned to column 3, which left the button auto-placing on top of
+     the toggle. Each of the three says where it goes. */
+  .mobile-row{
+    display:grid !important;
+    grid-template-columns:44px minmax(0,1fr) auto !important;
+    align-items:center;
+    gap:10px !important;
+  }
+
+  .mobile-nav-toggle{
+    grid-column:1 !important;
+    justify-self:start !important;
+  }
+
+  .mobile-row .brand{
+    grid-column:2 !important;
+    justify-self:start !important;
+    min-width:0;
+  }
+
+  .mobile-row .btn{
+    grid-column:3 !important;
+    justify-self:end !important;
+    display:inline-flex !important;
+    min-width:0;
+    min-height:40px;
+    padding:0 14px !important;
+    font-size:13px !important;
+    white-space:nowrap;
+  }
+
+  .mobile-top .brand span{
+    max-width:none;
+  }
+}
+
+@media (max-width:420px){
+  .mobile-row .brand .former{
+    display:none;
+  }
+
+  .mobile-top .brand span{
+    font-size:14px;
+  }
+}
+
+/* --- contrast -------------------------------------------------------------
+   Measured against WCAG AA on the surfaces these actually sit on. White text
+   on the brand pink is 3.61:1, which passes for large text and fails for
+   everything else, so small text on a pink fill takes a dark ink instead -
+   the pink is unchanged, only what sits on it. --- */
+:root{
+  --on-pink:#1A060D;
+}
+
+.btn.primary,
+.why-card .w-ic,
+.step em,
+.skip-link,
+.toggle-btn.active,
+.dx-chip.is-active,
+.dx-chip[aria-pressed="true"]{
+  color:var(--on-pink) !important;
+}
+
+/* 3.73:1 and 3.57:1 on the card surface. */
+th,
+thead th{
+  color:var(--muted) !important;
+}
+
+.delegation-delta-positive{color:var(--green) !important;}
+.delegation-delta-negative{color:var(--danger) !important;}
+.balance-empty{color:var(--muted) !important;}
+
+/* The chart tooltip sits on its own near-black panel; the muted greys it
+   inherited were tuned for a pink background that is no longer there. */
+.chart-tooltip span{color:var(--muted) !important;}
+.chart-tooltip small{color:var(--muted-2) !important;}
+
+/* The one remaining white-on-pink: the first link in the how-to panel is the
+   filled one; the second is an outline on the dark surface and keeps its
+   light text. */
+.role-guide-actions a:first-child{
+  color:var(--on-pink) !important;
+}
+
+/* --- values that are not numbers ------------------------------------------
+   The data size is tuned for figures. An address or a name set at 26px in a
+   190px tile wrapped mid-string - "0xb5a0...eac" then "3" on its own line.
+   These fields are identifiers: mono, smaller, and never broken. --- */
+strong[data-field="shortDelegation"],
+strong[data-field="shortIdentity"],
+strong[data-field="validatorNodeId"],
+strong[data-field="validatorNodeVersion"],
+strong[data-field="delegationAddress"],
+strong[data-field="providerIdentity"]{
+  font-family:var(--f-mono) !important;
+  font-size:15px !important;
+  font-weight:500 !important;
+  letter-spacing:0 !important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+strong[data-field="providerName"],
+strong[data-field="status"],
+strong[data-field="validatorConnected"],
+strong[data-field="preRegistered"],
+strong[data-field="latestEligibility"]{
+  font-size:19px !important;
+  letter-spacing:-.015em !important;
+  text-wrap:balance;
+}
+
+/* --- the last labels ------------------------------------------------------
+   A scan for remaining uppercase text found five more label roles that had
+   not joined the mono language, several at weights (800-950) the body face
+   does not carry, so the browser was synthesising them. Badges keep their
+   uppercase - a badge is meant to shout - everything else does not. --- */
+th,
+.copy-title,
+.address-copy-title,
+dt,
+.chart-summary small,
+.delegation-flow-summary small,
+.availability-scale span,
+.uptime-pills em,
+.uptime-pills span em{
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+  letter-spacing:.03em !important;
+  text-transform:none !important;
+  color:var(--muted) !important;
+}
+
+.dx-tag{
+  font-family:var(--f-mono) !important;
+  font-size:10px !important;
+  font-weight:500 !important;
+  letter-spacing:.06em !important;
+}
+
+/* The delegation-insight and address-row labels, the last two holdouts. */
+.delegation-insights span small,
+.address-stat span,
+.address span,
+.row span{
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+  letter-spacing:.03em !important;
+  text-transform:none !important;
+  color:var(--muted) !important;
+}
+
+.delegation-insights span strong{
+  font-family:var(--f-display);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Track-record tiles. */
+.tr-tile span{
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+  letter-spacing:.03em !important;
+  text-transform:none !important;
+  color:var(--muted) !important;
+}
+
+.tr-tile strong{
+  font-family:var(--f-display);
+  font-size:var(--t-data-l);
+  font-weight:800;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+}
+
+.tr-tile em{
+  font-style:normal;
+  font-size:12.5px;
+  color:var(--muted);
+}
+
+/* --- units ----------------------------------------------------------------
+   The inline-unit rule was written inside the 620px block, so above that
+   width "158,024" still dropped "FLR" onto a line of its own in a tile three
+   times wider than the value needed. One rule, every width; the zero-width
+   space still lets it wrap when it genuinely does not fit. --- */
+.metric-unit{
+  display:inline !important;
+  margin-top:0 !important;
+  margin-left:.26em !important;
+  font-size:.5em !important;
+  line-height:1;
+  vertical-align:baseline;
+  letter-spacing:.01em;
+  color:var(--muted);
+}
+
+.metric-unit::before{
+  content:"\200B";
+}
+
+/* --- status tiles ---------------------------------------------------------
+   These two hide their own text with font-size:0 and render the label from
+   ::after instead, so the dot and the word can be laid out together. The
+   design layer's data-size rule un-hid the text and the word appeared twice,
+   the second copy spilling into the tile beside it. The mechanism is
+   restored, with the label at a size that matches the other status values. */
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
+  font-size:0 !important;
+  letter-spacing:0 !important;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after,
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]::after{
+  font-family:var(--f-display);
+  font-size:19px;
+  font-weight:800;
+  letter-spacing:-.015em;
+}
+
+/* The control label beside a section heading. */
+.currency-control > span{
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+  letter-spacing:.03em !important;
+  text-transform:none !important;
+  color:var(--muted) !important;
+}
+
+/* The currency and range toggles: a segmented control, not two buttons. */
+.currency-control .toggle,
+.dx-range{
+  display:inline-flex;
+  padding:3px;
+  border:1px solid var(--edge-1);
+  border-radius:999px;
+  background:var(--elev-1);
+}
+
+.toggle-btn{
+  /* 44px on a touch screen, where it is a tap target; tighter on a mouse,
+     where a segmented control that tall looks like two buttons. */
+  min-height:44px;
+  padding:0 16px !important;
+  border:0 !important;
+  border-radius:999px !important;
+  background:transparent !important;
+  color:var(--muted) !important;
+  box-shadow:none !important;
+}
+
+.toggle-btn.active{
+  background:var(--pink) !important;
+  color:var(--on-pink) !important;
+}
+
+@media (hover:hover) and (pointer:fine){
+  .toggle-btn{min-height:34px;}
+}
+
+/* --- accordions -----------------------------------------------------------
+   The FAQ and legal entries are cards inside a panel that is also a card, so
+   every question sat inside a second frame. The container steps back. --- */
+.validator-panel:has(> .qa){
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+
+details.qa{
+  padding:0 !important;
+}
+
+details.qa > summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  min-height:44px;
+  cursor:pointer;
+  list-style:none;
+}
+
+details.qa > summary::-webkit-details-marker{display:none;}
+
+details.qa > summary strong{
+  font-family:var(--f-display);
+  font-size:15.5px;
+  font-weight:700;
+  letter-spacing:-.012em;
+  line-height:1.3;
+}
+
+details.qa .qa-body{
+  padding:0 18px 16px;
+}
+
+details.qa[open]{
+  border-color:var(--edge-pink) !important;
 }

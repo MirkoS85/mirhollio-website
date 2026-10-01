@@ -79,7 +79,7 @@
   display:flex;flex-direction:column;
   min-height:0;
 }
-.dx-countdown b{color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.dx-countdown b{color:var(--muted);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;font-weight:500;letter-spacing:.03em;text-transform:none}
 .dx-countdown strong{
   margin-top:10px;
   font-size:clamp(30px,4.4vw,42px);
@@ -125,7 +125,7 @@
 }
 .dx-flow-stat:hover{background:var(--surface-2)}
 .dx-flow-stat[aria-pressed="true"]{border-top-color:var(--pink);background:rgba(255,46,99,.10)}
-.dx-flow-stat span{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.dx-flow-stat span{display:block;color:var(--muted);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11.5px;font-weight:500;letter-spacing:.03em;text-transform:none}
 .dx-flow-stat strong{
   display:block;margin-top:8px;
   font-family:"Archivo",system-ui,sans-serif;
@@ -234,7 +234,12 @@
   font-variant-numeric:tabular-nums;
 }
 .dx-foot .dx-source{margin:0;margin-left:auto;text-align:right}
-.dx-link{color:var(--pink);font-size:12px;font-weight:700;text-decoration:none}
+/* Stands alone under the panel, so it carries a real target. */
+.dx-link{
+  display:inline-flex;align-items:center;gap:4px;
+  min-height:44px;padding:0 2px;
+  color:var(--pink);font-size:12px;font-weight:700;text-decoration:none;
+}
 .dx-link:hover{text-decoration:underline}
 
 /* ── the book ─────────────────────────────────────────────────────────────── */
@@ -262,14 +267,17 @@
   min-height:44px;padding:0 15px;
   border:1px solid var(--line);border-radius:999px;
   background:rgba(255,255,255,.03);color:var(--muted);
-  font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
+  font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;
   transition:color .15s ease, border-color .15s ease, background .15s ease;
 }
 .dx-chip:hover{color:var(--ink)}
+/* White on the brand pink measures 3.61:1, which fails AA for text this
+   size; the dark ink measures 5.3:1. A flat fill, not a gradient of one
+   colour, so it is also checkable. */
 .dx-chip[aria-pressed="true"]{
-  color:#fff;border-color:#ff296d;
-  background:linear-gradient(180deg,#ff296d,#ff296d);
-  box-shadow:0 10px 22px rgba(255,41,109,.20);
+  color:#1A060D;border-color:#FF2E63;
+  background:#FF2E63;
+  box-shadow:0 10px 22px rgba(255,46,99,.20);
 }
 .dx-chip[disabled]{opacity:.38;cursor:default}
 .dx-chip[disabled]:hover{color:var(--muted)}
@@ -317,6 +325,7 @@
 .dx-row{
   display:grid;
   grid-template-columns:34px minmax(0,1fr) auto;
+  /* set below for each width */
   grid-template-areas:
     "rank wallet amount"
     "rank meter  change";
@@ -327,14 +336,44 @@
   transition:background .12s ease;
 }
 .dx-row:last-child{border-bottom:0}
-.dx-row:hover{background:rgba(255,255,255,.022)}
+.dx-row:hover{background:rgba(255,255,255,.028)}
 .dx-row.is-departed{opacity:.72}
+
+/* The wallet link was 85x15 - a thumb could not reliably hit it, and there
+   were 29 of them stacked. The link now covers the whole row, which is also
+   what you expect from a row that opens an explorer page. The truncated
+   address was never worth selecting; the full one is in the title. */
+.dx-row{position:relative;cursor:pointer}
+.dx-wallet::after{content:"";position:absolute;inset:0;z-index:1;border-radius:inherit}
+.dx-row:hover .dx-wallet{color:var(--pink)}
+.dx-row:focus-within{background:rgba(255,46,99,.06)}
+.dx-wallet:focus-visible{outline:none}
+.dx-wallet:focus-visible::after{outline:2px solid var(--pink);outline-offset:-3px;border-radius:10px}
 
 .dx-rank{
   grid-area:rank;
-  color:var(--muted-2);font-size:12px;font-weight:800;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  color:var(--muted-2);
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;font-weight:500;letter-spacing:.04em;
   font-variant-numeric:tabular-nums;
 }
+.dx-rank b{font-weight:500}
+
+/* The mark is the wallet's fingerprint; three tones so neighbouring rows do
+   not read as one texture. All three are the site's pink at different
+   strengths - no colour is introduced here. */
+.dx-icon{
+  display:block;width:28px;height:28px;
+  border-radius:8px;
+  background:rgba(255,46,99,.07);
+  padding:2px;
+  box-sizing:border-box;
+}
+.dx-icon rect{fill:rgba(255,46,99,.85)}
+.dx-icon[data-tone="1"] rect{fill:rgba(255,46,99,.55)}
+.dx-icon[data-tone="2"] rect{fill:rgba(255,120,160,.75)}
+.dx-row.is-departed .dx-icon rect{fill:rgba(255,255,255,.3)}
 
 .dx-who{grid-area:wallet;min-width:0}
 .dx-wallet{
@@ -413,7 +452,7 @@
 @media (max-width:620px){
   .dx-crumbs{font-size:12px}
   .dx-row{
-    grid-template-columns:28px minmax(0,1fr) auto;
+    grid-template-columns:32px minmax(0,1fr) auto;
     padding:13px 14px;
     gap:6px 10px;
   }

@@ -593,6 +593,34 @@
     return rows.slice().sort((a, b) => (value(a) - value(b)) * sign);
   }
 
+  /* A 5x5 symmetric mark derived from the address, so a delegator can find
+     their own wallet in a list of 130 truncated hex strings without reading
+     it. Deterministic, drawn only in the site's pink - no new colour, no
+     request, no dependency. */
+  function identicon(address) {
+    const hex = String(address || "").replace(/^0x/i, "").toLowerCase();
+    if (hex.length < 12) return "";
+    // FNV-1a over the address: cheap, and spreads adjacent addresses apart.
+    let h = 0x811c9dc5;
+    for (let i = 0; i < hex.length; i += 1) {
+      h ^= hex.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    const cells = [];
+    let bits = h;
+    for (let col = 0; col < 3; col += 1) {
+      for (let row = 0; row < 5; row += 1) {
+        if (!(col * 5 + row) || (col * 5 + row) % 30 === 0) bits = Math.imul(bits ^ (col + 1), 0x01000193) >>> 0;
+        const on = ((bits >>> ((col * 5 + row) % 30)) & 1) === 1;
+        if (!on) continue;
+        cells.push(`<rect x="${col * 6}" y="${row * 6}" width="6" height="6"/>`);
+        if (col < 2) cells.push(`<rect x="${(4 - col) * 6}" y="${row * 6}" width="6" height="6"/>`);
+      }
+    }
+    const tone = (h % 3);
+    return `<svg class="dx-icon" viewBox="0 0 30 30" aria-hidden="true" focusable="false" data-tone="${tone}">${cells.join("")}</svg>`;
+  }
+
   function rowMarkup(r, index, cut) {
     const tag = r.departed
       ? '<span class="dx-tag gone">left</span>'
@@ -623,7 +651,7 @@
 
     return `
       <li class="dx-row${r.departed ? " is-departed" : ""}">
-        <span class="dx-rank">${String(index + 1).padStart(2, "0")}</span>
+        <span class="dx-rank">${identicon(r.from)}<b>${String(index + 1).padStart(2, "0")}</b></span>
         <span class="dx-who">
           <a class="dx-wallet" href="${EXPLORER_ADDRESS}${encodeURIComponent(r.from)}" target="_blank" rel="noopener"
              title="${escapeHtml(r.from)}">${escapeHtml(shortAddress(r.from))}</a>${tag}

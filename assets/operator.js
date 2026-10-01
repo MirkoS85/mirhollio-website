@@ -601,6 +601,13 @@ const MirhollioCore = (() => {
     setText("flrUsd", Number.isFinite(prices.USD) ? `$${prices.USD.toFixed(6)}` : "-");
     setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso, activePriceCurrency));
     setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator, activePriceCurrency));
+    // No price means no fiat line. A bare "-" under the estimate read as a
+    // missing number rather than an absent conversion.
+    ["ftsoMonthlyFiat", "validatorMonthlyFiat"].forEach(key => {
+      document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
+        el.hidden = (el.textContent || "").trim() === "-";
+      });
+    });
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
       btn.classList.toggle("active", btn.getAttribute("data-price-currency") === activePriceCurrency);
     });
@@ -1513,7 +1520,7 @@ const MirhollioCore = (() => {
     if (!svg) return;
 
     if (!rows.length) {
-      svg.innerHTML = `<text x="40" y="48" fill="#5C6577" font-size="18" font-weight="850">Delegation history unavailable.</text>`;
+      svg.innerHTML = `<text x="40" y="48" fill="#9AA0AF" font-size="18" font-weight="500">Delegation history unavailable.</text>`;
       if (summary) summary.innerHTML = `<span class="empty-state">Delegation history unavailable.</span>`;
       return;
     }
@@ -1556,47 +1563,47 @@ const MirhollioCore = (() => {
     const latest = rows[rows.length - 1];
     const grid = [0, .25, .5, .75, 1].map(tick => {
       const y = padTop + plotH * tick;
-      return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 41, 109,.16)" />`;
+      return `<line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 46, 99,.16)" />`;
     }).join("");
     const leftLabels = [maxDelegated, (maxDelegated + minDelegated) / 2, minDelegated].map((value, index) => {
       const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom - 10;
-      return `<text x="${padLeft - 14}" y="${y}" text-anchor="end" fill="#5C6577" font-size="${axisFont}" font-weight="850">${fmtCompact(value)}</text>`;
+      return `<text x="${padLeft - 14}" y="${y}" text-anchor="end" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtCompact(value)}</text>`;
     }).join("");
     const rightLabels = [maxDelegators, Math.round((maxDelegators + minDelegators) / 2), minDelegators].map((value, index) => {
       const y = index === 0 ? padTop + 6 : index === 1 ? padTop + plotH / 2 + 6 : height - padBottom - 10;
-      return `<text x="${width - padRight + 14}" y="${y}" text-anchor="start" fill="#5C6577" font-size="${axisFont}" font-weight="850">${fmtNum(value, 0)}</text>`;
+      return `<text x="${width - padRight + 14}" y="${y}" text-anchor="start" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtNum(value, 0)}</text>`;
     }).join("");
     const labelIndexes = [...new Set([0, Math.floor((points.length - 1) / 3), Math.floor((points.length - 1) * 2 / 3), points.length - 1])];
     const xLabels = labelIndexes.map(index => {
       const point = points[index];
-      return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#5C6577" font-size="${axisFont}" font-weight="850">${formatChartMonth(point.timestamp)}</text>`;
+      return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${formatChartMonth(point.timestamp)}</text>`;
     }).join("");
     const markers = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#ff296d" : "#37101d"}" stroke="#ff296d" stroke-width="2"></circle>
-      <circle cx="${point.x}" cy="${point.delegatorsY}" r="3.5" fill="#26a56c"></circle>
+      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="#FF2E63" stroke-width="2"></circle>
+      <circle cx="${point.x}" cy="${point.delegatorsY}" r="3.5" fill="#35C77E"></circle>
       <circle cx="${point.x}" cy="${Math.min(point.delegatedY, point.delegatorsY)}" r="18" fill="transparent" data-delegation-index="${index}" style="cursor:pointer"></circle>
     `).join("");
 
     svg.innerHTML = `
       <defs>
         <linearGradient id="ftsoDelegationFill" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="rgba(255, 41, 109,.22)" />
-          <stop offset="100%" stop-color="rgba(255, 41, 109,.02)" />
+          <stop offset="0%" stop-color="rgba(255, 46, 99,.22)" />
+          <stop offset="100%" stop-color="rgba(255, 46, 99,.02)" />
         </linearGradient>
       </defs>
       ${grid}
       ${leftLabels}
       ${rightLabels}
       <polygon points="${area}" fill="url(#ftsoDelegationFill)"></polygon>
-      <polyline points="${voteLine}" fill="none" stroke="#ff296d" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
-      <polyline points="${delegatorLine}" fill="none" stroke="#26a56c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
+      <polyline points="${voteLine}" fill="none" stroke="#FF2E63" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <polyline points="${delegatorLine}" fill="none" stroke="#35C77E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
       ${markers}
       ${xLabels}
       <g transform="translate(${padLeft},${axisFont * 0.75})">
-        <circle cx="0" cy="0" r="${axisFont * 0.32}" fill="#ff296d"></circle>
-        <text x="${axisFont * 0.8}" y="${axisFont * 0.36}" fill="#5C6577" font-size="${axisFont}" font-weight="900">Vote power</text>
-        <circle cx="${legendGap}" cy="0" r="${axisFont * 0.32}" fill="#26a56c"></circle>
-        <text x="${legendGap + axisFont * 0.8}" y="${axisFont * 0.36}" fill="#5C6577" font-size="${axisFont}" font-weight="900">Delegators</text>
+        <circle cx="0" cy="0" r="${axisFont * 0.32}" fill="#FF2E63"></circle>
+        <text x="${axisFont * 0.8}" y="${axisFont * 0.36}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">Vote power</text>
+        <circle cx="${legendGap}" cy="0" r="${axisFont * 0.32}" fill="#35C77E"></circle>
+        <text x="${legendGap + axisFont * 0.8}" y="${axisFont * 0.36}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">Delegators</text>
       </g>
     `;
 
@@ -2013,7 +2020,7 @@ const MirhollioCore = (() => {
     if (!svg) return;
 
     if (!series.length) {
-      svg.innerHTML = `<text x="40" y="40" fill="#b8c1bd" font-size="16" font-weight="700">${emptyMessage}</text>`;
+      svg.innerHTML = `<text x="40" y="40" fill="#9AA0AF" font-size="16" font-weight="500">${emptyMessage}</text>`;
       if (summary) summary.innerHTML = `<span class="empty-state">${emptyMessage}</span>`;
       return;
     }
@@ -2045,10 +2052,10 @@ const MirhollioCore = (() => {
       return `<line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="rgba(255,255,255,.10)" />`;
     }).join("");
     const labels = [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]].map(point => `
-      <text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${point.epoch}</text>
+      <text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${point.epoch}</text>
     `).join("");
     const circles = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#ff296d" : "#181616"}" stroke="rgba(255, 41, 109,.35)" stroke-width="1.5"></circle>
+      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="rgba(255, 46, 99,.35)" stroke-width="1.5"></circle>
       <circle cx="${point.x}" cy="${point.y}" r="15" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>
     `).join("");
 
@@ -2057,22 +2064,25 @@ const MirhollioCore = (() => {
     svg.innerHTML = `
       <defs>
         <linearGradient id="${gradientId}LineGrad" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stop-color="rgba(255, 41, 109,.58)" />
-          <stop offset="100%" stop-color="#ff296d" />
+          <stop offset="0%" stop-color="rgba(255, 46, 99,.58)" />
+          <stop offset="100%" stop-color="#FF2E63" />
         </linearGradient>
         <linearGradient id="${gradientId}FillGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="rgba(255, 41, 109,.28)" />
-          <stop offset="100%" stop-color="rgba(255, 41, 109,.02)" />
+          <stop offset="0%" stop-color="rgba(255, 46, 99,.28)" />
+          <stop offset="100%" stop-color="rgba(255, 46, 99,.02)" />
         </linearGradient>
       </defs>
       ${grid}
-      <text x="8" y="${padTop + 6}" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${fmtNum(maxReward, 0)}</text>
-      <text x="8" y="${height - padBottom - 6}" fill="#b8c1bd" font-size="${axisFont}" font-weight="700">${fmtNum(minReward, 0)}</text>
-      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 41, 109,.48)" stroke-dasharray="6 6" />
+      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 46, 99,.48)" stroke-dasharray="6 6" />
       <path d="${areaPath}" fill="url(#${gradientId}FillGrad)"></path>
       <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"></path>
       ${circles}
       ${labels}
+      <!-- The two axis figures were drawn before the area fill, so the fill
+           and the series line painted over them: the minimum read "16,0 0"
+           with the stroke through its middle. They go on top. -->
+      <text x="8" y="${padTop + 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtNum(maxReward, 0)}</text>
+      <text x="8" y="${height - padBottom - 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtNum(minReward, 0)}</text>
     `;
 
     bindChartTip({
@@ -2205,7 +2215,7 @@ const MirhollioCore = (() => {
     const series = hourlySeries(values);
 
     if (!series.length) {
-      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#8d7f87" font-size="20" font-weight="800">${emptyMessage}</text>`;
+      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#9AA0AF" font-size="20" font-weight="500">${emptyMessage}</text>`;
       if (summary) summary.innerHTML = `<span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Low <strong>-</strong></span>`;
       return;
     }
@@ -2240,8 +2250,8 @@ const MirhollioCore = (() => {
       const y = padTop + ((domainMax - tick) / domainRange) * chartH;
       const label = tick === 1 ? "100%" : tick === 0 ? "0%" : `${Math.round(tick * 100)}%`;
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${isTarget ? "rgba(255, 41, 109,.42)" : "rgba(255, 41, 109,.11)"}" stroke-dasharray="${isTarget ? "7 8" : "0"}" />
-        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="${isTarget ? "#ff296d" : "#8d7f87"}" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="${isTarget ? "rgba(255, 46, 99,.42)" : "rgba(255, 46, 99,.11)"}" stroke-dasharray="${isTarget ? "7 8" : "0"}" />
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="${isTarget ? "#FF2E63" : "#9AA0AF"}" font-size="${compact ? 11 : 12}" font-weight="500">${label}</text>
       `;
     }).join("");
 
@@ -2252,15 +2262,15 @@ const MirhollioCore = (() => {
     }));
     const linePath = points.map((point, index) => `${index ? "L" : "M"}${point.x} ${point.y}`).join(" ");
     const areaPath = `M${points[0].x} ${height - padBottom} L${points.map(point => `${point.x} ${point.y}`).join(" L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
-    const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#ff296d" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
-    const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(255, 41, 109,.12)"></path>`;
+    const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#FF2E63" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
+    const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(255, 46, 99,.12)"></path>`;
 
     const markers = points.map((point, index) => {
       const label = hourlyAvailabilityLabel(index, series.length);
       const isLatest = index === series.length - 1;
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(point.value)}" aria-label="${label} ${metricLabel}: ${pct(point.value)}">
-          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#ff296d" : "#181616"}" stroke="#ff296d" stroke-width="${compact ? 2.6 : 2.8}"></circle>
+          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#FF2E63" : "#0A0A0E"}" stroke="#FF2E63" stroke-width="${compact ? 2.6 : 2.8}"></circle>
           <rect class="hourly-hit" x="${point.x - Math.max(10, barW / 2)}" y="${padTop}" width="${Math.max(20, barW)}" height="${chartH}" fill="transparent"></rect>
         </g>
       `;
@@ -2271,7 +2281,7 @@ const MirhollioCore = (() => {
       if (index % interval !== 0 && index !== series.length - 1) return "";
       const x = xFor(index);
       const label = hourlyAvailabilityLabel(index, series.length);
-      return `<text x="${x}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${label}</text>`;
+      return `<text x="${x}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${label}</text>`;
     }).join("");
 
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
@@ -2321,21 +2331,21 @@ const MirhollioCore = (() => {
         key: "performance",
         label: "Performance",
         values: provider?.ftsoPerformance?.performance1h,
-        color: "#ff296d",
+        color: "#FF2E63",
         dash: ""
       },
       {
         key: "primary",
         label: "Primary band (IQR)",
         values: provider?.ftsoPerformance?.performance1_1h,
-        color: "#ff296d",
+        color: "#FF2E63",
         dash: "8 7"
       },
       {
         key: "secondary",
         label: "Secondary band",
         values: provider?.ftsoPerformance?.performance2_1h,
-        color: "#ff296d",
+        color: "#FF2E63",
         dash: "8 7"
       }
     ].map(series => ({
@@ -2346,7 +2356,7 @@ const MirhollioCore = (() => {
     const usable = rawSeries.filter(series => series.values.length);
     const count = Math.min(...usable.map(series => series.values.length));
     if (!usable.length || !Number.isFinite(count) || count <= 0) {
-      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#8d7f87" font-size="20" font-weight="800">FTSO performance data unavailable</text>`;
+      svg.innerHTML = `<text x="50%" y="50%" text-anchor="middle" fill="#9AA0AF" font-size="20" font-weight="500">FTSO performance data unavailable</text>`;
       if (summary) summary.innerHTML = `<span>Performance <strong>-</strong></span><span>Primary <strong>-</strong></span><span>Secondary <strong>-</strong></span>`;
       return;
     }
@@ -2373,15 +2383,15 @@ const MirhollioCore = (() => {
     const grid = ticks.map(tick => {
       const y = yFor(tick);
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 41, 109,.11)" />
-        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${Math.round(tick * 100)}%</text>
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 46, 99,.11)" />
+        <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${Math.round(tick * 100)}%</text>
       `;
     }).join("");
 
     const lines = series.map(item => {
       const points = item.values.map((value, index) => `${xFor(index)},${yFor(value)}`).join(" ");
       const circles = item.values.map((value, index) => `
-        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#181616" stroke="${item.color}" stroke-width="2"></circle>
+        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#0A0A0E" stroke="${item.color}" stroke-width="2"></circle>
       `).join("");
       return `
         <g class="performance-line performance-line-${item.key}">
@@ -2402,13 +2412,13 @@ const MirhollioCore = (() => {
     const labels = Array.from({ length: count }, (_, index) => {
       const interval = compact ? 6 : 3;
       if (index % interval !== 0 && index !== count - 1) return "";
-      return `<text x="${xFor(index)}" y="${height - 8}" text-anchor="middle" fill="#8d7f87" font-size="${compact ? 11 : 12}" font-weight="800">${hourlyAvailabilityLabel(index, count)}</text>`;
+      return `<text x="${xFor(index)}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${hourlyAvailabilityLabel(index, count)}</text>`;
     }).join("");
 
     const legend = compact ? "" : series.map((item, index) => `
       <g transform="translate(${360 + index * 170}, 12)">
         <circle cx="0" cy="0" r="7" fill="none" stroke="${item.color}" stroke-width="3"></circle>
-        <text x="12" y="5" fill="#7d7178" font-size="13" font-weight="850">${item.label}</text>
+        <text x="12" y="5" fill="#9AA0AF" font-size="13" font-weight="500">${item.label}</text>
       </g>
     `).join("");
 
