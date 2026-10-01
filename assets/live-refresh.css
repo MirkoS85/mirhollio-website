@@ -8247,3 +8247,158 @@ tbody tr + tr th{
   backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);
 }
+
+/* === core-41: close the dead row under the header ==========================
+   On a phone main has no panel chrome any more, so the hero field runs from
+   the header to the fold with nothing to break it. The section's own 24px of
+   padding plus the 40px I added for heading air stacked into a 64px strip of
+   empty gradient directly under the header bar -- with the technical grid at
+   its brightest in exactly that strip, because the grid's mask is focused at
+   6% of the section height. It read as an unfinished row.
+
+   The air belongs between the kicker, the headline and the lead, not above
+   all three. --- */
+@media (max-width:980px){
+  /* One number owns the gap now, so it cannot stack again. */
+  .home-hero-section{
+    padding-top:0 !important;
+  }
+
+  .home-hero-section > .inner{
+    padding-top:20px !important;
+  }
+
+  /* The grid's bright spot follows the content down instead of lighting up
+     the space above it. */
+  .home-hero-section::after{
+    -webkit-mask-image:radial-gradient(135% 86% at 26% 20%, #000 6%, rgba(0,0,0,.45) 44%, transparent 78%);
+    mask-image:radial-gradient(135% 86% at 26% 20%, #000 6%, rgba(0,0,0,.45) 44%, transparent 78%);
+  }
+
+  /* The header's 28px pink drop-glow smeared a second, softer edge across the
+     strip, which is what made one seam look like two. A single hairline is
+     the whole boundary. */
+  .mobile-top{
+    box-shadow:0 1px 0 rgba(255,46,99,.12) !important;
+  }
+}
+
+/* With the hero pulled up under the header, the mark's glow -- centred 152px
+   above the hero's own top edge -- was being cut in half by the header bar.
+   A soft round glow with a hard straight edge across it reads as a cropping
+   mistake, not as artwork. It drops far enough that the whole glow clears the
+   header by the same 20px the copy does. */
+@media (max-width:1120px){
+  .hero-mark,
+  .hero-mark-wrap{
+    top:calc(var(--mark) * -.2) !important;
+  }
+}
+
+/* === core-42: give the phone its margin back ===============================
+   Below 620px -- which is every phone -- `.section` had its horizontal
+   padding forced to zero and `.inner` stretched to 100vw, while
+   `.section-title` kept a 14px pad of its own. The result: headings sat on a
+   gutter and every card, tile, table and button ran hard into both screen
+   edges, one off the other, down the whole page. It is the single loudest
+   "unfinished" signal a phone layout can give, and it was on all ten pages.
+
+   One gutter, declared once, on the element that owns the column. --- */
+@media (max-width:620px){
+  .section{
+    padding-left:var(--gutter, 16px) !important;
+    padding-right:var(--gutter, 16px) !important;
+  }
+
+  .inner{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  /* These used to carry the gutter themselves; now they inherit it, so the
+     heading rule and the card edge line up to the pixel. */
+  .section-title,
+  .section-side,
+  .hero,
+  .hero.compact,
+  .home-hero{
+    padding-left:0 !important;
+    padding-right:0 !important;
+  }
+
+  /* The header's own padding matches, so the brand mark sits on the same
+     vertical as everything beneath it. */
+  .mobile-top{
+    padding-left:var(--gutter, 16px) !important;
+    padding-right:var(--gutter, 16px) !important;
+  }
+
+  /* Deliberately full-bleed: the ticker and the section rules are bands, and
+     a band that stops short of the edge is just a stripe. */
+  .ticker-band,
+  .band-divider{
+    margin-left:calc(var(--gutter, 16px) * -1);
+    margin-right:calc(var(--gutter, 16px) * -1);
+  }
+}
+
+/* --- the stake facts, on a phone ------------------------------------------
+   Six label/value pairs in two columns beside a 104px gauge leaves 54-79px
+   per column for pairs that need 65-94px, so "uptime 99.75%" and "APR 1.45%"
+   ran into each other. The gauge and the headline number keep the first row;
+   the facts drop below both and take the panel's full width, which is twice
+   the room they had. --- */
+@media (max-width:620px){
+  .p-gauge-row{
+    display:grid !important;
+    grid-template-columns:auto minmax(0,1fr);
+    align-items:center;
+    column-gap:16px;
+    row-gap:4px;
+  }
+
+  /* The wrapper the markup puts around the number and the facts is only a
+     wrapper; this lets both become rows of the grid above it. */
+  .p-gauge-row > div{
+    display:contents;
+  }
+
+  .p-gauge-row > svg{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .p-gauge-row .p-big,
+  .p-gauge-row > div > .p-sub:not(.p-facts){
+    grid-column:2;
+  }
+
+  .p-gauge-row .p-facts{
+    grid-column:1 / -1;
+    margin-top:12px;
+  }
+}
+
+/* --- one frame, not two ---------------------------------------------------
+   `.validator-panel` is a layout wrapper. On a wide screen it holds a title
+   column beside a content column and its own border is the outer edge of that
+   composition. On a phone the columns stack, so the wrapper's border ends up
+   8px outside the border of the card it contains: two concentric rounded
+   rectangles with the same fill, which is the cheapest-looking thing a dark
+   UI can do. The FAQ and legal pages already flatten it; these do not.
+
+   Where the wrapper contains its own framed content, it stops drawing a frame
+   and hands its 8px back to the card. Where it wraps a bare table, it keeps
+   the frame, because there it IS the frame. --- */
+@media (max-width:620px){
+  .validator-panel:has(> .card),
+  .validator-panel:has(> .chart-panel),
+  .validator-panel:has(> * > .card),
+  .validator-panel:has(> * > .chart-panel){
+    border:0 !important;
+    padding-left:0 !important;
+    padding-right:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+}
