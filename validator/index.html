@@ -71,36 +71,30 @@
           </div>
         </div>
       </section>
-      <section class="section light">
+            <section class="section light">
         <div class="inner">
-          <div class="section-title"><h2>Validator node.</h2><div class="section-side"><div class="currency-control"><span>Reward currency</span><div class="toggle"><button class="toggle-btn" type="button" data-price-currency="USD">USD</button><button class="toggle-btn active" type="button" data-price-currency="EUR">EUR</button></div></div></div></div>
-          <div class="validator-panel split-panel standalone-panel" id="validator-panel">
-            <div class="validator-head"><span class="status-dot" data-field="validatorConnected">Loading</span></div>
-            <div class="validator-row">
-              <div class="validator-id"><span>Node</span><strong data-field="validatorNodeId">-</strong></div>
-              <div class="validator-stat"><span>APR</span><strong data-field="validatorApr">-</strong></div>
-              <div class="validator-stat"><span>Uptime</span><strong data-field="validatorUptimeAvg">-</strong></div>
-              <div class="validator-progress"><span>Stake <b data-field="validatorCapacityText">-</b></span><div class="bar-track"><div class="bar-fill" data-bar="validatorStakeCapacity"></div></div><em data-field="validatorCapacityPct">-</em></div>
-              <div class="validator-progress"><span>Time left <b data-field="stakeTimeLeft">-</b></span><div class="bar-track green"><div class="bar-fill" data-bar="validatorTimeLeft"></div></div><em data-field="validatorTimeLeftPct">-</em></div>
-            </div>
-            <div class="panel-mini-grid">
+          <div class="section-title"><h2>What you earn.</h2><div class="section-side"><p>Estimate a stake at today's APR, and what this node has actually paid per epoch.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="val-earn">
+            <article class="card panel-wide-card">
+              <div class="panel-head"><strong>Staking calculator</strong><small>Estimate FLR staking rewards at the current live APR.</small></div>
+              <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
+              <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
+            </article><div class="chart-panel"><div class="panel-head"><strong>Validator payout estimate per epoch</strong><span class="mini-label">Oracle estimate · Latest 20</span></div><p class="chart-definition">Matches Oracle Daemon: (Node API + Validator API) × (1 − fee).</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator payout estimate per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title"><h2>Can you rely on it.</h2><div class="section-side"><p>Uptime by epoch, the fee and headroom, and the stake already placed here.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="val-trust">
+            <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article><div class="panel-mini-grid">
               <article class="card compact-stat"><b>Fee</b><strong data-field="validatorFee">-</strong><p>Validator fee before comparing APR.</p></article>
               <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
               <article class="card compact-stat"><b>Self-bond</b><strong data-field="selfBond">-</strong><p>Operator validator stake.</p></article>
               <article class="card compact-stat"><b>Live delegation</b><strong data-field="validatorDelegatorTotal">-</strong><p>Current validator delegations.</p></article>
               <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
               <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
-            </div>
-            <article class="card panel-wide-card">
-              <div class="panel-head"><strong>Delegation expiry timeline</strong><small>Each step is a delegation ending. Amber line marks the self-bond end — renewal is planned.</small></div>
-              <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-expiry-chart" viewBox="0 0 1000 260" preserveAspectRatio="xMidYMid meet" aria-label="Delegation expiry timeline"></svg></div>
-            </article>
-                        <article class="card panel-wide-card">
-              <div class="panel-head"><strong>Staking calculator</strong><small>Estimate FLR staking rewards at the current live APR.</small></div>
-              <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
-              <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
-            </article>
-            <article class="card panel-wide-card delegation-summary-card">
+            </div><article class="card panel-wide-card delegation-summary-card">
               <div class="panel-head"><strong>Delegation summary</strong></div>
               <div class="delegator-summary">
                 <span>Total delegators <strong data-field="validatorDelegatorCount">-</strong></span>
@@ -109,16 +103,21 @@
                 <span>Ending (next 5 days) <strong data-field="validatorDelegatorEnding">-</strong></span>
               </div>
             </article>
-            <article class="card panel-wide-card"><b>Recent uptime by epoch</b><div class="uptime-pills" data-render="validator-uptime"><span>-</span></div><p>Recent uptime / availability by reward epoch.</p></article>
-            <div class="chart-panel"><div class="panel-head"><strong>Validator payout estimate per epoch</strong><span class="mini-label">Oracle estimate · Latest 20</span></div><p class="chart-definition">Matches Oracle Daemon: (Node API + Validator API) × (1 − fee).</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator payout estimate per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
-            <div class="validator-panel delegator-panel" id="delegation-details-panel">
-              <div class="panel-head delegator-panel-head"><div><strong>Delegation details</strong><span class="mini-label">Current validator stake</span></div><label class="delegator-sort-control" for="delegator-sort"><span>Sort</span><select id="delegator-sort" data-delegator-sort aria-label="Sort delegation details"><option value="amount-desc">Amount high to low</option><option value="amount-asc">Amount low to high</option><option value="start-asc">Start date old to new</option><option value="start-desc">Start date new to old</option><option value="end-asc">End date earliest first</option><option value="end-desc">End date latest first</option></select></label></div>
-              <div class="table-wrap table-wrap-compact"><table class="delegator-table"><caption>Current validator delegators</caption><thead><tr><th scope="col">#</th><th scope="col">Address</th><th scope="col">Amount</th><th scope="col">Share</th><th scope="col">Start</th><th scope="col">End</th><th scope="col">Time left</th></tr></thead><tbody data-render="validator-delegator-table"><tr><td colspan="7">Loading...</td></tr></tbody></table></div>
-            </div>
           </div>
         </div>
       </section>
-    </main>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>When your stake ends.</h2><div class="section-side"><p>A P-chain delegation cannot run past the validator's own period, so this is the ceiling on how long a stake placed today can last.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="val-expiry">
+            <article class="card panel-wide-card">
+              <div class="panel-head"><strong>Delegation expiry timeline</strong><small>Each step is a delegation ending. Amber line marks the self-bond end — renewal is planned.</small></div>
+              <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-expiry-chart" viewBox="0 0 1000 260" preserveAspectRatio="xMidYMid meet" aria-label="Delegation expiry timeline"></svg></div>
+            </article>
+          </div>
+        </div>
+      </section>
+</main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="../assets/operator.js?v=core-32"></script>

@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirhollio-core-shell-v241";
+const CACHE_NAME = "mirhollio-core-shell-v242";
 const APP_SHELL = [
   "/",
   "/ftso/",
