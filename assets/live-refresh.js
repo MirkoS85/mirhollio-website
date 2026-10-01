@@ -236,8 +236,25 @@
     return block;
   }
 
+  /* The desktop sidebar carried a brand, a nav, three readings and then
+     roughly 200px of nothing, and the one thing the whole site exists to ask
+     for - delegate - was only ever offered inside the page or in the mobile
+     header. It belongs where it is always in view. */
+  function injectSideAction(nav) {
+    if (!nav || document.querySelector(".side-action")) return;
+    const target = nav.querySelector('a[href*="addresses"]');
+    // On the addresses page the button would point at the page you are on.
+    if (!target || target.getAttribute("aria-current") === "page") return;
+    const link = document.createElement("a");
+    link.className = "btn primary side-action";
+    link.href = target.getAttribute("href");
+    link.textContent = "Delegate WFLR";
+    nav.insertAdjacentElement("afterend", link);
+  }
+
   function injectShellLiveStats() {
     const primaryNav = document.querySelector(".side .nav");
+    injectSideAction(primaryNav);
     if (primaryNav && !document.querySelector(".side-live")) {
       primaryNav.insertAdjacentElement("afterend", createShellLiveStats("side-live"));
     }
