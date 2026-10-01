@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirhollio-core-shell-v243";
+const CACHE_NAME = "mirhollio-core-shell-v245";
 const APP_SHELL = [
   "/",
   "/ftso/",
@@ -12,6 +12,8 @@ const APP_SHELL = [
   "/assets/operator.js?v=core-32",
   "/assets/live-refresh.js?v=core-32",
   "/ftso/delegations/",
+  "/legal/",
+  "/faq/",
   "/assets/delegations.css?v=core-34",
   "/assets/delegations.js?v=core-34",
   "/data/ftso-delegations.json",

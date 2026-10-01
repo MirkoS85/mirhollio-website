@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mirhollio Core &mdash; FAQ and risk notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap">
+
+  <meta name="description" content="How delegating WFLR and staking FLR with Mirhollio Core works, what it pays, where the risk sits, and how to verify every address." />
+  <meta name="theme-color" content="#0A0A0E" />
+  <link rel="preconnect" href="https://api.oracle-daemon.com">
+  <link rel="dns-prefetch" href="//api.oracle-daemon.com">
+  <link rel="preconnect" href="https://api.coinbase.com">
+  <link rel="dns-prefetch" href="//api.coinbase.com">
+  <link rel="preconnect" href="https://flare-systems-explorer.flare.network">
+  <link rel="dns-prefetch" href="//flare-systems-explorer.flare.network">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-32" crossorigin="anonymous">
+  <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
+  <link rel="canonical" href="https://www.mirhollio.com/faq/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Mirhollio Core &mdash; FAQ and risk notes" />
+  <meta property="og:description" content="How delegating WFLR and staking FLR with Mirhollio Core works, what it pays, where the risk sits, and how to verify every address." />
+  <meta property="og:url" content="https://www.mirhollio.com/faq/" />
+  <meta property="og:image" content="https://www.mirhollio.com/og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Mirhollio Core &mdash; FAQ and risk notes" />
+  <meta name="twitter:description" content="How delegating WFLR and staking FLR with Mirhollio Core works, what it pays, where the risk sits, and how to verify every address." />
+  <meta name="twitter:image" content="https://www.mirhollio.com/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Mirhollio Core Flare validator and FTSO provider" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png?v=2">
+  <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
+  <link rel="manifest" href="../app.webmanifest">
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-32" />
+</head>
+<body>
+  <div class="mobile-top">
+    <div class="mobile-row"><a class="brand" href="../"><img src="../logo.png?v=2" alt="Mirhollio Core logo"><span class="brand-name">Mirhollio Core<small class="former">formerly MirSFlr</small></span></a><a class="btn primary" href="../addresses/">Delegate</a></div>
+    <nav class="mobile-links" aria-label="Mobile navigation"><a href="../">Home</a><a href="../ftso/">FTSO</a><a href="../validator/">Validator</a><a href="./" aria-current="page">Epochs</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a><a href="../faq/">FAQ</a></nav>
+  </div>
+  <div class="site-shell">
+    <aside class="side">
+      <div><a class="brand" href="../"><img src="../logo.png?v=2" alt="Mirhollio Core logo"><span class="brand-name">Mirhollio Core<small class="former">formerly MirSFlr</small></span></a><nav class="nav" aria-label="Primary navigation"><a href="../">Home</a><a href="../ftso/">FTSO provider</a><a href="../validator/">Validator node</a><a href="./" aria-current="page">Epoch history</a><a href="../addresses/">Addresses</a><a href="../performance/">Performance</a><a href="../faq/">FAQ</a></nav></div>
+      <p class="side-note">Epoch changes are not instant. Recheck after the next epoch before evaluating results.</p>
+    </aside>
+    <main>
+      <section class="section home-hero-section">
+        <div class="inner">
+          <div class="hero home-hero">
+            <div class="home-hero-copy">
+              <div class="kicker">Questions and risk</div>
+              <h1>Before you delegate.</h1>
+              <p class="lead">What delegation and staking actually involve, what they pay, where the risk sits, and how to check that any address claiming to be ours really is.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Delegating WFLR.</h2><div class="section-side"><p>What happens, when it counts, and what it pays.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="faq-ftso">
+            <details class="card panel-wide-card qa">
+              <summary><strong>How do I delegate, and when does it start earning?</strong></summary>
+              <div class="qa-body"><p>You delegate from your own wallet to the delegation address on the <a href="../addresses/">addresses page</a>. Nothing leaves your wallet and nothing is locked: delegation assigns the vote power of WFLR you already hold.</p><p>Vote power is sampled once per reward epoch, at a block chosen inside the epoch before. Delegate before that sample and you earn from the next epoch; delegate after it and you wait one more. The <a href="../ftso/delegations/">delegation explorer</a> counts down to the next snapshot.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>What does the 20% fee actually mean?</strong></summary>
+              <div class="qa-body"><p>The protocol pays a reward for each epoch. The provider keeps 20% and the rest goes to delegators in proportion to their share of the delegated vote power.</p><p>Across the 97 epochs on record that has meant 16.39M FLR paid out to delegators. Every epoch is listed on the <a href="../epochs/">epoch history</a>.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>Can I lose my WFLR by delegating?</strong></summary>
+              <div class="qa-body"><p>Delegation does not transfer custody. Your WFLR stays in your wallet, you can undelegate or redelegate at any time, and delegated WFLR is not slashed on Flare.</p><p>What you can lose is reward. If the provider fails the protocol's minimal conditions for an epoch, that epoch pays nothing to anyone delegating to it. The conditions and the full pass record are on the <a href="../ftso/">FTSO page</a>.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>What is the risk I should actually weigh?</strong></summary>
+              <div class="qa-body"><p>Three things, in order of how much they matter.</p><p><b>Reward risk.</b> An epoch that fails a condition pays nothing. One epoch of 97 has failed here &mdash; epoch 354, an FDC round &mdash; and 82 have been clean since.</p><p><b>Rate risk.</b> The reward rate is set by the protocol and moves with network-wide participation, not by the provider. It has fallen across the whole network since launch and may keep falling.</p><p><b>Concentration risk.</b> This is a small provider by registered weight. That is good for your share of its rewards and thinner for its margin against the eviction threshold, which is published on the home page.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="inner">
+          <div class="section-title"><h2>Staking FLR.</h2><div class="section-side"><p>The P-chain rules that catch people out.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="faq-validator">
+            <details class="card panel-wide-card qa">
+              <summary><strong>How long can I stake for?</strong></summary>
+              <div class="qa-body"><p>Not longer than the validator's own staking period. That period currently ends on <b>19 October 2026</b>, so a delegation placed today is capped at what remains &mdash; the <a href="../validator/">validator page</a> shows how many days that is, and the expiry timeline shows when existing stake rolls off.</p><p>This is a protocol rule, not a provider choice. The minimum delegation period is 14 days, so once fewer than 14 days remain no new delegation can be placed until the validator's own period is extended.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>Is there a minimum, and is my FLR locked?</strong></summary>
+              <div class="qa-body"><p>Flare requires a minimum of 50,000 FLR to delegate to a validator, and the FLR is locked for the period you choose. It is returned automatically when that period ends &mdash; there is nothing to claim and no way to withdraw early.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>What happens if the validator goes offline?</strong></summary>
+              <div class="qa-body"><p>Your stake is returned at the end of the period either way; downtime does not slash delegated FLR. It costs reward: a validator has to meet an uptime threshold for the epoch to pay. Uptime by epoch is on the <a href="../validator/">validator page</a>.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>Why can the validator show as nearly full?</strong></summary>
+              <div class="qa-body"><p>A Flare validator can carry a bounded multiple of its self-bond. The gauge on the home page shows how much of that ceiling is taken and how much room is left. When it is full, no new delegation can be accepted until stake rolls off or the self-bond grows.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+      <section class="section light">
+        <div class="inner">
+          <div class="section-title"><h2>Trust and safety.</h2><div class="section-side"><p>How to check this is really us.</p></div></div>
+          <div class="validator-panel split-panel standalone-panel" id="faq-trust">
+            <details class="card panel-wide-card qa">
+              <summary><strong>How do I know I have the right address?</strong></summary>
+              <div class="qa-body"><p>Never take an address from a message, a search result or a site &mdash; including this one &mdash; without checking it. Every address this operator uses is listed on the <a href="../addresses/">addresses page</a> with links to the block explorer and to FlareMetrics so you can confirm it independently.</p><p>Mirhollio Core will never contact you first, never ask for a seed phrase or private key, and never ask you to &quot;validate&quot; or &quot;sync&quot; a wallet. Anyone doing so is not us.</p></div>
+            </details>
+            <details class="card panel-wide-card qa">
+              <summary><strong>Where do the numbers on this site come from?</strong></summary>
+              <div class="qa-body"><p>The delegator book is read directly from the WNat contract over public Flare RPC, so it does not depend on an indexer being up. Reward, condition and performance figures come from the protocol's own reward data; network comparisons from FlareMetrics; validator state from the P-chain.</p><p>The site is open source and every figure on it is produced by the scripts in that repository: <a href="https://github.com/MirkoS85/mirhollio-website" target="_blank" rel="noopener">github.com/MirkoS85/mirhollio-website</a>.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+</main>
+  </div>
+  <footer class="site-foot">
+    <p>Independent Flare validator and FTSO provider. Not affiliated with the Flare Foundation.
+      Nothing here is financial advice &mdash; see <a href="../legal/">privacy, terms and disclaimer</a>
+      and the <a href="../faq/">risk notes</a>.</p>
+    <p><a href="https://github.com/MirkoS85/mirhollio-website" target="_blank" rel="noopener">Source on GitHub</a></p>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/operator.js?v=core-32"></script>
+  <script src="../assets/live-refresh.js?v=core-32"></script>
+  <script src="../assets/pwa.js?v=core-32"></script>
+</body>
+</html>
