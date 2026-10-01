@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-39");
+@import url("operator.css?v=core-40");
 
 :root{
   color-scheme:dark;
@@ -8178,4 +8178,72 @@ tbody tr + tr th{
   .hero-live-strip:has(> :nth-child(4)):not(:has(> :nth-child(5))){
     grid-template-columns:repeat(4, minmax(0,1fr));
   }
+}
+
+/* ===========================================================================
+   core-40: the brand mark on a phone
+
+   `.hero-mark` and `.hero-mark-wrap` were both set to display:none below
+   1120px, on all six pages that carry one - so the whole composition the
+   desktop hero is built around simply did not exist on the width most people
+   read the site at. It was presumably hidden because at its desktop size it
+   would have swallowed a phone.
+
+   That is a sizing problem, not a reason to drop it. Every offset in those
+   rules is already expressed as a multiple of --mark and every per-page crop
+   is a transform on the image, so re-sizing the one variable brings all six
+   back in proportion. Lower opacity and a tighter mask keep it behind the
+   type rather than under it.
+   =========================================================================== */
+@media (max-width:1120px){
+  .hero-mark,
+  .hero-mark-wrap{
+    display:block;
+    /* The desktop clamp floors at 58% of --mark-max, which is 342-452px on a
+       390px screen. This one is sized to the viewport. */
+    --mark:clamp(250px, 86vw, 400px) !important;
+    opacity:.34 !important;
+    -webkit-mask-image:radial-gradient(50% 50% at 50% 50%, #000 2%, transparent 60%);
+    mask-image:radial-gradient(50% 50% at 50% 50%, #000 2%, transparent 60%);
+  }
+
+  /* The hero clips, so a mark hanging off the corner cannot widen the page.
+     Stated here as well because a negative offset on an absolute element is
+     the classic source of a horizontal scrollbar. */
+  .home-hero,
+  .hero,
+  .hero.compact,
+  .home-hero-section,
+  .section{
+    overflow:hidden;
+  }
+}
+
+/* Below 520px the artwork is competing with a three-line headline for the
+   same corner, so it sits further out and quieter still. */
+@media (max-width:520px){
+  .hero-mark,
+  .hero-mark-wrap{
+    --mark:clamp(230px, 92vw, 360px) !important;
+    opacity:.3 !important;
+  }
+}
+
+/* --- the kicker -----------------------------------------------------------
+   Measured on rendered pixels rather than on the computed background colour:
+   the brand pink on the hero's own tinted field is 3.5:1, and where the brand
+   mark sits behind it that falls to 2.2:1. The CSS-only contrast check missed
+   this because it reads background-color, and the hero's lightness comes from
+   a gradient, a grid and an image.
+
+   A chip fixes it everywhere and for good: the text now sits on a known dark
+   surface whatever is painted under it. --- */
+.kicker{
+  padding:6px 13px 6px 11px;
+  border-radius:999px;
+  border:1px solid rgba(255,46,99,.26);
+  background:rgba(8,6,12,.85);
+  box-shadow:var(--lit), 0 2px 10px rgba(0,0,0,.35);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
 }
