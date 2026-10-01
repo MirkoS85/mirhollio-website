@@ -24,7 +24,7 @@
 .dx-crumbs a,
 .dx-crumbs b{
   display:inline-flex;align-items:center;
-  min-height:32px;padding:0 10px;
+  min-height:44px;padding:0 14px;
   border-radius:999px;
   text-decoration:none;
 }
@@ -259,7 +259,7 @@
 
 .dx-chips{display:flex;flex-wrap:wrap;gap:6px}
 .dx-chip{
-  min-height:36px;padding:0 13px;
+  min-height:44px;padding:0 15px;
   border:1px solid var(--line);border-radius:999px;
   background:rgba(255,255,255,.03);color:var(--muted);
   font:inherit;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;

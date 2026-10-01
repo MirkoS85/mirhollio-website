@@ -288,6 +288,25 @@
     window.requestAnimationFrame(syncTopHeight);
   }
 
+  // Keyboard and screen-reader users had to walk the whole sidebar nav on every
+  // page before reaching the content. Injected here rather than pasted into
+  // eight files, the same way the back-to-top button already is.
+  function bindSkipLink() {
+    if (document.querySelector(".skip-link")) return;
+    const main = document.querySelector("main");
+    if (!main) return;
+    if (!main.id) main.id = "main-content";
+    const link = document.createElement("a");
+    link.className = "skip-link";
+    link.href = `#${main.id}`;
+    link.textContent = "Skip to content";
+    link.addEventListener("click", () => {
+      main.setAttribute("tabindex", "-1");
+      main.focus({ preventScroll: false });
+    });
+    document.body.insertBefore(link, document.body.firstChild);
+  }
+
   function bindBackToTop() {
     const button = document.createElement("button");
     button.className = "back-to-top";
@@ -507,6 +526,7 @@
     injectShellLiveStats();
     bindMobileNav();
     bindInfoTips();
+    bindSkipLink();
     bindBackToTop();
     syncLatestHistoryScroll();
     bindPullToRefresh();

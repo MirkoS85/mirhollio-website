@@ -4883,7 +4883,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--pink);outline-offse
 .hero-live-strip .hero-live-tile{min-height:86px;display:flex;flex-direction:column;justify-content:center;gap:6px;border-radius:14px;}
 .section .inner{padding-top:8px;}
 .section{scroll-margin-top:20px;}
-@media (max-width:700px){ .hero-live-strip{grid-template-columns:repeat(2,1fr);} }
+@media (max-width:700px){
+  .hero-live-strip{grid-template-columns:repeat(2,1fr);}
+  /* An odd number of tiles left the last one alone beside a hole. It takes the
+     full width instead, which also suits the one that is usually last - the
+     call to action. */
+  .hero-live-strip > :last-child:nth-child(odd){grid-column:1 / -1;}
+}
 @media (min-width:1000px){ .hero-live-strip:has(> :nth-child(5)){grid-template-columns:repeat(5,1fr);} }
 /* === core-4: network-position widgets === */
 .hero-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:18px;}
@@ -5475,3 +5481,27 @@ a.table-more{display:flex;align-items:center;justify-content:center;text-decorat
   font:inherit;font-size:13px;font-weight:800;cursor:pointer;
 }
 .table-more:hover{background:rgba(255,46,99,.07)}
+
+/* The skip link is off-screen until focused, then sits over the header. */
+.skip-link{
+  position:fixed;top:10px;left:10px;z-index:200;
+  padding:12px 18px;min-height:44px;
+  display:inline-flex;align-items:center;
+  border-radius:12px;
+  background:var(--pink);color:#fff;
+  font-size:14px;font-weight:800;text-decoration:none;
+  transform:translateY(-200%);
+  transition:transform .15s ease;
+}
+.skip-link:focus{transform:translateY(0)}
+
+/* A 40px control is below every touch-target guideline, and the nav button is
+   the one control on every page. */
+.mobile-toggle,
+.mobile-top button{min-width:44px;min-height:44px}
+
+/* Stat cards in a .cards grid carried a 196px floor meant for cards with a
+   figure and a paragraph. These hold a label, a number and one line, so the
+   floor left 96px of dead space under every one of them. Grid items already
+   stretch to the tallest in their row, which keeps them even without it. */
+.cards .card{min-height:0}
