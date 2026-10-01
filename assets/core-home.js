@@ -800,3 +800,57 @@
     })
     .catch(() => show("–"));
 })();
+
+/* Track record.
+   The oracle payload carries 97 reward epochs with what each one actually paid
+   delegators, how accurate the price submissions were and which protocol
+   condition failed when one did. Almost none of it reached a page: the site
+   showed a reward figure that was in fact the operator's own fee, and a single
+   opaque "performance" percentage that looks poor until you see it against the
+   network. This block answers the question a delegator is really asking - has
+   this worked, and for how long. */
+(() => {
+  const card = document.getElementById("track-record");
+  if (!card) return;
+  const el = (k) => card.querySelector(`[data-tr="${k}"]`);
+  const flr = (n) => n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : Math.round(n).toLocaleString("en-US");
+
+  Promise.all([
+    fetch("/data/oracle-live.json?v=tr-1").then((r) => r.json()).catch(() => null),
+    fetch("/data/network-position.json?v=tr-1").then((r) => r.json()).catch(() => null)
+  ]).then(([oracle, np]) => {
+    const p = oracle?.providersV1;
+    const eps = Array.isArray(p?.epochData) ? p.epochData : [];
+    if (!eps.length) { card.hidden = true; return; }
+
+    const paid = eps.reduce((sum, e) => sum + (Number(e.delegatorsRewardAmount) || 0), 0);
+    el("paid").textContent = `${flr(paid)} FLR`;
+    el("paidSub").textContent = `Across ${eps.length} reward epochs, to delegators - not the provider's fee.`;
+
+    el("eligible").textContent = `${p.eligibleEpochs} / ${p.totalEpochs}`;
+
+    // Hit percentage is the share of submissions inside the reward band, which
+    // is a far more direct quality signal than the blended "performance".
+    const hits = eps.slice(-20).map((e) => e.ftsoScaling?.hitPercentage).filter(Number.isFinite);
+    if (hits.length) {
+      el("accuracy").textContent = `${(hits.reduce((a, b) => a + b, 0) / hits.length).toFixed(2)}%`;
+      el("accuracySub").textContent = `Average over the last ${hits.length} epochs, lowest ${Math.min(...hits).toFixed(1)}%.`;
+    }
+
+    const struck = eps.filter((e) => Number(e.strikes) > 0);
+    const latest = eps[eps.length - 1]?.epoch;
+    el("strikes").textContent = `${struck.length} in ${eps.length}`;
+    el("strikesSub").textContent = struck.length
+      ? `Epoch ${struck[0].epoch}, ${String(struck[0].failures?.[0]?.failureId || "a protocol round").replace(/_/g, " ").toLowerCase()}. ${latest - struck[0].epoch} epochs clean since.`
+      : "No protocol strike on record.";
+
+    // The blended performance figure reads badly on its own. Against the
+    // network's own medians it reads as what it is.
+    const pos = np?.position;
+    if (pos && Number.isFinite(pos.primaryPct) && Number.isFinite(pos.medianPrimaryPct)) {
+      el("perfNote").innerHTML =
+        `Anchor feeds <b>${pos.primaryPct.toFixed(1)}%</b> against a network median of ${pos.medianPrimaryPct.toFixed(1)}%, ` +
+        `block-latency feeds <b>${pos.secondaryPct.toFixed(1)}%</b> against ${pos.medianSecondaryPct.toFixed(1)}%.`;
+    }
+  });
+})();
