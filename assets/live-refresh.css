@@ -3278,6 +3278,63 @@ tbody tr:hover td{
   tbody td[colspan]::before{
     content:none;
   }
+
+  /* ── compact tables read as cards, not as a column of label/value lines ──
+     Stacking every cell on its own line turned a four-column table into four
+     lines plus a border each: eight epochs ran to 1,292px and a single row to
+     153px, against 48px on a desktop. The row header becomes the card's title
+     and the remaining fields sit side by side with the label above the value,
+     which is both shorter and quicker to scan. */
+  .ftso-epoch-table tbody tr,
+  .np-table tbody tr{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(84px, 1fr));
+    gap:12px 14px;
+    align-items:start;
+  }
+
+  .ftso-epoch-table tbody th:first-child,
+  .np-table tbody th:first-child{
+    grid-column:1 / -1;
+    display:flex;
+    justify-content:flex-start;
+    gap:8px;
+    padding:0 0 2px;
+    border-bottom:0;
+  }
+
+  .ftso-epoch-table tbody td,
+  .np-table tbody td{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:flex-start;
+    gap:3px;
+    padding:0;
+    border-bottom:0;
+    text-align:left;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .ftso-epoch-table tbody td::before,
+  .np-table tbody td::before{
+    max-width:none;
+    font-size:10.5px;
+  }
+
+  /* An address never fits beside anything. */
+  .np-table tbody td[data-label="Address"],
+  .ftso-epoch-table tbody td[data-label="Delegator"]{
+    grid-column:1 / -1;
+  }
+
+  /* Seven columns is more than a phone needs from a stake row. The exact start
+     and end dates are detail; how long is left is the answer people want, and
+     both dates are still there on a wider screen. */
+  .delegator-table tbody td[data-label="Start"],
+  .delegator-table tbody td[data-label="End"]{
+    display:none;
+  }
 }
 
 @media (max-width:420px){
