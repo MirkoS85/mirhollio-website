@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
 
+# The operator dashboard and the preview pages are no longer published.
+# Listed here so crawlers that cached them stop asking.
+Disallow: /ops/
+Disallow: /previews-live/
+
 Sitemap: https://www.mirhollio.com/sitemap.xml

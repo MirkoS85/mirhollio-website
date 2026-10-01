@@ -1152,7 +1152,13 @@ const MirhollioCore = (() => {
       }
 
       const labels = tableLabels(tbody);
-      tbody.innerHTML = sortedDelegators.map((item, index) => {
+      // 83 rows rendered flat made this table 8,290px - two thirds of the page
+      // on a phone, with no hierarchy and nothing to scan by. Show the stakes
+      // that carry the weight; the rest stay one tap away.
+      const PAGE = 10;
+      const expanded = tbody.dataset.expanded === "1";
+      const visible = expanded ? sortedDelegators : sortedDelegators.slice(0, PAGE);
+      tbody.innerHTML = visible.map((item, index) => {
         const amount = Number(item.m_dAmount);
         const share = totalDelegation > 0 && Number.isFinite(amount) ? (amount / totalDelegation) * 100 : null;
         const timeLeft = Array.isArray(item.m_aiTimeLeftDHM)
@@ -1170,6 +1176,20 @@ const MirhollioCore = (() => {
           </tr>
         `;
       }).join("");
+
+      if (!expanded && sortedDelegators.length > PAGE) {
+        const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 7;
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr class="table-more-row">
+            <td colspan="${columns}">
+              <button type="button" class="table-more">Show all ${sortedDelegators.length} stakes</button>
+            </td>
+          </tr>`);
+        tbody.querySelector(".table-more")?.addEventListener("click", () => {
+          tbody.dataset.expanded = "1";
+          renderValidatorDelegators(node);
+        });
+      }
     });
   }
 
@@ -1629,7 +1649,12 @@ const MirhollioCore = (() => {
       }
       const labels = tableLabels(tbody);
       const snapshotTotal = delegateSummaries.reduce((sum, row) => sum + Number(row.amount || 0), 0) || Number(latest?.delegated || 0);
-      tbody.innerHTML = delegateSummaries.map((row, index) => {
+      // 130 rows ran to 8,100px here - more than the rest of the page put
+      // together - and the delegation explorer already does this properly, with
+      // filters and movement. Show the largest few and send the reader there.
+      const TOP = 8;
+      const shown = delegateSummaries.slice(0, TOP);
+      tbody.innerHTML = shown.map((row, index) => {
         const share = snapshotTotal ? (Number(row.amount || 0) / snapshotTotal) * 100 : null;
         const deltaText = row.hasPriorSnapshot
           ? fmtSignedCompact(row.delta || 0, " WFLR")
@@ -1649,6 +1674,16 @@ const MirhollioCore = (() => {
         </tr>
       `;
       }).join("");
+
+      if (delegateSummaries.length > TOP) {
+        const columns = tbody.closest("table")?.querySelectorAll("thead th").length || 7;
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr class="table-more-row">
+            <td colspan="${columns}">
+              <a class="table-more" href="/ftso/delegations/">All ${delegateSummaries.length} delegators, with filters &#8594;</a>
+            </td>
+          </tr>`);
+      }
     });
   }
 

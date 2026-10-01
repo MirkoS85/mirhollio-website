@@ -5406,3 +5406,15 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
   gap:12px;
   align-items:center;
 }
+
+/* Long tables are capped and open on request. Without this the validator page
+   handed a phone 83 identical rows and ran to 13,000px. */
+.table-more-row td{padding:0;border-bottom:0}
+a.table-more{display:flex;align-items:center;justify-content:center;text-decoration:none}
+.table-more{
+  width:100%;min-height:48px;
+  border:0;border-top:1px solid var(--line);
+  background:transparent;color:var(--pink);
+  font:inherit;font-size:13px;font-weight:800;cursor:pointer;
+}
+.table-more:hover{background:rgba(255,46,99,.07)}

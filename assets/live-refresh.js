@@ -479,10 +479,15 @@
       });
     });
 
+    // Initial state. A panel marked data-accordion-open starts open: the epoch
+    // page's whole purpose is reward history, and it was hiding that history
+    // behind a click, so a visitor evaluating the provider met two headings and
+    // two buttons. A matching URL hash still wins, as before.
     const hashId = window.location.hash.replace("#", "");
     buttons.forEach(button => {
       const targetId = button.getAttribute("data-panel-toggle");
-      setPanelState(button, hashId && targetId === hashId);
+      const openByDefault = panels.get(targetId)?.hasAttribute("data-accordion-open");
+      setPanelState(button, Boolean(hashId ? targetId === hashId : openByDefault));
     });
     if (hashId) history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }

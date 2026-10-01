@@ -559,11 +559,14 @@
   wide.addEventListener("change", () => { delete card.dataset.userToggled; apply(); });
 })();
 
-/* FDC performance table + operator earnings (from oracle-daemon v2 payload, cache-first) */
+/* FDC performance table, from the oracle-daemon v2 payload, cache-first.
+   The operator-earnings panel this block used to fill has been removed: it
+   addressed the reader as the person collecting the fee, which on a page a
+   prospective delegator reads is exactly backwards. The arithmetic went with
+   it rather than staying in a script every visitor downloads. */
 (() => {
   const fdcTb = document.querySelector("#fdc-table tbody");
-  const oe = document.getElementById("oe-fsp-latest");
-  if (!fdcTb && !oe) return;
+  if (!fdcTb) return;
   const OURS = "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3";
   function fromCache() {
     try {
@@ -596,29 +599,6 @@
       }).join("");
       const agg = document.getElementById("fdc-agg");
       if (agg && sumT) agg.textContent = `${((sumR / sumT) * 100).toFixed(2)}% over ${sumT.toLocaleString("en-US")} rewarded voting rounds (last ${rows.length} epochs).`;
-    }
-    if (oe) {
-      const latest = eps.find((e) => e.feeBasedRewardAmount > 0) || eps[0];
-      const fees = eps.filter((e) => e.feeBasedRewardAmount > 0).slice(0, 10).map((e) => e.feeBasedRewardAmount);
-      const avg = fees.length ? fees.reduce((s, x) => s + x, 0) / fees.length : 0;
-      const monthlyFsp = avg * 8.68;
-      const fmtF = (x) => x >= 1000 ? Math.round(x).toLocaleString("en-US") + " FLR" : x.toFixed(1) + " FLR";
-      document.getElementById("oe-ep").textContent = latest ? latest.epoch : "?";
-      oe.textContent = latest ? fmtF(latest.feeBasedRewardAmount) : "–";
-      document.getElementById("oe-fsp-month").textContent = fmtF(monthlyFsp);
-      const aprEl = document.querySelector('[data-field="validatorApr"]');
-      const apr = aprEl && parseFloat((aprEl.textContent || "").replace(",", ".")) / 100;
-      let stakeMonthly = null;
-      if (apr && apr > 0) { stakeMonthly = 84e6 * apr * 0.2 / 12; }
-      fetch("/data/network-position.json?v=core-13").then((r) => r.json()).then((np) => {
-        const vv = np.validator;
-        if (vv && apr) stakeMonthly = (vv.totalStakeM - vv.selfBondM) * 1e6 * apr * 0.2 / 12;
-        document.getElementById("oe-stake-month").textContent = stakeMonthly ? fmtF(stakeMonthly) : "–";
-        document.getElementById("oe-total-month").textContent = fmtF(monthlyFsp + (stakeMonthly || 0));
-      }).catch(() => {
-        document.getElementById("oe-stake-month").textContent = stakeMonthly ? fmtF(stakeMonthly) : "–";
-        document.getElementById("oe-total-month").textContent = fmtF(monthlyFsp + (stakeMonthly || 0));
-      });
     }
   }
   const cached = findProv(fromCache());

@@ -1,7 +1,6 @@
-const CACHE_NAME = "mirhollio-core-shell-v235";
+const CACHE_NAME = "mirhollio-core-shell-v237";
 const APP_SHELL = [
   "/",
-  "/ops/",
   "/ftso/",
   "/validator/",
   "/epochs/",
@@ -12,19 +11,15 @@ const APP_SHELL = [
   "/assets/live-refresh.css?v=core-32",
   "/assets/operator.js?v=core-32",
   "/assets/live-refresh.js?v=core-32",
-  "/assets/ops.css?v=core-32",
-  "/assets/ops.js?v=core-32",
   "/ftso/delegations/",
   "/assets/delegations.css?v=core-34",
   "/assets/delegations.js?v=core-34",
-  "/ops/status.example.json",
   "/data/ftso-delegations.json",
   "/data/network-position.json",
   "/data/watch-status.json",
   "/assets/pwa.js?v=core-32",
   "/assets/core-home.js?v=core-32",
   "/app.webmanifest",
-  "/ops/app.webmanifest",
   "/assets/brand-mark.jpg?v=core-32",
   "/logo.png?v=2",
   "/apple-touch-icon-full.png",

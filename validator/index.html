@@ -95,16 +95,7 @@
               <div class="panel-head"><strong>Delegation expiry timeline</strong><small>Each step is a delegation ending. Amber line marks the self-bond end — renewal is planned.</small></div>
               <div class="reward-chart-wrap"><svg class="reward-chart" data-render="np-expiry-chart" viewBox="0 0 1000 260" preserveAspectRatio="xMidYMid meet" aria-label="Delegation expiry timeline"></svg></div>
             </article>
-            <article class="card panel-wide-card">
-              <div class="panel-head"><strong>Operator earnings</strong><small>What running this node actually pays, live &mdash; your share of the fees, before costs.</small></div>
-              <div class="oe-grid">
-                <div class="oe-tile"><span>Fee earned &middot; last epoch</span><strong id="oe-fsp-latest">&ndash;</strong><em>Your 20% cut of the protocol rewards paid out in epoch <span id="oe-ep">?</span>.</em></div>
-                <div class="oe-tile"><span>Fee earned &middot; per month</span><strong id="oe-fsp-month">&ndash;</strong><em>The last 10 epochs averaged, at roughly 8.7 epochs a month.</em></div>
-                <div class="oe-tile"><span>Staking fee &middot; per month</span><strong id="oe-stake-month">&ndash;</strong><em>Your 20% cut of what delegators earn from staking, at today&rsquo;s APR.</em></div>
-                <div class="oe-tile total"><span>Total &middot; per month</span><strong id="oe-total-month">&ndash;</strong><em>Both fees together, before running costs.</em></div>
-              </div>
-            </article>
-            <article class="card panel-wide-card">
+                        <article class="card panel-wide-card">
               <div class="panel-head"><strong>Staking calculator</strong><small>Estimate FLR staking rewards at the current live APR.</small></div>
               <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
               <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
