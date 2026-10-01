@@ -1,0 +1,22 @@
+name: Probe price sources
+
+# Read-only. Asks which sources can tell the site the FLR price, whether they
+# allow a browser to call them, and which also carry seven days of history for
+# the sparkline. Includes the FTSOv2 on-chain feed, which is the oracle this
+# provider helps operate.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/probe-price-sources.mjs
