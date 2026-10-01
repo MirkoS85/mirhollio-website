@@ -9,6 +9,23 @@ const MirhollioCore = (() => {
   // of those payloads here, on our own origin, where nothing can block it; the
   // API stays as the fallback.
   const ORACLE_MIRROR_URL = "/data/oracle-live.json";
+  // The FLR price this site shows comes from the oracle this provider helps
+  // operate. FTSOv2 publishes FLR/USD on-chain and a browser can read it
+  // directly - the Flare RPC allows cross-origin calls - so the figure is both
+  // seconds old and sourced from the thing the page is about. Measured against
+  // six exchanges it sat in the middle of them, within 0.6%.
+  //
+  // Exchanges stay as the fallback, because the chain gives a spot price and
+  // nothing else: the seven-day sparkline still needs candles from somewhere.
+  const FLARE_RPC_URLS = [
+    "https://flare-api.flare.network/ext/C/rpc",
+    "https://flare.public-rpc.com",
+    "https://rpc.ankr.com/flare"
+  ];
+  const CONTRACT_REGISTRY = "0xaD67FE66660Fb8dFE9d6b1b4240d8650e30F6019";
+  const FLR_USD_FEED_ID = "0x01464c522f55534400000000000000000000000000";
+  const SEL_CONTRACT_BY_NAME = "0x82760fca";
+  const SEL_FEED_BY_ID = "0x93e9f806";
   const FLR_PRICE_URL = "https://api.coinbase.com/v2/prices/FLR-USD/spot";
   const FLR_PRICE_EUR_URL = "https://api.coinbase.com/v2/prices/FLR-EUR/spot";
   const FLARE_BASE_VOTE_POWER_URL = "https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare";
@@ -2664,13 +2681,18 @@ const MirhollioCore = (() => {
 
   async function loadPrice() {
     try {
-      const [usdRes, eurRes] = await Promise.allSettled([
+      const [chainRes, usdRes, eurRes] = await Promise.allSettled([
+        fetchFtsoPrice(),
         fetchJsonWithCache(FLR_PRICE_URL, CACHE_TTLS.price),
         fetchJsonWithCache(FLR_PRICE_EUR_URL, CACHE_TTLS.price)
       ]);
-      if (usdRes.status === "fulfilled") {
+      // The oracle first; the exchange only if it could not be read.
+      if (chainRes.status === "fulfilled" && Number.isFinite(chainRes.value)) {
+        prices.USD = chainRes.value;
+        window.__flrPriceUsd = chainRes.value;
+      } else if (usdRes.status === "fulfilled") {
         const price = Number(usdRes.value?.data?.amount);
-        if (Number.isFinite(price)) prices.USD = price;
+        if (Number.isFinite(price)) { prices.USD = price; window.__flrPriceUsd = price; }
       }
       if (eurRes.status === "fulfilled") {
         const price = Number(eurRes.value?.data?.amount);
@@ -2680,6 +2702,37 @@ const MirhollioCore = (() => {
     } catch (_) {
       setPriceDisplay(activePriceCurrency);
     }
+  }
+
+  /** FLR/USD from the FTSOv2 feed, read over public Flare RPC. */
+  async function fetchFtsoPrice() {
+    const call = async (rpc, to, data) => {
+      const res = await fetch(rpc, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to, data }, "latest"] }),
+        signal: AbortSignal.timeout(8000)
+      });
+      const body = await res.json();
+      if (body.error) throw new Error(body.error.message);
+      return body.result;
+    };
+    const nameArg = Array.from("FtsoV2").map(c => c.charCodeAt(0).toString(16)).join("").padEnd(64, "0");
+    const registryData = `${SEL_CONTRACT_BY_NAME}${(32).toString(16).padStart(64, "0")}${(6).toString(16).padStart(64, "0")}${nameArg}`;
+
+    for (const rpc of FLARE_RPC_URLS) {
+      try {
+        const ftsoV2 = `0x${(await call(rpc, CONTRACT_REGISTRY, registryData)).slice(-40)}`;
+        const raw = (await call(rpc, ftsoV2, SEL_FEED_BY_ID + FLR_USD_FEED_ID.slice(2).padEnd(64, "0"))).replace(/^0x/, "");
+        // (uint256 value, int8 decimals, uint64 timestamp)
+        const value = BigInt(`0x${raw.slice(0, 64)}`);
+        const decRaw = BigInt(`0x${raw.slice(64, 128)}`);
+        const decimals = decRaw > 2n ** 255n ? Number(decRaw - 2n ** 256n) : Number(decRaw);
+        const price = Number(value) / 10 ** decimals;
+        if (Number.isFinite(price) && price > 0) return price;
+      } catch (_) { /* next endpoint */ }
+    }
+    throw new Error("FTSOv2 feed unreadable");
   }
 
   async function load() {

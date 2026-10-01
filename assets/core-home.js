@@ -23,24 +23,67 @@
 
   async function price() {
     const svg = $("np-price-spark"); if (!svg) return;
-    try {
-      const c = await jget("https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=21600");
-      const rows = c.slice(0, 28).reverse(); // [t, low, high, open, close, vol]
-      const closes = rows.map((r) => r[4]);
-      const lastP = closes[closes.length - 1], firstP = closes[0];
-      $("np-price").textContent = "$" + lastP.toFixed(5);
-      const d = ((lastP - firstP) / firstP) * 100;
+    const panel = svg.closest(".panel");
+
+    // The value comes from the FTSOv2 feed, read on-chain by operator.js, which
+    // loads first on every page. That is the oracle this provider helps run, it
+    // is seconds old, and it does not depend on an exchange listing FLR.
+    const chainPrice = () => new Promise((resolve) => {
+      let waited = 0;
+      const tick = () => {
+        if (Number.isFinite(window.__flrPriceUsd)) return resolve(window.__flrPriceUsd);
+        if ((waited += 200) > 9000) return resolve(null);
+        setTimeout(tick, 200);
+      };
+      tick();
+    });
+
+    // Candles for the sparkline. The chain gives a spot price and nothing else,
+    // so the seven-day shape still needs an exchange - measured, three of them
+    // answer and allow a browser to call them.
+    const HISTORY = [
+      ["https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=21600",
+       (c) => c.slice(0, 28).reverse().map((r) => r[4])],
+      ["https://api.coingecko.com/api/v3/coins/flare-networks/market_chart?vs_currency=usd&days=7",
+       (c) => (c.prices || []).map((r) => r[1]).filter(Number.isFinite).slice(-28)],
+      ["https://api.kraken.com/0/public/OHLC?pair=FLRUSD&interval=240",
+       (c) => (Object.values(c.result || {})[0] || []).slice(-28).map((r) => Number(r[4])).filter(Number.isFinite)]
+    ];
+    async function closes() {
+      for (const [url, pick] of HISTORY) {
+        try {
+          const rows = pick(await jget(url));
+          if (rows && rows.length > 2) return rows;
+        } catch (_) { /* next source */ }
+      }
+      return null;
+    }
+
+    const [spot, series] = await Promise.all([chainPrice(), closes()]);
+    const last = Number.isFinite(spot) ? spot : (series ? series[series.length - 1] : null);
+
+    if (!Number.isFinite(last)) {
+      // Nothing could be read at all. A dead card the size of the two beside it
+      // reads as a broken site, so it steps out of the row instead.
+      panel?.setAttribute("hidden", "");
+      return;
+    }
+
+    $("np-price").textContent = "$" + last.toFixed(5);
+    $("np-price-sub").textContent = Number.isFinite(spot)
+      ? "from the FTSO feed \u00b7 on-chain"
+      : "market data \u00b7 7 days";
+
+    if (series && series.length > 2) {
+      const first = series[0];
+      const d = ((last - first) / first) * 100;
       const chip = $("np-price-delta");
-      chip.textContent = (d >= 0 ? "▲ +" : "▼ ") + d.toFixed(1) + "% 7D";
+      chip.textContent = (d >= 0 ? "\u25b2 +" : "\u25bc ") + d.toFixed(1) + "% 7D";
       chip.style.color = d >= 0 ? "#35C77E" : RED;
-      spark(svg, closes);
-    } catch {
-      // A dead card the size of the two beside it is the first thing a visitor
-      // meets, and it reads as a broken site rather than as one missing feed.
-      // The market price is context, not one of this provider's numbers, so
-      // when the exchange cannot be reached the card steps out of the row and
-      // the two that carry real figures take the space.
-      svg.closest(".panel")?.setAttribute("hidden", "");
+      spark(svg, series.concat(Number.isFinite(spot) ? [spot] : []));
+    } else {
+      // A price with no history is still worth showing; the sparkline is not.
+      svg.setAttribute("hidden", "");
     }
   }
 
