@@ -46,10 +46,12 @@
     svg.appendChild(el("circle", { cx: 60, cy: 60, r: 34, fill: "none", stroke: "rgba(255,255,255,.09)", "stroke-width": 7 }));
     svg.appendChild(el("circle", { cx: 60, cy: 60, r: 34, fill: "none", stroke: AMBER, "stroke-width": 7, "stroke-linecap": "round",
       "stroke-dasharray": `${(c2 * periodPct) / 100} ${c2}`, transform: "rotate(-90 60 60)" }));
-    const t1 = el("text", { x: 60, y: 56, "text-anchor": "middle", "font-size": 17, "font-weight": 800, fill: "#F4F4F8", "font-family": "Archivo, sans-serif" });
-    t1.textContent = Math.round(fillPct) + "%";
-    const t2 = el("text", { x: 60, y: 72, "text-anchor": "middle", "font-size": fontUnits(svg, 11, 120), fill: MUT });
-    t2.textContent = daysLeft != null ? `full · ${daysLeft}d left` : "full";
+    const t1 = el("text", { x: 60, y: 58, "text-anchor": "middle", "font-size": 19, "font-weight": 800, fill: "#F4F4F8", "font-family": "Archivo, sans-serif" });
+    t1.textContent = Number.isFinite(fillPct) ? `${Math.round(fillPct)}%` : "-";
+    // "full · 18d left" did not fit inside the ring and was clipped at both
+    // ends. The ring shows how full; the days belong beside it, not within it.
+    const t2 = el("text", { x: 60, y: 75, "text-anchor": "middle", "font-size": fontUnits(svg, 10, 120), fill: MUT });
+    t2.textContent = "taken";
     svg.append(t1, t2);
   }
 
@@ -249,6 +251,9 @@
     price();
     let np = null;
     try { np = await jget("/data/network-position.json?v=core-4"); } catch { return; }
+    // How full the validator is, is measured by the watch feed, not this one.
+    let cap = null;
+    try { cap = (await jget("/data/watch-status.json?v=core-4"))?.validator || null; } catch { cap = null; }
     const p = np.position, rr = np.rewardRate, val = np.validator;
     // hero chips
     if ($("np-rr-rank") && rr) { $("np-rr-rank").textContent = `#${rr.rank} of ${rr.count} providers`; }
@@ -258,7 +263,17 @@
     if ($("np-stake") && val) $("np-stake").innerHTML = fmt(val.totalStakeM, 1) + "M<small> FLR</small>";
     if ($("np-stake-sub2") && val) $("np-stake-sub2").textContent = `self-bond ${fmt(val.selfBondM,0)}M · ${val.delegators} delegations`;
     const days = val ? Math.max(0, Math.round((new Date(val.stakeEndsAt) - Date.now()) / 864e5)) : null;
-    gauge($("np-gauge"), 100, days, days != null ? Math.min(100, 100 - (days / 92) * 100) : 0);
+    // How full the validator actually is, from the feed that measures it.
+    // This used to be the literal 100, so the page told every visitor the node
+    // was full while it had millions of FLR of room.
+    const fill = Number.isFinite(cap?.fillPct) ? cap.fillPct : null;
+    gauge($("np-gauge"), fill, days, days != null ? Math.min(100, 100 - (days / 92) * 100) : 0);
+    if ($("np-stake-sub") && cap) {
+      const freeM = cap.free / 1e6;
+      $("np-stake-sub").textContent = freeM >= 0.01
+        ? `${fmt(freeM, 2)}M FLR still free · ${days}d left`
+        : `at capacity · ${days}d left`;
+    }
     // strip
     if ($("np-rank")) $("np-rank").textContent = "#" + p.rank;
     if ($("np-voters")) $("np-voters").textContent = p.voters;
@@ -493,7 +508,7 @@
   const segA = document.getElementById("ticker-a"), segB = document.getElementById("ticker-b");
   if (segA) {
     const T0 = 1787857200, E0 = 428, LEN = 302400;
-    const S = { price: null, delta: null, rank: null, rrRank: null, rrCount: null, weight: null, uptime: null, stake: null, days: null };
+    const S = { price: null, delta: null, rank: null, voters: null, rrRank: null, rrCount: null, weight: null, uptime: null, stake: null, days: null };
     function esc(x) { return String(x); }
     function render() {
       const now = Date.now() / 1000;
@@ -504,17 +519,24 @@
       parts.push(`FLR <b>${S.price != null ? "$" + S.price.toFixed(5) : "…"}</b>${S.delta != null ? ` <span class="${S.delta >= 0 ? "up" : "down"}">${S.delta >= 0 ? "▲" : "▼"}${Math.abs(S.delta).toFixed(1)}% 7d</span>` : ""}`);
       parts.push(`epoch <b>${ep}</b> ends in <b>${h}h ${String(m).padStart(2, "0")}m</b>`);
       if (S.rrRank) parts.push(`reward rate <em>#${S.rrRank}</em> of ${S.rrCount} providers`);
-      if (S.rank) parts.push(`network weight <b>#${S.rank}</b> of 100`);
+      if (S.rank) parts.push(`network weight <b>#${S.rank}</b> of ${S.voters ?? "?"}`);
       if (S.stake) parts.push(`validator stake <b>${S.stake}M FLR</b>${S.days != null ? ` · renews in ${S.days}d` : ""}`);
-      parts.push(`uptime <b>100%</b>`);
+      // Was a hardcoded 100%. The validator card on this same page showed the
+      // measured figure, so the two disagreed in plain sight.
+      if (S.uptime != null) parts.push(`uptime <b>${S.uptime.toFixed(1)}%</b>`);
       parts.push(`<em>formerly MirSFlr</em>`);
       const html = parts.map((p) => esc(p)).join('<span style="color:var(--pink);padding:0 14px">◆</span>');
       segA.innerHTML = html; segB.innerHTML = html;
     }
     fetch("/data/network-position.json?v=core-10").then((r) => r.json()).then((np) => {
-      S.rank = np.position && np.position.rank; 
+      S.rank = np.position && np.position.rank;
+      S.voters = np.position && np.position.voters;
       if (np.rewardRate) { S.rrRank = np.rewardRate.rank; S.rrCount = np.rewardRate.count; }
-      if (np.validator) { S.stake = np.validator.totalStakeM.toFixed(0); S.days = Math.max(0, Math.round((new Date(np.validator.stakeEndsAt) - Date.now()) / 864e5)); }
+      if (np.validator) {
+        S.stake = np.validator.totalStakeM.toFixed(0);
+        S.uptime = Number.isFinite(np.validator.uptime) ? np.validator.uptime : null;
+        S.days = Math.max(0, Math.round((new Date(np.validator.stakeEndsAt) - Date.now()) / 864e5));
+      }
       render();
     }).catch(render);
     fetch("https://api.exchange.coinbase.com/products/FLR-USD/candles?granularity=21600").then((r) => r.json()).then((c) => {

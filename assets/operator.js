@@ -123,12 +123,14 @@ const MirhollioCore = (() => {
     return pct.toFixed(decimals) + "%";
   }
 
+  // Two decimals, the same as fmtPct: the hero and the card below it render the
+  // same number, and at one decimal the hero rounded 1.46% up to 1.5%.
   function fmtSnapshotPct(value) {
     const n = Number(value);
     if (!Number.isFinite(n)) return "-";
     const pct = n <= 1 ? n * 100 : n;
-    const rounded = Math.round(pct * 10) / 10;
-    return Math.abs(rounded - 100) < 0.05 ? "100%" : `${rounded.toFixed(1)}%`;
+    const rounded = Math.round(pct * 100) / 100;
+    return Math.abs(rounded - 100) < 0.005 ? "100%" : `${rounded.toFixed(2)}%`;
   }
 
   function fmtPrecisePct(value, decimals = 2) {
@@ -2441,7 +2443,7 @@ const MirhollioCore = (() => {
           el.removeAttribute("aria-busy");
         });
       };
-      write("rewardRateSnapshot", `${(ours * 100).toFixed(1)}%`);
+      write("rewardRateSnapshot", `${(ours * 100).toFixed(2)}%`);
       write("rewardRate", `${(ours * 100).toFixed(2)}%`);
     } catch (_) {}
   }
