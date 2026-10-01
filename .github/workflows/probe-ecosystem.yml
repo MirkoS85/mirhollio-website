@@ -1,0 +1,21 @@
+name: Probe ecosystem
+
+# Read-only research. Asks the public Flare sources what they publish about
+# providers, and fetches other providers' own sites to see what they consider
+# worth showing. Writes nothing and pushes nothing - it only prints.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node scripts/probe-ecosystem.mjs
