@@ -1765,11 +1765,16 @@ const MirhollioCore = (() => {
   }
 
   function rewardWithFiat(value) {
-    return `${fmtNum(value, 2)} FLR<br><small>${fmtFiat(value)}</small>`;
+    // When no price could be read the fiat line was a lone "-" under the FLR
+    // figure, which reads as a broken value rather than a missing conversion.
+    const fiat = fmtFiat(value);
+    return `${fmtNum(value, 2)} FLR${/^[-–—\s]*$/.test(fiat) ? "" : `<br><small>${fiat}</small>`}`;
   }
 
   function rewardRangeWithFiat(minReward, maxReward) {
-    return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR<br><small>${fmtFiat(minReward)} - ${fmtFiat(maxReward)}</small>`;
+    const lo = fmtFiat(minReward), hi = fmtFiat(maxReward);
+    const range = /^[-–—\s]*$/.test(lo) && /^[-–—\s]*$/.test(hi) ? "" : `<br><small>${lo} - ${hi}</small>`;
+    return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR${range}`;
   }
 
   function validatorRewardBreakdown(item, feePct) {
@@ -2039,7 +2044,10 @@ const MirhollioCore = (() => {
     const size = measuredSvgSize(svg, compact ? 420 : 1000, compact ? 218 : 220);
     const width = size.width;
     const height = size.height;
-    const padLeft = compact ? 38 : 58;
+    // 38 left the y-axis labels 4px short on a phone: "100%" is 34px wide and is
+    // right-aligned at padLeft - 8, so its first digit fell off the edge and the
+    // chart read "L00%". 46 clears the widest label the axis can produce.
+    const padLeft = compact ? 46 : 58;
     const padRight = compact ? 12 : 18;
     const padTop = compact ? 14 : 16;
     const padBottom = compact ? 30 : 42;
@@ -2209,7 +2217,10 @@ const MirhollioCore = (() => {
     const size = measuredSvgSize(svg, compact ? 420 : 1000, compact ? 236 : 260);
     const width = size.width;
     const height = size.height;
-    const padLeft = compact ? 38 : 58;
+    // 38 left the y-axis labels 4px short on a phone: "100%" is 34px wide and is
+    // right-aligned at padLeft - 8, so its first digit fell off the edge and the
+    // chart read "L00%". 46 clears the widest label the axis can produce.
+    const padLeft = compact ? 46 : 58;
     const padRight = compact ? 12 : 22;
     const padTop = compact ? 14 : 30;
     const padBottom = compact ? 30 : 44;
