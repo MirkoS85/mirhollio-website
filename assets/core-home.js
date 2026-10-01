@@ -9,16 +9,42 @@
 
   async function jget(u) { const r = await fetch(u, { cache: "no-store" }); if (!r.ok) throw new Error(u + " " + r.status); return r.json(); }
 
+  /* The seven-day shape under the price.
+
+     It used to inset itself four units on each side and fill with a flat
+     rgba, so the shaded area ended in two hard vertical cuts short of the
+     card edge and sat on a hard horizontal one. It runs the full width now
+     and the fill fades out downwards. */
   function spark(svg, pts, { fill = true } = {}) {
     if (!svg || !pts.length) return;
-    const W = 320, H = 74, P = 4;
+    const W = 320, H = 74, TOP = 6, BOT = 4;
     const min = Math.min(...pts), max = Math.max(...pts), rng = max - min || 1;
-    const xy = pts.map((v, i) => [P + (i * (W - 2 * P)) / (pts.length - 1), H - P - ((v - min) / rng) * (H - 2 * P - 8)]);
+    const xy = pts.map((v, i) => [(i * W) / (pts.length - 1), H - BOT - ((v - min) / rng) * (H - TOP - BOT)]);
     const line = xy.map((p) => p.join(",")).join(" ");
-    if (fill) { const path = el("path", { d: `M${xy[0][0]},${H} L` + line.replace(/ /g, " L") + ` L${xy[xy.length-1][0]},${H} Z`, fill: "rgba(255,46,99,.14)" }); svg.appendChild(path); }
-    svg.appendChild(el("polyline", { points: line, fill: "none", stroke: MAG, "stroke-width": 2.2, "stroke-linejoin": "round", filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
+
+    const defs = el("defs");
+    defs.innerHTML = `
+      <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,46,99,.30)"/>
+        <stop offset="100%" stop-color="rgba(255,46,99,0)"/>
+      </linearGradient>
+      <linearGradient id="sparkLine" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(255,46,99,.5)"/>
+        <stop offset="100%" stop-color="#FF2E63"/>
+      </linearGradient>`;
+    svg.appendChild(defs);
+
+    if (fill) {
+      svg.appendChild(el("path", {
+        d: `M${xy[0][0]},${H} L` + line.replace(/ /g, " L") + ` L${xy[xy.length - 1][0]},${H} Z`,
+        fill: "url(#sparkFill)"
+      }));
+    }
+    svg.appendChild(el("polyline", { points: line, fill: "none", stroke: "url(#sparkLine)", "stroke-width": 2.4,
+      "stroke-linejoin": "round", "stroke-linecap": "round", filter: "drop-shadow(0 0 6px rgba(255,46,99,.45))" }));
     const last = xy[xy.length - 1];
-    svg.appendChild(el("circle", { cx: last[0], cy: last[1], r: 3.6, fill: MAGL }));
+    svg.appendChild(el("circle", { cx: last[0], cy: last[1], r: 4.6, fill: "rgba(255,46,99,.25)" }));
+    svg.appendChild(el("circle", { cx: last[0], cy: last[1], r: 3.2, fill: "#FFE6ED" }));
   }
 
   async function price() {
@@ -111,20 +137,79 @@
     }
   }
 
+  /* The capacity dial.
+
+     It used to be two flat rings on a flat disc: a grey track, a pink arc, a
+     grey track, an amber arc. At a glance it read as a loading spinner. It is
+     an instrument now - a tick bezel, a recessed track, a lit arc with a cap
+     marker, and the reading in the middle - and none of it moves, which is
+     the point: it has to carry on a phone with Reduce Motion on. */
   function gauge(svg, fillPct, daysLeft, periodPct) {
     if (!svg) return;
-    const c1 = 2 * Math.PI * 48, c2 = 2 * Math.PI * 34;
-    svg.appendChild(el("circle", { cx: 60, cy: 60, r: 48, fill: "none", stroke: "rgba(255,255,255,.09)", "stroke-width": 11 }));
-    svg.appendChild(el("circle", { cx: 60, cy: 60, r: 48, fill: "none", stroke: MAG, "stroke-width": 11, "stroke-linecap": "round",
-      "stroke-dasharray": `${(c1 * fillPct) / 100} ${c1}`, transform: "rotate(-90 60 60)", filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
-    svg.appendChild(el("circle", { cx: 60, cy: 60, r: 34, fill: "none", stroke: "rgba(255,255,255,.09)", "stroke-width": 7 }));
-    svg.appendChild(el("circle", { cx: 60, cy: 60, r: 34, fill: "none", stroke: AMBER, "stroke-width": 7, "stroke-linecap": "round",
-      "stroke-dasharray": `${(c2 * periodPct) / 100} ${c2}`, transform: "rotate(-90 60 60)" }));
-    const t1 = el("text", { x: 60, y: 58, "text-anchor": "middle", "font-size": 19, "font-weight": 800, fill: "#F4F4F8", "font-family": "Archivo, sans-serif" });
-    t1.textContent = Number.isFinite(fillPct) ? `${Math.round(fillPct)}%` : "-";
-    // "full · 18d left" did not fit inside the ring and was clipped at both
-    // ends. The ring shows how full; the days belong beside it, not within it.
-    const t2 = el("text", { x: 60, y: 75, "text-anchor": "middle", "font-size": fontUnits(svg, 10, 120), fill: MUT });
+    const CX = 60, CY = 60;
+    const pct = Number.isFinite(fillPct) ? Math.max(0, Math.min(100, fillPct)) : null;
+    const period = Number.isFinite(periodPct) ? Math.max(0, Math.min(100, periodPct)) : 0;
+
+    const defs = el("defs");
+    defs.innerHTML = `
+      <linearGradient id="gaugeArc" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FF7FA3"/>
+        <stop offset="55%" stop-color="#FF2E63"/>
+        <stop offset="100%" stop-color="#D81048"/>
+      </linearGradient>
+      <linearGradient id="gaugePeriod" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#FFD27A"/>
+        <stop offset="100%" stop-color="#F2B233"/>
+      </linearGradient>
+      <filter id="gaugeGlow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>`;
+    svg.appendChild(defs);
+
+    // Tick bezel: 48 marks, every sixth one longer. Gives the dial a scale to
+    // read against instead of a bare ring.
+    const ticks = el("g", { opacity: ".5" });
+    for (let i = 0; i < 48; i += 1) {
+      const a = (i / 48) * Math.PI * 2 - Math.PI / 2;
+      const major = i % 6 === 0;
+      const r1 = 57, r2 = major ? 52.5 : 54.5;
+      ticks.appendChild(el("line", {
+        x1: CX + Math.cos(a) * r1, y1: CY + Math.sin(a) * r1,
+        x2: CX + Math.cos(a) * r2, y2: CY + Math.sin(a) * r2,
+        stroke: major ? "rgba(255,255,255,.3)" : "rgba(255,255,255,.13)",
+        "stroke-width": major ? 1.4 : 1, "stroke-linecap": "round"
+      }));
+    }
+    svg.appendChild(ticks);
+
+    const ring = (r, w, stroke, frac, extra) => el("circle", Object.assign({
+      cx: CX, cy: CY, r, fill: "none", stroke, "stroke-width": w, "stroke-linecap": "round",
+      "stroke-dasharray": `${2 * Math.PI * r * frac} ${2 * Math.PI * r}`,
+      transform: `rotate(-90 ${CX} ${CY})`
+    }, extra || {}));
+
+    // Capacity: recessed track, then the lit arc.
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 44, fill: "none", stroke: "rgba(0,0,0,.45)", "stroke-width": 10 }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 44, fill: "none", stroke: "rgba(255,255,255,.07)", "stroke-width": 9 }));
+    if (pct != null) {
+      svg.appendChild(ring(44, 9, "url(#gaugeArc)", pct / 100, { filter: "url(#gaugeGlow)" }));
+      // A bright cap at the end of the arc, so the reading has a needle.
+      const a = (pct / 100) * Math.PI * 2 - Math.PI / 2;
+      svg.appendChild(el("circle", { cx: CX + Math.cos(a) * 44, cy: CY + Math.sin(a) * 44, r: 3.4, fill: "#FFE6ED" }));
+    }
+
+    // Staking period: a thinner inner arc in the warning colour.
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 32, fill: "none", stroke: "rgba(255,255,255,.055)", "stroke-width": 5 }));
+    svg.appendChild(ring(32, 5, "url(#gaugePeriod)", period / 100));
+
+    const t1 = el("text", { x: CX, y: CY + 2, "text-anchor": "middle", "font-size": 21, "font-weight": 800,
+      fill: "#F4F4F8", "font-family": "Archivo, sans-serif", "letter-spacing": "-.5" });
+    t1.textContent = pct != null ? `${Math.round(pct)}%` : "-";
+    // "full \u00b7 18d left" did not fit inside the ring and was clipped at
+    // both ends. The ring shows how full; the days belong beside it.
+    const t2 = el("text", { x: CX, y: CY + 17, "text-anchor": "middle", "font-size": 9, fill: MUT,
+      "font-family": "IBM Plex Mono, monospace", "letter-spacing": ".6" });
     t2.textContent = "taken";
     svg.append(t1, t2);
   }
@@ -335,18 +420,42 @@
     rrCurve($("np-rr-curve"), rr);
     if ($("np-stake-end") && val) $("np-stake-end").textContent = "ends " + val.stakeEndsAt.slice(5).replace("-", "/");
     if ($("np-stake") && val) $("np-stake").innerHTML = fmt(val.totalStakeM, 1) + "M<small> FLR</small>";
-    if ($("np-stake-sub2") && val) $("np-stake-sub2").textContent = `self-bond ${fmt(val.selfBondM,0)}M · ${val.delegators} delegations`;
     const days = val ? Math.max(0, Math.round((new Date(val.stakeEndsAt) - Date.now()) / 864e5)) : null;
     // How full the validator actually is, from the feed that measures it.
     // This used to be the literal 100, so the page told every visitor the node
     // was full while it had millions of FLR of room.
     const fill = Number.isFinite(cap?.fillPct) ? cap.fillPct : null;
     gauge($("np-gauge"), fill, days, days != null ? Math.min(100, 100 - (days / 92) * 100) : 0);
-    if ($("np-stake-sub") && cap) {
-      const freeM = cap.free / 1e6;
-      $("np-stake-sub").textContent = freeM >= 0.01
-        ? `${fmt(freeM, 2)}M FLR still free · ${days}d left`
-        : `at capacity · ${days}d left`;
+
+    // Six facts used to run together across three lines joined by middots -
+    // "self-bond 6M · 83 delegations", "2.18M FLR still free · 18d left",
+    // "uptime 99.75% · APR 1.45%". Nothing lined up and nothing was
+    // scannable. They are a label/value grid now. The uptime and APR spans
+    // are moved rather than rebuilt, so operator.js keeps filling them.
+    const facts = $("np-stake-sub2");
+    if (facts && val) {
+      const freeM = cap ? cap.free / 1e6 : null;
+      const up = document.querySelector('[data-field="validatorUptimeSnapshot"]');
+      const apr = document.querySelector('[data-field="validatorAprSnapshot"]');
+      const row = (label, value) => `<span><i>${label}</i><b>${value}</b></span>`;
+      facts.className = "p-facts";
+      facts.innerHTML =
+        row("self-bond", `${fmt(val.selfBondM, 0)}M`) +
+        row("delegations", val.delegators) +
+        row("free", freeM == null ? "&ndash;" : freeM >= 0.01 ? `${fmt(freeM, 2)}M` : "none") +
+        row("renews in", days == null ? "&ndash;" : `${days}d`) +
+        row("uptime", '<span data-slot="uptime"></span>') +
+        row("APR", '<span data-slot="apr"></span>');
+      const slotUp = facts.querySelector('[data-slot="uptime"]');
+      const slotApr = facts.querySelector('[data-slot="apr"]');
+      if (up && slotUp) slotUp.replaceWith(up);
+      if (apr && slotApr) slotApr.replaceWith(apr);
+      // The two lines these six facts replaced.
+      const spare = $("np-stake-sub");
+      if (spare) spare.remove();
+      const legacy = facts.parentElement && facts.parentElement.querySelector(".p-sub:last-child");
+      if (legacy && legacy !== facts && !legacy.querySelector("[data-field]")) legacy.remove();
+      else if (legacy && legacy !== facts && legacy.childElementCount === 0) legacy.remove();
     }
     // strip
     if ($("np-rank")) $("np-rank").textContent = "#" + p.rank;
@@ -630,8 +739,11 @@
       const uptime = Number.isFinite(avg) ? avg : S.uptime;
       if (uptime != null) parts.push(`uptime <b>${uptime.toFixed(1)}%</b>`);
       parts.push(`<em>formerly MirSFlr</em>`);
-      const html = parts.map((p) => esc(p)).join('<span style="color:var(--pink);padding:0 14px">◆</span>');
+      const html = parts.map((p) => esc(p)).join('<span class="ticker-dot">\u25c6</span>');
       segA.innerHTML = html; segB.innerHTML = html;
+      // The loop length is one segment's width, and that width changes every
+      // time the countdown re-renders.
+      if (typeof window.__tickerMeasure === "function") window.__tickerMeasure();
     }
     fetch("/data/network-position.json?v=core-10").then((r) => r.json()).then((np) => {
       S.rank = np.position && np.position.rank;
@@ -658,55 +770,96 @@
     takePrice(window.__flrPriceState);
     render(); setInterval(render, 30000);
 
-    /* --- watchdog ---------------------------------------------------------
-       The band was reported dead on a phone. The cause found here was a bare
-       :hover pause latching on touch, now fixed in CSS, but a marquee that
-       silently stops is bad enough to be worth a second line of defence: if
-       the compositor is not actually advancing the transform, drive it from
-       rAF instead. Honours reduced motion and stops while off-screen. */
+    /* --- the band itself ---------------------------------------------------
+       This was a CSS animation with a JS watchdog behind it. It was reported
+       dead twice, and the reason was found here: with Reduce Motion on - which
+       many people run on a phone without thinking about it - the stylesheet
+       set `animation:none` and the watchdog was gated behind the same
+       preference, so the strip froze at translate 0, flush left and cut off
+       mid-word. That is worse than either moving or not existing.
+
+       So there is no CSS animation any more. One requestAnimationFrame loop
+       drives it, which also removes any dependence on how a given browser
+       handles a percentage translate on a very wide flex container.
+
+       Reduce Motion is still honoured, but by degree rather than by switching
+       the content off: the strip is a single line of small text moving
+       sideways, not a parallax or a zoom, so it runs at about a third of the
+       speed instead of stopping. A tap pauses it either way, which is what
+       WCAG 2.2.2 asks for; a mouse pauses it on hover. */
     const track = document.getElementById("ticker-track");
-    if (track && !reduced) {
-      const shift = () => {
-        const m = new DOMMatrixReadOnly(getComputedStyle(track).transform);
-        return m.m41;
-      };
-      let raf = 0, last = 0, x = 0, span = 0, visible = true;
-      const SPEED = 62; // px per second, the rate the 46s keyframe worked out to
-      function loop(now) {
-        if (!visible) { raf = 0; return; }
+    const band = track && track.closest(".ticker-band");
+    if (track && band) {
+      track.classList.add("ticker-js");
+      const FAST = 58, SLOW = 20;            // px per second
+      let speed = reduced ? SLOW : FAST;
+      let raf = 0, last = 0, x = 0, span = 0;
+      let onScreen = false, paused = false;
+
+      function measure() {
+        // The track holds the segment twice; one segment's width is the loop.
+        const first = track.firstElementChild;
+        span = first ? first.getBoundingClientRect().width : track.getBoundingClientRect().width / 2;
+      }
+
+      function frame(now) {
+        raf = 0;
+        if (!onScreen || paused || document.hidden) return;
         if (last) {
-          x -= (SPEED * (now - last)) / 1000;
-          if (!span) span = track.getBoundingClientRect().width / 2;
+          if (!span) measure();
+          x -= (speed * Math.min(now - last, 64)) / 1000;   // cap after a tab switch
           if (span && x <= -span) x += span;
           track.style.transform = `translate3d(${x.toFixed(2)}px,0,0)`;
         }
         last = now;
-        raf = requestAnimationFrame(loop);
+        raf = requestAnimationFrame(frame);
       }
-      function takeOver() {
-        if (track.classList.contains("ticker-js")) return;
-        track.classList.add("ticker-js");
-        span = track.getBoundingClientRect().width / 2;
-        last = 0; raf = requestAnimationFrame(loop);
+
+      function run() {
+        if (raf || paused || !onScreen || document.hidden) return;
+        last = 0;
+        raf = requestAnimationFrame(frame);
       }
-      const io = new IntersectionObserver((e) => {
-        visible = e[0].isIntersecting && !document.hidden;
-        if (visible && track.classList.contains("ticker-js") && !raf) { last = 0; raf = requestAnimationFrame(loop); }
-        if (!visible && raf) { cancelAnimationFrame(raf); raf = 0; }
+
+      function stop() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      new IntersectionObserver((entries) => {
+        onScreen = entries[0].isIntersecting;
+        onScreen ? run() : stop();
+      }).observe(band);
+
+      document.addEventListener("visibilitychange", () => (document.hidden ? stop() : run()));
+      addEventListener("resize", () => { measure(); }, { passive: true });
+      // Fonts land after first paint and change the segment width under us.
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+      function setPaused(next) {
+        paused = next;
+        band.classList.toggle("is-paused", paused);
+        band.setAttribute("aria-label", paused ? "Live ticker, paused" : "Live ticker, running");
+        paused ? stop() : run();
+      }
+      // A mouse pauses by hovering and resumes by leaving. A finger has no
+      // hover, so a tap toggles. Without the pointerType check a mouse click
+      // would fire both and cancel itself out.
+      let viaMouse = false;
+      band.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") { viaMouse = true; setPaused(true); } });
+      band.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") { viaMouse = false; setPaused(false); } });
+      band.addEventListener("pointerdown", (e) => { viaMouse = e.pointerType === "mouse"; });
+      band.addEventListener("click", () => { if (!viaMouse) setPaused(!paused); });
+      band.setAttribute("role", "button");
+      band.setAttribute("tabindex", "0");
+      band.setAttribute("aria-label", "Live ticker, running");
+      band.removeAttribute("aria-hidden");
+      band.addEventListener("keydown", (e) => {
+        if (e.key === " " || e.key === "Enter") { e.preventDefault(); setPaused(!paused); }
       });
-      io.observe(track);
-      document.addEventListener("visibilitychange", () => {
-        visible = !document.hidden && track.getBoundingClientRect().bottom > 0;
-        if (visible && track.classList.contains("ticker-js") && !raf) { last = 0; raf = requestAnimationFrame(loop); }
-      });
-      // Two samples a second apart. 62px/s means a working ticker has moved
-      // tens of pixels by then; anything under 2px is stalled.
-      const a = shift();
-      setTimeout(() => {
-        if (document.hidden) return;
-        if (track.getBoundingClientRect().bottom <= 0) return;
-        if (Math.abs(shift() - a) < 2) takeOver();
-      }, 1100);
+
+      window.__tickerMeasure = measure;
+      measure();
     }
   }
 })();

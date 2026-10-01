@@ -261,6 +261,12 @@
     function syncTopHeight() {
       const height = Math.ceil(mobileTop.getBoundingClientRect().height || 0);
       if (height > 0) document.documentElement.style.setProperty("--mobile-top-height", `${height}px`);
+      // --mobile-top-height grows to include the open sheet, so bounding the
+      // sheet by it is a feedback loop: it measured 448px with the sheet open
+      // and capped the sheet at 376px, cutting the last stats row in half.
+      // This one is the bar alone and does not move when the sheet opens.
+      const bar = Math.ceil(row.getBoundingClientRect().bottom || 0);
+      if (bar > 0) document.documentElement.style.setProperty("--mobile-bar-bottom", `${bar}px`);
     }
 
     function setOpen(open) {

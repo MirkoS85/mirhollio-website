@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-36");
+@import url("operator.css?v=core-37");
 
 :root{
   color-scheme:dark;
@@ -5046,7 +5046,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--pink);outline-offse
 .p-big{font-family:Archivo,sans-serif;font-size:32px;font-weight:800;margin:6px 0 2px;color:var(--ink);}
 .p-big small{font-size:14px;color:var(--muted);font-weight:600;}
 .p-sub{font-size:12.5px;color:var(--muted);}
-svg.spark{width:100%;height:64px;display:block;margin-top:8px;overflow:visible;}
+svg.spark{width:100%;height:66px;display:block;margin-top:10px;overflow:visible;}
 .p-gauge-row{display:flex;gap:16px;align-items:center;margin-top:6px;}
 .p-gauge-row svg{width:104px;height:104px;flex:0 0 104px;}
 .np-card{padding:18px 20px;}
@@ -5179,21 +5179,14 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .ticker-band::after{right:0;background:linear-gradient(270deg,var(--bg) 10%,transparent);}
 /* will-change + backface promote the track to its own layer: without it iOS
    Safari has been seen to drop the animation entirely on a long marquee. */
-.ticker-track{display:flex;white-space:nowrap;width:max-content;will-change:transform;backface-visibility:hidden;animation:ticker-run 46s linear infinite;}
-/* This pause used to be a bare :hover. On a touch screen :hover sticks to
-   whatever was last tapped, so one tap on the band froze the ticker for good
-   - which is exactly how it was being reported. Fine pointers only. */
-@media (hover:hover) and (pointer:fine){
-  .ticker-band:hover .ticker-track{animation-play-state:paused;}
-}
-/* Set when the JS watchdog finds the CSS animation is not advancing and takes
-   over with requestAnimationFrame. */
-.ticker-track.ticker-js{animation:none !important;}
+/* No CSS animation: the strip is driven from requestAnimationFrame. A
+   stylesheet animation is switched off wholesale by Reduce Motion, and
+   this strip carries content, not decoration. See assets/core-home.js. */
+.ticker-track{display:flex;white-space:nowrap;width:max-content;will-change:transform;backface-visibility:hidden;}
 .ticker-seg{padding:9px 0 9px 28px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--muted);letter-spacing:.02em;}
 .ticker-seg b{color:var(--text);font-weight:600;}
 .ticker-seg em{font-style:normal;color:var(--pink);}
 .ticker-seg .up{color:var(--green);} .ticker-seg .down{color:var(--danger);}
-@keyframes ticker-run{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
 .band-divider{max-width:var(--max);margin:0 auto;padding:0 24px;height:22px;display:flex;align-items:center;position:relative;}
 .band-divider::before{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,46,99,.38) 18%,rgba(255,46,99,.38) 82%,transparent);}
 .band-divider i{position:absolute;left:50%;top:50%;width:7px;height:7px;transform:translate(-50%,-50%) rotate(45deg);background:var(--pink);box-shadow:0 0 12px rgba(255,46,99,.75);animation:orb-breathe 3.4s ease-in-out infinite;}
@@ -5202,7 +5195,6 @@ article.card > b, .compact-stat b, .reward-lines b, .rewards-metric b,
 .panel:hover::after,.why-card:hover::after{opacity:1;}
 @media (prefers-reduced-motion:reduce){
   .band-divider i{animation:none !important;}
-  .ticker-track{animation:none !important;}
   .panel,.why-card{transition:none;}
 }
 
@@ -6979,4 +6971,599 @@ details.qa .qa-body{
 
 details.qa[open]{
   border-color:var(--edge-pink) !important;
+}
+
+/* ===========================================================================
+   core-37: the navigation sheet, and a ticker that survives Reduce Motion
+   =========================================================================== */
+
+/* --- the ticker band ------------------------------------------------------ */
+.ticker-band{
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.ticker-band:focus-visible{
+  outline:2px solid var(--pink);
+  outline-offset:-2px;
+}
+
+.ticker-dot{
+  color:var(--pink);
+  padding:0 14px;
+  opacity:.75;
+}
+
+/* A paused strip has to say so, or it reads as the broken one it replaced. */
+.ticker-band.is-paused::after{
+  content:"paused";
+  width:auto;
+  padding:0 14px 0 34px;
+  display:flex;
+  align-items:center;
+  font-family:var(--f-mono);
+  font-size:10px;
+  letter-spacing:.08em;
+  color:var(--muted-2);
+  background:linear-gradient(270deg,var(--bg) 58%,transparent);
+}
+
+/* --- the mobile navigation sheet ------------------------------------------
+   It was seven identical full-width boxes with centred text, and the live
+   stats underneath were cut in half: the open state was pinned to a
+   max-height of 420px with overflow hidden, and the content is taller than
+   that, so the "FTSO status" row lost its bottom edge.
+
+   It is a menu now - left-aligned rows on hairlines, one marked as current,
+   and a stats footer that belongs to the sheet. The height is bounded by the
+   viewport rather than by a guess, and it scrolls if it has to. --- */
+@media (max-width:980px){
+  body.mobile-nav-open .mobile-links{
+    max-height:calc(100vh - var(--mobile-bar-bottom, 76px) - 24px) !important;
+    max-height:calc(100dvh - var(--mobile-bar-bottom, 76px) - 24px) !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch;
+    gap:0 !important;
+    margin-top:10px !important;
+    padding:6px !important;
+    border:1px solid var(--edge-1) !important;
+    border-radius:var(--r-lg) !important;
+    background:rgba(14,13,18,.97) !important;
+    box-shadow:0 24px 60px rgba(0,0,0,.6) !important;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+  }
+
+  .mobile-links a{
+    display:flex !important;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:50px !important;
+    padding:0 12px !important;
+    border:0 !important;
+    border-radius:var(--r-sm) !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    text-align:left !important;
+    color:var(--muted) !important;
+    font-size:15px !important;
+    font-weight:600 !important;
+    letter-spacing:-.01em !important;
+  }
+
+  /* Hairlines between rows, not a box around each. */
+  .mobile-links a + a{
+    box-shadow:inset 0 1px 0 var(--edge-1) !important;
+    border-radius:0 !important;
+  }
+
+  .mobile-links a::after{
+    content:"";
+    flex:0 0 auto;
+    width:7px;
+    height:7px;
+    border-right:1.6px solid currentColor;
+    border-top:1.6px solid currentColor;
+    transform:rotate(45deg);
+    opacity:.4;
+  }
+
+  .mobile-links a:active{
+    background:var(--elev-2) !important;
+  }
+
+  .mobile-links a[aria-current="page"]{
+    /* An earlier rule pins this to justify-content:flex-start, which pulled
+       the chevron up against the label instead of to the right edge. */
+    justify-content:space-between !important;
+    color:var(--ink) !important;
+    background:linear-gradient(90deg, rgba(255,46,99,.16), rgba(255,46,99,0) 70%) !important;
+    box-shadow:inset 3px 0 0 var(--pink) !important;
+    border-radius:var(--r-sm) !important;
+    border-left:0 !important;
+  }
+
+  .mobile-links a[aria-current="page"]::after{
+    opacity:1;
+    color:var(--pink);
+  }
+
+  /* The stats belong to the sheet; they sit under a full-width rule and keep
+     their own padding so nothing touches the sheet edge. */
+  .mobile-links .mobile-live{
+    margin:6px -6px -6px !important;
+    padding:12px 18px 14px !important;
+    border:0 !important;
+    border-top:1px solid var(--edge-1) !important;
+    border-radius:0 0 var(--r-lg) var(--r-lg) !important;
+    background:rgba(255,255,255,.022) !important;
+    box-shadow:none !important;
+  }
+
+  .mobile-links .shell-live{
+    gap:9px !important;
+  }
+
+  .mobile-links .shell-live-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-height:20px !important;
+  }
+
+  .mobile-links .shell-live span{
+    font-family:var(--f-mono) !important;
+    font-size:11.5px !important;
+    font-weight:500 !important;
+    letter-spacing:.03em !important;
+    color:var(--muted) !important;
+  }
+
+  .mobile-links .shell-live strong{
+    font-family:var(--f-mono) !important;
+    font-size:13px !important;
+    font-weight:600 !important;
+    font-variant-numeric:tabular-nums;
+    color:var(--ink) !important;
+  }
+}
+
+/* ===========================================================================
+   core-37: material
+
+   The previous round put the character into motion - reveals, a count-up, an
+   aurora, a progress bar. A phone with Reduce Motion switched on gets none of
+   it, and that is the phone this was being judged on. So the character has to
+   be in the static page: light direction, depth, material, weight.
+
+   Nothing below animates. Colours are the declared tokens.
+   =========================================================================== */
+
+:root{
+  /* One light source, from above. Every surface is lit the same way. */
+  --lit:inset 0 1px 0 rgba(255,255,255,.07);
+  --lit-strong:inset 0 1px 0 rgba(255,255,255,.11);
+  --drop-1:0 1px 2px rgba(0,0,0,.4), 0 6px 16px rgba(0,0,0,.28);
+  --drop-2:0 2px 4px rgba(0,0,0,.45), 0 14px 34px rgba(0,0,0,.42);
+  --drop-pink:0 10px 34px rgba(255,46,99,.16);
+}
+
+/* --- tiles ----------------------------------------------------------------
+   Flat fills at a single opacity gave the page no light direction: card,
+   section and background all sat within three per cent of each other. Each
+   tile is now lit from the top, sits a little above the page, and falls away
+   slightly towards its bottom edge. --- */
+.metric,
+.compact-stat,
+article.card,
+.snap-metric,
+.hero-live-tile,
+.proof-tile{
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.022) 42%, rgba(255,255,255,.012)) !important;
+  box-shadow:var(--lit), var(--drop-1) !important;
+}
+
+@media (hover:hover){
+  .metric:hover,
+  .compact-stat:hover,
+  article.card:hover,
+  .snap-metric:hover,
+  .hero-live-tile:hover,
+  .proof-tile:hover{
+    background:linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.035) 42%, rgba(255,255,255,.018)) !important;
+    box-shadow:var(--lit-strong), var(--drop-2) !important;
+  }
+}
+
+/* The one tile that carries the headline number is raised a step and lit
+   pink, so a glance lands on it first. */
+.proof-tile.star,
+.hero-live-link{
+  background:linear-gradient(180deg, rgba(255,46,99,.17), rgba(255,46,99,.05) 55%, rgba(255,46,99,.02)) !important;
+  box-shadow:var(--lit-strong), var(--drop-2), var(--drop-pink) !important;
+}
+
+/* --- panels and frames ---------------------------------------------------- */
+.panel,
+.chart-panel,
+.validator-panel,
+.status-panel,
+.reward-chart-wrap,
+.ftso-delegation-chart-wrap,
+.hourly-chart-wrap,
+.panel-wide-card,
+.dx-book,
+.dx-countdown,
+.contact-card{
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.018) 38%, rgba(255,255,255,.01)) !important;
+  box-shadow:var(--lit), var(--drop-1) !important;
+}
+
+/* A chart frame inside a panel is a well, not another raised card: it reads
+   as recessed so the series on it comes forward. */
+.chart-panel .reward-chart-wrap,
+.chart-panel .hourly-chart-wrap,
+.ftso-delegation-chart-panel .ftso-delegation-chart-wrap{
+  background:linear-gradient(180deg, rgba(0,0,0,.34), rgba(0,0,0,.14)) !important;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.5), inset 0 -1px 0 rgba(255,255,255,.04) !important;
+}
+
+/* --- the page ------------------------------------------------------------
+   A flat #0A0A0E over 5000px banded badly and gave the eye nothing to hold.
+   Two still washes, no animation, and a stronger film of grain than the 2.5%
+   that was effectively invisible. --- */
+body{
+  background:
+    radial-gradient(118% 62% at 50% -12%, rgba(255,46,99,.10), transparent 62%),
+    radial-gradient(80% 46% at 92% 8%, rgba(255,138,92,.045), transparent 70%),
+    linear-gradient(180deg, #0C0A10 0%, #08080C 46%, #0A0810 100%) !important;
+  background-attachment:fixed, fixed, fixed;
+}
+
+body::after{
+  opacity:.055 !important;
+}
+
+/* Alternate sections carry a faint lift so a long page has banding you can
+   read rather than banding the panel happens to produce. */
+.section.light > .inner{
+  position:relative;
+}
+
+.section.light::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.022), transparent 38%, rgba(255,255,255,.012));
+}
+
+.section{
+  position:relative;
+}
+
+/* --- section headings -----------------------------------------------------
+   The counter was a small pink number floating above a heading. It is a
+   proper index now, with a rule that runs out to the edge of the column. --- */
+.section-title h2::before{
+  /* block, not inline-flex: inline put the index on the same line as the
+     heading and it read as "01Proof over promises." */
+  display:block;
+  margin-bottom:10px;
+  font-size:11px;
+  letter-spacing:.18em;
+  opacity:1;
+}
+
+.section-title h2{
+  padding-top:2px;
+}
+
+.section-title h2::after{
+  content:"";
+  display:block;
+  width:56px;
+  height:2px;
+  margin-top:16px;
+  border-radius:2px;
+  background:linear-gradient(90deg, var(--pink), rgba(255,46,99,0));
+}
+
+/* --- the hero -------------------------------------------------------------
+   A still glow behind the headline, and a headline that is actually lit
+   rather than flat white on flat black. --- */
+.home-hero h1,
+.hero.compact h1{
+  /* A narrow range: over four lines a wide one left the last line visibly
+     grey, which reads as a rendering fault rather than as lighting. */
+  background:linear-gradient(176deg, #FFFFFF 10%, #F6F2F4 52%, #D9D2D6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+}
+
+.home-hero::before,
+.hero.compact::before{
+  animation:none !important;
+  background:
+    radial-gradient(46% 52% at 16% 26%, rgba(255,46,99,.26), transparent 68%),
+    radial-gradient(40% 44% at 74% 8%, rgba(255,138,92,.14), transparent 72%) !important;
+  filter:blur(34px) !important;
+  opacity:1 !important;
+}
+
+/* --- the ticker strip -----------------------------------------------------
+   It was a hairline-bordered band on the page colour. It reads as a recessed
+   instrument strip now: darker than the page, lit along its top edge. --- */
+.ticker-band{
+  border-top:1px solid rgba(255,255,255,.07) !important;
+  border-bottom:1px solid rgba(255,255,255,.05) !important;
+  background:linear-gradient(180deg, rgba(0,0,0,.5), rgba(0,0,0,.32)) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -8px 18px rgba(0,0,0,.3);
+}
+
+.ticker-band::before{background:linear-gradient(90deg, #08080C 18%, transparent) !important;}
+.ticker-band::after{background:linear-gradient(270deg, #08080C 18%, transparent) !important;}
+
+.ticker-seg{
+  font-size:12.5px;
+  padding:11px 0 11px 28px;
+}
+
+/* --- the primary action ---------------------------------------------------
+   A flat pink pill became the brightest flat shape on the page. Lit, with a
+   shadow in its own colour, it reads as a button. --- */
+.btn.primary,
+.mobile-row .btn.primary{
+  background:linear-gradient(180deg, #FF4A77, #F51D55) !important;
+  box-shadow:var(--lit-strong), 0 8px 22px rgba(255,46,99,.3) !important;
+  border:0 !important;
+}
+
+.btn.primary:hover{
+  background:linear-gradient(180deg, #FF6089, #FF2E63) !important;
+  box-shadow:var(--lit-strong), 0 10px 28px rgba(255,46,99,.42) !important;
+}
+
+.btn:not(.primary){
+  box-shadow:var(--lit), 0 2px 8px rgba(0,0,0,.3) !important;
+}
+
+/* --- status chips --------------------------------------------------------- */
+.condition-dots span,
+strong.pre-reg-value .pre-reg-pill{
+  box-shadow:var(--lit) !important;
+}
+
+.condition-dots span.ok,
+strong.pre-reg-value .pre-reg-pill.ok{
+  box-shadow:var(--lit), 0 0 18px rgba(53,199,126,.22) !important;
+}
+
+/* --- epoch pills ---------------------------------------------------------- */
+.uptime-pills span{
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02)) !important;
+  box-shadow:var(--lit) !important;
+}
+
+/* --- tables --------------------------------------------------------------- */
+thead th{
+  background:rgba(255,255,255,.028) !important;
+  box-shadow:inset 0 -1px 0 var(--edge-1);
+}
+
+tbody tr + tr td,
+tbody tr + tr th{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+/* "Pre-registered" is the longest status string on the site and it sat one
+   or two pixels wider than the tile it lives in. Smaller, and allowed to
+   wrap rather than run over the edge. */
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::after,
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]::after{
+  font-size:16.5px;
+  white-space:normal;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label],
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]{
+  white-space:normal !important;
+  align-items:flex-start;
+}
+
+.snap-metric strong[data-field="preRegisteredStatus"][data-mobile-label]::before,
+.snap-metric strong[data-field="validatorConnected"][data-mobile-label]::before{
+  margin-top:5px;
+}
+
+/* --- the stake facts ------------------------------------------------------
+   Six numbers that used to run together across three lines joined by middots.
+   A label/value grid: the labels in the same mono as every other label, the
+   values in tabular figures so the two columns line up. --- */
+.p-facts{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:5px 18px;
+  margin-top:10px;
+}
+
+.p-facts > span{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+  padding-bottom:4px;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.055);
+}
+
+.p-facts i{
+  font-style:normal;
+  font-family:var(--f-mono);
+  font-size:10.5px;
+  letter-spacing:.03em;
+  color:var(--muted);
+  white-space:nowrap;
+}
+
+.p-facts b,
+.p-facts [data-field]{
+  font-family:var(--f-mono);
+  font-size:12.5px;
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+  white-space:nowrap;
+}
+
+@media (max-width:420px){
+  .p-facts{grid-template-columns:repeat(2, minmax(0,1fr)); gap:4px 14px;}
+  .p-facts i{font-size:10px;}
+  .p-facts b,.p-facts [data-field]{font-size:12px;}
+}
+
+/* --- panel chips ----------------------------------------------------------
+   "#10 of 78 providers" and "ends 10/19" were loose coloured text floating
+   at the end of a heading row. They are chips, which is what they read as. */
+.p-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 9px;
+  border-radius:999px;
+  border:1px solid rgba(53,199,126,.28);
+  background:rgba(53,199,126,.10);
+  font-family:var(--f-mono);
+  font-size:10.5px;
+  font-weight:500;
+  letter-spacing:.02em;
+  font-variant-numeric:tabular-nums;
+}
+
+.p-chip.amberc{
+  border-color:rgba(242,178,51,.3);
+  background:rgba(242,178,51,.1);
+}
+
+.p-chip:empty{display:none;}
+
+/* --- the panel head ------------------------------------------------------- */
+.p-head{
+  padding-bottom:10px;
+  margin-bottom:2px;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.055);
+}
+
+/* --- section seams --------------------------------------------------------
+   A flat 1px line between sections. A gradient hairline that fades at both
+   ends reads as a seam rather than a border. --- */
+.section + .section::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:6%;
+  right:6%;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.10) 22%, rgba(255,255,255,.10) 78%, transparent);
+}
+
+/* --- the desktop shell ----------------------------------------------------
+   The sidebar was a floating rounded panel with a visible border on all four
+   sides. Lit from the top like everything else, and anchored. --- */
+@media (min-width:981px){
+  .side{
+    background:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012) 40%, rgba(255,255,255,.006)) !important;
+    box-shadow:var(--lit), var(--drop-1) !important;
+    border-color:var(--edge-1) !important;
+  }
+
+  .side .brand{
+    padding-bottom:16px;
+    box-shadow:inset 0 -1px 0 var(--edge-1);
+  }
+
+  .side-live{
+    padding:12px 14px !important;
+    border:1px solid var(--edge-1) !important;
+    border-radius:var(--r-md) !important;
+    background:rgba(0,0,0,.26) !important;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.4) !important;
+  }
+}
+
+/* --- the reward-rate scale ------------------------------------------------ */
+.np-strip,
+#np-rr-curve{
+  margin-top:10px;
+}
+
+/* --- the "why" cards ------------------------------------------------------
+   These were left out of both the tile grid and the material pass: one per
+   row on a phone, centred, flat. They pair up and are lit like everything
+   else, with the icon reading as a key rather than a sticker. --- */
+.why-grid{
+  grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.why-card{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:10px;
+  padding:16px 18px !important;
+  border:1px solid var(--edge-1) !important;
+  border-radius:var(--r-lg) !important;
+  text-align:left !important;
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.022) 42%, rgba(255,255,255,.012)) !important;
+  box-shadow:var(--lit), var(--drop-1) !important;
+}
+
+.why-card .w-ic{
+  width:32px !important;
+  height:32px !important;
+  margin:0 !important;
+  border-radius:10px !important;
+  font-size:14px !important;
+  /* The dark end of the old gradient (#E51450) put the glyph at 4.23:1.
+     Both stops are now at or above the brand pink's own luminance, where the
+     dark ink measures 5.3:1. */
+  background:linear-gradient(180deg, #FF6E93, #FF2E63) !important;
+  box-shadow:var(--lit-strong), 0 6px 16px rgba(255,46,99,.3) !important;
+}
+
+.why-card b{
+  font-family:var(--f-display);
+  font-size:15px;
+  letter-spacing:-.015em;
+}
+
+.why-card p{
+  margin:0 !important;
+  font-size:12.5px !important;
+  line-height:1.45 !important;
+  color:var(--muted) !important;
+}
+
+@media (hover:hover){
+  .why-card:hover{
+    border-color:var(--edge-2) !important;
+    box-shadow:var(--lit-strong), var(--drop-2) !important;
+  }
+}
+
+/* --- the band divider ----------------------------------------------------- */
+.band-divider i{
+  box-shadow:0 0 14px rgba(255,46,99,.8) !important;
+}
+
+/* --- the decision rows ----------------------------------------------------
+   "How to delegate WFLR" and the metric links sit under each role card. They
+   are the step after the numbers, so they read as actions. --- */
+.role-choice summary,
+.decision-btn{
+  box-shadow:var(--lit), 0 2px 8px rgba(0,0,0,.3) !important;
 }

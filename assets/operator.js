@@ -2055,7 +2055,7 @@ const MirhollioCore = (() => {
       <text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${point.epoch}</text>
     `).join("");
     const circles = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5 : 3.6}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="rgba(255, 46, 99,.35)" stroke-width="1.5"></circle>
+      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5.4 : 3.8}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="${index === points.length - 1 ? "#FFE6ED" : "rgba(255, 46, 99,.72)"}" stroke-width="2"></circle>
       <circle cx="${point.x}" cy="${point.y}" r="15" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>
     `).join("");
 
