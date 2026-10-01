@@ -336,7 +336,7 @@
     const gw = (W - L) / hist.length;
     for (const g of [0, 0.5, 1]) {
       const y = T + (H - T - B) * (1 - g);
-      svg.appendChild(el("line", { x1: L, x2: W, y1: y, y2: y, stroke: "rgba(255,255,255,.07)" }));
+      svg.appendChild(el("line", { x1: L, x2: W, y1: y, y2: y, stroke: "rgba(255,255,255,.07)", "stroke-width": fs(1) }));
       const t = el("text", { x: L - 6, y: y + 3, "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(maxW * g); svg.appendChild(t);
     }
     const epochStride = labelStride(hist.length, gw, String(hist[hist.length - 1].epoch).length * fs(11) * 0.62 + 6);
@@ -345,18 +345,24 @@
       const x = L + i * gw + gw / 2;
       const sh = ((h.stakeM * 5) / maxBase) * (H - T - B) * 0.92;
       const wh = Math.max(((h.wflrM) / maxBase) * (H - T - B) * 0.92, 2);
-      svg.appendChild(el("rect", { x: x - 14, y: H - B - sh, width: 18, height: sh, rx: 2, fill: "#4A3540" }));
-      svg.appendChild(el("rect", { x: x + 6, y: H - B - wh, width: 7, height: wh, rx: 2, fill: AMBER }));
+      svg.appendChild(el("rect", { x: x - fs(5), y: H - B - sh, width: fs(6), height: sh, rx: fs(1.5), fill: "#4A3540" }));
+      svg.appendChild(el("rect", { x: x + fs(2), y: H - B - wh, width: fs(2.6), height: wh, rx: fs(1.3), fill: AMBER }));
       if (i % epochStride === 0 || i === hist.length - 1) {
         const tl = el("text", { x, y: H - B + fs(11) + 4, "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "middle" }); tl.textContent = h.epoch; svg.appendChild(tl);
       }
       pts.push([x, T + (H - T - B) * (1 - h.weight / maxW), h.weight]);
     });
-    svg.appendChild(el("polyline", { points: pts.map((p) => p[0] + "," + p[1]).join(" "), fill: "none", stroke: MAG, "stroke-width": 2.4, "stroke-linejoin": "round", filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
+    svg.appendChild(el("polyline", { points: pts.map((p) => p[0] + "," + p[1]).join(" "), fill: "none", stroke: MAG, "stroke-width": fs(2.2), "stroke-linejoin": "round", filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
     pts.forEach((p, i) => {
-      svg.appendChild(el("circle", { cx: p[0], cy: p[1], r: 3.6, fill: MAG }));
+      svg.appendChild(el("circle", { cx: p[0], cy: p[1], r: fs(3), fill: MAG }));
       if (i === 0 || i === pts.length - 1 || Math.abs(pts[Math.max(i-1,0)][2] - p[2]) > 15) {
-        const t = el("text", { x: p[0], y: Math.max(p[1] - 9, T + fs(11)), "font-size": fs(11), "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": "middle" }); t.textContent = p[2].toFixed(1); svg.appendChild(t);
+        // A centred label on the first or last point hangs half its width off
+        // the chart and gets clipped by the frame, so those two anchor to the
+        // edge they sit against.
+        const first = i === 0, lastPoint = i === pts.length - 1;
+        const anchor = first ? "start" : lastPoint ? "end" : "middle";
+        const tx = first ? Math.max(p[0] - fs(6), L) : lastPoint ? Math.min(p[0] + fs(6), W) : p[0];
+        const t = el("text", { x: tx, y: Math.max(p[1] - fs(8), T + fs(11)), "font-size": fs(11), "font-weight": 700, fill: MAGL, "font-family": "Archivo, sans-serif", "text-anchor": anchor }); t.textContent = p[2].toFixed(1); svg.appendChild(t);
       }
     });
   }
@@ -377,16 +383,16 @@
     const x = (d) => L + ((new Date(d).getTime() - t0) / (t1 - t0)) * (W - L - 8);
     const y = (v) => T + (H - T - B) * (1 - v / start);
     for (const g of [0, 0.5, 1]) {
-      svg.appendChild(el("line", { x1: L, x2: W, y1: y(start * g), y2: y(start * g), stroke: "rgba(255,255,255,.07)" }));
+      svg.appendChild(el("line", { x1: L, x2: W, y1: y(start * g), y2: y(start * g), stroke: "rgba(255,255,255,.07)", "stroke-width": fs(1) }));
       const t = el("text", { x: L - 6, y: y(start * g) + (g === 0 ? -5 : 3), "font-size": fs(11), fill: MUT, "font-family": mono, "text-anchor": "end" }); t.textContent = Math.round(start * g) + "M"; svg.appendChild(t);
     }
     let d = `M${L},${y(start)}`; let cur = start;
     for (const s of steps) { d += ` H${Math.max(x(s.date), L)}`; cur = s.remainingM + (s.date < val.stakeEndsAt ? val.selfBondM : 0); d += ` V${y(Math.max(cur, 0))}`; }
     d += ` H${W - 8}`;
     svg.appendChild(el("path", { d: d + ` V${y(0)} H${L} Z`, fill: "rgba(255,46,99,.10)" }));
-    svg.appendChild(el("path", { d, fill: "none", stroke: MAG, "stroke-width": 2.4, filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
+    svg.appendChild(el("path", { d, fill: "none", stroke: MAG, "stroke-width": fs(2.2), filter: "drop-shadow(0 0 5px rgba(255,46,99,.5))" }));
     const xe = x(val.stakeEndsAt);
-    svg.appendChild(el("line", { x1: xe, x2: xe, y1: T, y2: y(0), stroke: AMBER, "stroke-dasharray": "4 4" }));
+    svg.appendChild(el("line", { x1: xe, x2: xe, y1: T, y2: y(0), stroke: AMBER, "stroke-width": fs(1.4), "stroke-dasharray": `${fs(4)} ${fs(4)}` }));
     // At a legible size the full sentence no longer fits the panel, so keep the
     // date and trim the prose, and hold the text inside the left edge.
     const annFont = fs(10.5);

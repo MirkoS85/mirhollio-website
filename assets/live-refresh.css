@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-37");
+@import url("operator.css?v=core-38");
 
 :root{
   color-scheme:dark;
@@ -7566,4 +7566,361 @@ tbody tr + tr th{
 .role-choice summary,
 .decision-btn{
   box-shadow:var(--lit), 0 2px 8px rgba(0,0,0,.3) !important;
+}
+
+/* ===========================================================================
+   core-38
+   =========================================================================== */
+
+/* --- the strip under the header ------------------------------------------
+   `main` carries a panel treatment - its own fill, a 1px top border and a
+   shadow - which is right for the desktop column beside the sidebar. On a
+   phone `main` is the whole page, so that fill painted a 58px band between
+   the header and the point where the hero's glow starts, with a hard edge at
+   each end. That is the strip. There is no panel on a phone. --- */
+@media (max-width:980px){
+  main{
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+
+  main::before{
+    display:none !important;
+  }
+}
+
+/* --- room around the headings --------------------------------------------
+   The kicker sat 8px under the header and the heading ran straight into its
+   own lead. Each part gets air, and the first screen of a sub-page starts
+   where the eye expects it to. --- */
+.hero,
+.hero.compact,
+.home-hero{
+  padding-top:0 !important;
+}
+
+.home-hero-section > .inner{
+  padding-top:40px !important;
+}
+
+@media (min-width:981px){
+  .home-hero-section > .inner{
+    padding-top:52px !important;
+  }
+}
+
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:18px !important;
+}
+
+.hero h1,
+.home-hero h1{
+  margin:0 0 20px !important;
+}
+
+.hero .lead,
+.home-hero .lead{
+  margin:0 !important;
+}
+
+.section-title h2{
+  margin:0 !important;
+}
+
+/* --- the epoch cards ------------------------------------------------------
+   Three equal columns for "FTSO reward", "Reward rate" and "Eligible" left a
+   quarter of every card empty, because the third value is the word Yes. The
+   eligibility moves up beside the epoch number as a chip, and the two figures
+   that matter take half the width each. --- */
+@media (max-width:620px){
+  .ftso-epoch-table tbody tr,
+  .np-table tbody tr{
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+    gap:10px 16px !important;
+  }
+
+  .ftso-epoch-table tbody th:first-child,
+  .np-table tbody th:first-child{
+    display:flex !important;
+    align-items:baseline;
+    /* Not space-between: with the label, the number and the chip all in the
+       row that spread the number into the middle of nowhere. The label and
+       the number stay together and the chip is pushed to the edge. */
+    justify-content:flex-start !important;
+    gap:9px;
+    padding-bottom:9px !important;
+    box-shadow:inset 0 -1px 0 var(--edge-1);
+    font-family:var(--f-display);
+    font-size:17px;
+    font-weight:800;
+    letter-spacing:-.02em;
+    color:var(--ink);
+  }
+
+  .ftso-epoch-table tbody th:first-child::before,
+  .np-table tbody th:first-child::before{
+    align-self:center;
+  }
+
+  .ftso-epoch-table tbody th:first-child::after,
+  .np-table tbody th:first-child::after{
+    margin-left:auto;
+    align-self:center;
+  }
+
+  /* The epoch number is the card's title, so it takes the display face. */
+  .ftso-epoch-table tbody th:first-child::after,
+  .np-table tbody th:first-child::after{
+    content:attr(data-eligible);
+    font-family:var(--f-mono);
+    font-size:10.5px;
+    font-weight:500;
+    letter-spacing:.04em;
+    padding:3px 9px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  .ftso-epoch-table tbody th:first-child[data-eligible="Yes"]::after,
+  .np-table tbody th:first-child[data-eligible="Yes"]::after{
+    color:var(--green);
+    border:1px solid rgba(53,199,126,.32);
+    background:rgba(53,199,126,.1);
+  }
+
+  .ftso-epoch-table tbody th:first-child[data-eligible="No"]::after,
+  .np-table tbody th:first-child[data-eligible="No"]::after{
+    color:var(--danger);
+    border:1px solid rgba(255,98,66,.34);
+    background:rgba(255,98,66,.1);
+  }
+
+  .ftso-epoch-table tbody th:first-child:not([data-eligible])::after{
+    content:none;
+  }
+
+  /* The column it came from is now redundant. */
+  .ftso-epoch-table tbody td[data-label="Eligible"],
+  .np-table tbody td[data-label="Eligible"]{
+    display:none !important;
+  }
+
+  .ftso-epoch-table tbody td,
+  .np-table tbody td{
+    gap:4px !important;
+  }
+
+  .ftso-epoch-table tbody td strong,
+  .np-table tbody td strong,
+  .ftso-epoch-table tbody td{
+    font-size:16px;
+  }
+}
+
+/* --- the hero glow --------------------------------------------------------
+   The glow lived on `.home-hero`, which clips its own overflow, so the blur
+   was cut off dead straight along the hero's top edge and left a seam about
+   55px below the header. It belongs to the section, which starts directly
+   under the header, so there is nothing for it to butt against. --- */
+.home-hero::before,
+.hero.compact::before{
+  content:none !important;
+}
+
+.home-hero-section{
+  position:relative;
+}
+
+.home-hero-section::before{
+  content:"";
+  position:absolute;
+  /* Anchored at the section's own top edge, which is the header: there is
+     nothing above it for the blur to be cut against. */
+  inset:0 -14% auto -20%;
+  height:104%;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(52% 62% at 14% 18%, rgba(255,46,99,.38), transparent 68%),
+    radial-gradient(44% 50% at 82% 0%, rgba(255,138,92,.2), transparent 72%);
+  filter:blur(30px);
+}
+
+/* The section's own children sit above the glow. */
+.home-hero-section > .inner{
+  position:relative;
+  z-index:1;
+}
+
+/* --- the minimal-conditions table ----------------------------------------
+   Two faults, both visible as soon as the table is scrolled sideways.
+
+   The first column is sticky and has to be opaque, or the epoch columns
+   slide underneath and show through it - which is what was happening:
+   "E430", "Condition" and "E431" were painted on top of each other. The
+   design layer had given every `thead th` a 2.8% translucent fill with
+   !important, which beat the opaque colour this column needs.
+
+   The second: every row label was set in the brand pink. Seven pink labels
+   down the left of a table is the loudest thing on the page and says
+   nothing - they are labels, and labels on this site are muted. --- */
+.condition-history-table th:first-child,
+.condition-history-table td:first-child{
+  background:#13101A !important;
+  box-shadow:1px 0 0 var(--edge-1) !important;
+  color:var(--muted) !important;
+}
+
+.condition-history-header th:first-child,
+.condition-history-table thead th:first-child{
+  background:#191320 !important;
+  box-shadow:1px 0 0 var(--edge-1), inset 0 -1px 0 var(--edge-1) !important;
+  z-index:3 !important;
+}
+
+.condition-history-header th{
+  color:var(--muted) !important;
+  font-family:var(--f-mono) !important;
+  font-size:var(--t-micro) !important;
+  font-weight:500 !important;
+}
+
+/* The scroll is not obvious on a phone, so the frame says there is more. */
+.condition-history-wrap{
+  position:relative;
+}
+
+.condition-history-wrap::after{
+  content:"";
+  position:absolute;
+  top:0;
+  right:0;
+  bottom:0;
+  width:28px;
+  pointer-events:none;
+  background:linear-gradient(270deg, rgba(10,8,14,.85), transparent);
+}
+
+/* --- the chart summary ----------------------------------------------------
+   Label, figure and the fiat conversion on one line each, rather than the
+   conversion dropping onto a line of its own and turning three entries into
+   six on a phone. --- */
+.chart-summary{
+  display:grid;
+  gap:6px;
+}
+
+.chart-summary > span{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding-bottom:5px;
+  box-shadow:inset 0 -1px 0 rgba(255,255,255,.055);
+}
+
+.chart-summary > span:last-child{
+  box-shadow:none;
+  padding-bottom:0;
+}
+
+.chart-summary strong{
+  display:inline-flex;
+  align-items:baseline;
+  gap:8px;
+  font-size:13.5px;
+  color:var(--ink);
+  white-space:nowrap;
+}
+
+.chart-summary small{
+  display:inline;
+  font-family:var(--f-mono);
+  font-size:11px;
+  font-weight:500;
+  color:var(--muted);
+}
+
+@media (min-width:760px){
+  .chart-summary{
+    grid-template-columns:repeat(3, minmax(0,1fr));
+    gap:0 18px;
+  }
+
+  .chart-summary > span{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:3px;
+    justify-content:flex-start;
+    padding-bottom:0;
+    box-shadow:none;
+  }
+}
+
+/* --- the entity address rows ---------------------------------------------
+   A 42-character address and a copy button shared one 342px row, so the
+   address was squeezed to the point of being hard to read. The address gets
+   the row; the button sits under it, aligned right. --- */
+@media (max-width:760px){
+  [data-render="entity-address-table"] td.ea-addr{
+    display:grid !important;
+    grid-template-columns:1fr;
+    gap:8px;
+    align-items:stretch;
+  }
+
+  .ea-code{
+    font-size:13px !important;
+    line-height:1.45;
+    word-break:break-all;
+  }
+
+  [data-render="entity-address-table"] td.ea-addr .addr-copy{
+    justify-self:start;
+    min-height:36px;
+  }
+}
+
+/* The address itself: the site's mono at a normal weight. It was being set at
+   850, which no mono face carries, so the browser synthesised a heavy bold
+   and the hex read as a smear. */
+.entity-address-table code,
+.ea-code{
+  font-family:var(--f-mono) !important;
+  font-weight:500 !important;
+  letter-spacing:0 !important;
+  color:var(--ink) !important;
+}
+
+/* The copy control was an unlabelled icon in a 56px box with nothing beside
+   it. Icon plus word, sized like every other secondary button. */
+.addr-copy{
+  display:inline-flex !important;
+  align-items:center;
+  gap:7px;
+  width:auto !important;
+  min-height:38px !important;
+  padding:0 14px !important;
+  border:1px solid var(--edge-1) !important;
+  border-radius:999px !important;
+  background:var(--elev-1) !important;
+  box-shadow:var(--lit) !important;
+  color:var(--muted) !important;
+  font-family:var(--f-text);
+  font-size:12.5px;
+  font-weight:600;
+}
+
+.addr-copy::after{
+  content:"Copy";
+}
+
+.addr-copy:hover{
+  border-color:var(--edge-pink) !important;
+  color:var(--ink) !important;
 }

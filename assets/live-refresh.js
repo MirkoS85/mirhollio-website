@@ -22,6 +22,20 @@
     });
   }
 
+  /* The epoch cards fold their "Eligible" column up into the title row as a
+     chip, which needs the value on the row header. CSS cannot read a sibling
+     cell, so it is copied onto a data attribute here. */
+  function liftEligibility(root = document) {
+    root.querySelectorAll(".ftso-epoch-table tbody tr, .np-table tbody tr").forEach(row => {
+      const cell = row.querySelector('td[data-label="Eligible"]');
+      const head = row.querySelector("th");
+      if (!head) return;
+      const value = cell ? (cell.textContent || "").trim() : "";
+      if (value && value !== "-") head.setAttribute("data-eligible", value);
+      else head.removeAttribute("data-eligible");
+    });
+  }
+
   function tightenLongValues(root = document) {
     root.querySelectorAll(targets.join(", ")).forEach(el => {
       if (el.classList.contains("pre-reg-value")) return;
@@ -719,6 +733,7 @@
 
   function boot() {
     formatFlrUnits();
+    liftEligibility();
     simplifyConditionDots();
     tightenLongValues();
     formatPassStrikeValues();
@@ -743,6 +758,7 @@
       for (const mutation of mutations) {
         if (mutation.type === "childList" || mutation.type === "characterData") {
           formatFlrUnits();
+          liftEligibility();
           simplifyConditionDots();
           tightenLongValues();
           formatPassStrikeValues();

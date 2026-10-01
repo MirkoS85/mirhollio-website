@@ -1529,13 +1529,16 @@ const MirhollioCore = (() => {
     const height = fitHeight(svg, width, 320);
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     const fs = (px) => fontUnits(svg, px, width);
+    // Geometry in CSS pixels, like the type: this box is scaled down three
+    // times on a phone, so a literal radius renders at a third of itself.
+    const u = (px) => fs(px);
     const axisFont = fs(13);
     // Leave room for the widest axis label instead of a fixed gutter.
     const padLeft = Math.max(78, 14 + 7 * axisFont * 0.62);
     const padRight = Math.max(72, 14 + 5 * axisFont * 0.62);
     // Keep the second legend marker clear of the first label at any font size.
     const legendGap = axisFont * 0.8 + "Vote power".length * axisFont * 0.62 + axisFont * 1.2;
-    const padTop = Math.max(34, axisFont * 1.5);
+    const padTop = Math.max(56, axisFont * 2.6);
     const padBottom = 48;
     const plotW = width - padLeft - padRight;
     const plotH = height - padTop - padBottom;
@@ -1578,11 +1581,22 @@ const MirhollioCore = (() => {
       const point = points[index];
       return `<text x="${point.x}" y="${height - 12}" text-anchor="middle" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${formatChartMonth(point.timestamp)}</text>`;
     }).join("");
-    const markers = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.delegatedY}" r="${index === points.length - 1 ? 5 : 4}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="#FF2E63" stroke-width="2"></circle>
-      <circle cx="${point.x}" cy="${point.delegatorsY}" r="3.5" fill="#35C77E"></circle>
-      <circle cx="${point.x}" cy="${Math.min(point.delegatedY, point.delegatorsY)}" r="18" fill="transparent" data-delegation-index="${index}" style="cursor:pointer"></circle>
-    `).join("");
+    // Fifty-odd epochs across a 330px phone puts the points 6px apart, and
+    // once each one is big enough to see they merge into a sausage. Markers
+    // are drawn only where they are at least 13px apart; the latest point is
+    // always drawn, and every point keeps its invisible hit target so the
+    // tooltip still reaches all of them.
+    const renderedWidth = svg.getBoundingClientRect().width || width;
+    const stepPx = renderedWidth / Math.max(points.length - 1, 1);
+    const every = Math.max(1, Math.ceil(13 / Math.max(stepPx, 1)));
+    const markers = points.map((point, index) => {
+      const latest = index === points.length - 1;
+      const show = latest || index % every === 0;
+      return `
+      ${show ? `<circle cx="${point.x}" cy="${point.delegatedY}" r="${u(latest ? 4.6 : 3.2)}" fill="${latest ? "#FF2E63" : "#0E0C12"}" stroke="#FF2E63" stroke-width="${u(1.8)}"></circle>` : ""}
+      ${show ? `<circle cx="${point.x}" cy="${point.delegatorsY}" r="${u(2.8)}" fill="#35C77E"></circle>` : ""}
+      <circle cx="${point.x}" cy="${Math.min(point.delegatedY, point.delegatorsY)}" r="${u(17)}" fill="transparent" data-delegation-index="${index}" style="cursor:pointer"></circle>`;
+    }).join("");
 
     svg.innerHTML = `
       <defs>
@@ -1595,14 +1609,14 @@ const MirhollioCore = (() => {
       ${leftLabels}
       ${rightLabels}
       <polygon points="${area}" fill="url(#ftsoDelegationFill)"></polygon>
-      <polyline points="${voteLine}" fill="none" stroke="#FF2E63" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></polyline>
-      <polyline points="${delegatorLine}" fill="none" stroke="#35C77E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="7 7"></polyline>
+      <polyline points="${voteLine}" fill="none" stroke="#FF2E63" stroke-width="${u(2.6)}" stroke-linejoin="round" stroke-linecap="round"></polyline>
+      <polyline points="${delegatorLine}" fill="none" stroke="#35C77E" stroke-width="${u(2)}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${u(6)} ${u(6)}"></polyline>
       ${markers}
       ${xLabels}
-      <g transform="translate(${padLeft},${axisFont * 0.75})">
-        <circle cx="0" cy="0" r="${axisFont * 0.32}" fill="#FF2E63"></circle>
+      <g transform="translate(${padLeft},${padTop * 0.34})">
+        <circle cx="0" cy="0" r="${u(4)}" fill="#FF2E63"></circle>
         <text x="${axisFont * 0.8}" y="${axisFont * 0.36}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">Vote power</text>
-        <circle cx="${legendGap}" cy="0" r="${axisFont * 0.32}" fill="#35C77E"></circle>
+        <circle cx="${legendGap}" cy="0" r="${u(4)}" fill="#35C77E"></circle>
         <text x="${legendGap + axisFont * 0.8}" y="${axisFont * 0.36}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">Delegators</text>
       </g>
     `;
@@ -1793,12 +1807,14 @@ const MirhollioCore = (() => {
     // When no price could be read the fiat line was a lone "-" under the FLR
     // figure, which reads as a broken value rather than a missing conversion.
     const fiat = fmtFiat(value);
-    return `${fmtNum(value, 2)} FLR${/^[-–—\s]*$/.test(fiat) ? "" : `<br><small>${fiat}</small>`}`;
+    // A <br> put the conversion on a line of its own, so three summary
+    // entries became six lines on a phone. It sits beside the figure.
+    return `${fmtNum(value, 2)} FLR${/^[-–—\s]*$/.test(fiat) ? "" : `<small>${fiat}</small>`}`;
   }
 
   function rewardRangeWithFiat(minReward, maxReward) {
     const lo = fmtFiat(minReward), hi = fmtFiat(maxReward);
-    const range = /^[-–—\s]*$/.test(lo) && /^[-–—\s]*$/.test(hi) ? "" : `<br><small>${lo} - ${hi}</small>`;
+    const range = /^[-–—\s]*$/.test(lo) && /^[-–—\s]*$/.test(hi) ? "" : `<small>${lo}&thinsp;&ndash;&thinsp;${hi}</small>`;
     return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR${range}`;
   }
 
@@ -2047,17 +2063,26 @@ const MirhollioCore = (() => {
     const areaPath = `M${points[0].x} ${height - padBottom} ${linePath.replace(/^M/, "L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
     const last = series[series.length - 1];
     const avgY = height - padBottom - ((avgReward - minReward) / range) * plotH;
+    // Everything geometric is declared in CSS pixels and converted into
+    // viewBox units, the same way the type already was. Without it a 3.4-unit
+    // stroke and a 3.8-unit marker render at 1.1px and 1.2px on a phone,
+    // where the box is scaled down threefold - which is why the points
+    // disappeared under the line.
+    const u = (px) => fs(px);
     const grid = [0, 1, 2, 3].map(i => {
       const y = padTop + plotH * (i / 3);
-      return `<line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="rgba(255,255,255,.10)" />`;
+      return `<line x1="${padX}" y1="${y}" x2="${width - padX}" y2="${y}" stroke="rgba(255,255,255,.07)" stroke-width="${u(1)}" />`;
     }).join("");
     const labels = [points[0], points[Math.floor(points.length / 2)], points[points.length - 1]].map(point => `
       <text x="${point.x}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${point.epoch}</text>
     `).join("");
-    const circles = points.map((point, index) => `
-      <circle cx="${point.x}" cy="${point.y}" r="${index === points.length - 1 ? 5.4 : 3.8}" fill="${index === points.length - 1 ? "#FF2E63" : "#0A0A0E"}" stroke="${index === points.length - 1 ? "#FFE6ED" : "rgba(255, 46, 99,.72)"}" stroke-width="2"></circle>
-      <circle cx="${point.x}" cy="${point.y}" r="15" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>
-    `).join("");
+    const circles = points.map((point, index) => {
+      const latest = index === points.length - 1;
+      return `
+      ${latest ? `<circle cx="${point.x}" cy="${point.y}" r="${u(9)}" fill="rgba(255,46,99,.22)"></circle>` : ""}
+      <circle cx="${point.x}" cy="${point.y}" r="${u(latest ? 4.6 : 3.4)}" fill="${latest ? "#FF2E63" : "#0E0C12"}" stroke="${latest ? "#FFE6ED" : "#FF2E63"}" stroke-width="${u(latest ? 2 : 1.8)}"></circle>
+      <circle cx="${point.x}" cy="${point.y}" r="${u(17)}" fill="transparent" data-chart-index="${index}" style="cursor:pointer"></circle>`;
+    }).join("");
 
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
@@ -2068,14 +2093,14 @@ const MirhollioCore = (() => {
           <stop offset="100%" stop-color="#FF2E63" />
         </linearGradient>
         <linearGradient id="${gradientId}FillGrad" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stop-color="rgba(255, 46, 99,.28)" />
-          <stop offset="100%" stop-color="rgba(255, 46, 99,.02)" />
+          <stop offset="0%" stop-color="rgba(255, 46, 99,.20)" />
+          <stop offset="100%" stop-color="rgba(255, 46, 99,0)" />
         </linearGradient>
       </defs>
       ${grid}
-      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 46, 99,.48)" stroke-dasharray="6 6" />
+      <line x1="${padX}" y1="${avgY}" x2="${width - padX}" y2="${avgY}" stroke="rgba(255, 46, 99,.5)" stroke-width="${u(1.2)}" stroke-dasharray="${u(5)} ${u(5)}" />
       <path d="${areaPath}" fill="url(#${gradientId}FillGrad)"></path>
-      <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"></path>
+      <path d="${linePath}" fill="none" stroke="url(#${gradientId}LineGrad)" stroke-width="${u(2.6)}" stroke-linejoin="round" stroke-linecap="round"></path>
       ${circles}
       ${labels}
       <!-- The two axis figures were drawn before the area fill, so the fill
@@ -2265,12 +2290,20 @@ const MirhollioCore = (() => {
     const line = `<path class="hourly-line" d="${linePath}" fill="none" stroke="#FF2E63" stroke-width="${compact ? 3.2 : 3.6}" stroke-linecap="round" stroke-linejoin="round"></path>`;
     const area = `<path class="hourly-area" d="${areaPath}" fill="rgba(255, 46, 99,.12)"></path>`;
 
+    // Twenty-four hours across a 330px phone puts the points 12px apart; a
+    // marker on each one merges into a chain, which is how this chart has
+    // been reading. Draw them where they are at least 16px apart, always
+    // including the latest, and keep every hit target so the tooltip still
+    // reaches each hour.
+    const stepPx = chartW / Math.max(series.length - 1, 1);
+    const markEvery = Math.max(1, Math.ceil(16 / Math.max(stepPx, 1)));
     const markers = points.map((point, index) => {
       const label = hourlyAvailabilityLabel(index, series.length);
       const isLatest = index === series.length - 1;
+      const show = isLatest || index % markEvery === 0;
       return `
         <g class="hourly-point" tabindex="0" data-chart-index="${index}" data-label="${label}" data-value="${pct(point.value)}" aria-label="${label} ${metricLabel}: ${pct(point.value)}">
-          <circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.8 : 5.6) : (compact ? 3.8 : 4.5)}" fill="${isLatest ? "#FF2E63" : "#0A0A0E"}" stroke="#FF2E63" stroke-width="${compact ? 2.6 : 2.8}"></circle>
+          ${show ? `<circle class="hourly-dot" cx="${point.x}" cy="${point.y}" r="${isLatest ? (compact ? 4.4 : 5.2) : (compact ? 3.2 : 4)}" fill="${isLatest ? "#FF2E63" : "#0E0C12"}" stroke="${isLatest ? "#FFE6ED" : "#FF2E63"}" stroke-width="${compact ? 1.8 : 2.2}"></circle>` : ""}
           <rect class="hourly-hit" x="${point.x - Math.max(10, barW / 2)}" y="${padTop}" width="${Math.max(20, barW)}" height="${chartH}" fill="transparent"></rect>
         </g>
       `;
@@ -2327,9 +2360,15 @@ const MirhollioCore = (() => {
   function renderHourlyPerformanceChart({ svg, tooltip, summary, provider }) {
     if (!svg) return;
     const rawSeries = [
+      // All three were drawn in the same pink with a marker on every point, so
+      // the dash patterns meant to tell them apart were hidden under the
+      // markers and the chart read as one thick braid. One ramp, three
+      // weights: the headline series in the brand pink with points on it, the
+      // two bands lighter, thinner and dashed, without points.
       {
         key: "performance",
         label: "Performance",
+        short: "Performance",
         values: provider?.ftsoPerformance?.performance1h,
         color: "#FF2E63",
         dash: ""
@@ -2337,16 +2376,18 @@ const MirhollioCore = (() => {
       {
         key: "primary",
         label: "Primary band (IQR)",
+        short: "Primary",
         values: provider?.ftsoPerformance?.performance1_1h,
-        color: "#FF2E63",
-        dash: "8 7"
+        color: "#FFA8C0",
+        dash: "9 6"
       },
       {
         key: "secondary",
         label: "Secondary band",
+        short: "Secondary",
         values: provider?.ftsoPerformance?.performance2_1h,
-        color: "#FF2E63",
-        dash: "8 7"
+        color: "#9AA0AF",
+        dash: "2.5 5"
       }
     ].map(series => ({
       ...series,
@@ -2372,7 +2413,7 @@ const MirhollioCore = (() => {
     const padLeft = compact ? 46 : 58;
     const padRight = compact ? 12 : 22;
     const padTop = compact ? 14 : 30;
-    const padBottom = compact ? 30 : 44;
+    const padBottom = compact ? 48 : 44;
     const chartW = width - padLeft - padRight;
     const chartH = height - padTop - padBottom;
     const ticks = compact ? [1, 0.8, 0.6, 0.4, 0.2, 0] : [1, 0.8, 0.6, 0.4, 0.2, 0];
@@ -2383,19 +2424,26 @@ const MirhollioCore = (() => {
     const grid = ticks.map(tick => {
       const y = yFor(tick);
       return `
-        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255, 46, 99,.11)" />
+        <line x1="${padLeft}" y1="${y}" x2="${width - padRight}" y2="${y}" stroke="rgba(255,255,255,.07)" />
         <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${Math.round(tick * 100)}%</text>
       `;
     }).join("");
 
+    // Twenty-four points across a 330px phone sit 12px apart, so a marker on
+    // each one merges into a chain. Markers go on the headline series only,
+    // and only where they are far enough apart to read as points.
+    const stepPx = chartW / Math.max(count - 1, 1);
+    const markEvery = Math.max(1, Math.ceil(16 / Math.max(stepPx, 1)));
     const lines = series.map(item => {
       const points = item.values.map((value, index) => `${xFor(index)},${yFor(value)}`).join(" ");
-      const circles = item.values.map((value, index) => `
-        <circle cx="${xFor(index)}" cy="${yFor(value)}" r="4" fill="#0A0A0E" stroke="${item.color}" stroke-width="2"></circle>
-      `).join("");
+      const circles = item.key !== "performance" ? "" : item.values.map((value, index) => {
+        const latest = index === item.values.length - 1;
+        if (!latest && index % markEvery !== 0) return "";
+        return `<circle cx="${xFor(index)}" cy="${yFor(value)}" r="${latest ? 4.4 : 3.2}" fill="${latest ? "#FF2E63" : "#0E0C12"}" stroke="${latest ? "#FFE6ED" : item.color}" stroke-width="1.8"></circle>`;
+      }).join("");
       return `
         <g class="performance-line performance-line-${item.key}">
-          <polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.key === "performance" ? 4 : 3}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${item.dash}" opacity="${item.key === "performance" ? 1 : .92}"></polyline>
+          <polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="${item.key === "performance" ? 2.8 : 1.8}" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="${item.dash}" opacity="${item.key === "performance" ? 1 : .85}"></polyline>
           ${circles}
         </g>
       `;
@@ -2412,13 +2460,29 @@ const MirhollioCore = (() => {
     const labels = Array.from({ length: count }, (_, index) => {
       const interval = compact ? 6 : 3;
       if (index % interval !== 0 && index !== count - 1) return "";
-      return `<text x="${xFor(index)}" y="${height - 8}" text-anchor="middle" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${hourlyAvailabilityLabel(index, count)}</text>`;
+      // On a phone the legend occupies the bottom band, so the hour labels sit
+      // directly under the plot instead of on top of it.
+      const labelY = compact ? height - padBottom + 16 : height - 8;
+      return `<text x="${xFor(index)}" y="${labelY}" text-anchor="middle" fill="#9AA0AF" font-size="${compact ? 11 : 12}" font-weight="500">${hourlyAvailabilityLabel(index, count)}</text>`;
     }).join("");
 
-    const legend = compact ? "" : series.map((item, index) => `
+    // Three unlabelled lines say nothing. The legend used to be suppressed on
+    // a phone, which is the width where it is needed most; it runs along the
+    // bottom there with short labels instead.
+    const legendFont = compact ? 10.5 : 13;
+    const legend = compact
+      ? (() => {
+          const gap = chartW / 3;
+          return series.map((item, index) => `
+      <g transform="translate(${padLeft + index * gap + 4}, ${height - 7})">
+        <line x1="0" y1="-3" x2="13" y2="-3" stroke="${item.color}" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${item.dash}"></line>
+        <text x="17" y="0" fill="#9AA0AF" font-size="${legendFont}" font-weight="500">${item.short}</text>
+      </g>`).join("");
+        })()
+      : series.map((item, index) => `
       <g transform="translate(${360 + index * 170}, 12)">
-        <circle cx="0" cy="0" r="7" fill="none" stroke="${item.color}" stroke-width="3"></circle>
-        <text x="12" y="5" fill="#9AA0AF" font-size="13" font-weight="500">${item.label}</text>
+        <line x1="0" y1="-4" x2="18" y2="-4" stroke="${item.color}" stroke-width="3" stroke-linecap="round" stroke-dasharray="${item.dash}"></line>
+        <text x="24" y="0" fill="#9AA0AF" font-size="${legendFont}" font-weight="500">${item.label}</text>
       </g>
     `).join("");
 
