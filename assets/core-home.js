@@ -34,7 +34,14 @@
       chip.textContent = (d >= 0 ? "▲ +" : "▼ ") + d.toFixed(1) + "% 7D";
       chip.style.color = d >= 0 ? "#35C77E" : RED;
       spark(svg, closes);
-    } catch { $("np-price-sub").textContent = "market data unavailable"; }
+    } catch {
+      // A dead card the size of the two beside it is the first thing a visitor
+      // meets, and it reads as a broken site rather than as one missing feed.
+      // The market price is context, not one of this provider's numbers, so
+      // when the exchange cannot be reached the card steps out of the row and
+      // the two that carry real figures take the space.
+      svg.closest(".panel")?.setAttribute("hidden", "");
+    }
   }
 
   function gauge(svg, fillPct, daysLeft, periodPct) {

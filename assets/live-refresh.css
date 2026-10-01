@@ -3961,7 +3961,7 @@ tbody tr:hover td{
   }
 
   .mobile-top .brand span{
-    max-width:112px;
+    max-width:min(44vw, 176px);
     font-size:15px;
   }
 
@@ -4094,7 +4094,7 @@ tbody tr:hover td{
   }
 
   .mobile-top .brand span{
-    max-width:128px;
+    max-width:min(60vw, 176px);
     font-size:15px;
   }
 
