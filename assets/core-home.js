@@ -412,6 +412,67 @@
     }
   }
 
+  /* --- provenance -----------------------------------------------------------
+     Every ranking and comparative claim on this page is a snapshot, not a live
+     read: the pipeline writes data/network-position.json and the browser renders
+     whatever that file says. A rank with no date attached reads as "now", so
+     each claim carries where it came from and how old it is.
+
+     The reward-rate rank deliberately carries no epoch. FlareMetrics publishes
+     fspRewardRate as a rolling figure, so stamping an epoch on it would invent a
+     precision the number does not have. The registration-weight rank does carry
+     one, because it is epoch-scoped by definition. --- */
+  const STALE_MS = 90 * 60 * 1000;   // past this, say so rather than imply "now"
+
+  function fmtAge(ms) {
+    if (!Number.isFinite(ms) || ms < 0) return "just now";
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${Math.max(1, s)}s ago`;
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+    if (s < 172800) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
+  }
+
+  /** "FlareMetrics · 8m ago", or "FlareMetrics · 3h ago · may be stale". */
+  function provenance(generatedAt, source, epoch) {
+    const age = Date.now() - new Date(generatedAt).getTime();
+    const stale = !Number.isFinite(age) || age > STALE_MS;
+    const parts = [];
+    if (epoch != null) parts.push(`Epoch ${epoch}`);
+    parts.push(source, fmtAge(age));
+    if (stale) parts.push("may be stale");
+    return { text: parts.join(" \u00b7 "), stale };
+  }
+
+  /* The age is stamped on the element, not baked into it: a tab left open for
+     three hours would otherwise still read "22m ago", which is the exact thing
+     this label exists to prevent. The source timestamp is kept in the dataset
+     and every label is re-stamped once a minute from it. */
+  function markSource(node, generatedAt, source, epoch) {
+    if (!node) return null;
+    node.classList.add("data-source");
+    node.dataset.at = generatedAt;
+    node.dataset.src = source;
+    if (epoch != null) node.dataset.epoch = String(epoch);
+    return restampSource(node);
+  }
+
+  function restampSource(node) {
+    const { text, stale } = provenance(node.dataset.at, node.dataset.src,
+      node.dataset.epoch != null ? node.dataset.epoch : null);
+    node.textContent = text;
+    node.dataset.tone = stale ? "warn" : "ok";
+    return node;
+  }
+
+  function paintSource(id, generatedAt, source, epoch) {
+    markSource($(id), generatedAt, source, epoch);
+  }
+
+  setInterval(() => {
+    document.querySelectorAll(".data-source[data-at]").forEach(restampSource);
+  }, 60000);
+
   async function main() {
     price();
     let np = null;
@@ -422,7 +483,12 @@
     const p = np.position, rr = np.rewardRate, val = np.validator;
     // hero chips
     if ($("np-rr-rank") && rr) { $("np-rr-rank").textContent = `#${rr.rank} of ${rr.count} providers`; }
-    if ($("np-rr-sub") && rr) { $("np-rr-sub").innerHTML = `network median ${(rr.median * 100).toFixed(2)}% — <b style="color:${MAGL}">${(rr.ours / rr.median).toFixed(1)}×</b> above`; }
+    if ($("np-rr-sub") && rr) {
+      // The multiple is computed from the same two numbers in the same file as
+      // the rank above it, so the three claims cannot drift apart.
+      $("np-rr-sub").innerHTML = `network median ${(rr.median * 100).toFixed(2)}% — <b style="color:${MAGL}">${(rr.ours / rr.median).toFixed(1)}×</b> above<span></span>`;
+      markSource($("np-rr-sub").lastElementChild, np.generatedAt, "FlareMetrics");
+    }
     rrCurve($("np-rr-curve"), rr);
     if ($("np-stake-end") && val) $("np-stake-end").textContent = "ends " + val.stakeEndsAt.slice(5).replace("-", "/");
     if ($("np-stake") && val) $("np-stake").innerHTML = fmt(val.totalStakeM, 1) + "M<small> FLR</small>";
@@ -471,12 +537,24 @@
     if ($("np-legend")) $("np-legend").innerHTML =
       `<span><i style="background:${MAG}"></i>our weight ${fmt(p.weight,1)}</span><span><i style="background:${DIM}"></i>other voters</span>` +
       `<span>eviction threshold ${fmt(p.cutoff,1)}</span><span>${p.voters}/${p.maxVoters} seats taken</span>` +
-      `<span style="opacity:.7">updated ${Math.round((Date.now() - new Date(np.generatedAt)) / 36e5 * 10) / 10}h ago</span>`;
+      // This rank IS epoch-scoped, but the chip directly above the strip already
+      // states the epoch, so repeating it here would be clutter, not provenance.
+      `<span></span>`;
+    if ($("np-legend")) markSource($("np-legend").lastElementChild, np.generatedAt, "Flare Systems Explorer");
     // feature cards
-    if ($("np-f-rank") && rr) $("np-f-rank").textContent = `#${rr.rank} reward rate of ${rr.count} providers (FlareMetrics), ${(rr.ours/rr.median).toFixed(1)}× the median.`;
+    if ($("np-f-rank") && rr) {
+      $("np-f-rank").innerHTML = `#${rr.rank} reward rate of ${rr.count} providers, ${(rr.ours/rr.median).toFixed(1)}× the median.<span></span>`;
+      markSource($("np-f-rank").lastElementChild, np.generatedAt, "FlareMetrics");
+    }
     // proof sekcija
     if ($("pf-rank") && rr) { $("pf-rank").textContent = "#" + rr.rank;
+      // Ceil, so the claim rounds against us: rank 9 of 78 is 11.54%, shown as
+      // "top 12%". Both numbers come from the rr object rendered directly above,
+      // so the percentile can never disagree with the rank it is derived from.
       $("pf-rank-sub").textContent = `of ${rr.count} providers — top ${Math.max(1, Math.ceil((rr.rank / rr.count) * 100))}%`; }
+    // One provenance line for the whole proof grid: every tile in it is read
+    // from this one file, written in a single pass, so they share a timestamp.
+    paintSource("pf-provenance", np.generatedAt, "FlareMetrics + Flare Systems Explorer", p.epoch);
     if ($("pf-avail") && p.availabilityPct != null) $("pf-avail").textContent = p.availabilityPct.toFixed(1).replace(".0", "") + "%";
     if ($("pf-passes") && p.passes != null) { $("pf-passes").textContent = p.passes + "/3";
       $("pf-passes-sub").textContent = p.eligible ? "eligible for rewards" : "minimal conditions"; }
