@@ -8,9 +8,9 @@
     "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
    }
   ],
-  "signing_policy_address_balance": 3225,
-  "submit_signatures_address_balance": 3739.2,
-  "submit_address_balance": 3598.39,
+  "signing_policy_address_balance": 3224.51,
+  "submit_signatures_address_balance": 3739.19,
+  "submit_address_balance": 3598.38,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -58,17 +58,17 @@
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1790965384,
+   "last_used": 1790966411,
    "balance": 3952.85
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1790965353,
+   "last_used": 1790966513,
    "balance": 3952.61
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1790965024,
+   "last_used": 1790966448,
    "balance": 3953.5
   }
  ],
