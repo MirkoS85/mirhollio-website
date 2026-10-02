@@ -52,7 +52,7 @@ Apple Watch app in komplikacije bodo brale samo ta mali JSON.
 12. Shrani projekt nekam lokalno, na primer:
 
    ```text
-   /Users/svensekovi/Documents/New project/MirSFlrWatch
+   <pot-do-projekta>/MirSFlrWatch
    ```
 
 ## Korak 2: Dodaj Widget Extension
@@ -77,7 +77,7 @@ Apple Watch app in komplikacije bodo brale samo ta mali JSON.
 V Finderju odpri:
 
 ```text
-/Users/svensekovi/Documents/New project/mirhollio-website/watchos
+<pot-do-projekta>/mirhollio-website/watchos
 ```
 
 V Xcode povleci notri te datoteke:

@@ -23,3 +23,65 @@
 
 # Local icon experiments
 /icon-concepts/
+
+# --- secrets and local configuration ---------------------------------------
+# Nothing in this repository needs a credential, and nothing in it may carry
+# one. These patterns exist so an accidental local file cannot be committed.
+# .env.example is the only env file that belongs here; it holds placeholders.
+.env
+.env.*
+!.env.example
+*.local
+secrets.json
+config.local.json
+
+# Credentials and signing material of any kind
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.asc
+*.gpg
+id_rsa*
+id_ecdsa*
+id_ed25519*
+*.ppk
+.netrc
+.npmrc
+.ssh/
+known_hosts
+
+# Wallet, node and price-provider material — must never live in this repo
+wallet.json
+keystore/
+mnemonic*
+*.wallet
+node-config/
+price-provider/
+
+# Server and deployment configuration — this repo is the website only
+nginx.conf
+*.service
+*.timer
+docker-compose*.yml
+Dockerfile*
+deploy.sh
+ansible/
+
+# Logs, dumps and backups
+*.log
+logs/
+*.bak
+*.backup
+*.orig
+*.sql
+*.sqlite
+*.db
+*.dump
+
+# OS and editor noise
+Thumbs.db
+.idea/
+.vscode/

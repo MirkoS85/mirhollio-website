@@ -47,10 +47,18 @@ jobs:
       # around the clock instead of dying at the end of each window.
       - name: Hand off to the next run
         if: always()
+        # Context values go through env rather than straight into the script
+        # body: a ${{ }} expression is pasted into the shell before bash ever
+        # sees it, so interpolating one into a command is the standard Actions
+        # script-injection shape even when the value happens to be safe today.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
         run: |
           curl -sS -X POST \
-            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/update-watch-status.yml/dispatches" \
-            -d "{\"ref\":\"${{ github.ref_name }}\"}" \
+            "https://api.github.com/repos/$REPO/actions/workflows/update-watch-status.yml/dispatches" \
+            -d "$(printf '{"ref":"%s"}' "$REF")" \
             && echo "handed off to the next watch-status run"
