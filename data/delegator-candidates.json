@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-03T09:43:15.724Z",
+  "generatedAt": "2026-10-03T09:58:41.220Z",
   "provider": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "wnat": "0x1d80c49bbbcd1c0911346656b529df9e5c2f783d",
   "vpContracts": [
     "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c"
   ],
-  "chainHead": 71213508,
-  "scannedToBlock": 71213508,
+  "chainHead": 71214361,
+  "scannedToBlock": 71214361,
   "historyComplete": true,
   "explorerCursor": 31705918,
   "explorerWindow": 2000000,
@@ -15,10 +15,10 @@
   "discovery": {
     "explorer": null,
     "rpc": {
-      "from": 71213489,
-      "to": 71213508,
-      "found": 0,
-      "added": 0
+      "from": 71213509,
+      "to": 71214361,
+      "found": 24,
+      "added": 23
     }
   },
   "candidates": {
@@ -1415,6 +1415,94 @@
     "0x019b44755d79df3f75611c1c98a60ceba3632fc0": {
       "firstBlock": 71213453,
       "firstSeen": 1791020525000
+    },
+    "0x63873f0d7165689022feef1b77428df357b33dcf": {
+      "firstBlock": 71213537,
+      "firstSeen": 1791020622000
+    },
+    "0x67f246f1de19d4afc652dd85eb262a586cdbd82d": {
+      "firstBlock": 71213551,
+      "firstSeen": 1791020636000
+    },
+    "0xdad1976c48cf93a7d90f106382c60cd2c888b2dc": {
+      "firstBlock": 71213564,
+      "firstSeen": 1791020651000
+    },
+    "0x2642e52781c749051169357c1694c8dd6fd9ccdf": {
+      "firstBlock": 71213579,
+      "firstSeen": 1791020666000
+    },
+    "0x87b8135defe130cb3edf78a578a230d4d5f19bad": {
+      "firstBlock": 71213592,
+      "firstSeen": 1791020679000
+    },
+    "0xc9baba3f36ccaa54675deecc327ec7eaa48cb97d": {
+      "firstBlock": 71213606,
+      "firstSeen": 1791020693000
+    },
+    "0x9a3215f8b0d128816f75175c9fd74e7ebbd987da": {
+      "firstBlock": 71213620,
+      "firstSeen": 1791020708000
+    },
+    "0x6c58ac774f31abe010437681c5365fd8d6a43adc": {
+      "firstBlock": 71213635,
+      "firstSeen": 1791020723000
+    },
+    "0x0d807ad839d4e5bff3378f15da795d9135e8ce30": {
+      "firstBlock": 71213649,
+      "firstSeen": 1791020737000
+    },
+    "0x2e05473d83fa5cbdb35c1be601d9eb6f0f9b8a9a": {
+      "firstBlock": 71213662,
+      "firstSeen": 1791020751000
+    },
+    "0x45a914901529f0ca96812ee5e6158f6684beb11e": {
+      "firstBlock": 71213676,
+      "firstSeen": 1791020765000
+    },
+    "0x51b3793a72f03a40cbccea71f993c7c1b69b0ad1": {
+      "firstBlock": 71213690
+    },
+    "0x73b9df1bccd56d20d79c1bd9ff2cc8fcaa71a604": {
+      "firstBlock": 71213702
+    },
+    "0xa1e3f1b9f07d7b9c74ff178a632e4bc6e43243d1": {
+      "firstBlock": 71213717
+    },
+    "0xaf76ba760b849e1080deb860219d25064ea9f919": {
+      "firstBlock": 71213730,
+      "firstSeen": 1791020826000
+    },
+    "0xe2fe62564394e0641acc9c4a1c28533a41a39608": {
+      "firstBlock": 71213741,
+      "firstSeen": 1791020837000
+    },
+    "0xf9b24c2a90e27b452911686866559e582ab006b6": {
+      "firstBlock": 71213755,
+      "firstSeen": 1791020851000
+    },
+    "0x3f5e66faa7b41a7a3b7bb223046f2b7b3afd2643": {
+      "firstBlock": 71213769,
+      "firstSeen": 1791020865000
+    },
+    "0x6edbf5f63ce4e03890c494bd5f159a10e6d563e1": {
+      "firstBlock": 71213783,
+      "firstSeen": 1791020879000
+    },
+    "0x9cb5b9139763d118660e377f955ab1a5336c43f4": {
+      "firstBlock": 71213797
+    },
+    "0xdbf4c95155f7c8dbd8a6d439616ef374fac11207": {
+      "firstBlock": 71213811,
+      "firstSeen": 1791020909000
+    },
+    "0x08e6cb0c6b91dba21b9b5dff5694fab75fa91440": {
+      "firstBlock": 71213824,
+      "firstSeen": 1791020922000
+    },
+    "0xbe933dd46c2dce6fcd1b25d985f50b79603d8650": {
+      "firstBlock": 71213835,
+      "firstSeen": 1791020936000
     }
   },
   "baseline": {
