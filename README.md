@@ -85,8 +85,13 @@ If you find something in here that looks like a credential, an internal
 hostname, or private infrastructure detail, please open an issue without
 quoting the value itself.
 
-## Licence
+## Rights
 
-[MIT](LICENSE) for the site's own source. The protocol data under `data/` is
-public Flare network state and is not owned by the operator. The Mirhollio Core
-name and brand marks are excluded — see the LICENSE file.
+This repository is public so that anyone can read it and check how each figure
+on the site was produced. **No licence is granted and no rights are
+transferred.** Nothing here is offered for reuse.
+
+The protocol data under `data/` is public Flare network state — reward epochs,
+delegation weights, validator registration — read from public endpoints. Those
+are facts about a public blockchain and the operator claims no ownership of
+them.
