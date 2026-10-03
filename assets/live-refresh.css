@@ -1668,7 +1668,7 @@ h1{
   padding:16px;
 }
 
-.delegator-summary span{
+.delegator-summary > span{
   display:grid;
   gap:3px;
   min-height:62px;
@@ -1818,7 +1818,7 @@ h1{
   border-bottom:1px solid var(--line);
 }
 
-.delegation-flow-summary span{
+.delegation-flow-summary > span{
   display:grid;
   gap:4px;
   min-height:62px;
