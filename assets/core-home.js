@@ -161,10 +161,7 @@
         <stop offset="0%" stop-color="#FFD27A"/>
         <stop offset="100%" stop-color="#F2B233"/>
       </linearGradient>
-      <filter id="gaugeGlow" x="-40%" y="-40%" width="180%" height="180%">
-        <feGaussianBlur stdDeviation="2" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>`;
+`;
     svg.appendChild(defs);
 
     // Tick bezel: 48 marks, every sixth one longer. Gives the dial a scale to
@@ -193,7 +190,9 @@
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: 44, fill: "none", stroke: "rgba(0,0,0,.45)", "stroke-width": 10 }));
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: 44, fill: "none", stroke: "rgba(255,255,255,.07)", "stroke-width": 9 }));
     if (pct != null) {
-      svg.appendChild(ring(44, 9, "url(#gaugeArc)", pct / 100, { filter: "url(#gaugeGlow)" }));
+      // No blur filter on the arc. A gradient stroke against a recessed track
+      // already reads as lit; the bloom only made it read as a game HUD.
+      svg.appendChild(ring(44, 9, "url(#gaugeArc)", pct / 100));
       // A bright cap at the end of the arc, so the reading has a needle.
       const a = (pct / 100) * Math.PI * 2 - Math.PI / 2;
       svg.appendChild(el("circle", { cx: CX + Math.cos(a) * 44, cy: CY + Math.sin(a) * 44, r: 3.4, fill: "#FFE6ED" }));
@@ -274,8 +273,10 @@
 
     svg.appendChild(el("line", { x1: x(rr.median), x2: x(rr.median), y1: yy - 13, y2: yy + 13,
       stroke: "rgba(255,255,255,.65)", "stroke-width": 2, "stroke-dasharray": "3 3" }));
+    // The dark stroke already separates the marker from the track behind it,
+    // which is what the halo was there to do.
     svg.appendChild(el("circle", { cx: x(rr.ours), cy: yy, r: 7, fill: MAGL, stroke: "#17171d",
-      "stroke-width": 2, filter: "drop-shadow(0 0 7px rgba(255,46,99,.65))" }));
+      "stroke-width": 2 }));
 
     const half = (t, size) => (t.length * size * 0.6) / 2;
     const ourFont = fs(11), medFont = fs(11);
