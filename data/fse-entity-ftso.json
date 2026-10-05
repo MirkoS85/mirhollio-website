@@ -1,13 +1,13 @@
 {
  "last_6h": {
   "availability": 1,
-  "primary": 0.5231182795698924,
-  "secondary": 0.9868951612903226
+  "primary": 0.5227822580645162,
+  "secondary": 0.9863575268817204
  },
  "last_24h": {
-  "availability": 0.9979166666666667,
-  "primary": 0.5161962365591398,
-  "secondary": 0.984744623655914
+  "availability": 0.9979188345473465,
+  "primary": 0.5160283307039039,
+  "secondary": 0.9846597965828606
  },
  "per_reward_epoch": [
   {
