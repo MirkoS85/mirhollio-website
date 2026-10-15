@@ -8,9 +8,9 @@
     "tx_id": "2MqceYaFzDMSBJo98rWc86AMxRkZiExtzbtatJcszHAghMk1Pk"
    }
   ],
-  "signing_policy_address_balance": 3112.97,
-  "submit_signatures_address_balance": 3731.89,
-  "submit_address_balance": 3585.27,
+  "signing_policy_address_balance": 3112.59,
+  "submit_signatures_address_balance": 3731.88,
+  "submit_address_balance": 3585.26,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -42,36 +42,36 @@
   "node_ids": [
    "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   ],
-  "reward_epoch": 441,
-  "staking_weight": 7.690325982603182e+25,
+  "reward_epoch": 442,
+  "staking_weight": 7.504450263299712e+25,
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "delegation_fee_bips": 2000,
-  "w_nat_weight": 1.162744811811555e+26,
-  "w_nat_capped_weight": 1.162744811811555e+26,
-  "delegation_rate": 0.002854881532281196,
-  "weight": 1.9317774100718733e+26,
-  "vote_power": 105862523821550650000,
+  "w_nat_weight": 1.1601708678580433e+26,
+  "w_nat_capped_weight": 1.1601708678580433e+26,
+  "delegation_rate": 0.002849557892883203,
+  "weight": 1.9106158941880147e+26,
+  "vote_power": 104344611584287260000,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
   "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
-  "registration_weight": 105862509907459340000,
-  "normalized_weight": 343
+  "registration_weight": 104344592490373050000,
+  "normalized_weight": 338
  },
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1792090101,
-   "balance": 3951.35
+   "last_used": 1792091057,
+   "balance": 3951.08
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1792090039,
-   "balance": 3951.12
+   "last_used": 1792090995,
+   "balance": 3951.11
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1792090003,
+   "last_used": 1792091101,
    "balance": 3952.01
   }
  ],
