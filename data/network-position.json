@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-10-19T14:12:19.065Z",
+  "generatedAt": "2026-10-19T14:27:46.592Z",
   "position": {
     "epoch": 443,
     "voters": 100,
@@ -140,9 +140,9 @@
     ]
   },
   "validator": {
-    "totalStakeM": 65.45,
+    "totalStakeM": 66.61,
     "selfBondM": 7.5,
-    "delegators": 5,
+    "delegators": 6,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2027-04-05",
@@ -150,6 +150,11 @@
       {
         "date": "2026-11-02",
         "expiresM": 53.24,
+        "remainingM": 5.87
+      },
+      {
+        "date": "2026-11-15",
+        "expiresM": 1.15,
         "remainingM": 4.72
       },
       {
