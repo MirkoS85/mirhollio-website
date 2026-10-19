@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-10-19T12:07:39.765Z",
+  "generatedAt": "2026-10-19T12:23:19.146Z",
   "position": {
     "epoch": 443,
     "voters": 100,
@@ -112,44 +112,44 @@
       0
     ],
     "ourIndex": 75,
-    "primaryPct": 55.99,
-    "secondaryPct": 99.12,
+    "primaryPct": 56.08,
+    "secondaryPct": 99.13,
     "availabilityPct": 100,
-    "medianPrimaryPct": 40.44,
-    "medianSecondaryPct": 96.95,
+    "medianPrimaryPct": 40.5,
+    "medianSecondaryPct": 96.94,
     "passes": 3,
     "eligible": true
   },
   "rewardRate": {
     "rank": 4,
-    "count": 65,
-    "ours": 0.01513160139718439,
-    "median": 0.01204374827655384,
-    "p25": 0.01047415723438644,
-    "p75": 0.01340198993554678,
+    "count": 74,
+    "ours": 0.01529854415496333,
+    "median": 0.0118278580426018,
+    "p25": 0.01058447490905521,
+    "p75": 0.01367235256571239,
     "curve": [
-      0.01484,
-      0.01361,
-      0.01295,
-      0.0123,
-      0.01204,
-      0.01145,
-      0.01092,
-      0.01005,
-      0.0087
+      0.01471,
+      0.0143,
+      0.01329,
+      0.0124,
+      0.01183,
+      0.01128,
+      0.0108,
+      0.01004,
+      0.00866
     ]
   },
   "validator": {
-    "totalStakeM": 8.22,
+    "totalStakeM": 9.15,
     "selfBondM": 7.5,
-    "delegators": 1,
+    "delegators": 2,
     "uptime": 100,
     "connected": true,
     "stakeEndsAt": "2027-04-05",
     "expirySteps": [
       {
         "date": "2026-12-18",
-        "expiresM": 0.72,
+        "expiresM": 1.65,
         "remainingM": 0
       }
     ]
