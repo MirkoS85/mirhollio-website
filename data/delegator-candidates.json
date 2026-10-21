@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-21T12:22:13.140Z",
+  "generatedAt": "2026-10-21T12:37:38.469Z",
   "provider": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "wnat": "0x1d80c49bbbcd1c0911346656b529df9e5c2f783d",
   "vpContracts": [
     "0x50edeaa0f6772c899276ddc1b515f4c81d529e6c"
   ],
-  "chainHead": 72630835,
-  "scannedToBlock": 72630835,
+  "chainHead": 72631648,
+  "scannedToBlock": 72631648,
   "historyComplete": true,
   "explorerCursor": 31705918,
   "explorerWindow": 2000000,
@@ -15,8 +15,8 @@
   "discovery": {
     "explorer": null,
     "rpc": {
-      "from": 72630023,
-      "to": 72630835,
+      "from": 72630836,
+      "to": 72631648,
       "found": 1,
       "added": 0
     }
