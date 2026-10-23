@@ -1,7 +1,7 @@
 {
   "schema": "mirsflr-watch-status/v1",
-  "generatedAt": "2026-10-23T12:05:01.567Z",
-  "updatedAt": "2026-10-23T12:05:01.567Z",
+  "generatedAt": "2026-10-23T12:10:10.244Z",
+  "updatedAt": "2026-10-23T12:10:10.244Z",
   "provider": {
     "name": "MirSFlr",
     "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
@@ -9,51 +9,20 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "125.0% full",
+    "validatorLabel": "8.3% full",
     "ftsoLabel": "FTSO E444"
   },
   "validator": {
     "status": "connected",
-    "stake": 112499093,
+    "stake": 7500000,
     "capacity": 90000000,
-    "fillPct": 124.999,
-    "free": 0,
-    "delegation": 104999093,
+    "fillPct": 8.3333,
+    "free": 82500000,
+    "delegation": 0,
     "selfBond": 7500000,
-    "delegationCount": 18,
+    "delegationCount": 0,
     "stakeEnd": "2027-04-05T10:00:00Z",
-    "topDelegations": [
-      {
-        "address": null,
-        "amount": 52760523,
-        "start": "2026-10-19T12:44:36Z",
-        "end": "2026-11-02T14:00:00Z"
-      },
-      {
-        "address": null,
-        "amount": 20000000,
-        "start": "2026-10-20T06:41:46Z",
-        "end": "2026-11-16T04:00:00Z"
-      },
-      {
-        "address": null,
-        "amount": 10026880,
-        "start": "2026-10-20T04:36:54Z",
-        "end": "2026-11-03T05:41:00Z"
-      },
-      {
-        "address": null,
-        "amount": 7900000,
-        "start": "2026-10-20T10:00:38Z",
-        "end": "2026-11-03T10:10:30Z"
-      },
-      {
-        "address": null,
-        "amount": 3975799,
-        "start": "2026-10-20T00:38:51Z",
-        "end": "2026-11-03T00:48:45Z"
-      }
-    ]
+    "topDelegations": []
   },
   "ftso": {
     "status": "ok",
