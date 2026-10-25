@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-10-25T14:54:04.982Z",
+  "generatedAt": "2026-10-25T15:09:35.084Z",
   "position": {
     "epoch": 444,
     "voters": 100,
@@ -112,11 +112,11 @@
       0
     ],
     "ourIndex": 58,
-    "primaryPct": 54.42,
-    "secondaryPct": 99.04,
+    "primaryPct": 54.27,
+    "secondaryPct": 99.06,
     "availabilityPct": 100,
-    "medianPrimaryPct": 39.51,
-    "medianSecondaryPct": 97.25,
+    "medianPrimaryPct": 39.3,
+    "medianSecondaryPct": 97.3,
     "passes": 3,
     "eligible": true
   },
