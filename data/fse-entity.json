@@ -8,9 +8,9 @@
     "tx_id": "21DiEiFW9LMS3fgeeS7YQ2R9wqHE4YavZ9gqWRFCdYatKbtTbE"
    }
   ],
-  "signing_policy_address_balance": 2979.41,
-  "submit_signatures_address_balance": 3723.54,
-  "submit_address_balance": 3571.08,
+  "signing_policy_address_balance": 2979.27,
+  "submit_signatures_address_balance": 3723.53,
+  "submit_address_balance": 3571.07,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -18,16 +18,19 @@
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "rewards_signed": 1,
-  "uptime_signed": 0,
+  "uptime_signed": 1,
   "voter_registered_event_re": [
    446,
    445,
    444,
-   443,
-   442
+   443
   ],
-  "uptime_vote_re": [],
-  "uptime_vote_hash": [],
+  "uptime_vote_re": [
+   445
+  ],
+  "uptime_vote_hash": [
+   "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
+  ],
   "rewards_signed_re": [
    444
   ],
@@ -40,36 +43,36 @@
   "node_ids": [
    "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   ],
-  "reward_epoch": 445,
+  "reward_epoch": 446,
   "staking_weight": 1.124990987794365e+26,
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "delegation_fee_bips": 2000,
-  "w_nat_weight": 1.0719485160867655e+26,
-  "w_nat_capped_weight": 1.0719485160867655e+26,
-  "delegation_rate": 0.002641263283220624,
-  "weight": 2.1969395038811306e+26,
-  "vote_power": 131645351527934350000,
+  "w_nat_weight": 1.0874671394424325e+26,
+  "w_nat_capped_weight": 1.0874671394424325e+26,
+  "delegation_rate": 0.0026836080656818598,
+  "weight": 2.2124581272367975e+26,
+  "vote_power": 131874080012088100000,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
   "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
-  "registration_weight": 131645343212653970000,
-  "normalized_weight": 423
+  "registration_weight": 131874058897045900000,
+  "normalized_weight": 424
  },
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1793300232,
-   "balance": 3949.42
+   "last_used": 1793301717,
+   "balance": 3949.41
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1793300245,
+   "last_used": 1793301761,
    "balance": 3949.45
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1793300835,
+   "last_used": 1793301534,
    "balance": 3950.34
   }
  ],
