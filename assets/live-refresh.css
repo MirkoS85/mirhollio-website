@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-40");
+@import url("operator.css?v=core-41");
 
 :root{
   color-scheme:dark;
@@ -219,11 +219,14 @@ body::after{
   letter-spacing:-.02em;
 }
 
+/* The logo has a transparent background, so a box-shadow lit up the square
+   around it and left the square itself reading as a dark tile. A drop-shadow
+   follows the artwork instead. */
 .brand img{
   width:44px;
   height:44px;
   border-radius:12px;
-  box-shadow:0 12px 28px rgba(255, 46, 99,.14);
+  filter:drop-shadow(0 6px 14px rgba(255, 46, 99,.18));
 }
 
 .nav{
@@ -8138,7 +8141,7 @@ tbody tr + tr th{
 }
 
 /* ===========================================================================
-   core-40: the brand mark on a phone
+   core-41: the brand mark on a phone
 
    `.hero-mark` and `.hero-mark-wrap` were both set to display:none below
    1120px, on all six pages that carry one - so the whole composition the
