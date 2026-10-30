@@ -49,8 +49,11 @@
 /* No column span: the strip is an auto-fit grid, so a tile that takes two
    slots pushes the last one onto a row of its own. The headline figure earns
    its prominence from type size instead. */
-.dx-tile-lead strong{font-size:clamp(26px,2.6vw,34px) !important;letter-spacing:-.03em;color:var(--ink)}
-.dx-tile-lead{border-color:rgba(255,46,99,.22)}
+/* That size is keyed to the viewport, but in the five-across row the tile is
+   only 143-176px, and "103.38M" at 34px broke after the decimals at every
+   desktop width. The tile's own width caps it (20cqi), on one line. */
+.dx-tile-lead strong{font-size:min(clamp(26px,2.6vw,34px), 20cqi) !important;white-space:nowrap;letter-spacing:-.03em;color:var(--ink)}
+.dx-tile-lead{container-type:inline-size;border-color:rgba(255,46,99,.22)}
 
 .dx-up{color:var(--green);font-weight:800}
 .dx-down{color:var(--danger);font-weight:800}

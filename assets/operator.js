@@ -1,3 +1,47 @@
+// Every chart on the site draws itself to the size of its box at the moment it
+// renders - the viewBox, the gutters, the type are all derived from that width.
+// Drawn once, a chart that first rendered narrow (a phone turned sideways, a
+// window widened, a panel that settled after the data arrived) stayed that
+// width and was letterboxed into the middle of a wider panel, with empty bands
+// either side and the plot standing too tall for its width. Each chart hands
+// over how to redraw itself and is redrawn whenever its box changes width.
+// Shared with core-home.js and delegations.js, which load after this file.
+const MirhollioChartResize = (() => {
+  const redraws = new WeakMap();
+  const drawnWidths = new WeakMap();
+  const pending = new Set();
+  let frame = 0;
+
+  const flush = () => {
+    frame = 0;
+    const charts = [...pending];
+    pending.clear();
+    charts.forEach(svg => redraws.get(svg)?.());
+  };
+
+  const observer = "ResizeObserver" in window
+    ? new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const width = Math.round(entry.contentRect.width);
+        // Only width moves the drawing; a height change after a redraw is the
+        // chart settling, and reacting to it would loop.
+        if (!width || Math.abs(width - (drawnWidths.get(entry.target) || 0)) < 2) continue;
+        pending.add(entry.target);
+      }
+      if (pending.size && !frame) frame = requestAnimationFrame(flush);
+    })
+    : null;
+
+  function watch(svg, redraw) {
+    if (!svg || !observer) return;
+    redraws.set(svg, redraw);
+    drawnWidths.set(svg, Math.round(svg.getBoundingClientRect().width));
+    observer.observe(svg);
+  }
+
+  return { watch };
+})();
+
 const MirhollioCore = (() => {
   const API_URL = "https://api.oracle-daemon.com/v1/flare/providers";
   const VALIDATORS_URL = "https://api.oracle-daemon.com/v1/flare/validators";
@@ -1656,6 +1700,7 @@ const MirhollioCore = (() => {
         wrap.scrollLeft = wrap.scrollWidth;
       });
     }
+    MirhollioChartResize.watch(svg, () => renderFtsoDelegationChart(rows));
   }
 
   function renderFtsoDelegationSummary(historyRows, delegatorRows, source = "live") {
@@ -2126,6 +2171,7 @@ const MirhollioCore = (() => {
     if (summary && last) {
       summary.innerHTML = `<span>Latest <strong>${rewardWithFiat(last.reward)}</strong></span><span>Average <strong>${rewardWithFiat(avgReward)}</strong></span><span>Range <strong>${rewardRangeWithFiat(minReward, maxReward)}</strong></span>`;
     }
+    MirhollioChartResize.watch(svg, () => renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }));
   }
 
   function renderRewardChart(provider) {
@@ -2335,6 +2381,7 @@ const MirhollioCore = (() => {
     if (summary) {
       summary.innerHTML = `<span>Latest <strong>${pct(latest)}</strong></span><span>Average <strong>${pct(avg)}</strong></span><span>Low <strong>${pct(low)}</strong></span>`;
     }
+    MirhollioChartResize.watch(svg, () => renderHourlyAvailabilityChart({ svg, tooltip, summary, values, metricLabel, emptyMessage, target }));
   }
 
   function renderHourlyAvailabilityCharts(provider) {
@@ -2501,6 +2548,7 @@ const MirhollioCore = (() => {
       const byKey = Object.fromEntries(latest);
       summary.innerHTML = `<span>Performance <strong>${Number.isFinite(byKey.performance) ? pct(byKey.performance) : "-"}</strong></span><span>Primary <strong>${Number.isFinite(byKey.primary) ? pct(byKey.primary) : "-"}</strong></span><span>Secondary <strong>${Number.isFinite(byKey.secondary) ? pct(byKey.secondary) : "-"}</strong></span>`;
     }
+    MirhollioChartResize.watch(svg, () => renderHourlyPerformanceChart({ svg, tooltip, summary, provider }));
   }
 
   function renderHourlyPerformanceCharts(provider) {
@@ -3041,16 +3089,8 @@ const MirhollioCore = (() => {
       staleServed = false;
       loadFtsoSnapshot(); load(); loadValidator(); loadFtsoExplorer(); loadFtsoEntity(); loadFtsoDelegationSummary(); loadPrice();
     }, 7000);
-    let resizeTimer = 0;
-    window.addEventListener("resize", () => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => {
-        if (!providerData) return;
-        renderRewardChart(providerData);
-        renderHourlyAvailabilityCharts(providerData);
-        renderHourlyPerformanceCharts(providerData);
-      }, 120);
-    });
+    // Charts redraw themselves when their box changes width; see
+    // MirhollioChartResize at the top of this file.
   }
 
   return { init };

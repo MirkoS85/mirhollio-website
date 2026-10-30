@@ -321,8 +321,16 @@
     return Math.max(1, Math.ceil(labelUnits / slotUnits));
   }
 
+  // Both charts below are built by appending, so a redraw starts from empty.
+  // They redraw when their box changes width (MirhollioChartResize, operator.js).
+  function redrawOnResize(svg, redraw) {
+    if (typeof MirhollioChartResize !== "undefined") MirhollioChartResize.watch(svg, redraw);
+  }
+
   function weightChart(svg, hist) {
     if (!svg || !hist.length) return;
+    svg.replaceChildren();
+    redrawOnResize(svg, () => weightChart(svg, hist));
     const W = 1000;
     const H = fitHeight(svg, W, 300);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -370,6 +378,8 @@
 
   function expiryChart(svg, val) {
     if (!svg || !val) return;
+    svg.replaceChildren();
+    redrawOnResize(svg, () => expiryChart(svg, val));
     const W = 1000;
     const H = fitHeight(svg, W, 260);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);

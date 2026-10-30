@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-41");
+@import url("operator.css?v=core-42");
 
 :root{
   color-scheme:dark;
@@ -8141,7 +8141,7 @@ tbody tr + tr th{
 }
 
 /* ===========================================================================
-   core-41: the brand mark on a phone
+   core-42: the brand mark on a phone
 
    `.hero-mark` and `.hero-mark-wrap` were both set to display:none below
    1120px, on all six pages that carry one - so the whole composition the
@@ -8208,7 +8208,7 @@ tbody tr + tr th{
   -webkit-backdrop-filter:blur(8px);
 }
 
-/* === core-41: close the dead row under the header ==========================
+/* === core-42: close the dead row under the header ==========================
    On a phone main has no panel chrome any more, so the hero field runs from
    the header to the fold with nothing to break it. The section's own 24px of
    padding plus the 40px I added for heading air stacked into a 64px strip of
@@ -8540,4 +8540,38 @@ tbody tr + tr th{
    lost to it. Same shape as the other status indicators. */
 strong.pre-reg-value .pre-reg-pill.ok{
   box-shadow:var(--lit), 0 0 6px rgba(53,199,126,.2) !important;
+}
+
+/* --- the hero readings strip, beside the headline -------------------------
+   Between 621px and 1179px the hero is two columns and the strip gets the
+   narrow one, 340px. The column counts above are keyed to the viewport, so
+   from 1000px they put four or five tiles into that 340px and every reading
+   broke a letter at a time ("On / lin / e"). Beside the headline it is two
+   columns, with an odd last tile taking the full row. --- */
+@media (min-width:621px) and (max-width:1179px){
+  .home-hero .hero-live-strip{
+    grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+  }
+
+  .home-hero .hero-live-strip > :last-child:nth-child(odd){
+    grid-column:1 / -1;
+  }
+}
+
+/* --- the brand mark, bled to the card edge --------------------------------
+   Two things gave the hero artwork hard straight edges. It was a JPEG on
+   black that relied on mix-blend-mode:screen to drop the black, but
+   `.home-hero-section > .inner` is its own stacking context (z-index:1), so
+   the screen had nothing of the card to blend with and the black square
+   darkened the card at the mark's opacity. And `.home-hero` clipped it, a box
+   that sits 80px below the card's top and 30px in from its right edge - so
+   the darkened square ended on a ruled line across the top and down the side.
+
+   The artwork now carries its own alpha (assets/brand-mark.webp, its
+   brightness as coverage, which is what the screen blend was for), and only
+   the section clips it - the section runs to the card's own top and right
+   edge, and the radial mask has faded the art out before it gets there. --- */
+.home-hero,
+.hero.home-hero{
+  overflow:visible !important;
 }

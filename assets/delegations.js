@@ -355,8 +355,17 @@
     const svg = $(`[data-dx-chart="${key}"]`);
     if (!svg) return;
     const rows = visibleHistory().filter((r) => Number.isFinite(accessor(r)));
-    const W = key === "power" ? 1000 : 1000;
-    const H = key === "power" ? 300 : 150;
+    // Drawn in the box's own pixels. A fixed 1000-wide box stretched with
+    // preserveAspectRatio="none" squashed the end marker into an ellipse and
+    // thinned the line wherever it ran steep; at 1:1 neither happens. It is
+    // redrawn when the box changes width (MirhollioChartResize, operator.js).
+    const box = svg.getBoundingClientRect();
+    const W = Math.round(box.width) || 1000;
+    const H = Math.round(box.height) || (key === "power" ? 300 : 150);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    if (typeof MirhollioChartResize !== "undefined") {
+      MirhollioChartResize.watch(svg, () => drawChart(key, accessor, opts));
+    }
     // padR clears the y-axis labels so the latest point is never jammed
     // under them; padB clears the epoch row.
     const padL = 8, padR = 56, padT = 16, padB = 22;
@@ -415,7 +424,7 @@
 
     svg.dataset.rows = String(rows.length);
     drawAxes(svg, rows, { lo, hi, fmt: opts.axis || fmtAmount });
-    bindHover(svg, key, rows, accessor, x, y, opts);
+    bindHover(svg, key, rows, accessor, x, y, opts, W);
   }
 
   // Recessive gridlines plus value labels. Without them the plot is a shape
@@ -442,7 +451,10 @@
     wrap.appendChild(xAxis);
   }
 
-  function bindHover(svg, key, rows, accessor, x, y, opts) {
+  function bindHover(svg, key, rows, accessor, x, y, opts, W) {
+    // Every redraw binds afresh, so the previous draw's listeners go first;
+    // otherwise each range change or resize stacked another set.
+    if (svg.__dxHoverOff) svg.__dxHoverOff();
     const tip = $(`[data-dx-tooltip="${key}"]`);
     const cross = svg.querySelector(`[data-dx-crosshair="${key}"]`);
     if (!tip || !cross) return;
@@ -464,7 +476,7 @@
       tip.hidden = false;
       tip.innerHTML = `<b>Epoch ${row.epoch}</b><span>${opts.tip(row)}</span>`;
       const box = svg.getBoundingClientRect();
-      const left = (px / 1000) * box.width;
+      const left = (px / W) * box.width;
       tip.style.left = `${Math.min(Math.max(left, 60), box.width - 60)}px`;
     }
 
@@ -473,15 +485,23 @@
       tip.hidden = true;
     }
 
-    svg.addEventListener("pointermove", move);
-    svg.addEventListener("pointerleave", leave);
     // Tapping pins the reading. A tooltip that only exists while the pointer is
     // held over a point is unusable on a touch screen, which is where most of
     // this page is read.
-    svg.addEventListener("pointerdown", (event) => {
+    function down(event) {
       move(event);
       pinEpoch(rows[pick(event)]?.epoch);
-    });
+    }
+
+    svg.addEventListener("pointermove", move);
+    svg.addEventListener("pointerleave", leave);
+    svg.addEventListener("pointerdown", down);
+    svg.__dxHoverOff = () => {
+      svg.removeEventListener("pointermove", move);
+      svg.removeEventListener("pointerleave", leave);
+      svg.removeEventListener("pointerdown", down);
+      svg.__dxHoverOff = null;
+    };
   }
 
   // ── a pinned epoch ────────────────────────────────────────────────────────
