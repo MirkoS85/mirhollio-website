@@ -39,6 +39,10 @@
   function tightenLongValues(root = document) {
     root.querySelectorAll(targets.join(", ")).forEach(el => {
       if (el.classList.contains("pre-reg-value")) return;
+      // Mid count-up the figure passes through shorter strings ("4730,03"
+      // before "10.126,25"), and re-measuring each frame flicked the size up
+      // and back. The value it is counting to already set the size.
+      if (el.__countCancel) return;
       el.classList.remove("metric-tight", "metric-ultra-tight");
 
       // A value with a unit used to be exempt, because the unit sat on its own
@@ -706,7 +710,16 @@
     }
 
     function run(node) {
-      const final = node.textContent;
+      // A value whose unit has been split out ("23.715,07" + <span
+      // class="metric-unit">FLR</span>) counts its figure alone. Writing the
+      // whole string back as text dropped the span, and since "…07FLR" has no
+      // space the unit pass could not find it again: for the length of the
+      // count the unit sat full size on a line of its own, then snapped back.
+      const unit = node.querySelector(":scope > .metric-unit");
+      const target = unit
+        ? [...node.childNodes].find(child => child.nodeType === Node.TEXT_NODE && child.textContent.trim()) || node
+        : node;
+      const final = target.textContent;
       const parsed = parse(final.trim());
       if (!parsed) return;
       const format = new Intl.NumberFormat(undefined, {
@@ -727,11 +740,11 @@
         const t = Math.min(1, (now - started) / DURATION);
         const eased = 1 - Math.pow(1 - t, 3);
         if (t >= 1) {
-          node.textContent = final;
+          target.textContent = final;
           node.__countCancel = null;
           return;
         }
-        node.textContent = parsed.prefix + format.format(parsed.value * eased) + parsed.suffix;
+        target.textContent = parsed.prefix + format.format(parsed.value * eased) + parsed.suffix;
         requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);

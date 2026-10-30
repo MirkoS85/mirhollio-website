@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-42");
+@import url("operator.css?v=core-46");
 
 :root{
   color-scheme:dark;
@@ -8141,7 +8141,7 @@ tbody tr + tr th{
 }
 
 /* ===========================================================================
-   core-42: the brand mark on a phone
+   core-46: the brand mark on a phone
 
    `.hero-mark` and `.hero-mark-wrap` were both set to display:none below
    1120px, on all six pages that carry one - so the whole composition the
@@ -8208,7 +8208,7 @@ tbody tr + tr th{
   -webkit-backdrop-filter:blur(8px);
 }
 
-/* === core-42: close the dead row under the header ==========================
+/* === core-46: close the dead row under the header ==========================
    On a phone main has no panel chrome any more, so the hero field runs from
    the header to the fold with nothing to break it. The section's own 24px of
    padding plus the 40px I added for heading air stacked into a 64px strip of
@@ -8255,7 +8255,7 @@ tbody tr + tr th{
   }
 }
 
-/* === core-42: give the phone its margin back ===============================
+/* === core-46: give the phone its margin back ===============================
    Below 620px -- which is every phone -- `.section` had its horizontal
    padding forced to zero and `.inner` stretched to 100vw, while
    `.section-title` kept a 14px pad of its own. The result: headings sat on a
@@ -8363,7 +8363,7 @@ tbody tr + tr th{
   }
 }
 
-/* === core-43: provenance on ranking and comparative claims ==================
+/* === core-46: provenance on ranking and comparative claims ==================
    A rank with no date on it reads as "now". These figures are snapshots the
    pipeline wrote, so each claim says where it came from and how old it is.
    Same visual language as the delegation explorer's .dx-source, so the page
@@ -8404,7 +8404,7 @@ tbody tr + tr th{
   color:var(--yellow);
 }
 
-/* === core-44: take the neon off ============================================
+/* === core-46: take the neon off ============================================
    The corner ticks were the complaint, but they were a symptom. Underneath
    them sat sixteen separate glows - a bloom on every big number, a breathing
    diamond, a halo on each status dot, a lit progress bar, a radial that
@@ -8574,4 +8574,48 @@ strong.pre-reg-value .pre-reg-pill.ok{
 .home-hero,
 .hero.home-hero{
   overflow:visible !important;
+}
+
+/* --- long readings in the hero tiles --------------------------------------
+   The tighten pass marks long values (.metric-tight from 10 characters,
+   .metric-ultra-tight from 12), but `.hero-live-tile > strong` sets its size
+   with !important, so in the hero the marks did nothing: "23.715,07 FLR"
+   dropped its unit to a second line in every tile under ~190px, and on the
+   address sheet the provider name and the short addresses broke in two.
+
+   Those values are now capped by their own tile's width and held on one
+   line. Each cap is the value's measured width at its full size, with a
+   little room for one more digit, so a wide tile keeps the full size and a
+   narrow one scales the reading down instead of breaking it. --- */
+/* :has() cannot nest, so the unit is matched as a child here rather than
+   with an inner :has() - one invalid selector drops the whole rule. */
+.hero-live-tile:has(> strong.metric-tight > .metric-unit),
+.hero-live-tile:has(> strong.metric-ultra-tight > .metric-unit),
+.hero-live-tile:has(> strong[data-field="providerName"]),
+.hero-live-tile:has(> strong[data-field^="short"]){
+  container-type:inline-size;
+}
+
+.hero-live-tile > strong:is(.metric-tight, .metric-ultra-tight):has(> .metric-unit),
+.hero-live-tile > strong[data-field="providerName"],
+.hero-live-tile > strong[data-field^="short"]{
+  white-space:nowrap;
+}
+
+/* FLR amounts: "1.234,56 FLR" needs 18.5cqi at full size, "23.715,07 FLR" 17.1. */
+.hero-live-tile > strong.metric-tight:has(> .metric-unit){
+  font-size:min(var(--t-data-l), 17cqi) !important;
+}
+
+.hero-live-tile > strong.metric-ultra-tight:has(> .metric-unit){
+  font-size:min(var(--t-data-l), 15cqi) !important;
+}
+
+/* The address sheet sets its own smaller sizes; these only ever go down. */
+.hero-live-tile > strong[data-field="providerName"]{
+  font-size:min(19px, 14cqi) !important;
+}
+
+.hero-live-tile > strong[data-field^="short"]{
+  font-size:min(15px, 12cqi) !important;
 }
