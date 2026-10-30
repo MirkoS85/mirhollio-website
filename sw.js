@@ -1,4 +1,4 @@
-const CACHE_NAME = "mirhollio-core-shell-v253";
+const CACHE_NAME = "mirhollio-core-shell-v254";
 const APP_SHELL = [
   "/",
   "/ftso/",
@@ -23,7 +23,7 @@ const APP_SHELL = [
   "/assets/core-home.js?v=core-40",
   "/app.webmanifest",
   "/assets/brand-mark.jpg?v=core-40",
-  "/logo.png?v=2",
+  "/logo.png?v=3",
   "/apple-touch-icon-full.png",
   "/flare-icon.png",
   "/app-icon-full-192.png",
