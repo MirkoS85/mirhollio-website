@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-46");
+@import url("operator.css?v=core-47");
 
 :root{
   color-scheme:dark;
@@ -8618,4 +8618,194 @@ strong.pre-reg-value .pre-reg-pill.ok{
 
 .hero-live-tile > strong[data-field^="short"]{
   font-size:min(15px, 12cqi) !important;
+}
+
+/* --- primary accuracy spotlight (home hero) --------------------------------
+   The one claim on the page that is a distinction rather than a reading, so
+   it gets a card of its own under the three panels: full width, a magenta
+   edge where the panels have a grey one, and the whole field of providers
+   drawn beside the rank so "top 20" is something you can see, not just read.
+   core-home.js fills it and keeps it hidden until there is a rank to show. --- */
+.rank-spot{
+  position:relative;
+  isolation:isolate;
+  /* the layout inside follows the card's own width, not the window's:
+     with the sidebar open a 1024px window leaves the card only ~600px */
+  container-type:inline-size;
+  /* between 621 and 1179px the hero is a copy | panels grid; span both */
+  grid-column:1 / -1;
+  margin-top:14px;
+  padding:24px 28px 22px;
+  border-radius:20px;
+  border:1px solid transparent;
+  background:
+    radial-gradient(90% 130% at 0% 0%, rgba(255, 46, 99, .17), transparent 60%),
+    radial-gradient(60% 90% at 100% 100%, rgba(255, 46, 99, .08), transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .015));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 22px 50px -22px rgba(255, 46, 99, .45),
+    0 6px 16px rgba(0, 0, 0, .28);
+}
+
+.rank-spot[hidden]{display:none;}
+
+.rank-spot-body{
+  display:grid;
+  grid-template-columns:minmax(0, 5fr) minmax(0, 7fr);
+  gap:30px;
+  align-items:center;
+}
+
+/* A gradient edge: bright at the corner the glow comes from, fading along
+   the sides, back up at the far corner. */
+.rank-spot::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  z-index:-1;
+  padding:1px;
+  border-radius:inherit;
+  background:linear-gradient(130deg, rgba(255, 138, 168, .95), rgba(255, 46, 99, .28) 32%, rgba(255, 255, 255, .07) 58%, rgba(255, 46, 99, .55));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events:none;
+}
+
+.rank-spot-eyebrow{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 12px;
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:11.5px;
+  letter-spacing:.03em;
+  color:var(--muted);
+}
+
+.rank-spot-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 11px 4px 9px;
+  border-radius:999px;
+  background:linear-gradient(135deg, #FF2E63, #FF6E93);
+  color:#fff;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  box-shadow:0 0 0 1px rgba(255, 255, 255, .14) inset, 0 0 22px rgba(255, 46, 99, .5);
+}
+
+.rank-spot-badge svg{width:10px;height:10px;fill:currentColor;}
+
+.rank-spot-figure{
+  display:flex;
+  align-items:baseline;
+  gap:12px;
+  margin-top:14px;
+}
+
+.rank-spot-figure strong{
+  font-family:Archivo, sans-serif;
+  font-size:clamp(54px, 5.4vw, 76px);
+  font-weight:800;
+  line-height:.9;
+  letter-spacing:-.045em;
+  font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg, #FFFFFF 30%, #FF9DB8);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 6px 24px rgba(255, 46, 99, .35));
+}
+
+.rank-spot-figure span{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.rank-spot-figure b{color:var(--ink);font-weight:600;}
+
+.rank-spot h2.rank-spot-title{
+  margin:14px 0 8px;
+  font-family:Archivo, sans-serif;
+  /* the site-wide h2 size is !important; this is a card title, not a section */
+  font-size:clamp(19px, 1.8vw, 25px) !important;
+  font-weight:750;
+  line-height:1.2;
+  letter-spacing:-.015em;
+  color:var(--ink);
+  text-wrap:balance;
+}
+
+.rank-spot-lead{
+  margin:0;
+  max-width:56ch;
+  font-size:14px;
+  line-height:1.6;
+  color:var(--muted);
+  text-wrap:pretty;
+}
+
+.rank-spot-lead b{color:var(--ink);font-weight:700;}
+.rank-spot-lead em{font-style:normal;font-weight:700;color:#FF6E93;}
+
+.rank-spot-foot{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 16px;
+  margin-top:14px;
+}
+
+.rank-spot-foot a{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:11.5px;
+  color:#FF6E93;
+  text-decoration:none;
+  border-bottom:1px solid rgba(255, 110, 147, .35);
+  transition:color .18s ease, border-color .18s ease;
+}
+
+.rank-spot-foot a:hover{color:#fff;border-bottom-color:#fff;}
+
+.rank-spot-chart{margin:0;min-width:0;}
+
+.rank-spot-chart svg{
+  display:block;
+  width:100%;
+  height:220px;
+  overflow:visible;
+}
+
+/* the field rises once, left to right, then our mark lands on it */
+.rank-spot-chart .rs-bar{
+  transform-box:fill-box;
+  transform-origin:50% 100%;
+  transition:transform .9s cubic-bezier(.2, .8, .2, 1) calc(var(--i) * 6ms);
+}
+
+.rank-spot-chart svg:not(.is-in) .rs-bar{transform:scaleY(0);}
+.rank-spot-chart .rs-mark{transition:opacity .45s ease .8s;}
+.rank-spot-chart svg:not(.is-in) .rs-mark{opacity:0;}
+
+@media (prefers-reduced-motion:reduce){
+  .rank-spot-chart .rs-bar,
+  .rank-spot-chart .rs-mark{transition:none;}
+}
+
+@container (max-width:760px){
+  .rank-spot-body{grid-template-columns:minmax(0, 1fr);gap:18px;}
+  .rank-spot-chart svg{height:170px;}
+}
+
+@container (max-width:420px){
+  .rank-spot-chart svg{height:140px;}
+}
+
+@media (max-width:620px){
+  .rank-spot{padding:20px 18px 16px;border-radius:18px;}
 }

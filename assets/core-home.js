@@ -294,6 +294,114 @@
     tm.textContent = medTxt; svg.appendChild(tm);
   }
 
+  /* --- primary accuracy spotlight -------------------------------------------
+     The badge, the headline and the rank under them are all read from one
+     primaryRank object, so the claim in large type can never outrun the
+     number it rests on. The badge is the smallest round tier that holds the
+     rank, so it moves with the data instead of saying "top 20" on a day we
+     are 23rd. Past the top 30 it turns into a percentile, rounded against
+     us; past the median the card stays hidden, because it is a highlight,
+     not a scoreboard. --- */
+  const RANK_TIERS = [3, 5, 10, 15, 20, 25, 30];
+  function rankTier(rank, count) {
+    const top = RANK_TIERS.find((n) => rank <= n);
+    if (top) return { badge: `Top ${top}`, size: top,
+      title: `Among the ${top} most accurate FTSO providers on Flare.` };
+    const pct = Math.ceil(((rank / count) * 100) / 5) * 5;
+    if (pct > 50) return null;
+    return { badge: `Top ${pct}%`, size: Math.ceil((count * pct) / 100),
+      title: `In the top ${pct}% of FTSO providers on Flare for accuracy.` };
+  }
+
+  function rankSpot(np) {
+    const card = $("rank-spot"), pr = np && np.primaryRank;
+    if (!card || !pr || !Number.isFinite(pr.rank) || !Number.isFinite(pr.ours) || !(pr.field || []).length) return;
+    const tier = rankTier(pr.rank, pr.count);
+    if (!tier) return;
+    const hours = pr.window === "6h" ? "6 hours" : pr.window;
+    const multiple = pr.median > 0 ? pr.ours / pr.median : null;
+    $("rank-spot-badge").textContent = tier.badge;
+    $("rank-spot-rank").textContent = `#${pr.rank}`;
+    $("rank-spot-count").textContent = pr.count;
+    $("rank-spot-title").textContent = tier.title;
+    $("rank-spot-lead").innerHTML =
+      `<b>${fmt(pr.ours)}%</b> of our price submissions landed inside the primary reward band over the last ${hours}` +
+      (multiple ? ` &mdash; <em>${multiple.toFixed(1)}&times;</em> the network median of ${fmt(pr.median)}%.` : ".") +
+      ` That band is the tight range around Flare's consensus price, the hardest target an FTSO provider aims for.`;
+    markSource($("rank-spot-src"), np.generatedAt, "Flare Systems Explorer");
+    card.hidden = false;
+    const svg = $("rank-spot-field");
+    const draw = () => { svg.replaceChildren(); rankField(svg, pr, tier.size); };
+    draw();
+    redrawOnResize(svg, draw);
+    // Bars rise once, on first paint; a redraw on resize lands already grown.
+    requestAnimationFrame(() => requestAnimationFrame(() => svg.classList.add("is-in")));
+  }
+
+  // Every registered provider as one bar, highest hit rate first, on a true
+  // 0-100% scale so bar height reads as the rate itself. Drawn in pixels of
+  // the box it sits in, so labels stay at their CSS size at any width.
+  function rankField(svg, pr, topN) {
+    const box = svg.getBoundingClientRect();
+    const W = Math.round(box.width) || 640, H = Math.round(box.height) || 170;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const field = pr.field, n = field.length, me = pr.rank - 1;
+    const T = 26, B = 22, base = H - B;
+    const slot = W / n, bw = Math.max(1.5, slot * 0.62);
+    const x = (i) => i * slot + (slot - bw) / 2;
+    const y = (v) => T + (base - T) * (1 - Math.min(Math.max(v, 0), 100) / 100);
+    const text = (t, attrs) => { const e = el("text", Object.assign({ "font-family": mono, "font-size": 11, fill: MUT }, attrs)); e.textContent = t; svg.appendChild(e); return e; };
+
+    const defs = el("defs");
+    defs.innerHTML = `
+      <linearGradient id="rsZone" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,46,99,.16)"/>
+        <stop offset="100%" stop-color="rgba(255,46,99,.02)"/>
+      </linearGradient>
+      <linearGradient id="rsTop" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FF8AA8"/>
+        <stop offset="100%" stop-color="rgba(255,46,99,.30)"/>
+      </linearGradient>`;
+    svg.appendChild(defs);
+
+    // the top-N zone and its bracket
+    const zw = slot * Math.min(topN, n);
+    svg.appendChild(el("rect", { x: 0, y: T - 12, width: zw, height: base - T + 12, rx: 8, fill: "url(#rsZone)" }));
+    svg.appendChild(el("path", { d: `M1,${T - 4} V${T - 12} H${zw - 1} V${T - 4}`, fill: "none",
+      stroke: "rgba(255,110,147,.55)", "stroke-width": 1 }));
+    text(`TOP ${topN}`, { x: zw / 2, y: T - 16, "text-anchor": "middle", fill: MAGL, "font-weight": 600, "letter-spacing": "1.2" });
+
+    // network median
+    const my = y(pr.median);
+    svg.appendChild(el("line", { x1: 0, x2: W, y1: my, y2: my, stroke: "rgba(255,255,255,.34)",
+      "stroke-width": 1, "stroke-dasharray": "3 4" }));
+    text(`network median ${fmt(pr.median)}%`, { x: W - 2, y: my - 6, "text-anchor": "end" });
+
+    field.forEach((v, i) => {
+      const top = i < topN, mine = i === me, yy = y(v);
+      svg.appendChild(el("rect", { class: "rs-bar", style: `--i:${i}`, x: x(i), y: yy, width: bw,
+        height: Math.max(base - yy, 1.5), rx: Math.min(bw / 2, 2),
+        fill: mine ? MAG : top ? "url(#rsTop)" : "rgba(255,255,255,.14)",
+        ...(mine ? { filter: "drop-shadow(0 0 8px rgba(255,46,99,.85))" } : {}) }));
+    });
+    svg.appendChild(el("line", { x1: 0, x2: W, y1: base, y2: base, stroke: "rgba(255,255,255,.12)" }));
+
+    // our mark: a cap on the bar and a label to its right, where every bar
+    // is shorter than ours and the space above them is free
+    const cx = x(me) + bw / 2, cy = y(pr.ours);
+    const mark = el("g", { class: "rs-mark" });
+    mark.appendChild(el("circle", { cx, cy: cy - 7, r: 6, fill: "rgba(255,46,99,.28)" }));
+    mark.appendChild(el("circle", { cx, cy: cy - 7, r: 3.4, fill: "#FFE6ED" }));
+    svg.appendChild(mark);
+    const lab = text("", { x: cx + 12, y: cy - 3, "font-family": "Archivo, sans-serif", "font-size": 13, "font-weight": 700, fill: "#FFE6ED", class: "rs-mark" });
+    lab.innerHTML = `Mirhollio Core <tspan fill="${MAGL}">${fmt(pr.ours)}%</tspan>`;
+
+    // axis: the two ends and our own rank
+    text(`#${pr.rank}`, { x: cx, y: H - 5, "text-anchor": "middle", fill: MAGL, "font-weight": 600 });
+    if (cx > 34) text("#1", { x: 1, y: H - 5 });
+    text(`#${n}`, { x: W - 1, y: H - 5, "text-anchor": "end" });
+  }
+
   // These charts draw in a 1000-unit space but render into a ~330px panel, so a
   // font-size of 10 units lands on screen at ~3px. Convert a wanted CSS pixel
   // size into the user units that actually produce it at the current width.
@@ -501,6 +609,7 @@
       markSource($("np-rr-sub").lastElementChild, np.generatedAt, "FlareMetrics");
     }
     rrCurve($("np-rr-curve"), rr);
+    rankSpot(np);
     if ($("np-stake-end") && val) $("np-stake-end").textContent = "ends " + val.stakeEndsAt.slice(5).replace("-", "/");
     if ($("np-stake") && val) $("np-stake").innerHTML = fmt(val.totalStakeM, 1) + "M<small> FLR</small>";
     const days = val ? Math.max(0, Math.round((new Date(val.stakeEndsAt) - Date.now()) / 864e5)) : null;
@@ -624,7 +733,15 @@
       const st = document.getElementById("np-stake");
       if (st) st.innerHTML = ((total + selfB) / 1e6).toFixed(1) + "M<small> FLR</small>";
       const ss = document.getElementById("np-stake-sub2");
-      if (ss) ss.textContent = `self-bond ${(selfB/1e6).toFixed(0)}M · ${dels.length} delegations · live`;
+      if (ss && ss.classList.contains("p-facts")) {
+        // The hero has already turned this line into its label/value grid.
+        // Writing text over it whenever this answer came in second wiped the
+        // grid, and the uptime and APR fields that had been moved into it.
+        for (const [label, value] of [["self-bond", `${(selfB/1e6).toFixed(0)}M`], ["delegations", dels.length]]) {
+          const cell = [...ss.querySelectorAll("span > i")].find((i) => i.textContent === label);
+          if (cell && cell.nextElementSibling) cell.nextElementSibling.textContent = value;
+        }
+      } else if (ss) ss.textContent = `self-bond ${(selfB/1e6).toFixed(0)}M · ${dels.length} delegations · live`;
       if (!tb) return;
       const day = 864e5, now = Date.now();
       const fd = (t) => new Date(t).toISOString().slice(0, 10);
@@ -811,7 +928,7 @@
   const segA = document.getElementById("ticker-a"), segB = document.getElementById("ticker-b");
   if (segA) {
     const T0 = 1787857200, E0 = 428, LEN = 302400;
-    const S = { price: null, delta: null, rank: null, voters: null, rrRank: null, rrCount: null, weight: null, uptime: null, stake: null, days: null };
+    const S = { price: null, delta: null, rank: null, voters: null, rrRank: null, rrCount: null, prRank: null, prCount: null, weight: null, uptime: null, stake: null, days: null };
     function esc(x) { return String(x); }
     function render() {
       const now = Date.now() / 1000;
@@ -822,6 +939,7 @@
       parts.push(`FLR <b>${S.price != null ? "$" + S.price.toFixed(5) : "…"}</b>${S.delta != null ? ` <span class="${S.delta >= 0 ? "up" : "down"}">${S.delta >= 0 ? "▲" : "▼"}${Math.abs(S.delta).toFixed(1)}% 7d</span>` : ""}`);
       parts.push(`epoch <b>${ep}</b> ends in <b>${h}h ${String(m).padStart(2, "0")}m</b>`);
       if (S.rrRank) parts.push(`reward rate <em>#${S.rrRank}</em> of ${S.rrCount} providers`);
+      if (S.prRank) parts.push(`price accuracy <em>#${S.prRank}</em> of ${S.prCount} providers`);
       if (S.rank) parts.push(`network weight <b>#${S.rank}</b> of ${S.voters ?? "?"}`);
       if (S.stake) parts.push(`validator stake <b>${S.stake}M FLR</b>${S.days != null ? ` · renews in ${S.days}d` : ""}`);
       // Was a hardcoded 100%. The validator card on this same page showed the
@@ -844,6 +962,7 @@
       S.rank = np.position && np.position.rank;
       S.voters = np.position && np.position.voters;
       if (np.rewardRate) { S.rrRank = np.rewardRate.rank; S.rrCount = np.rewardRate.count; }
+      if (np.primaryRank) { S.prRank = np.primaryRank.rank; S.prCount = np.primaryRank.count; }
       if (np.validator) {
         S.stake = np.validator.totalStakeM.toFixed(0);
         S.uptime = Number.isFinite(np.validator.uptime) ? np.validator.uptime : null;

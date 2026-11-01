@@ -139,6 +139,24 @@ async function main() {
     eligible: (our && our.entityminimalconditionslatest && our.entityminimalconditionslatest.eligible_for_reward) ?? null,
   };
 
+  // --- primary-band accuracy ranking
+  // providersuccessrate on the entity list is the explorer's last-6h figure
+  // (the same number /entity/{addr}/ftso reports as last_6h), so the whole
+  // field is ranked from the request above with no extra calls. The sorted
+  // field ships too: the home page draws every provider, not just our rank.
+  let primaryRank = null;
+  const prim = reg
+    .map((e) => ({ addr: (e.identity_address || "").toLowerCase(),
+      v: e.providersuccessrate && e.providersuccessrate.primary }))
+    .filter((r) => Number.isFinite(r.v))
+    .sort((a, b) => b.v - a.v);
+  const pi = prim.findIndex((r) => r.addr === IDENTITY);
+  if (pi >= 0) {
+    const pct = (v) => +(v / 100).toFixed(2);
+    primaryRank = { window: "6h", rank: pi + 1, count: prim.length, ours: pct(prim[pi].v),
+      median: pct(prim[Math.floor(prim.length / 2)].v), field: prim.map((r) => pct(r.v)) };
+  }
+
   // --- FlareMetrics reward-rate ranking
   let rewardRate = null;
   try {
@@ -201,10 +219,11 @@ async function main() {
   } catch (e) { console.error("fse mirror failed:", e.message); }
 
   const out = { schema: "mirhollio-network-position/v1", generatedAt: new Date().toISOString(),
-    position, rewardRate, validator, weightHistory };
+    position, primaryRank, rewardRate, validator, weightHistory };
   out.votePowerSnapshots = await votePowerSnapshots(epochs.results || []);
   writeFileSync("data/network-position.json", JSON.stringify(out, null, 2) + "\n");
   console.log("ok:", JSON.stringify({ rank: position.rank, voters: position.voters, rrRank: rewardRate && rewardRate.rank,
+    primaryRank: primaryRank && primaryRank.rank,
     stake: validator && validator.totalStakeM, hist: weightHistory.length }));
 }
 main().catch((e) => { console.error(e); process.exit(1); });
