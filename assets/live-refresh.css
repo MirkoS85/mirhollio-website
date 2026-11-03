@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-49");
+@import url("operator.css?v=core-50");
 
 :root{
   color-scheme:dark;
@@ -8843,5 +8843,63 @@ strong.pre-reg-value .pre-reg-pill.ok{
     height:1px;
     margin:0 0 28px;
     background:var(--line);
+  }
+}
+
+/* === core-48: epoch tables that fit what they hold ========================
+   The FTSO epoch table lost its payout column and the validator table lost
+   four, so three columns were being stretched across the full panel: two
+   hundred pixels of air between "446" and "1.50%", and a card that looked
+   half-empty. The FTSO table gets a fourth column back in markup - what the
+   delegated weight earned, which belongs on a public page in a way the
+   operator's own payout did not. The validator table genuinely has three
+   columns' worth of data, so the panel around it narrows to suit instead of
+   the table stretching to fill it. Below 860px both scroll as before. */
+@media (min-width:860px){
+  /* `table{min-width:760px}` is there so wide tables scroll rather than
+     crush on a phone. These two no longer need it at this width, and while
+     it stood, narrowing the panel did nothing: the table held 760px and the
+     first column swallowed the slack, which is what put a hand's width of
+     empty space between "446" and "0.90%". */
+  .ftso-epoch-table,
+  .validator-epoch-table{
+    min-width:0;
+  }
+
+  .table-panel:has(.validator-epoch-table){
+    max-width:580px;
+  }
+
+  .table-panel:has(.ftso-epoch-table){
+    max-width:760px;
+  }
+
+  /* /stats/ shows the same FTSO table without a panel around it. */
+  .table-wrap-compact:has(> .ftso-epoch-table){
+    max-width:760px;
+  }
+
+  /* Figures line up on their last digit, so a column of rates and a column
+     of amounts can be compared down the page rather than read one by one.
+     The epoch and the yes/no stay left, where the eye starts. */
+  .ftso-epoch-table th:nth-child(2),
+  .ftso-epoch-table td:nth-child(2),
+  .ftso-epoch-table th:nth-child(3),
+  .ftso-epoch-table td:nth-child(3),
+  .validator-epoch-table th:nth-child(2),
+  .validator-epoch-table td:nth-child(2),
+  .validator-epoch-table th:nth-child(3),
+  .validator-epoch-table td:nth-child(3){
+    text-align:right;
+  }
+
+  /* Their content is short and uniform, so the columns have no reason to
+     wrap - and a wrapped "To delegators" header was the one thing that made
+     the narrower table look cramped rather than tidy. */
+  .ftso-epoch-table th,
+  .ftso-epoch-table td,
+  .validator-epoch-table th,
+  .validator-epoch-table td{
+    white-space:nowrap;
   }
 }

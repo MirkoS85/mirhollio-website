@@ -1147,8 +1147,9 @@ const MirhollioCore = (() => {
       tbody.innerHTML = rows.map(item => `
         <tr>
           <th scope="row" data-label="${labels[0] || "Epoch"}">${item.epoch ?? "-"}</th>
-          <td data-label="${labels[1] || "Reward rate"}">${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
-          <td data-label="${labels[2] || "Eligible"}">${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
+          <td data-label="${labels[1] || "Reward rate"}">${fmtRate(item.m_dRewardRate)}</td>
+          <td data-label="${labels[2] || "To delegators"}">${item.delegatorsRewardAmount != null ? `${fmtNum(item.delegatorsRewardAmount, 0)} FLR` : "-"}</td>
+          <td data-label="${labels[3] || "Eligible"}">${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
         </tr>
       `).join("");
     });

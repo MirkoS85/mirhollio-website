@@ -1321,6 +1321,46 @@
     .catch(() => { el.textContent = "–"; });
 })();
 
+/* Primary band (FTSO page): the share of this provider's anchor-feed
+   submissions that landed inside the primary reward band, against the whole
+   field of registered voters. Weight rank answers "how big", which says
+   nothing about quality and sits mid-table; this answers "how accurate", and
+   it is the number that earns the reward rate beside it.
+
+   The window comes from the snapshot rather than being assumed, and the
+   network median travels with the figure - 70% means nothing without it. */
+(() => {
+  const el = document.getElementById("ftso-primary");
+  if (!el) return;
+  const give = (text, sub) => {
+    el.textContent = text;
+    el.classList.remove("skeleton-value");
+    el.removeAttribute("aria-busy");
+    if (sub && !el.parentElement.querySelector(".rank-of")) {
+      el.insertAdjacentHTML("afterend", `<em class="rank-of">${sub}</em>`);
+    }
+  };
+  fetch("/data/network-position.json")
+    .then((r) => r.json())
+    .then((d) => {
+      const p = d && d.primaryRank;
+      const ours = p && Number(p.ours);
+      const rank = p && Number(p.rank);
+      const of = p && Number(p.count);
+      const median = p && Number(p.median);
+      if (!Number.isFinite(ours)) { el.textContent = "\u2013"; return; }
+      // The measurement window leads the line. Trailing it wrapped "- 6h"
+      // onto a line of its own under the tile, and moving it into the label
+      // only moved the orphan there; in front it breaks mid-content instead.
+      const parts = [];
+      if (p.window) parts.push(`${p.window} \u00b7`);
+      if (rank > 0 && of > 0) parts.push(`#${rank} of ${of}`);
+      if (Number.isFinite(median)) parts.push(`\u00b7 median ${median.toFixed(1)}%`);
+      give(`${ours.toFixed(1)}%`, parts.join(" "));
+    })
+    .catch(() => { el.textContent = "\u2013"; });
+})();
+
 /* Validator hero: the grid holds four and only three were filled, leaving a
    quarter of it empty. Delegation count is the figure a would-be staker asks
    for next, and the P-chain answers it live. */
