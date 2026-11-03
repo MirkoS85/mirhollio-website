@@ -2724,6 +2724,75 @@ const MirhollioCore = (() => {
     } catch (_) {}
   }
 
+  // The execution panel used to show one blended "FTSO performance" figure.
+  // It averages the primary band, which is hard and where this provider is
+  // well clear of the field, with the secondary band, which nearly everyone
+  // passes - so the blend lands in the high eighties and reads as a bar that
+  // is missing a chunk, when the truth is the opposite. There is also no
+  // published median for a blend, so the one number that would give it
+  // meaning cannot be shown beside it.
+  //
+  // The two bands are shown separately instead, each against the network
+  // median for that same band. Both sides of each comparison come out of
+  // network-position.json, from the same registry read at the same epoch, so
+  // the value and the median cannot drift apart the way a figure taken from
+  // one source and a median from another would.
+  async function applyBandBars() {
+    if (!document.querySelector("[data-bar-median]")) return;
+    let np;
+    try { np = await fetchJsonWithCache("/data/network-position.json", 120_000); } catch (_) { return; }
+    const pos = np && np.position;
+    if (!pos) return;
+
+    const paint = (key, value, median) => {
+      const v = Number(value), m = Number(median);
+      if (!Number.isFinite(v)) return;
+      setText(key, `${v.toFixed(2)}%`);
+      setBar(key, v);
+      const note = document.querySelector(`[data-bar-note="${key}"]`);
+      const mark = document.querySelector(`[data-bar-median="${key}"]`);
+      if (!Number.isFinite(m) || m <= 0) {
+        if (note) note.textContent = "";
+        return;
+      }
+      if (mark) {
+        mark.style.left = `${Math.max(0, Math.min(100, m))}%`;
+        mark.hidden = false;
+        mark.setAttribute("title", `Network median ${m.toFixed(2)}%`);
+      }
+      if (note) {
+        const times = v / m;
+        note.textContent = times >= 1.1
+          ? `Network median ${m.toFixed(2)}% \u2014 ${times.toFixed(1)}\u00d7 above`
+          : `Network median ${m.toFixed(2)}%`;
+      }
+    };
+
+    paint("bandPrimary", pos.primaryPct, pos.medianPrimaryPct);
+    paint("bandSecondary", pos.secondaryPct, pos.medianSecondaryPct);
+
+    const source = document.querySelector("[data-bar-source]");
+    if (source) markSourceLabel(source, np.generatedAt, "Flare Systems Explorer", pos.epoch);
+  }
+
+  // Small local stamp: the provenance helpers live in core-home.js, which this
+  // page does not load.
+  function markSourceLabel(node, generatedAt, source, epoch) {
+    const age = Date.now() - new Date(generatedAt).getTime();
+    const stale = !Number.isFinite(age) || age > 90 * 60 * 1000;
+    const mins = Math.round(age / 60000);
+    const when = !Number.isFinite(age) ? "age unknown"
+      : mins < 1 ? "just now"
+      : mins < 60 ? `${mins}m ago`
+      : `${Math.floor(mins / 60)}h ago`;
+    const parts = [];
+    if (epoch != null) parts.push(`Epoch ${epoch}`);
+    parts.push(source, when);
+    if (stale) parts.push("may be stale");
+    node.textContent = parts.join(" \u00b7 ");
+    node.dataset.tone = stale ? "warn" : "ok";
+  }
+
   function applyData(provider, latest) {
     const delegation = provider.delegationAddress || TARGET_DELEGATION;
     const voter = provider.voterAddress || TARGET_VOTER;
@@ -2972,6 +3041,7 @@ const MirhollioCore = (() => {
       latestData = latestEpoch(provider);
       applyData(providerData, latestData);
       applyFieldRewardRate();
+      applyBandBars();
       if (validatorData) applyValidatorData(validatorData);
       if (!lastUpdatedSet) setText("lastUpdated", formatRelativeTime(new Date()));
       clearLiveErrors();

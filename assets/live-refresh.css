@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-51");
+@import url("operator.css?v=core-52");
 
 :root{
   color-scheme:dark;
@@ -8902,4 +8902,47 @@ strong.pre-reg-value .pre-reg-pill.ok{
   .validator-epoch-table td{
     white-space:nowrap;
   }
+}
+
+/* === core-49: the network median, on the bar ==============================
+   A bar reading 87% looks like something is missing. Against a field whose
+   median is 37%, the same reading is the opposite of missing - but only if
+   the median is on the bar rather than in a sentence somewhere else. The
+   notch marks it; the line underneath says what it is, because a notch with
+   no caption is a decoration. */
+.bar-track{
+  position:relative;
+}
+
+.bar-median{
+  position:absolute;
+  top:-4px;
+  bottom:-4px;
+  width:2px;
+  margin-left:-1px;
+  border-radius:2px;
+  background:var(--ink);
+  opacity:.72;
+  pointer-events:none;
+}
+
+/* The fill is drawn inside the track and would otherwise sit over the notch
+   whenever the reading is above the median - which is exactly the case worth
+   showing. */
+.bar-median{
+  z-index:2;
+}
+
+.bar-note{
+  margin:8px 0 0;
+  font-family:var(--f-mono);
+  font-size:11px;
+  font-weight:600;
+  line-height:1.5;
+  letter-spacing:.015em;
+  color:var(--muted);
+}
+
+.bars .data-source{
+  margin-top:14px;
 }
