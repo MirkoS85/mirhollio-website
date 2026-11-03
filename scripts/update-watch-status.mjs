@@ -20,7 +20,13 @@ const ENDPOINTS = {
 };
 
 const OUT_PATH = path.resolve("data/watch-status.json");
-const VALIDATOR_CAPACITY = 90_000_000;
+// Flare caps a validator's total stake at fifteen times its own self-bond.
+// This used to be a flat 90,000,000, which was exactly right while the
+// self-bond was 6M - and wrong from the moment it went to 7.5M, because the
+// ceiling moved to 112.5M with it. The page then told every visitor the node
+// was full and had no room, while /validator/ showed 21.8M FLR free from the
+// same payload. Derive it instead of hardcoding it.
+const SELF_BOND_MULTIPLE = 15;
 
 function argValue(name) {
   const index = process.argv.indexOf(name);
@@ -269,10 +275,20 @@ async function main() {
   const validatorStake = Number.isFinite(selfBond) && Number.isFinite(liveDelegation)
     ? selfBond + liveDelegation
     : Number(validator?.m_dTotal);
-  const capacity = Number(validator?.m_dTotalMax) || VALIDATOR_CAPACITY;
-  const free = Number.isFinite(validatorStake) ? Math.max(0, capacity - validatorStake) : null;
+  // The oracle publishes the room that is left directly, so the ceiling is
+  // what is taken plus what is free - no rule to get wrong. The 15x rule is
+  // the fallback for when that field is missing; both give 112,500,000 here.
+  const freeSpace = Number(validator?.m_dFreeDelegationSpace);
+  const capacity = Number.isFinite(validatorStake) && Number.isFinite(freeSpace)
+    ? validatorStake + freeSpace
+    : Number.isFinite(selfBond) ? selfBond * SELF_BOND_MULTIPLE : null;
+  const free = Number.isFinite(freeSpace)
+    ? Math.max(0, freeSpace)
+    : Number.isFinite(validatorStake) && Number.isFinite(capacity)
+      ? Math.max(0, capacity - validatorStake)
+      : null;
   const fillPct = Number.isFinite(validatorStake) && Number.isFinite(capacity) && capacity > 0
-    ? (validatorStake / capacity) * 100
+    ? Math.min(100, (validatorStake / capacity) * 100)
     : null;
   const ftso = ftsoWeights(explorer, snapshot);
   const ftsoAvailabilityHours = provider?.ftsoPerformance?.availability1h;

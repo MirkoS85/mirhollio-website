@@ -9,15 +9,15 @@
     "nodeId": "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   },
   "summary": {
-    "validatorLabel": "100.7% full",
+    "validatorLabel": "80.6% full",
     "ftsoLabel": "FTSO E447"
   },
   "validator": {
     "status": "connected",
     "stake": 90655151,
-    "capacity": 90000000,
-    "fillPct": 100.7279,
-    "free": 0,
+    "capacity": 112500000,
+    "fillPct": 80.5824,
+    "free": 21844849,
     "delegation": 83155151,
     "selfBond": 7500000,
     "delegationCount": 13,

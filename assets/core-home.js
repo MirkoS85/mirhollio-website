@@ -656,7 +656,9 @@
       const row = (label, value) => `<span><i>${label}</i><b>${value}</b></span>`;
       facts.className = "p-facts";
       facts.innerHTML =
-        row("self-bond", `${fmt(val.selfBondM, 0)}M`) +
+        // At no decimals a 7.5M self-bond read as "8M", which does not match
+        // the figure on /validator/ or the one the cap is derived from.
+        row("self-bond", `${fmt(val.selfBondM, val.selfBondM % 1 ? 1 : 0)}M`) +
         row("delegations", val.delegators) +
         row("free", freeM == null ? "&ndash;" : freeM >= 0.01 ? `${fmt(freeM, 2)}M` : "none") +
         row("renews in", days == null ? "&ndash;" : `${days}d`) +
