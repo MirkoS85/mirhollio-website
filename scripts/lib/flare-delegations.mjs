@@ -52,7 +52,15 @@ const SEL_WRITE_VP_CONTRACT = selector("writeVotePowerContract()");
 // be harmless anyway, since it would read back a delegation of zero.
 const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
-const STATE_PATH = path.resolve("data/delegator-candidates.json");
+// Candidate discovery state: every address that has ever shown up in the
+// delegation scan, including wallets that have since left. It is working state,
+// not site content, and it used to live in data/ - which GitHub Pages serves
+// verbatim, so a list of 393 third-party addresses was published for no reason.
+// No page and no browser script ever read it. It lives outside the published
+// tree now and is carried between CI runs by actions/cache; a cache miss costs
+// a history re-walk and nothing else, because the active delegators and their
+// first-seen dates are seeded from data/ftso-delegations.json.
+const STATE_PATH = path.resolve(process.env.DELEGATION_STATE_PATH || ".cache/delegator-candidates.json");
 
 const FIRST_RUN_LOOKBACK = Number(process.env.DELEGATION_FIRST_LOOKBACK || 50_000);
 const DISCOVERY_BUDGET_MS = Number(process.env.DELEGATION_DISCOVERY_BUDGET_MS || 45_000);
@@ -492,7 +500,6 @@ export async function readOnChainDelegators({ provider, seeds = [], epoch = null
         share: total ? (row.amount / total) * 100 : null,
         firstSeen: Number.isFinite(row.meta.firstSeen) ? row.meta.firstSeen : null,
         lastSeen: now,
-        firstBlock: row.meta.firstBlock ?? null,
         delta: Number.isFinite(before) ? row.amount - before : null,
         // Nothing at the epoch baseline and something now: this wallet arrived
         // during the epoch in progress.

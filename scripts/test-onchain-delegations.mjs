@@ -140,7 +140,7 @@ globalThis.fetch = async (url, init = {}) => {
 const dir = await mkdtemp(path.join(tmpdir(), "dx-"));
 process.chdir(dir);
 const { readOnChainDelegators } = await import(path.join(HERE, "lib", "flare-delegations.mjs"));
-const statePath = path.join(dir, "data/delegator-candidates.json");
+const statePath = path.join(dir, ".cache/delegator-candidates.json");
 const readStateFile = async () => JSON.parse(await readFile(statePath, "utf8"));
 
 console.log("=== run 1: explorer history + rpc forward window ===");
@@ -191,7 +191,11 @@ const checks = [
   ["history walk stopped at the floor, not genesis",
     Math.min(...explorerWindows.map(([from]) => from)) > 0],
   ["transfer-only address excluded", !names.includes(addr(3))],
-  ["earliest block wins for a repeat delegator", first.delegators.find(d => d.from === addr(1)).firstBlock === HEAD - 1000],
+  // firstBlock is discovery state, not site content: it is kept in the
+  // candidate file and deliberately not published in the delegator record.
+  ["earliest block wins for a repeat delegator", state1.candidates[addr(1)].firstBlock === HEAD - 1000],
+  ["firstBlock is not published in the delegator record",
+    first.delegators.every(d => !("firstBlock" in d))],
   ["firstSeen dated from the block once history is complete", Number.isFinite(first.delegators.find(d => d.from === addr(2)).firstSeen)],
   ["sorted by amount, descending", first.delegators.every((d, i, a) => i === 0 || a[i - 1].amount >= d.amount)],
   ["shares sum to 100 of the live total", Math.abs(first.delegators.reduce((s, d) => s + d.share, 0) - 100) < 0.01],

@@ -167,7 +167,6 @@ const MirhollioCore = (() => {
   let prices = { USD: null, EUR: null };
   let activePriceCurrency = "EUR";
   let activeDelegatorSort = "amount-desc";
-  let monthlyRewards = { ftso: null, validator: null };
   let lastUpdatedSet = false;
   const RETRY_MESSAGE = "Could not load live data. Try again, or use the verification links while the API catches up.";
 
@@ -182,6 +181,16 @@ const MirhollioCore = (() => {
     if (!Number.isFinite(n)) return "-";
     const pct = n <= 1 ? n * 100 : n;
     return pct.toFixed(decimals) + "%";
+  }
+
+  // fmtPct treats anything at or below 1 as a fraction and multiplies it by a
+  // hundred, which is right for availability (0.98) and wrong for a rate that
+  // is already a percentage and can legitimately sit under 1% - a 0.90% epoch
+  // APR would have rendered as 89.74%. Use this wherever the number is known
+  // to be a percentage already.
+  function fmtRate(value, decimals = 2) {
+    const n = Number(value);
+    return Number.isFinite(n) ? `${n.toFixed(decimals)}%` : "-";
   }
 
   // Two decimals, the same as fmtPct: the hero and the card below it render the
@@ -643,20 +652,14 @@ const MirhollioCore = (() => {
     const prefix = activePriceCurrency === "EUR" ? "€" : "$";
     setText("flrPrice", Number.isFinite(value) ? `${prefix}${value.toFixed(6)}` : "-");
     setText("flrUsd", Number.isFinite(prices.USD) ? `$${prices.USD.toFixed(6)}` : "-");
-    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso, activePriceCurrency));
-    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator, activePriceCurrency));
-    // No price means no fiat line. A bare "-" under the estimate read as a
-    // missing number rather than an absent conversion.
-    ["ftsoMonthlyFiat", "validatorMonthlyFiat"].forEach(key => {
-      document.querySelectorAll(`[data-field="${key}"]`).forEach(el => {
-        el.hidden = (el.textContent || "").trim() === "-";
-      });
-    });
+    // The monthly FTSO and validator payout estimates were converted to fiat
+    // here, and the two reward charts were redrawn on every currency switch
+    // because their tooltips carried a fiat line. Both plotted the operator's
+    // own payout; they plot rates now, so nothing on this path depends on the
+    // price any more.
     document.querySelectorAll("[data-price-currency]").forEach(btn => {
       btn.classList.toggle("active", btn.getAttribute("data-price-currency") === activePriceCurrency);
     });
-    if (providerData) renderRewardChart(providerData);
-    if (validatorData) renderValidatorRewardChart(Array.isArray(validatorData.m_axNode) ? validatorData.m_axNode[0] : null);
     broadcastPrice();
   }
 
@@ -971,41 +974,25 @@ const MirhollioCore = (() => {
     return FTSO_UPTIME_SNAPSHOT;
   }
 
-  function estimateFtsoMonthlyReward(provider) {
-    const direct = Number(provider?.m_dMonthlyReward ?? provider?.monthlyReward ?? provider?.monthlyRewards ?? provider?.estimatedMonthlyReward);
-    if (Number.isFinite(direct)) return direct;
-    const history = Array.isArray(provider?.epochData) ? provider.epochData : [];
-    const recent = history
-      .filter(item => Number.isFinite(Number(item.totalRewardAmount)))
-      .sort((a, b) => Number(b.epoch) - Number(a.epoch))
-      .slice(0, 8);
-    if (!recent.length) return null;
-    const total = recent.reduce((sum, item) => sum + Number(item.totalRewardAmount || 0), 0);
-    return total * (30.5 / 28);
-  }
+  // What a delegator earns, not what the operator earns. The mirror publishes
+  // m_dEpochRate - the validator reward over the stake behind the node for that
+  // epoch, as a percentage - in place of the payout amounts it used to carry,
+  // so this reads a rate directly instead of dividing one out of an income
+  // figure. Same number as before; the input is just no longer a FLR amount.
+  const EPOCHS_PER_YEAR = 365 / 3.5;
 
-  function estimateValidatorMonthlyReward(node) {
-    const direct = Number(node?.m_dMonthlyReward ?? node?.monthlyReward ?? node?.monthlyRewards ?? node?.estimatedMonthlyReward);
-    if (Number.isFinite(direct)) return direct;
-    const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
-    const recent = history
-      .filter(item => Number.isFinite(Number(item.m_dNodeReward ?? item.m_dValidatorReward)))
-      .sort((a, b) => Number(b.m_dRewardEpoch) - Number(a.m_dRewardEpoch))
-      .slice(0, 8);
-    if (!recent.length) return null;
-    const total = recent.reduce((sum, item) => sum + Number(item.m_dNodeReward ?? item.m_dValidatorReward ?? 0), 0);
-    return total * (30.5 / 28);
+  function validatorEpochRates(node) {
+    return (Array.isArray(node?.m_axReward) ? node.m_axReward : [])
+      .filter(item => Number.isFinite(Number(item.m_dEpochRate)));
   }
 
   function estimateValidatorApr(node) {
-    const history = Array.isArray(node?.m_axReward) ? node.m_axReward : [];
-    const recent = history
-      .filter(item => Number.isFinite(Number(item.m_dValidatorReward)) && Number(item.m_dRewardWeight) > 0)
+    const recent = validatorEpochRates(node)
       .sort((a, b) => Number(b.m_dRewardEpoch) - Number(a.m_dRewardEpoch))
       .slice(0, 8);
     if (!recent.length) return null;
-    const avgRate = recent.reduce((sum, item) => sum + (Number(item.m_dValidatorReward) / Number(item.m_dRewardWeight)), 0) / recent.length;
-    return avgRate * (365 / 3.5) * 100;
+    const avgRate = recent.reduce((sum, item) => sum + Number(item.m_dEpochRate), 0) / recent.length;
+    return avgRate * EPOCHS_PER_YEAR;
   }
 
   function timeLeftPct(stake) {
@@ -1015,13 +1002,6 @@ const MirhollioCore = (() => {
     const now = Date.now();
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
     return Math.max(0, Math.min(100, ((end - now) / (end - start)) * 100));
-  }
-
-  function renderMonthlyRewards() {
-    setText("ftsoMonthlyRewards", Number.isFinite(monthlyRewards.ftso) ? `${fmtNum(monthlyRewards.ftso, 0)} FLR` : "-");
-    setText("validatorMonthlyRewards", Number.isFinite(monthlyRewards.validator) ? `${fmtNum(monthlyRewards.validator, 0)} FLR` : "-");
-    setText("ftsoMonthlyFiat", fmtFiat(monthlyRewards.ftso));
-    setText("validatorMonthlyFiat", fmtFiat(monthlyRewards.validator));
   }
 
   function findProviderDeep(data) {
@@ -1161,12 +1141,14 @@ const MirhollioCore = (() => {
         return;
       }
 
+      // The reward column held the provider's own payout for the epoch. The
+      // rate beside it is the part a delegator can act on, so the payout is
+      // gone and the rate stays.
       tbody.innerHTML = rows.map(item => `
         <tr>
           <th scope="row" data-label="${labels[0] || "Epoch"}">${item.epoch ?? "-"}</th>
-          <td data-label="${labels[1] || "Reward"}">${item.totalRewardAmount != null ? fmtNum(item.totalRewardAmount, 2) : "-"}</td>
-          <td data-label="${labels[2] || "Reward rate"}">${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
-          <td data-label="${labels[3] || "Eligible"}">${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
+          <td data-label="${labels[1] || "Reward rate"}">${item.m_dRewardRate != null ? fmtPct(item.m_dRewardRate) : "-"}</td>
+          <td data-label="${labels[2] || "Eligible"}">${item.eligibleForReward === true ? "Yes" : item.eligibleForReward === false ? "No" : "-"}</td>
         </tr>
       `).join("");
     });
@@ -1186,15 +1168,12 @@ const MirhollioCore = (() => {
       const labels = tableLabels(tbody);
       const fee = Number(node?.m_dFee);
       tbody.innerHTML = history.map(item => {
-        const breakdown = validatorRewardBreakdown(item, fee);
+        const row = validatorEpochYield(item, fee);
         return `
           <tr>
-            <th scope="row" data-label="${labels[0] || "Validator epoch"}">${item.m_dRewardEpoch ?? "-"}</th>
-            <td data-label="${labels[1] || "Oracle estimate"}">${fmtNum(breakdown.netEstimate, 2)}</td>
-            <td data-label="${labels[2] || "Gross reward"}">${fmtNum(breakdown.gross, 2)}</td>
-            <td data-label="${labels[3] || "Node API"}">${fmtNum(breakdown.nodeReward, 2)}</td>
-            <td data-label="${labels[4] || "Validator API"}">${fmtNum(breakdown.validatorReward, 2)}</td>
-            <td data-label="${labels[5] || "Fee"}">${fmtNum(breakdown.fee, 2)}%</td>
+            <th scope="row" data-label="${labels[0] || "Validator epoch"}">${row.epoch ?? "-"}</th>
+            <td data-label="${labels[1] || "APR"}">${fmtRate(row.apr)}</td>
+            <td data-label="${labels[2] || "Fee"}">${row.fee != null ? `${fmtNum(row.fee, 2)}%` : "-"}</td>
           </tr>
         `;
       }).join("");
@@ -1863,18 +1842,18 @@ const MirhollioCore = (() => {
     return `${fmtNum(minReward, 0)} - ${fmtNum(maxReward, 0)} FLR${range}`;
   }
 
-  function validatorRewardBreakdown(item, feePct) {
-    const nodeReward = Number(item?.m_dNodeReward);
-    const validatorReward = Number(item?.m_dValidatorReward);
-    const gross = (Number.isFinite(nodeReward) ? nodeReward : 0)
-      + (Number.isFinite(validatorReward) ? validatorReward : 0);
-    const fee = Number.isFinite(Number(feePct)) ? Number(feePct) : 0;
+  // This used to break a reward epoch down into the operator's payout: gross,
+  // node and validator components, and the net after fee. Those are income
+  // figures and nothing on the site shows them any more, so the per-epoch view
+  // is the rate a delegator earns and its annualised form.
+  function validatorEpochYield(item, feePct) {
+    const rate = Number(item?.m_dEpochRate);
+    const fee = Number.isFinite(Number(feePct)) ? Number(feePct) : null;
     return {
-      nodeReward,
-      validatorReward,
-      gross,
-      fee,
-      netEstimate: gross * (1 - fee / 100)
+      epoch: item?.m_dRewardEpoch,
+      rate: Number.isFinite(rate) ? rate : null,
+      apr: Number.isFinite(rate) ? rate * EPOCHS_PER_YEAR : null,
+      fee
     };
   }
 
@@ -2077,7 +2056,7 @@ const MirhollioCore = (() => {
     hide();
   }
 
-  function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }) {
+  function renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml, valueFormat, rangeFormat, axisFormat }) {
     if (!svg) return;
 
     if (!series.length) {
@@ -2104,6 +2083,12 @@ const MirhollioCore = (() => {
       const y = height - padBottom - ((item.reward - minReward) / range) * plotH;
       return { ...item, x, y };
     });
+    // A series is not always FLR any more: the reward charts plot rates now,
+    // so the units come from the caller and only default to the old FLR +
+    // fiat pair.
+    const value = typeof valueFormat === "function" ? valueFormat : rewardWithFiat;
+    const range2 = typeof rangeFormat === "function" ? rangeFormat : rewardRangeWithFiat;
+    const axis = typeof axisFormat === "function" ? axisFormat : (n => fmtNum(n, 0));
     const linePath = smoothLinePath(points);
     const areaPath = `M${points[0].x} ${height - padBottom} ${linePath.replace(/^M/, "L")} L${points[points.length - 1].x} ${height - padBottom} Z`;
     const last = series[series.length - 1];
@@ -2151,8 +2136,8 @@ const MirhollioCore = (() => {
       <!-- The two axis figures were drawn before the area fill, so the fill
            and the series line painted over them: the minimum read "16,0 0"
            with the stroke through its middle. They go on top. -->
-      <text x="8" y="${padTop + 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtNum(maxReward, 0)}</text>
-      <text x="8" y="${height - padBottom - 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${fmtNum(minReward, 0)}</text>
+      <text x="8" y="${padTop + 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${axis(maxReward)}</text>
+      <text x="8" y="${height - padBottom - 6}" fill="#9AA0AF" font-size="${axisFont}" font-weight="500">${axis(minReward)}</text>
     `;
 
     bindChartTip({
@@ -2164,23 +2149,24 @@ const MirhollioCore = (() => {
         if (!point) return null;
         return typeof tooltipHtml === "function"
           ? tooltipHtml(point)
-          : `<strong>${rewardWithFiat(point.reward)}</strong><span>Epoch ${point.epoch}</span>`;
+          : `<strong>${value(point.reward)}</strong><span>Epoch ${point.epoch}</span>`;
       }
     });
 
     if (summary && last) {
-      summary.innerHTML = `<span>Latest <strong>${rewardWithFiat(last.reward)}</strong></span><span>Average <strong>${rewardWithFiat(avgReward)}</strong></span><span>Range <strong>${rewardRangeWithFiat(minReward, maxReward)}</strong></span>`;
+      summary.innerHTML = `<span>Latest <strong>${value(last.reward)}</strong></span><span>Average <strong>${value(avgReward)}</strong></span><span>Range <strong>${range2(minReward, maxReward)}</strong></span>`;
     }
-    MirhollioChartResize.watch(svg, () => renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml }));
+    MirhollioChartResize.watch(svg, () => renderRewardSeries({ svg, tooltip, summary, series, emptyMessage, gradientId, tooltipHtml, valueFormat, rangeFormat, axisFormat }));
   }
 
   function renderRewardChart(provider) {
     const series = [...(provider.epochData || [])]
       .sort((a, b) => Number(a.epoch) - Number(b.epoch))
       .slice(-20)
+      .filter(item => Number.isFinite(Number(item.m_dRewardRate)))
       .map(item => ({
         epoch: item.epoch,
-        reward: Number(item.totalRewardAmount || 0)
+        reward: Number(item.m_dRewardRate)
       }));
 
     renderRewardSeries({
@@ -2188,23 +2174,22 @@ const MirhollioCore = (() => {
       tooltip: document.querySelector("[data-render='reward-tooltip']"),
       summary: document.querySelector("[data-render='reward-summary']"),
       series,
-      emptyMessage: "FTSO reward history unavailable",
-      gradientId: "ftsoReward"
+      emptyMessage: "FTSO reward rate history unavailable",
+      gradientId: "ftsoReward",
+      valueFormat: n => fmtRate(n),
+      rangeFormat: (lo, hi) => `${fmtRate(lo)} - ${fmtRate(hi)}`,
+      axisFormat: n => fmtRate(n)
     });
   }
 
   function renderValidatorRewardChart(node) {
     const fee = Number(node?.m_dFee);
-    const series = [...(node?.m_axReward || [])]
+    const series = validatorEpochRates(node)
       .sort((a, b) => Number(a.m_dRewardEpoch) - Number(b.m_dRewardEpoch))
       .slice(-20)
       .map(item => {
-        const breakdown = validatorRewardBreakdown(item, fee);
-        return {
-          epoch: item.m_dRewardEpoch,
-          reward: breakdown.netEstimate,
-          ...breakdown
-        };
+        const row = validatorEpochYield(item, fee);
+        return { epoch: row.epoch, reward: row.apr, rate: row.rate, fee: row.fee };
       });
 
     renderRewardSeries({
@@ -2212,16 +2197,16 @@ const MirhollioCore = (() => {
       tooltip: document.querySelector("[data-render='validator-reward-tooltip']"),
       summary: document.querySelector("[data-render='validator-reward-summary']"),
       series,
-      emptyMessage: "Validator reward history unavailable",
+      emptyMessage: "Validator APR history unavailable",
       gradientId: "validatorReward",
+      valueFormat: n => fmtRate(n),
+      rangeFormat: (lo, hi) => `${fmtRate(lo)} - ${fmtRate(hi)}`,
+      axisFormat: n => fmtRate(n),
       tooltipHtml: point => `
         <b>Epoch ${point.epoch}</b>
-        <strong>${fmtNum(point.netEstimate, 2)} FLR</strong>
-        <small>Oracle display estimate</small>
-        <span>Gross <b>${fmtNum(point.gross, 2)} FLR</b></span>
-        <span>Node API <b>${fmtNum(point.nodeReward, 2)} FLR</b></span>
-        <span>Validator API <b>${fmtNum(point.validatorReward, 2)} FLR</b></span>
-        <small>Fee ${fmtNum(point.fee, 2)}%</small>
+        <strong>${fmtRate(point.reward)}</strong>
+        <small>Annualised from this epoch</small>
+        ${point.fee != null ? `<small>Fee ${fmtNum(point.fee, 2)}%</small>` : ""}
       `
     });
   }
@@ -2743,8 +2728,8 @@ const MirhollioCore = (() => {
     const voter = provider.voterAddress || TARGET_VOTER;
     setText("status", "Online");
     setText("providerName", provider.dataProviderName && provider.dataProviderName !== "Unknown" ? provider.dataProviderName : "Mirhollio Core");
-    setText("rewardRate", latest?.m_dRewardRate != null ? fmtPct(latest.m_dRewardRate) : "-");
-    setText("rewardRateSnapshot", latest?.m_dRewardRate != null ? fmtSnapshotPct(latest.m_dRewardRate) : "-");
+    setText("rewardRate", fmtRate(latest?.m_dRewardRate));
+    setText("rewardRateSnapshot", fmtRate(latest?.m_dRewardRate));
     setWeightText("votePower", latest?.m_dTotalWeight);
     setWeightText("ftsoWeight", latest?.m_dTotalWeight);
     setWeightText("delegationWeight", latest?.m_dDelegationWeight);
@@ -2753,8 +2738,8 @@ const MirhollioCore = (() => {
     setText("ftsoFee", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     setText("ftsoFeeSnapshot", latest?.voterRegistration?.delegationFeeBIPS != null ? `${fmtNum(Number(latest.voterRegistration.delegationFeeBIPS) / 100, 2)}%` : "-");
     if (ftsoSnapshotData) applyFtsoSnapshotWeights(ftsoSnapshotData);
-    setText("totalRewards", provider.totalRewards != null ? fmtCompact(provider.totalRewards, " FLR") : "-");
-    setText("averageReward", provider.averageRewardPerEpoch != null ? fmtCompact(provider.averageRewardPerEpoch, " FLR") : "-");
+    // totalRewards and averageRewardPerEpoch were the operator's own FTSO
+    // income. They are no longer published in the mirror and no longer shown.
     setText("availability", provider.ftsoPerformance?.availability != null ? fmtPct(provider.ftsoPerformance.availability) : "-");
     setText("availabilitySnapshot", provider.ftsoPerformance?.availability != null ? fmtSnapshotPct(provider.ftsoPerformance.availability) : "-");
     setText("performance", provider.ftsoPerformance?.performance != null ? fmtPct(provider.ftsoPerformance.performance) : "-");
@@ -2769,13 +2754,10 @@ const MirhollioCore = (() => {
     setText("preRegisteredStatus", preReg === "Yes" ? "Pre-registered" : preReg === "No" ? "Not pre-registered" : "Pre-reg unknown");
     renderPreRegisteredState(preReg);
     setText("minimalConditions", minimalConditions(provider, latest));
-    monthlyRewards.ftso = estimateFtsoMonthlyReward(provider);
-    renderMonthlyRewards();
     setText("selfBond", latest?.staking?.totalSelfBond != null ? fmtChainAmount(latest.staking.totalSelfBond) : "-");
     refreshFtsoStakeInputField();
     setText("stakedFlr", latest?.staking?.stakeWithUptime != null ? fmtChainAmount(latest.staking.stakeWithUptime) : latest?.staking?.stake != null ? fmtChainAmount(latest.staking.stake) : "-");
     setText("latestEpoch", currentEpoch() ?? latest?.epoch ?? "-");
-    setText("latestReward", latest?.totalRewardAmount != null ? `${fmtNum(latest.totalRewardAmount, 2)} FLR` : "-");
     setText("latestEligibility", latest?.eligibleForReward === true ? "Yes" : latest?.eligibleForReward === false ? "No" : "-");
     setText("delegationAddress", delegation);
     setText("providerIdentity", voter);
@@ -2847,15 +2829,13 @@ const MirhollioCore = (() => {
 
     setText("validatorConnected", connected);
     setText("validatorNodeId", shortAddr(node?.m_sNodeID));
-    setText("validatorApr", Number.isFinite(estimateValidatorApr(node)) ? fmtPct(estimateValidatorApr(node)) : "-");
-    setText("validatorAprSnapshot", Number.isFinite(estimateValidatorApr(node)) ? fmtSnapshotPct(estimateValidatorApr(node)) : "-");
+    setText("validatorApr", fmtRate(estimateValidatorApr(node)));
+    setText("validatorAprSnapshot", fmtRate(estimateValidatorApr(node)));
     setText("validatorUptimeAvg", Number.isFinite(uptimeAvg) ? `${fmtNum(uptimeAvg, 2)}%` : "-");
     setText("validatorUptimeSnapshot", Number.isFinite(uptimeAvg) ? fmtSnapshotPct(uptimeAvg) : "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
     setText("validatorNodeVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "") : "-");
-    monthlyRewards.validator = estimateValidatorMonthlyReward(node);
-    renderMonthlyRewards();
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
     setText("validatorTotal", Number.isFinite(capacity) ? fmtCompact(capacity, " FLR") : "-");
     setText("validatorStake", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");

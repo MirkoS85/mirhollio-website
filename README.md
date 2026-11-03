@@ -59,6 +59,24 @@ inside a single Actions run and chains to a successor. The workflows under
 `.github/workflows/` are manual fallbacks for the same scripts. All of them
 read public data and write JSON; none of them holds a credential.
 
+### What the snapshots leave out
+
+`data/oracle-live.json` is a slice of a public upstream payload, and that
+payload carries more than the site shows. Before it is written, the mirror
+drops the operator's own reward amounts — total, average, per-epoch and the
+fee-based share — and the validator node's public IP. The per-epoch validator
+history is reduced to the rate it implies, which is what the APR on the site is
+computed from. The site publishes rates, weights and eligibility; a delegator
+needs those. It does not publish what the operator earned.
+
+`delegatorsRewardAmount` stays, because that is what was paid *to delegators*,
+and the FTSO page says so.
+
+The delegation pipeline's candidate file — every address the scan has ever
+seen, including wallets that have since left — is working state, not site
+content. It lives outside the published tree in `.cache/` and is carried
+between runs by `actions/cache`.
+
 ## Running it locally
 
 ```bash
@@ -68,6 +86,11 @@ npx http-server -p 8080 -c-1
 # Refresh a snapshot (reads public endpoints, writes data/)
 node scripts/update-watch-status.mjs
 node scripts/update-ftso-delegations.mjs
+
+# Operator income, printed to the terminal and published nowhere.
+# Reads the public upstream API directly; writes nothing.
+node scripts/income-report.mjs
+node scripts/income-report.mjs --epochs 30 --json
 ```
 
 Configuration is optional and entirely non-secret — RPC endpoints, timeouts and

@@ -26,9 +26,12 @@ set -uo pipefail
 BRANCH="${BRANCH:-${GITHUB_REF_NAME:-main}}"
 INTERVAL="${REFRESH_INTERVAL_SECONDS:-300}"
 WINDOW="${REFRESH_WINDOW_SECONDS:-3900}"
+# Only site content. The delegation pipeline's candidate state used to be
+# staged here too, which published a list of every address that has ever
+# delegated - including wallets that had left - for no reason: nothing on the
+# site reads it. It lives in .cache/ now and rides actions/cache instead.
 FILES=(data/watch-status.json data/oracle-live.json data/ftso-delegations.json
-       data/network-position.json data/fse-entity.json data/fse-entity-ftso.json
-       data/delegator-candidates.json)
+       data/network-position.json data/fse-entity.json data/fse-entity-ftso.json)
 
 # The delegation snapshot used to be published by its own workflow on a four-hour
 # cron, so the home page and the operator dashboard - which read it - showed a

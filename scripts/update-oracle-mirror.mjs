@@ -53,6 +53,80 @@ function extract(root) {
   return null;
 }
 
+// ── what this mirror does not publish ────────────────────────────────────────
+//
+// The upstream payload is the operator's own slice, so it carries the
+// operator's income and the node's network address alongside the figures the
+// site actually renders. Mirroring it verbatim put all of that on the website:
+// total rewards to date, the average and per-epoch payout, the fee-based share,
+// and the validator node's public IP and port - none of which any page or
+// script reads.
+//
+// They are public in the upstream API and derivable from the chain, so this is
+// not a secret being kept; it is the operator's earnings not being published on
+// the operator's own front page.
+//
+// What stays: every rate and weight the site shows (reward rate, vote power,
+// stake, availability, performance, eligibility, fee), and
+// delegatorsRewardAmount - which is what was paid *to delegators*, and is the
+// point of the "paid to delegators" figure on the FTSO page.
+const EPOCHS_PER_YEAR = 365 / 3.5;
+
+// Per-provider income aggregates.
+const DROP_PROVIDER = ["totalRewards", "averageRewardPerEpoch"];
+
+// Per-epoch income: the epoch total, the operator's fee share, the
+// weight-based share, and the claim count.
+const DROP_EPOCH = [
+  "totalRewardAmount",
+  "feeBasedRewardAmount",
+  "weightBasedRewardAmount",
+  "totalRewardClaims",
+  // Always zero upstream and read by nothing here.
+  "epochApr",
+];
+
+// Node-level: the live payout counters and the node's network address.
+const DROP_NODE = ["m_dRewards", "m_dClaimableRewards", "m_sPublicIp"];
+
+// Per-epoch validator reward history. The site needs the APR behind these, not
+// the amounts, so each entry is reduced to the rate the amounts imply:
+// validator reward over the stake behind the node, as a percentage of that
+// stake for the epoch. Annualise it with EPOCHS_PER_YEAR to get the APR the
+// page shows - the same number it showed when it divided the amounts itself.
+function epochRate(entry) {
+  const reward = Number(entry?.m_dValidatorReward);
+  const weight = Number(entry?.m_dRewardWeight);
+  if (!Number.isFinite(reward) || !Number.isFinite(weight) || weight <= 0) return null;
+  return (reward / weight) * 100;
+}
+
+function redact(out) {
+  for (const key of ["providersV1", "providersV2"]) {
+    const provider = out[key];
+    if (!provider || typeof provider !== "object") continue;
+    for (const field of DROP_PROVIDER) delete provider[field];
+    for (const epoch of Array.isArray(provider.epochData) ? provider.epochData : []) {
+      for (const field of DROP_EPOCH) delete epoch[field];
+    }
+  }
+
+  for (const validator of out.validators?.m_axValidator || []) {
+    for (const node of Array.isArray(validator?.m_axNode) ? validator.m_axNode : []) {
+      for (const field of DROP_NODE) delete node[field];
+      if (!Array.isArray(node.m_axReward)) continue;
+      node.m_axReward = node.m_axReward.map((entry) => {
+        const rate = epochRate(entry);
+        return rate == null
+          ? { m_dRewardEpoch: entry?.m_dRewardEpoch ?? null }
+          : { m_dRewardEpoch: entry.m_dRewardEpoch, m_dEpochRate: rate };
+      });
+    }
+  }
+
+  return out;
+}
+
 async function main() {
   const out = { schema: "mirsflr-oracle-mirror/v1", generatedAt: new Date().toISOString(), warnings: [] };
 
@@ -73,6 +147,8 @@ async function main() {
 
   const found = ["providersV1", "providersV2", "validators"].filter((k) => out[k]);
   if (!found.length) throw new Error("No slices could be extracted; refusing to publish an empty mirror");
+
+  redact(out);
 
   mkdirSync(path.dirname(OUT), { recursive: true });
   writeFileSync(OUT, `${JSON.stringify(out)}\n`);

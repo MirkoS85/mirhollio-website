@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Public+Sans:wght@400;500;600&display=swap">
 
-  <meta name="description" content="Mirhollio Core epoch history with reward amounts, reward rates, eligibility, and registration timing for Flare delegation." />
+  <meta name="description" content="Mirhollio Core epoch history with reward rates, staking APR, eligibility, and registration timing for Flare delegation." />
   <meta name="theme-color" content="#0A0A0E" />
   <link rel="preconnect" href="https://api.oracle-daemon.com">
   <link rel="dns-prefetch" href="//api.oracle-daemon.com">
@@ -19,12 +19,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-47" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-48" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/epochs/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Mirhollio Core Epoch History" />
-  <meta property="og:description" content="Mirhollio Core epoch history with reward amounts, reward rates, eligibility, and registration timing." />
+  <meta property="og:description" content="Mirhollio Core epoch history with reward rates, staking APR, eligibility, and registration timing." />
   <meta property="og:url" content="https://www.mirhollio.com/epochs/" />
   <meta property="og:image" content="https://www.mirhollio.com/og-image.jpg" />
   <meta property="og:image:width" content="1200" />
@@ -39,7 +39,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png?v=3">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-47" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-48" />
 </head>
 <body>
   <div class="mobile-top">
@@ -54,11 +54,11 @@
     <main>
       <section class="section home-hero-section">
         <div class="inner">
-          <div class="hero home-hero epochs-hero"><span class="hero-mark-wrap hm-d" aria-hidden="true"><img src="../assets/brand-mark.webp?v=core-47" alt=""></span>
+          <div class="hero home-hero epochs-hero"><span class="hero-mark-wrap hm-d" aria-hidden="true"><img src="../assets/brand-mark.webp?v=core-48" alt=""></span>
             <div class="home-hero-copy epochs-hero-copy"><div class="kicker">Epoch history</div><h1>Reward history with context.</h1><p class="lead">Track rewards, rates, and eligibility across recent epochs.</p></div>
             <div class="hero-live-strip" aria-label="Epoch metric highlights">
               <div class="hero-live-tile"><span>Epoch</span><strong data-field="latestEpoch">-</strong></div>
-              <div class="hero-live-tile"><span>Latest reward</span><strong data-field="latestReward">-</strong></div>
+              <div class="hero-live-tile"><span>Availability</span><strong data-field="availability">-</strong></div>
               <div class="hero-live-tile"><span>Reward rate</span><strong data-field="rewardRateSnapshot">-</strong></div>
               <div class="hero-live-tile"><span>Eligible</span><strong data-field="latestEligibility">-</strong></div>
             </div>
@@ -70,8 +70,8 @@
           <div class="section-title recent-epochs-title"><h2>Recent epochs.</h2><p data-error></p></div>
           <button class="btn decision-btn" type="button" data-panel-toggle="ftso-epochs-panel" data-open-label="Open FTSO epochs" data-close-label="Hide FTSO epochs" aria-controls="ftso-epochs-panel" aria-expanded="false">Open FTSO epochs</button>
           <div class="validator-panel table-panel" id="ftso-epochs-panel" data-accordion-panel data-accordion-open>
-            <div class="panel-head"><strong>FTSO reward history</strong><span class="status-dot" data-field="status">Loading</span></div>
-            <div class="table-wrap table-wrap-compact"><table class="ftso-epoch-table"><caption>FTSO reward history by epoch</caption><thead><tr><th scope="col">Epoch</th><th scope="col">FTSO reward</th><th scope="col">Reward rate</th><th scope="col">Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="4">Loading...</td></tr></tbody></table></div>
+            <div class="panel-head"><strong>FTSO reward rate history</strong><span class="status-dot" data-field="status">Loading</span></div>
+            <div class="table-wrap table-wrap-compact"><table class="ftso-epoch-table"><caption>FTSO reward rate and eligibility by epoch</caption><thead><tr><th scope="col">Epoch</th><th scope="col">Reward rate</th><th scope="col">Eligible</th></tr></thead><tbody data-render="epoch-table" data-limit="14"><tr><td colspan="3">Loading...</td></tr></tbody></table></div>
           </div>
         </div>
       </section>
@@ -80,8 +80,8 @@
           <div class="section-title recent-epochs-title"><h2>Validator epochs.</h2><p>Validator reward history is separate from FTSO provider rewards.</p></div>
           <button class="btn decision-btn" type="button" data-panel-toggle="validator-epochs-panel" data-open-label="Open validator epochs" data-close-label="Hide validator epochs" aria-controls="validator-epochs-panel" aria-expanded="false">Open validator epochs</button>
           <div class="validator-panel table-panel" id="validator-epochs-panel" data-accordion-panel hidden>
-            <div class="panel-head"><strong>Validator reward history</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div>
-            <div class="table-wrap table-wrap-compact"><table class="validator-epoch-table"><caption>Validator payout estimate and API components by epoch</caption><thead><tr><th scope="col">Validator epoch</th><th scope="col">Oracle estimate</th><th scope="col">Gross reward</th><th scope="col">Node API</th><th scope="col">Validator API</th><th scope="col">Fee</th></tr></thead><tbody data-render="validator-epoch-table" data-limit="10"><tr><td colspan="6">Loading...</td></tr></tbody></table></div>
+            <div class="panel-head"><strong>Validator APR history</strong><span class="status-dot" data-field="validatorConnected">Loading</span></div>
+            <div class="table-wrap table-wrap-compact"><table class="validator-epoch-table"><caption>Validator staking APR by epoch</caption><thead><tr><th scope="col">Validator epoch</th><th scope="col">APR</th><th scope="col">Fee</th></tr></thead><tbody data-render="validator-epoch-table" data-limit="10"><tr><td colspan="3">Loading...</td></tr></tbody></table></div>
           </div>
         </div>
       </section>
@@ -100,8 +100,8 @@
     <p><a href="https://github.com/MirkoS85/mirhollio-website" target="_blank" rel="noopener">Website source on GitHub</a></p>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-47"></script>
-  <script src="../assets/live-refresh.js?v=core-47"></script>
-  <script src="../assets/pwa.js?v=core-47"></script>
+  <script src="../assets/operator.js?v=core-48"></script>
+  <script src="../assets/live-refresh.js?v=core-48"></script>
+  <script src="../assets/pwa.js?v=core-48"></script>
 </body>
 </html>

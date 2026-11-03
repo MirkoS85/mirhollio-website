@@ -37,6 +37,20 @@ jobs:
         with:
           node-version: "20"
 
+      # The delegation pipeline's candidate state is no longer committed: it is
+      # working state, and keeping it in data/ published every address that has
+      # ever delegated here. Carry it between runs out of band instead. A cache
+      # miss is not a failure - the active delegators and their first-seen dates
+      # are seeded from data/ftso-delegations.json, so a miss only costs one
+      # history re-walk.
+      - name: Restore delegation discovery state
+        uses: actions/cache@v4
+        with:
+          path: .cache/delegator-candidates.json
+          key: delegation-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            delegation-state-
+
       - name: Refresh every five minutes for the hour
         env:
           BRANCH: ${{ github.ref_name }}

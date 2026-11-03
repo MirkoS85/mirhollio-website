@@ -23,7 +23,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Mirhollio Core" />
-    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-47" crossorigin="anonymous">
+    <link rel="preload" as="fetch" href="/data/network-position.json?v=core-48" crossorigin="anonymous">
   <link rel="preload" as="fetch" href="/data/watch-status.json" crossorigin="anonymous">
   <link rel="canonical" href="https://www.mirhollio.com/validator/" />
   <meta property="og:type" content="website" />
@@ -43,7 +43,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="../favicon-64x64.png?v=3">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon-full.png">
   <link rel="manifest" href="../app.webmanifest">
-  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-47" />
+  <link rel="stylesheet" href="../assets/live-refresh.css?v=core-48" />
 </head>
 <body>
   <div class="mobile-top">
@@ -61,7 +61,7 @@
     <main>
       <section class="section home-hero-section">
         <div class="inner">
-          <div class="hero home-hero"><span class="hero-mark-wrap hm-c" aria-hidden="true"><img src="../assets/brand-mark.webp?v=core-47" alt=""></span>
+          <div class="hero home-hero"><span class="hero-mark-wrap hm-c" aria-hidden="true"><img src="../assets/brand-mark.webp?v=core-48" alt=""></span>
             <div class="home-hero-copy"><div class="kicker">Stake FLR</div><h1>Validator node metrics.</h1><p class="lead">APR, uptime, capacity, delegation details, and validator reward history for Mirhollio Core.</p></div>
             <div class="hero-live-strip hero-live-strip-3" aria-label="Validator metric highlights">
               <div class="hero-live-tile"><span>APR</span><strong data-field="validatorAprSnapshot">-</strong></div>
@@ -79,7 +79,7 @@
               <div class="panel-head"><strong>Staking calculator</strong><small>Estimate FLR staking rewards at the current live APR.</small></div>
               <div class="np-calc"><input id="np-calc-in" type="number" min="0" inputmode="decimal" placeholder="Amount in FLR (e.g. 50000)"><button type="button" class="btn primary" id="np-calc-btn">Estimate</button></div>
               <p class="p-sub" id="np-calc-out" style="margin-top:10px">Enter an amount to estimate rewards.</p>
-            </article><div class="chart-panel"><div class="panel-head"><strong>Validator payout estimate per epoch</strong><span class="mini-label">Oracle estimate · Latest 20</span></div><p class="chart-definition">Matches Oracle Daemon: (Node API + Validator API) × (1 − fee).</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Validator payout estimate per epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
+            </article><div class="chart-panel"><div class="panel-head"><strong>Staking APR by epoch</strong><span class="mini-label">Latest 20</span></div><p class="chart-definition">Validator reward over the stake behind the node, annualised across the 3.5-day reward epoch.</p><div class="reward-chart-wrap"><svg class="reward-chart" data-render="validator-reward-chart" viewBox="0 0 1000 280" preserveAspectRatio="none" aria-label="Staking APR by epoch chart"></svg><div class="chart-tooltip" data-render="validator-reward-tooltip"></div></div><div class="chart-summary" data-render="validator-reward-summary"><span>Latest <strong>-</strong></span><span>Average <strong>-</strong></span><span>Range <strong>-</strong></span></div></div>
           </div>
         </div>
       </section>
@@ -92,7 +92,7 @@
               <article class="card compact-stat"><b>Free space</b><strong data-field="freeDelegationSpace">-</strong><p>Current validator headroom.</p></article>
               <article class="card compact-stat"><b>Self-bond</b><strong data-field="selfBond">-</strong><p>Operator validator stake.</p></article>
               <article class="card compact-stat"><b>Live delegation</b><strong data-field="validatorDelegatorTotal">-</strong><p>Current validator delegations.</p></article>
-              <article class="card compact-stat"><b>Monthly est.</b><strong data-field="validatorMonthlyRewards">-</strong><p data-field="validatorMonthlyFiat">-</p></article>
+              <article class="card compact-stat"><b>Staking APR</b><strong data-field="validatorApr">-</strong><p>Live APR from recent epochs.</p></article>
               <article class="card compact-stat"><b>Node version</b><strong data-field="validatorNodeVersion">-</strong><p>Validator client version.</p></article>
             </div><article class="card panel-wide-card delegation-summary-card">
               <div class="panel-head"><strong>Delegation summary</strong></div>
@@ -126,9 +126,9 @@
     <p><a href="https://github.com/MirkoS85/mirhollio-website" target="_blank" rel="noopener">Website source on GitHub</a></p>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="../assets/operator.js?v=core-47"></script>
-  <script src="../assets/live-refresh.js?v=core-47"></script>
-  <script src="../assets/pwa.js?v=core-47"></script>
-  <script src="../assets/core-home.js?v=core-47" defer></script>
+  <script src="../assets/operator.js?v=core-48"></script>
+  <script src="../assets/live-refresh.js?v=core-48"></script>
+  <script src="../assets/pwa.js?v=core-48"></script>
+  <script src="../assets/core-home.js?v=core-48" defer></script>
 </body>
 </html>

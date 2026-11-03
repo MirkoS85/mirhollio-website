@@ -85,3 +85,8 @@ logs/
 Thumbs.db
 .idea/
 .vscode/
+
+# Pipeline working state — never site content, never published. The delegation
+# scan's candidate file lists every address that has ever delegated here; it
+# lived in data/ by accident, where GitHub Pages served it.
+/.cache/

@@ -29,21 +29,40 @@ jobs:
         with:
           node-version: "20"
 
+      # The delegation pipeline's candidate state is no longer committed: it is
+      # working state, and keeping it in data/ published every address that has
+      # ever delegated here. Carry it between runs out of band instead. A cache
+      # miss is not a failure - the active delegators and their first-seen dates
+      # are seeded from data/ftso-delegations.json, so a miss only costs one
+      # history re-walk.
+      - name: Restore delegation discovery state
+        uses: actions/cache@v4
+        with:
+          path: .cache/delegator-candidates.json
+          key: delegation-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            delegation-state-
+
       - name: Refresh delegation snapshot
         run: node scripts/update-ftso-delegations.mjs
 
       - name: Commit snapshot
         run: |
           # `git add` exits 128 on a path that does not exist, and this step runs
-          # under `bash -e`. data/delegator-candidates.json is only written when
-          # the chain could be read, so naming it unconditionally turned "the
-          # RPC was unreachable this run" into a failed workflow and an alert.
-          # And `git diff` cannot see an untracked file at all, so the first run
+          # under `bash -e`. The snapshot is only written when the upstreams
+          # could be read, so naming it unconditionally turned "the RPC was
+          # unreachable this run" into a failed workflow and an alert. And
+          # `git diff` cannot see an untracked file at all, so the first run
           # that created it would have reported no changes: stage first, then
           # ask the index what actually changed.
+          #
+          # The pipeline's candidate state is deliberately not staged. It is
+          # working state, not site content, and committing it published every
+          # address that has ever delegated here. It lives in .cache/ and is
+          # carried between runs by actions/cache.
           stage_snapshot() {
             local file staged=0
-            for file in data/ftso-delegations.json data/delegator-candidates.json; do
+            for file in data/ftso-delegations.json; do
               if [ -e "$file" ]; then
                 git add -- "$file" || return 1
                 staged=1
