@@ -1,4 +1,4 @@
-@import url("operator.css?v=core-48");
+@import url("operator.css?v=core-49");
 
 :root{
   color-scheme:dark;
@@ -8808,4 +8808,40 @@ strong.pre-reg-value .pre-reg-pill.ok{
 
 @media (max-width:620px){
   .rank-spot{padding:20px 18px 16px;border-radius:18px;}
+}
+
+/* === core-47: lift the footer clear of the fixed rail ======================
+   At 981px and up .side is position:fixed, so it sits over the page at every
+   scroll position - including the very bottom. The footer is a sibling of
+   .site-shell, not a child of it, so it spans the whole page from the left
+   edge and its first words were drawn underneath the rail: "Independent Flare
+   validator and FTSO provider" began behind it on every desktop width, from
+   288px of overlap at 1024 down to 178px at 1680 and still overlapping at
+   1920.
+
+   .site-shell solves this for the page body with a 290px first grid column.
+   The footer is outside that grid, so it has to be given the same geometry by
+   hand: the shell's own 1500px box, and a left inset of the shell padding
+   plus the rail plus the grid gap - which is exactly where the main column
+   starts. Below 981px the rail is not fixed and the footer is left alone. */
+@media (min-width:981px){
+  .site-foot{
+    /* Matches .site-shell: max-width 1500px, padding 22px, 290px rail, 18px gap. */
+    max-width:1500px;
+    border-top:0;
+    padding:0 22px 40px calc(22px + 290px + 18px);
+  }
+
+  /* The dividing rule was the element's own border-top. A border follows the
+     box, not the padded content, so once the box was widened to the shell's
+     1500px the rule reappeared to the left of the rail as a short orphan
+     stub. A block inside the padding box spans exactly the content column
+     instead, which is where the rule belongs. */
+  .site-foot::before{
+    content:"";
+    display:block;
+    height:1px;
+    margin:0 0 28px;
+    background:var(--line);
+  }
 }

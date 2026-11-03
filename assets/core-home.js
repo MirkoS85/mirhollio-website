@@ -518,16 +518,40 @@
     const annText = val.stakeEndsAt + " — self-bond ends";
     const t = el("text", { x: Math.max(xe - 6, L + annText.length * annFont * 0.62), y: T + annFont, "font-size": annFont, fill: AMBER, "font-family": mono, "text-anchor": "end" });
     t.textContent = annText; svg.appendChild(t);
-    // Dates are not evenly spaced, so drop any tick that would touch the last
-    // one drawn rather than keeping a fixed every-Nth rule.
+    // Dates are not evenly spaced, so ticks have to be thinned - but thinning
+    // them in date order kept whichever date came first in a cluster, which is
+    // not the one a reader needs. On 2026-11-16, 73.81M of 90.67M expired in a
+    // single day; the tick for it was dropped because 2026-11-15 (1.15M) sat
+    // six pixels to its left and had been drawn already. The chart showed its
+    // largest cliff with the wrong date beside it.
+    //
+    // Place by size instead: biggest expiry first, keep it if it clears every
+    // tick already placed, then draw the survivors in date order. The cliff
+    // always gets its label; the small days around it give way.
     const dateFont = fs(11);
     const minGap = 5 * dateFont * 0.62 + dateFont;
-    let lastX = -Infinity;
-    for (const [d0, lab] of steps.map((s) => [s.date, s.date.slice(5)])) {
-      const tx = x(d0);
-      if (tx - lastX < minGap || tx > W - 4) continue;
-      lastX = tx;
-      const tt = el("text", { x: tx, y: H - B + dateFont + 4, "font-size": dateFont, fill: MUT, "font-family": mono, "text-anchor": "middle" }); tt.textContent = lab; svg.appendChild(tt);
+    const half = 2.5 * dateFont * 0.62;
+    const placed = [];
+    for (const s of [...steps].sort((a, b) => b.expiresM - a.expiresM)) {
+      const tx = x(s.date);
+      if (tx > W - 4) continue;
+      if (placed.some((q) => Math.abs(tx - q.tx) < minGap)) continue;
+      placed.push({ tx, lab: s.date.slice(5) });
+    }
+    for (const q of placed.sort((a, b) => a.tx - b.tx)) {
+      // A centred label runs off the plot at either end: the first step sits
+      // left of the axis once "now" has passed it, and the last one is close
+      // enough to the right edge that half of it was clipped - on a phone the
+      // final tick read "04-0". Anchor those two to the edge instead.
+      const atStart = q.tx < L + half;
+      const atEnd = q.tx > W - 8 - half;
+      const tt = el("text", {
+        x: atStart ? L : atEnd ? W - 8 : q.tx,
+        y: H - B + dateFont + 4, "font-size": dateFont,
+        fill: MUT, "font-family": mono,
+        "text-anchor": atStart ? "start" : atEnd ? "end" : "middle"
+      });
+      tt.textContent = q.lab; svg.appendChild(tt);
     }
   }
 
