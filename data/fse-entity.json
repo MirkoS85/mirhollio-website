@@ -10,7 +10,7 @@
   ],
   "signing_policy_address_balance": 2791.1,
   "submit_signatures_address_balance": 3714.63,
-  "submit_address_balance": 3556.93,
+  "submit_address_balance": 3556.92,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
@@ -18,7 +18,7 @@
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "rewards_signed": 4,
-  "uptime_signed": 3,
+  "uptime_signed": 4,
   "voter_registered_event_re": [
    450,
    449,
@@ -26,11 +26,13 @@
    447
   ],
   "uptime_vote_re": [
+   449,
    448,
    447,
    445
   ],
   "uptime_vote_hash": [
+   "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563"
@@ -72,7 +74,7 @@
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1794510728,
+   "last_used": 1794511641,
    "balance": 3947.66
   },
   {
@@ -82,7 +84,7 @@
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1794510942,
+   "last_used": 1794511700,
    "balance": 3948.58
   }
  ],
