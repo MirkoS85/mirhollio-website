@@ -1,6 +1,6 @@
 {
   "schema": "mirhollio-network-position/v1",
-  "generatedAt": "2026-11-12T20:36:48.558Z",
+  "generatedAt": "2026-11-12T20:52:53.952Z",
   "position": {
     "epoch": 450,
     "voters": 99,
@@ -250,7 +250,7 @@
     "totalStakeM": 112.5,
     "selfBondM": 7.5,
     "delegators": 17,
-    "uptime": 99.9136,
+    "uptime": 99.9978,
     "connected": true,
     "stakeEndsAt": "2027-04-05",
     "expirySteps": [
