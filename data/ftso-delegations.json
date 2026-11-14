@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T08:57:24.124Z",
+  "generatedAt": "2026-11-14T09:12:59.737Z",
   "address": "0xad9105bef5e5df2eacbe2de9037a96695b00cade",
   "voterAddress": "0xb5a081dec72c8c87256b7e14cfadcbc342bdeac3",
   "rangeDays": 180,
@@ -9,7 +9,7 @@
     "weights": "flare-systems-explorer"
   },
   "warnings": [
-    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1779094644449&endTime=1794646644449&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
+    "Flare Base history failed: Request failed 502: https://flare-base.io/api/votepower/getDelegatedVotePowerHistory/flare?address=0xad9105bef5e5df2eacbe2de9037a96695b00cade&startTime=1779095580055&endTime=1794647580055&page=1&pageSize=250&sortField=timestamp&sortOrder=asc",
     "Reused existing Flare Base history because Oracle fallback was not newer"
   ],
   "failedDelegatorEpochs": [],
@@ -29,9 +29,9 @@
   "live": {
     "delegated": 19890782.24765075,
     "delegators": 115,
-    "blockNumber": 74500277,
+    "blockNumber": 74501157,
     "wnat": "0x1d80c49bbbcd1c0911346656b529df9e5c2f783d",
-    "observedAt": "2026-11-14T08:57:24.124Z",
+    "observedAt": "2026-11-14T09:12:59.737Z",
     "listed": 19890782.24667261,
     "historyScanComplete": true,
     "flow": {
@@ -375,7 +375,7 @@
       "previous": 1791612.9661061738,
       "share": 9.00860964823794,
       "firstSeen": 1788372908000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 269.96256569121033,
       "joined": false,
       "hasPriorSnapshot": true
@@ -386,7 +386,7 @@
       "previous": 1593799.610627517,
       "share": 8.012754806642945,
       "firstSeen": 1785423192000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -397,7 +397,7 @@
       "previous": 1503114.9406258143,
       "share": 7.5568596486034565,
       "firstSeen": 1794240331000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 3.5568384847138077,
       "joined": false,
       "hasPriorSnapshot": true
@@ -408,7 +408,7 @@
       "previous": 1500012.507072109,
       "share": 7.541244423653935,
       "firstSeen": 1793390861000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -419,7 +419,7 @@
       "previous": 1440000.0635482252,
       "share": 7.239534602608703,
       "firstSeen": 1788703635000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -430,7 +430,7 @@
       "previous": 1154407.3901818856,
       "share": 5.803730470772359,
       "firstSeen": 1786367811000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -441,7 +441,7 @@
       "previous": 669792.8042338745,
       "share": 3.3681731457323347,
       "firstSeen": 1785170029000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 163.18190759245772,
       "joined": false,
       "hasPriorSnapshot": true
@@ -452,7 +452,7 @@
       "previous": 637788.8823982571,
       "share": 3.20645449966446,
       "firstSeen": 1790086873000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -463,7 +463,7 @@
       "previous": 604020.6073022009,
       "share": 3.03668603769236,
       "firstSeen": 1792479576000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -474,7 +474,7 @@
       "previous": 547870.0537032019,
       "share": 2.7543916920004965,
       "firstSeen": 1794011991000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -485,7 +485,7 @@
       "previous": 533513.4961146417,
       "share": 2.6822147539102117,
       "firstSeen": 1788444903000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -496,7 +496,7 @@
       "previous": 525199.8178627033,
       "share": 2.6404181159076003,
       "firstSeen": 1788380260000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -507,7 +507,7 @@
       "previous": 504873.5677966062,
       "share": 2.538412720281518,
       "firstSeen": 1789795325000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 36.57894125848543,
       "joined": false,
       "hasPriorSnapshot": true
@@ -518,7 +518,7 @@
       "previous": 459457.76585468714,
       "share": 2.309902949688932,
       "firstSeen": 1792291495000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -529,7 +529,7 @@
       "previous": 450000.00121248857,
       "share": 2.268373558780508,
       "firstSeen": 1788560804000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 1197.2439278283273,
       "joined": false,
       "hasPriorSnapshot": true
@@ -540,7 +540,7 @@
       "previous": 319121.53510553326,
       "share": 1.6043689540828587,
       "firstSeen": 1786440189000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -551,7 +551,7 @@
       "previous": 299833.2984405996,
       "share": 1.5073982245017645,
       "firstSeen": 1788424743000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -562,7 +562,7 @@
       "previous": 255423.03207859688,
       "share": 1.28422596292967,
       "firstSeen": 1788424885000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 19.5577755398117,
       "joined": false,
       "hasPriorSnapshot": true
@@ -573,7 +573,7 @@
       "previous": 251697.83592028872,
       "share": 1.2655731971537987,
       "firstSeen": 1788581842000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 34.572910205082735,
       "joined": false,
       "hasPriorSnapshot": true
@@ -584,7 +584,7 @@
       "previous": 244126.4311497394,
       "share": 1.2273344914756812,
       "firstSeen": 1788593982000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -595,7 +595,7 @@
       "previous": 238731.37737154725,
       "share": 1.2002111048183801,
       "firstSeen": 1788645946000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -606,7 +606,7 @@
       "previous": 230310.7032730314,
       "share": 1.182890393674516,
       "firstSeen": 1792505335000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 4975.449161145312,
       "joined": false,
       "hasPriorSnapshot": true
@@ -617,7 +617,7 @@
       "previous": 234068.10596629334,
       "share": 1.1767667206448782,
       "firstSeen": 1792455342000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -628,7 +628,7 @@
       "previous": 231538.73429524677,
       "share": 1.164050420000919,
       "firstSeen": 1788564269000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -639,7 +639,7 @@
       "previous": 216278.08109387584,
       "share": 1.087328182477187,
       "firstSeen": 1788675075000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -650,7 +650,7 @@
       "previous": 201087.5571213341,
       "share": 1.0109585164509256,
       "firstSeen": 1788229549000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -661,7 +661,7 @@
       "previous": 195847.65655775045,
       "share": 0.9846151554993847,
       "firstSeen": 1788235457000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -672,7 +672,7 @@
       "previous": 181747.71506815092,
       "share": 0.9137283431355078,
       "firstSeen": 1790603248000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -683,7 +683,7 @@
       "previous": 163247.42441828546,
       "share": 0.8208422093039627,
       "firstSeen": 1792227974000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 24.512031171354465,
       "joined": false,
       "hasPriorSnapshot": true
@@ -694,7 +694,7 @@
       "previous": 153961.11891061714,
       "share": 0.7740324990426211,
       "firstSeen": 1790016853000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -705,7 +705,7 @@
       "previous": 146401.77673734174,
       "share": 0.7363474315503196,
       "firstSeen": 1788278072000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 63.487458501476794,
       "joined": false,
       "hasPriorSnapshot": true
@@ -716,7 +716,7 @@
       "previous": 145797.4635058319,
       "share": 0.7329900940575208,
       "firstSeen": 1788696458000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -727,7 +727,7 @@
       "previous": 131694.98712322305,
       "share": 0.6630058862506462,
       "firstSeen": 1792848462000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 182.07000000000698,
       "joined": false,
       "hasPriorSnapshot": true
@@ -738,7 +738,7 @@
       "previous": 105918.6867680705,
       "share": 0.5325013639450016,
       "firstSeen": 1792281367000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -749,7 +749,7 @@
       "previous": 103018.56064314062,
       "share": 0.5179211122041613,
       "firstSeen": 1792279796000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -760,7 +760,7 @@
       "previous": 101753.7565612157,
       "share": 0.5115623674037937,
       "firstSeen": 1773349691000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -771,7 +771,7 @@
       "previous": 92820.62460976602,
       "share": 0.4666514541967238,
       "firstSeen": 1788249363000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -782,7 +782,7 @@
       "previous": 91980.44664196578,
       "share": 0.462427497806575,
       "firstSeen": 1788456884000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -793,7 +793,7 @@
       "previous": 90000.00000046959,
       "share": 0.45247089269754215,
       "firstSeen": 1790795597000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -804,7 +804,7 @@
       "previous": 88507.10879544135,
       "share": 0.4450290407763155,
       "firstSeen": 1788591145000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 12.64864418443176,
       "joined": false,
       "hasPriorSnapshot": true
@@ -815,7 +815,7 @@
       "previous": 87199.34494630795,
       "share": 0.4383907272254556,
       "firstSeen": 1794024498000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -826,7 +826,7 @@
       "previous": 78752.30378180066,
       "share": 0.39592361326614944,
       "firstSeen": 1790795305000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -837,7 +837,7 @@
       "previous": 78414.83086856181,
       "share": 0.394226983595998,
       "firstSeen": 1792491447000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -848,7 +848,7 @@
       "previous": 74918.96428394823,
       "share": 0.37669743903844066,
       "firstSeen": 1789160897000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 9.103047664932092,
       "joined": false,
       "hasPriorSnapshot": true
@@ -859,7 +859,7 @@
       "previous": 74811.60670901074,
       "share": 0.3761119385731878,
       "firstSeen": 1793710709000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -870,7 +870,7 @@
       "previous": 71385.61715206316,
       "share": 0.3588879324265607,
       "firstSeen": 1790246752000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -881,7 +881,7 @@
       "previous": 70113.03979529433,
       "share": 0.3525273352049482,
       "firstSeen": 1788595908000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 7.404813767760061,
       "joined": false,
       "hasPriorSnapshot": true
@@ -892,7 +892,7 @@
       "previous": 64650.32468813285,
       "share": 0.3250265569408088,
       "firstSeen": 1790008239000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -903,7 +903,7 @@
       "previous": 63156.91445681179,
       "share": 0.3176117336690444,
       "firstSeen": 1790070429000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 18.54388028626272,
       "joined": false,
       "hasPriorSnapshot": true
@@ -914,7 +914,7 @@
       "previous": 61605.913241084614,
       "share": 0.30976250020366786,
       "firstSeen": 1776878866000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 8.271159305673791,
       "joined": false,
       "hasPriorSnapshot": true
@@ -925,7 +925,7 @@
       "previous": 60346.54451780035,
       "share": 0.3033894985448736,
       "firstSeen": 1791237534000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -936,7 +936,7 @@
       "previous": 56073.460055139694,
       "share": 0.2819067614184072,
       "firstSeen": 1788374540000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -947,7 +947,7 @@
       "previous": 46366.44303389969,
       "share": 0.24500588721598107,
       "firstSeen": 1791817176000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 2367.144486155892,
       "joined": false,
       "hasPriorSnapshot": true
@@ -958,7 +958,7 @@
       "previous": 46306.15396813003,
       "share": 0.23282588231140167,
       "firstSeen": 1787597347000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 4.735298602485273,
       "joined": false,
       "hasPriorSnapshot": true
@@ -969,7 +969,7 @@
       "previous": 43794.58390963812,
       "share": 0.22017527196453315,
       "firstSeen": 1787853840000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -980,7 +980,7 @@
       "previous": 41999.99999999999,
       "share": 0.21115308325775126,
       "firstSeen": 1788352324000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -991,7 +991,7 @@
       "previous": 40322.408587546895,
       "share": 0.20271906899141323,
       "firstSeen": 1785435919000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1002,7 +1002,7 @@
       "previous": 31924.911293109733,
       "share": 0.16050103457786485,
       "firstSeen": 1788693480000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1013,7 +1013,7 @@
       "previous": 27377.556772660337,
       "share": 0.13896535930359427,
       "firstSeen": 1789162736000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 263.7402460830708,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1024,7 +1024,7 @@
       "previous": 26336.119065276573,
       "share": 0.13240363670658084,
       "firstSeen": 1788286654000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1035,7 +1035,7 @@
       "previous": 26187.871236251514,
       "share": 0.13165832751170203,
       "firstSeen": 1792870647000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1046,7 +1046,7 @@
       "previous": 22500.158599244125,
       "share": 0.11312663850477295,
       "firstSeen": 1788991623000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 1.6147298272917396,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1057,7 +1057,7 @@
       "previous": 20201.21308870382,
       "share": 0.10162181371870445,
       "firstSeen": 1789172800000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 12.160594196961029,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1068,7 +1068,7 @@
       "previous": 19308.158612423,
       "share": 0.09707088626292433,
       "firstSeen": 1788468834000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1079,7 +1079,7 @@
       "previous": 17823.6488659234,
       "share": 0.08960758126055351,
       "firstSeen": 1788618033000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1090,7 +1090,7 @@
       "previous": 14139.884337507032,
       "share": 0.07108762320887133,
       "firstSeen": 1788546338000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1101,7 +1101,7 @@
       "previous": 13641.564075543029,
       "share": 0.0700663603243299,
       "firstSeen": 1788582104000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 295.18308542379236,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1112,7 +1112,7 @@
       "previous": 13327.99020638394,
       "share": 0.06700586251683528,
       "firstSeen": 1788621317000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1123,7 +1123,7 @@
       "previous": 13177.000178840653,
       "share": 0.06624676704405105,
       "firstSeen": 1788473559000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1134,7 +1134,7 @@
       "previous": 12699.445291153192,
       "share": 0.06384588164024112,
       "firstSeen": 1788379717000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1145,7 +1145,7 @@
       "previous": 11604.444056389562,
       "share": 0.05834081290473196,
       "firstSeen": 1788691312000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1156,7 +1156,7 @@
       "previous": 11529.482050397264,
       "share": 0.05796418690086979,
       "firstSeen": 1789180048000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0.048147676045118715,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1167,7 +1167,7 @@
       "previous": 10928.065354169314,
       "share": 0.05531072369191006,
       "firstSeen": 1788524594000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 73.67025498829025,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1178,7 +1178,7 @@
       "previous": 10266.581161817201,
       "share": 0.05161476825794401,
       "firstSeen": 1788869038000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1189,7 +1189,7 @@
       "previous": 7825.3159190646875,
       "share": 0.03934141866134458,
       "firstSeen": 1788559981000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1200,7 +1200,7 @@
       "previous": 7745.731417098391,
       "share": 0.03894131120968467,
       "firstSeen": 1788282051000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1211,7 +1211,7 @@
       "previous": 6715.887981924852,
       "share": 0.03376382033802642,
       "firstSeen": 1788522498000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1222,7 +1222,7 @@
       "previous": 6358.379527833559,
       "share": 0.03196646290059573,
       "firstSeen": 1788448993000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1233,7 +1233,7 @@
       "previous": 5049.576493292836,
       "share": 0.02577657984848306,
       "firstSeen": 1789514729000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 77.586875260753,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1244,7 +1244,7 @@
       "previous": 5091.019381200461,
       "share": 0.025594867601558248,
       "firstSeen": 1785447358000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1255,7 +1255,7 @@
       "previous": 4497.168553921253,
       "share": 0.022609309668816076,
       "firstSeen": 1788601188000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1266,7 +1266,7 @@
       "previous": 4166.7,
       "share": 0.020947894095477912,
       "firstSeen": 1791300185000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1277,7 +1277,7 @@
       "previous": 4060.4925894156468,
       "share": 0.020413941185722956,
       "firstSeen": 1789953499000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1288,7 +1288,7 @@
       "previous": 2333.244365265282,
       "share": 0.017127893509288113,
       "firstSeen": 1788657965000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 1073.6276362767235,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1299,7 +1299,7 @@
       "previous": 3370.881913497275,
       "share": 0.016946954984112812,
       "firstSeen": 1785414405000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1310,7 +1310,7 @@
       "previous": 2970.8733571628245,
       "share": 0.014935930222219928,
       "firstSeen": 1790966723000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1321,7 +1321,7 @@
       "previous": 2901.5478227185695,
       "share": 0.014587399261591454,
       "firstSeen": 1785346390000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1332,7 +1332,7 @@
       "previous": 2871.4675812041296,
       "share": 0.014436172220141173,
       "firstSeen": 1788657557000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1343,7 +1343,7 @@
       "previous": 0.17884395391074978,
       "share": 0.012825489242256505,
       "firstSeen": 1792885455000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 2550.9112934192026,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1354,7 +1354,7 @@
       "previous": 2061.0231979136847,
       "share": 0.011085830376270917,
       "firstSeen": 1790565206000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 144.03518257428505,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1365,7 +1365,7 @@
       "previous": 2205,
       "share": 0.011085536871031941,
       "firstSeen": 1788200115000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1376,7 +1376,7 @@
       "previous": 2069.821838344862,
       "share": 0.010405934832398678,
       "firstSeen": 1785161345000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1387,7 +1387,7 @@
       "previous": 1854.7368706227826,
       "share": 0.009324604972948417,
       "firstSeen": 1788781499000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1398,7 +1398,7 @@
       "previous": 1854.0651575090449,
       "share": 0.009321227965923882,
       "firstSeen": 1788726224000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1409,7 +1409,7 @@
       "previous": 1111.2988551323936,
       "share": 0.005842593775989803,
       "firstSeen": 1791020879000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 50.83875046453386,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1420,7 +1420,7 @@
       "previous": null,
       "share": 0.005713451893892254,
       "firstSeen": 1792163168000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": null,
       "joined": true,
       "hasPriorSnapshot": false
@@ -1431,7 +1431,7 @@
       "previous": 1126.8970478781496,
       "share": 0.00566542348032212,
       "firstSeen": 1791020679000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1442,7 +1442,7 @@
       "previous": 740.6103132533201,
       "share": 0.0037233845508554183,
       "firstSeen": 1791465679000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1453,7 +1453,7 @@
       "previous": 710.01,
       "share": 0.0035695428724722856,
       "firstSeen": 1788416499000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1464,7 +1464,7 @@
       "previous": 584.9825477729456,
       "share": 0.0027891790737575133,
       "firstSeen": 1791020751000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": -30.193011714796626,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1475,7 +1475,7 @@
       "previous": 450,
       "share": 0.0022623544634759064,
       "firstSeen": 1756463057000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1486,7 +1486,7 @@
       "previous": 372.86044081397534,
       "share": 0.002056589584232743,
       "firstSeen": 1788663653000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 36.21131511362546,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1497,7 +1497,7 @@
       "previous": 351.27516278089854,
       "share": 0.0017660198498346477,
       "firstSeen": 1788670616000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1508,7 +1508,7 @@
       "previous": 216.30877811349808,
       "share": 0.0010874825103424264,
       "firstSeen": 1788754493000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1519,7 +1519,7 @@
       "previous": 211.34971902893858,
       "share": 0.0010625510671099954,
       "firstSeen": 1788207473000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1530,7 +1530,7 @@
       "previous": 77.00037481854588,
       "share": 0.00038711587035567793,
       "firstSeen": 1791020737000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1541,7 +1541,7 @@
       "previous": 63.39295421067553,
       "share": 0.0003187051842476568,
       "firstSeen": 1792079450000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1552,7 +1552,7 @@
       "previous": 58.5,
       "share": 0.00029410608025186785,
       "firstSeen": 1787943081000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1563,7 +1563,7 @@
       "previous": 23.26643622899029,
       "share": 0.00011697094633740827,
       "firstSeen": 1791020865000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1574,7 +1574,7 @@
       "previous": 9.10025138163784,
       "share": 0.000045751098515558114,
       "firstSeen": 1791020765000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1585,7 +1585,7 @@
       "previous": 5.266649429233316,
       "share": 0.00002647783965286406,
       "firstSeen": 1791020837000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1596,7 +1596,7 @@
       "previous": 4.619729146847944,
       "share": 0.00002322547745649153,
       "firstSeen": 1788651952000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1607,7 +1607,7 @@
       "previous": 4.456405639126278,
       "share": 0.00002240437597497008,
       "firstSeen": 1785043177000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1618,7 +1618,7 @@
       "previous": 2.42316387893701,
       "share": 0.000012182345816103858,
       "firstSeen": 1788233099000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
@@ -1629,7 +1629,7 @@
       "previous": 0.563770431386356,
       "share": 0.000002834330115161466,
       "firstSeen": 1791020826000,
-      "lastSeen": 1794646649482,
+      "lastSeen": 1794647585652,
       "delta": 0,
       "joined": false,
       "hasPriorSnapshot": true
