@@ -1435,14 +1435,32 @@
       el("accuracySub").textContent = `Average over the last ${hits.length} epochs, lowest ${Math.min(...hits).toFixed(1)}%.`;
     }
 
+    // This tile used to lead with "1 in 113", which puts the single worst
+    // epoch on record in the headline and buries the fact that earns trust:
+    // nothing has gone wrong since, for the better part of a year. The strike
+    // is still disclosed, in the line underneath, where it belongs - a
+    // provider page that quietly dropped a protocol strike would not be worth
+    // reading, and the strike is on-chain anyway.
     const struck = sum ? sum.strikes || [] : eps.filter((e) => Number(e.strikes) > 0);
     const latest = (sum ? sum.lastEpoch : null) ?? eps[eps.length - 1]?.epoch;
-    const firstStrike = struck[0];
-    const strikeId = firstStrike && (firstStrike.failureId ?? firstStrike.failures?.[0]?.failureId);
-    el("strikes").textContent = `${struck.length} in ${epochCount}`;
-    el("strikesSub").textContent = struck.length
-      ? `Epoch ${firstStrike.epoch}, ${String(strikeId || "a protocol round").replace(/_/g, " ").toLowerCase()}. ${latest - firstStrike.epoch} epochs clean since.`
-      : "No protocol strike on record.";
+    // The clean run is counted from the NEWEST strike. The list is ascending,
+    // so that is the last entry; this read the first before, which was the
+    // same thing with one strike on record and would have been wrong the
+    // moment a second landed.
+    const lastStrike = struck[struck.length - 1];
+    if (!lastStrike) {
+      el("strikes").textContent = `${epochCount} epochs`;
+      el("strikesSub").textContent = "No protocol strike on record.";
+    } else {
+      const clean = Number(latest) - Number(lastStrike.epoch);
+      const id = String(lastStrike.failureId ?? lastStrike.failures?.[0]?.failureId ?? "a protocol round")
+        .replace(/_/g, " ").toLowerCase();
+      const days = Math.round(clean * 3.5);
+      el("strikes").textContent = `${clean} epochs`;
+      el("strikesSub").textContent = struck.length === 1
+        ? `One strike on record, epoch ${lastStrike.epoch} (${id}). ${days} days clean since.`
+        : `${struck.length} strikes on record, the last at epoch ${lastStrike.epoch} (${id}). ${days} days clean since.`;
+    }
 
     // The blended performance figure reads badly on its own. Against the
     // network's own medians it reads as what it is.
