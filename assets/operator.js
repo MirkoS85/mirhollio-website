@@ -2905,7 +2905,19 @@ const MirhollioCore = (() => {
     setText("validatorUptimeSnapshot", Number.isFinite(uptimeAvg) ? fmtSnapshotPct(uptimeAvg) : "-");
     setText("validatorUptime", uptime);
     setText("validatorFee", node?.m_dFee != null ? `${fmtNum(node.m_dFee, 2)}%` : "-");
-    setText("validatorNodeVersion", node?.m_sVersion ? String(node.m_sVersion).replace(/^avalanchego\//, "") : "-");
+    // The Oracle Daemon reports m_sVersion as the literal string "unknown" for
+    // this node - it has no way to read a third-party validator's client
+    // version, and neither has the P-chain. Printing it put the word "unknown"
+    // in a stat card as though it were a reading. Treat it as absent, the same
+    // as every other value the upstream cannot supply.
+    const nodeVersion = String(node?.m_sVersion ?? "").trim();
+    setText("validatorNodeVersion", nodeVersion && nodeVersion.toLowerCase() !== "unknown"
+      ? nodeVersion.replace(/^avalanchego\//, "")
+      : "-");
+    // Reward eligibility is a flag the P-chain does answer, and nothing on the
+    // site was showing it.
+    setText("validatorEligible", node?.m_bElegible === true ? "Yes"
+      : node?.m_bElegible === false ? "No" : "-");
     setText("validatorBoost", node?.m_dBoost != null ? fmtCompact(node.m_dBoost, " FLR") : "-");
     setText("validatorTotal", Number.isFinite(capacity) ? fmtCompact(capacity, " FLR") : "-");
     setText("validatorStake", Number.isFinite(selfBond) ? fmtCompact(selfBond, " FLR") : "-");
