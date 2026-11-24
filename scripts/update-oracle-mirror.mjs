@@ -89,16 +89,36 @@ const DROP_EPOCH = [
 // Node-level: the live payout counters and the node's network address.
 const DROP_NODE = ["m_dRewards", "m_dClaimableRewards", "m_sPublicIp"];
 
-// Per-epoch validator reward history. The site needs the APR behind these, not
-// the amounts, so each entry is reduced to the rate the amounts imply:
-// validator reward over the stake behind the node, as a percentage of that
-// stake for the epoch. Annualise it with EPOCHS_PER_YEAR to get the APR the
-// page shows - the same number it showed when it divided the amounts itself.
+// Per-epoch validator reward history, reduced to the one rate the site needs:
+// what a delegator earned, per unit delegated, in that epoch.
+//
+// This used to be m_dValidatorReward / m_dRewardWeight - the operator's own
+// take divided by the whole stake behind the node. That is not a yield anybody
+// receives. It is a share of the pot over a base that includes the self-bond
+// and the boost, and it came out around half of what a delegator actually got:
+// 1.18% against 2.52% on the same eight epochs.
+//
+// The docs give the split (dev.flare.network/network/fsp/rewarding): a
+// provider's reward divides into fee claims, which the provider keeps, and
+// weight participation claims, which go to delegators and stakers by weight.
+// m_dNodeReward is the gross for all the stake behind the node and
+// m_dValidatorReward is the operator's part - checked by summing the latter
+// over all 123 epochs, which reproduces node.m_dRewards to the FLR. So the
+// delegators' part is the difference, and their yield is that over what they
+// delegated. Across 115 epochs with data it lands between 0% and 11.2%
+// annualised, with no negative or absurd value.
+//
+// It is also the safer figure to publish. The old rate was the operator's
+// reward over a weight that is public on the P-chain, so the operator's income
+// could be multiplied straight back out of it. This one yields the delegators'
+// payout instead.
 function epochRate(entry) {
-  const reward = Number(entry?.m_dValidatorReward);
-  const weight = Number(entry?.m_dRewardWeight);
-  if (!Number.isFinite(reward) || !Number.isFinite(weight) || weight <= 0) return null;
-  return (reward / weight) * 100;
+  const gross = Number(entry?.m_dNodeReward);
+  const operator = Number(entry?.m_dValidatorReward);
+  const delegated = Number(entry?.m_dDelegation);
+  if (!Number.isFinite(gross) || !Number.isFinite(operator)) return null;
+  if (!Number.isFinite(delegated) || delegated <= 0) return null;
+  return ((gross - operator) / delegated) * 100;
 }
 
 function redact(out) {
