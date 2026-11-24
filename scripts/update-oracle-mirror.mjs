@@ -121,6 +121,36 @@ function epochRate(entry) {
   return ((gross - operator) / delegated) * 100;
 }
 
+// epochData was 160KB of the 181KB mirror: 113 reward epochs, every one of
+// them in full, fetched by every page. Nothing on the site reads more than the
+// last 20 of them - the reward chart's window, and the widest of any. The
+// three figures that genuinely need the whole history are all on the FTSO
+// track-record card: what has been paid to delegators, how many epochs that
+// covers, and which epochs carried a strike. Those are computed here instead,
+// so the array can be cut to a window that covers every reader with room to
+// spare.
+const RETAIN_EPOCHS = 30;
+
+function summariseEpochs(epochs) {
+  const sorted = [...epochs].sort((a, b) => Number(a.epoch) - Number(b.epoch));
+  return {
+    epochs: sorted.length,
+    firstEpoch: sorted[0]?.epoch ?? null,
+    lastEpoch: sorted[sorted.length - 1]?.epoch ?? null,
+    retained: Math.min(RETAIN_EPOCHS, sorted.length),
+    // What the delegated weight earned across every epoch on record. This is
+    // not the operator's income - it is the figure the FTSO page puts up on
+    // purpose.
+    delegatorsRewardTotal: sorted.reduce(
+      (sum, e) => sum + (Number(e.delegatorsRewardAmount) || 0), 0),
+    // Ascending, so the reader's "epochs clean since" counts from the same
+    // entry it counted from when it had the whole array.
+    strikes: sorted
+      .filter((e) => Number(e.strikes) > 0)
+      .map((e) => ({ epoch: e.epoch, failureId: e.failures?.[0]?.failureId ?? null })),
+  };
+}
+
 function redact(out) {
   for (const key of ["providersV1", "providersV2"]) {
     const provider = out[key];
@@ -128,6 +158,12 @@ function redact(out) {
     for (const field of DROP_PROVIDER) delete provider[field];
     for (const epoch of Array.isArray(provider.epochData) ? provider.epochData : []) {
       for (const field of DROP_EPOCH) delete epoch[field];
+    }
+    if (Array.isArray(provider.epochData) && provider.epochData.length) {
+      provider.epochSummary = summariseEpochs(provider.epochData);
+      provider.epochData = [...provider.epochData]
+        .sort((a, b) => Number(a.epoch) - Number(b.epoch))
+        .slice(-RETAIN_EPOCHS);
     }
   }
 

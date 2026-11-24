@@ -1414,9 +1414,16 @@
     const eps = Array.isArray(p?.epochData) ? p.epochData : [];
     if (!eps.length) { card.hidden = true; return; }
 
-    const paid = eps.reduce((sum, e) => sum + (Number(e.delegatorsRewardAmount) || 0), 0);
+    // The mirror carries only the last 30 epochs - every chart and table here
+    // reads fewer than that - and precomputes the three figures that do need
+    // the whole history. Fall back to the array when the summary is absent,
+    // so an untruncated mirror still produces the same numbers.
+    const sum = p.epochSummary || null;
+    const paid = sum ? Number(sum.delegatorsRewardTotal)
+                     : eps.reduce((t, e) => t + (Number(e.delegatorsRewardAmount) || 0), 0);
+    const epochCount = sum ? Number(sum.epochs) : eps.length;
     el("paid").textContent = `${flr(paid)} FLR`;
-    el("paidSub").textContent = `Across ${eps.length} reward epochs, to delegators - not the provider's fee.`;
+    el("paidSub").textContent = `Across ${epochCount} reward epochs, to delegators - not the provider's fee.`;
 
     el("eligible").textContent = `${p.eligibleEpochs} / ${p.totalEpochs}`;
 
@@ -1428,11 +1435,13 @@
       el("accuracySub").textContent = `Average over the last ${hits.length} epochs, lowest ${Math.min(...hits).toFixed(1)}%.`;
     }
 
-    const struck = eps.filter((e) => Number(e.strikes) > 0);
-    const latest = eps[eps.length - 1]?.epoch;
-    el("strikes").textContent = `${struck.length} in ${eps.length}`;
+    const struck = sum ? sum.strikes || [] : eps.filter((e) => Number(e.strikes) > 0);
+    const latest = (sum ? sum.lastEpoch : null) ?? eps[eps.length - 1]?.epoch;
+    const firstStrike = struck[0];
+    const strikeId = firstStrike && (firstStrike.failureId ?? firstStrike.failures?.[0]?.failureId);
+    el("strikes").textContent = `${struck.length} in ${epochCount}`;
     el("strikesSub").textContent = struck.length
-      ? `Epoch ${struck[0].epoch}, ${String(struck[0].failures?.[0]?.failureId || "a protocol round").replace(/_/g, " ").toLowerCase()}. ${latest - struck[0].epoch} epochs clean since.`
+      ? `Epoch ${firstStrike.epoch}, ${String(strikeId || "a protocol round").replace(/_/g, " ").toLowerCase()}. ${latest - firstStrike.epoch} epochs clean since.`
       : "No protocol strike on record.";
 
     // The blended performance figure reads badly on its own. Against the
