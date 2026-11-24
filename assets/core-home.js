@@ -1409,7 +1409,8 @@
     fetch("/data/oracle-live.json?v=tr-1").then((r) => r.json()).catch(() => null),
     fetch("/data/network-position.json?v=tr-1").then((r) => r.json()).catch(() => null)
   ]).then(([oracle, np]) => {
-    const p = oracle?.providersV1;
+    // The mirror ships one provider slice, not both; V2 is the one it keeps.
+    const p = oracle?.providersV2 || oracle?.providersV1;
     const eps = Array.isArray(p?.epochData) ? p.epochData : [];
     if (!eps.length) { card.hidden = true; return; }
 

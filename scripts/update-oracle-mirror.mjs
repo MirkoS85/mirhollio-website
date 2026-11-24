@@ -165,6 +165,16 @@ async function main() {
     }
   }
 
+  // The v1 and v2 provider endpoints return the same slice for this provider,
+  // byte for byte, so the mirror was shipping 163KB of it twice - half the
+  // file, on every page view of every page, for nothing. Publish one and let
+  // the reader fall back; if the two ever diverge, both go out again and the
+  // readers pick V2 as they already do.
+  if (out.providersV1 && out.providersV2
+      && JSON.stringify(out.providersV1) === JSON.stringify(out.providersV2)) {
+    delete out.providersV1;
+  }
+
   const found = ["providersV1", "providersV2", "validators"].filter((k) => out[k]);
   if (!found.length) throw new Error("No slices could be extracted; refusing to publish an empty mirror");
 

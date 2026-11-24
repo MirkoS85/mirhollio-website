@@ -32,7 +32,6 @@ assets/                    CSS and browser JavaScript, loaded directly
 data/                      JSON snapshots, refreshed by the jobs below
 scripts/                   Node scripts that produce data/
 .github/workflows/         the schedules that run them
-watchos/                   read-only mirror of a retired Apple Watch app
 ```
 
 The pages read `data/*.json` from this same origin first and fall back to the

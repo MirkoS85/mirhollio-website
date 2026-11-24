@@ -1052,6 +1052,12 @@ const MirhollioCore = (() => {
       : "providersV1";
     const mirror = await loadOracleMirror();
     if (mirror && mirror[key]) return mirror[key];
+    // The two provider endpoints return the same slice, so the mirror ships
+    // only one of them. Without this, asking for the one it left out would
+    // fall through to the 16MB upstream payload in the browser - the exact
+    // fetch the mirror exists to avoid.
+    if (mirror && key === "providersV1" && mirror.providersV2) return mirror.providersV2;
+    if (mirror && key === "providersV2" && mirror.providersV1) return mirror.providersV1;
     return fetchJsonWithCache(url, ttl);
   }
 
@@ -2738,7 +2744,10 @@ const MirhollioCore = (() => {
   // the value and the median cannot drift apart the way a figure taken from
   // one source and a median from another would.
   async function applyBandBars() {
-    if (!document.querySelector("[data-bar-median]")) return;
+    // /performance/ draws the bands as bars with a median notch; /ftso/ shows
+    // the secondary band as one metric with the median under it. Run for
+    // either.
+    if (!document.querySelector("[data-bar-median], [data-bar-note]")) return;
     let np;
     try { np = await fetchJsonWithCache("/data/network-position.json", 120_000); } catch (_) { return; }
     const pos = np && np.position;
