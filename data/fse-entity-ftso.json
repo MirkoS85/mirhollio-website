@@ -1,15 +1,21 @@
 {
  "last_6h": {
   "availability": 1,
-  "primary": 0.7436827956989247,
-  "secondary": 0.995766129032258
+  "primary": 0.7435880486515072,
+  "secondary": 0.9957694341618192
  },
  "last_24h": {
   "availability": 1,
-  "primary": 0.7479838709677419,
-  "secondary": 0.9956317204301075
+  "primary": 0.7478522480361023,
+  "secondary": 0.9956209259568778
  },
  "per_reward_epoch": [
+  {
+   "availability": 1,
+   "primary": 0.7530193932411674,
+   "secondary": 0.9953725038402458,
+   "reward_epoch_id": 453
+  },
   {
    "availability": 0.999702380952381,
    "primary": 0.7686251920122887,
@@ -27,12 +33,6 @@
    "primary": 0.7730654761904762,
    "secondary": 0.9916570660522274,
    "reward_epoch_id": 450
-  },
-  {
-   "availability": 0.9997022923489134,
-   "primary": 0.7468428583775893,
-   "secondary": 0.993642501128408,
-   "reward_epoch_id": 449
   }
  ]
 }
