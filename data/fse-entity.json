@@ -8,33 +8,30 @@
     "tx_id": "21DiEiFW9LMS3fgeeS7YQ2R9wqHE4YavZ9gqWRFCdYatKbtTbE"
    }
   ],
-  "signing_policy_address_balance": 2307.21,
+  "signing_policy_address_balance": 2306.03,
   "submit_signatures_address_balance": 3695.5,
-  "submit_address_balance": 3542.84,
+  "submit_address_balance": 3542.83,
   "delegation_address_balance": 5077.95,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
   "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
-  "rewards_signed": 5,
-  "uptime_signed": 5,
+  "rewards_signed": 4,
+  "uptime_signed": 4,
   "voter_registered_event_re": [
    454,
    453,
    452,
-   451,
-   450
+   451
   ],
   "uptime_vote_re": [
    452,
    451,
    450,
-   449,
-   448
+   449
   ],
   "uptime_vote_hash": [
-   "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
    "0x290decd9548b62a8d60345a988386fc84ba6bc95484008f6362f93160ef3e563",
@@ -44,15 +41,13 @@
    452,
    451,
    450,
-   449,
-   448
+   449
   ],
   "rewards_signed_hash": [
    "0xc1fed2d158fb1433d6649eb495955a0bff68c6fb19478b4c6f4fc0d1fadf80a4",
    "0x7ed3244dfb53aa0c7e0252eebbbd8237daac86cde8c96adff2a423db25bd178a",
    "0x909e3ecfd2a351007c87d1826b66c9f4690aa934c67b47bed96aa0cdefc45b02",
-   "0x947439d696118233c2c2e95fed434ef1dc54485888358a052412e0dbfcad29fa",
-   "0x22478a87999e687c57753129f51089d35e8a5b71c676687b7e42c20278a52d12"
+   "0x947439d696118233c2c2e95fed434ef1dc54485888358a052412e0dbfcad29fa"
   ]
  },
  "denormalizedsigningpolicy": {
@@ -60,36 +55,36 @@
   "node_ids": [
    "NodeID-8dNfgpspPNDrZD2ksKCRJoGe4Xqe6qVtz"
   ],
-  "reward_epoch": 453,
-  "staking_weight": 1.1245647999615124e+26,
+  "reward_epoch": 454,
+  "staking_weight": 1.124564799940682e+26,
   "delegation_address": "0xAd9105BEF5E5df2Eacbe2De9037A96695b00cade",
   "delegation_fee_bips": 2000,
-  "w_nat_weight": 2.4120623248281903e+25,
-  "w_nat_capped_weight": 2.4120623248281903e+25,
-  "delegation_rate": 0.0006445437147700154,
-  "weight": 1.3657710324443315e+26,
-  "vote_power": 119164570082802380000,
+  "w_nat_weight": 2.7648332136231503e+25,
+  "w_nat_capped_weight": 2.7648332136231503e+25,
+  "delegation_rate": 0.0007391539630048089,
+  "weight": 1.401048121302997e+26,
+  "vote_power": 119701823348299610000,
   "public_key": "0x0864e7fab9b247f2aa06cc00d8a824e1064090f49938682289737621368a3c4904540a56e641671db6167b8b5bfecd920d0e3e47e80dd3124206757f873b2d0f",
   "submit_signatures_address": "0x7890eeC3139BcfFc95C3ac3e6a0bbf74367B6975",
   "submit_address": "0xeF3fE201f3319B3E576177f5F331708C032a8d3f",
   "signing_policy_address": "0x593E0e7E089054C295f4fC943344aEa52CF499AF",
-  "registration_weight": 119164567458207120000,
-  "normalized_weight": 383
+  "registration_weight": 119701813905895100000,
+  "normalized_weight": 379
  },
  "fast_updates_addresses": [
   {
    "address": "0x8E5254D5299b70Fc5B23C7579fB2DE454E83ba23",
-   "last_used": 1795718658,
+   "last_used": 1795719566,
    "balance": 3946.02
   },
   {
    "address": "0xe83eB8A78888e38A137AEDd267876Cb0dF9CB4DE",
-   "last_used": 1795718509,
+   "last_used": 1795719894,
    "balance": 3946.05
   },
   {
    "address": "0x53E46B1E920d092c130986B99763774792aEe578",
-   "last_used": 1795718797,
+   "last_used": 1795719732,
    "balance": 3946.94
   }
  ],
